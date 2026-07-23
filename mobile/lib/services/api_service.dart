@@ -82,6 +82,23 @@ class ApiService {
     return null;
   }
 
+  /// Crée un espace professionnel (nécessite un jeton). Renvoie l'id créé.
+  Future<int?> creerEspace(Map<String, dynamic> espace) async {
+    final res = await http.post(Uri.parse('$baseUrl/espaces'),
+        headers: _headers, body: jsonEncode(espace));
+    if (res.statusCode == 201) {
+      return (jsonDecode(res.body) as Map<String, dynamic>)['id'] as int?;
+    }
+    return null;
+  }
+
+  /// Publie une offre (produit ou service) sous un espace (nécessite un jeton).
+  Future<bool> publierOffre(Map<String, dynamic> offre) async {
+    final res = await http.post(Uri.parse('$baseUrl/offres'),
+        headers: _headers, body: jsonEncode(offre));
+    return res.statusCode == 201;
+  }
+
   // -------- Données de démonstration (repli hors ligne) --------
   static final List<Categorie> _demoCategories = [
     Categorie(id: 1, nom: 'Restaurants', populaire: true),
@@ -95,11 +112,11 @@ class ApiService {
   ];
 
   static final List<Offre> _demoOffres = [
-    Offre(id: 1, titre: 'Le Baobab Gourmand', categorieNom: 'Restaurant', prix: 7500, espaceNom: 'Le Baobab Gourmand', espaceVerifie: true, noteEspace: 4.8, distanceKm: 0.8),
-    Offre(id: 2, titre: 'Hôtel Téranga', categorieNom: 'Hôtel', prix: 45000, espaceNom: 'Hôtel Téranga', espaceVerifie: true, noteEspace: 4.6, distanceKm: 2.1),
-    Offre(id: 3, titre: 'DépannPro Plomberie', categorieNom: 'Service', prix: 5000, espaceNom: 'DépannPro', espaceVerifie: true, noteEspace: 4.9, distanceKm: 1.4),
-    Offre(id: 4, titre: 'Pharmacie du Plateau', categorieNom: 'Pharmacie', espaceNom: 'Pharmacie du Plateau', espaceVerifie: true, noteEspace: 4.7, distanceKm: 0.9),
-    Offre(id: 5, titre: 'Casino Supermarché', categorieNom: 'Supermarché', espaceNom: 'Casino', noteEspace: 4.3, distanceKm: 0.5),
-    Offre(id: 6, titre: 'Yobanté Transport', categorieNom: 'Transport', prix: 1500, espaceNom: 'Yobanté', espaceVerifie: true, noteEspace: 4.5, distanceKm: 1.1),
+    Offre(id: 1, titre: 'Clinique Pasteur', categorieNom: 'Clinique · Urgence 24/24', espaceNom: 'Clinique Pasteur', espaceVerifie: true, noteEspace: 4.8, nombreAvis: 214, distanceKm: 0.8, ouvert: true, dureeEstimeeMin: 8, telephone: '+221 33 800 00 00'),
+    Offre(id: 2, titre: 'Le Baobab Gourmand', categorieNom: 'Restaurant', prix: 7500, espaceNom: 'Le Baobab Gourmand', espaceVerifie: true, noteEspace: 4.7, nombreAvis: 132, distanceKm: 0.9, ouvert: true, dureeEstimeeMin: 9, telephone: '+221 33 801 00 00'),
+    Offre(id: 3, titre: 'Hôtel Téranga', categorieNom: 'Hôtel · 4★', prix: 45000, espaceNom: 'Hôtel Téranga', espaceVerifie: true, noteEspace: 4.6, nombreAvis: 88, distanceKm: 2.1, ouvert: true, dureeEstimeeMin: 21, telephone: '+221 33 802 00 00'),
+    Offre(id: 4, titre: 'DépannPro Plomberie', categorieNom: 'Service · Urgence', prix: 5000, espaceNom: 'DépannPro', espaceVerifie: true, noteEspace: 4.9, nombreAvis: 57, distanceKm: 1.4, ouvert: true, dureeEstimeeMin: 14, telephone: '+221 77 000 00 00'),
+    Offre(id: 5, titre: 'Casino Supermarché', categorieNom: 'Supermarché', espaceNom: 'Casino', noteEspace: 4.3, nombreAvis: 40, distanceKm: 0.5, ouvert: false, dureeEstimeeMin: 5, telephone: '+221 33 803 00 00'),
+    Offre(id: 6, titre: 'Yobanté Transport', categorieNom: 'Transport', prix: 1500, espaceNom: 'Yobanté', espaceVerifie: true, noteEspace: 4.5, nombreAvis: 31, distanceKm: 1.1, ouvert: true, dureeEstimeeMin: 11, telephone: '+221 78 000 00 00'),
   ];
 }

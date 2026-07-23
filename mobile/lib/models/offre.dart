@@ -9,9 +9,17 @@ class Offre {
   final String? categorieNom;
   final String? espaceNom;
   final bool espaceVerifie;
+  final bool espaceCertifie;
   final double? noteEspace;
+  final int nombreAvis;
   final String? imagePrincipale;
   final double? distanceKm;
+  final bool ouvert;
+  final int? dureeEstimeeMin;
+  final String? telephone;
+  final String? adresseCourte;
+  final double? latitude;
+  final double? longitude;
 
   Offre({
     required this.id,
@@ -23,9 +31,17 @@ class Offre {
     this.categorieNom,
     this.espaceNom,
     this.espaceVerifie = false,
+    this.espaceCertifie = false,
     this.noteEspace,
+    this.nombreAvis = 0,
     this.imagePrincipale,
     this.distanceKm,
+    this.ouvert = false,
+    this.dureeEstimeeMin,
+    this.telephone,
+    this.adresseCourte,
+    this.latitude,
+    this.longitude,
   });
 
   factory Offre.fromJson(Map<String, dynamic> j) => Offre(
@@ -38,8 +54,16 @@ class Offre {
         categorieNom: j['categorieNom'] as String?,
         espaceNom: j['espaceNom'] as String?,
         espaceVerifie: (j['espaceVerifie'] ?? false) as bool,
+        espaceCertifie: (j['espaceCertifie'] ?? false) as bool,
         noteEspace: (j['noteEspace'] as num?)?.toDouble(),
+        nombreAvis: (j['nombreAvis'] ?? 0) as int,
         imagePrincipale: j['imagePrincipale'] as String?,
         distanceKm: (j['distanceKm'] as num?)?.toDouble(),
+        ouvert: (j['ouvert'] ?? false) as bool,
+        dureeEstimeeMin: (j['dureeEstimeeMin'] as num?)?.toInt(),
+        telephone: j['telephone'] as String?,
+        adresseCourte: j['adresseCourte'] as String?,
+        latitude: (j['latitude'] as num?)?.toDouble(),
+        longitude: (j['longitude'] as num?)?.toDouble(),
       );
 }

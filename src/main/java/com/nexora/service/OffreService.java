@@ -1,6 +1,7 @@
 package com.nexora.service;
 
 import com.nexora.dto.OffreDTO;
+import com.nexora.dto.OffreRequest;
 import com.nexora.dto.PageResult;
 import com.nexora.dto.RechercheCriteria;
 
@@ -12,4 +13,7 @@ public interface OffreService {
 
     /** Consulte une offre et incremente son compteur de vues. */
     OffreDTO consulter(Long idOffre);
+
+    /** Publie une nouvelle offre (produit ou service) sous un espace. */
+    OffreDTO publier(OffreRequest req);
 }

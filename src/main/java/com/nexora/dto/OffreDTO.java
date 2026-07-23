@@ -26,7 +26,17 @@ public class OffreDTO implements Serializable {
     private String categorieNom;
     private String espaceNom;
     private boolean espaceVerifie;
+    private boolean espaceCertifie;
     private Double noteEspace;
+    private int nombreAvis;
     private String imagePrincipale;
     private Double distanceKm;
+
+    // --- Champs de la carte de resultat premium ---
+    private boolean ouvert;              // ouvert actuellement (selon horaires)
+    private Integer dureeEstimeeMin;     // temps estime jusqu'au lieu (minutes)
+    private String telephone;            // pour le bouton Appeler
+    private String adresseCourte;        // "Quartier, Ville"
+    private Double latitude;             // pour le bouton Itineraire
+    private Double longitude;
 }

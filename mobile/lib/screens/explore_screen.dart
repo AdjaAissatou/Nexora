@@ -84,7 +84,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   padding: const EdgeInsets.all(16),
                   itemCount: list.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 14),
-                  itemBuilder: (context, i) => _row(list[i]),
+                  itemBuilder: (context, i) => OfferCard(
+                    offre: list[i],
+                    onTap: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => DetailScreen(offre: list[i]))),
+                  ),
                 );
               },
             ),
@@ -94,49 +98,4 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
-  Widget _row(Offre o) => InkWell(
-        onTap: () => Navigator.push(context,
-            MaterialPageRoute(builder: (_) => DetailScreen(offre: o))),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.black.withOpacity(.06)),
-          ),
-          child: Row(children: [
-            Container(
-              width: 96, height: 96,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: const LinearGradient(colors: [Color(0xFF0F766E), Color(0xFF10B981)]),
-              ),
-              child: const Icon(Icons.storefront_outlined, color: Colors.white70, size: 34),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(o.titre, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text('${o.categorieNom ?? ''} · ${o.distanceKm?.toStringAsFixed(1) ?? '—'} km',
-                      style: const TextStyle(color: NexoraColors.text2, fontSize: 12.5)),
-                  const SizedBox(height: 8),
-                  Row(children: [
-                    const Icon(Icons.star_rounded, size: 16, color: NexoraColors.amber),
-                    Text(' ${o.noteEspace?.toStringAsFixed(1) ?? '—'}',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13)),
-                    const Spacer(),
-                    Text(o.prix != null ? 'dès ${o.prix!.toStringAsFixed(0)} F' : 'Voir prix',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600,
-                            color: NexoraColors.emerald700)),
-                  ]),
-                ],
-              ),
-            ),
-          ]),
-        ),
-      );
 }

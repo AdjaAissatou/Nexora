@@ -1,6 +1,8 @@
 package com.nexora.rest;
 
+import com.nexora.common.security.Secured;
 import com.nexora.dto.OffreDTO;
+import com.nexora.dto.OffreRequest;
 import com.nexora.dto.PageResult;
 import com.nexora.dto.RechercheCriteria;
 import com.nexora.service.OffreService;
@@ -64,5 +66,13 @@ public class OffreResource {
     @Path("/{id}")
     public Response consulter(@PathParam("id") Long id) {
         return Response.ok(offreService.consulter(id)).build();
+    }
+
+    /** POST /api/offres : publie une offre (produit ou service). Protege. */
+    @POST
+    @Secured
+    public Response publier(OffreRequest req) {
+        return Response.status(Response.Status.CREATED)
+                .entity(offreService.publier(req)).build();
     }
 }

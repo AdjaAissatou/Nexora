@@ -45,8 +45,28 @@ Recherche multi-critères paginée. Paramètres de requête :
 
 Réponse : `PageResult<OffreDTO>` → `{ contenu:[…], total, page, taillePage }`.
 
+Chaque `OffreDTO` porte désormais les champs de la **carte de résultat premium** :
+`espaceVerifie`, `espaceCertifie`, `noteEspace`, `nombreAvis`, `ouvert`,
+`distanceKm`, `dureeEstimeeMin` (temps estimé, minutes), `telephone`,
+`adresseCourte`, `latitude`, `longitude` (pour l'itinéraire).
+
 ### GET `/offres/{id}`
 Détail d'une offre (incrémente le compteur de vues).
+
+## Espace professionnel (protégé — `Secured`)
+Toute connexion mène à un espace utilisateur ; l'utilisateur peut y créer ses
+espaces professionnels (boutique, service, clinique…) et publier ses offres.
+
+| Méthode | Route | Corps / effet |
+|---|---|---|
+| POST | `/espaces` | Crée un espace pour l'utilisateur connecté (`EspaceRequest`) |
+| GET | `/espaces/mes` | Liste les espaces de l'utilisateur connecté |
+| POST | `/offres` | Publie une offre produit/service (`OffreRequest`, avec attributs EAV) |
+
+`EspaceRequest` : `nomCommercial`, `idTypeEspace`, `telephonePrincipal`,
+`ville`, `quartier`, `latitude`, `longitude`, `logo`…
+`OffreRequest` : `type` (PRODUIT|SERVICE), `titre`, `prix`, `idEspace`,
+`idCategorie`, champs produit/service, et `attributsTexte` (idAttribut → valeur).
 
 ## Administration & modération (protégé — `Secured`)
 

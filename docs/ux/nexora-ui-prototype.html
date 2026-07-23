@@ -205,6 +205,9 @@ a{color:inherit; text-decoration:none;}
 .rrow-body{display:flex; flex-direction:column; gap:7px; min-width:0; padding:4px 4px 4px 0;}
 .rrow-body h3{font-size:17px;}
 .rrow-foot{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.rrow-actions{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
+.rrow-actions .btn{flex:1; min-width:104px;}
+.rrow-actions .ic{width:15px;height:15px;}
 
 /* ============ DETAIL ============ */
 .back-btn{display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14px; color:var(--text-2); margin-bottom:18px;}
@@ -634,7 +637,7 @@ a{color:inherit; text-decoration:none;}
       "ty.resto":"Restaurant","ty.hotel":"Hôtel · 4★","ty.plumb":"Service · Urgence","ty.market":"Supermarché","ty.pharma":"Pharmacie · 24/7","ty.transport":"Transport",
       "ty.service":"Service","ty.grocery":"Épicerie","ty.realestate":"Immobilier",
       "ex.eyebrow":"Recherche","ex.title":"Résultats autour de vous","f.distance":"Distance · 5 km","f.price":"Prix","f.rating":"Note 4+","f.category":"Catégorie","f.open":"Ouvert maintenant",
-      "res.results":"résultats","res.sortedby":"triés par","res.relevance":"pertinence","btn.seecard":"Voir la fiche",
+      "res.results":"résultats","res.sortedby":"triés par","res.relevance":"pertinence","btn.seecard":"Voir la fiche","label.verified":"Vérifié Nexora","btn.itineraire":"Itinéraire","btn.appeler":"Appeler","btn.message":"Message","unit.min":"min",
       "back":"Retour aux résultats","d.open":"Ouvert · ferme à 23h30","d.reviews":"(214 avis)","d.type":"· Restaurant · Cuisine sénégalaise",
       "d.about":"À propos","d.about.text":"Une table chaleureuse au cœur du Plateau, réputée pour son thiéboudienne et ses jus de bissap maison. Cadre élégant, service attentionné, terrasse ouverte le soir. Réservation recommandée le week-end.",
       "d.gallery":"Galerie","d.info":"Informations","d.call":"Appeler","d.hours":"Lun – Dim","d.reviews.title":"Avis récents",
@@ -669,7 +672,7 @@ a{color:inherit; text-decoration:none;}
       "ty.resto":"Restaurant","ty.hotel":"Hotel · 4★","ty.plumb":"Service · Emergency","ty.market":"Supermarket","ty.pharma":"Pharmacy · 24/7","ty.transport":"Transport",
       "ty.service":"Service","ty.grocery":"Grocery","ty.realestate":"Real estate",
       "ex.eyebrow":"Search","ex.title":"Results around you","f.distance":"Distance · 5 km","f.price":"Price","f.rating":"Rating 4+","f.category":"Category","f.open":"Open now",
-      "res.results":"results","res.sortedby":"sorted by","res.relevance":"relevance","btn.seecard":"View listing",
+      "res.results":"results","res.sortedby":"sorted by","res.relevance":"relevance","btn.seecard":"View listing","label.verified":"Verified by Nexora","btn.itineraire":"Directions","btn.appeler":"Call","btn.message":"Message","unit.min":"min",
       "back":"Back to results","d.open":"Open · closes at 11:30 PM","d.reviews":"(214 reviews)","d.type":"· Restaurant · Senegalese cuisine",
       "d.about":"About","d.about.text":"A warm table in the heart of Plateau, known for its thieboudienne and homemade bissap juices. Elegant setting, attentive service, terrace open in the evening. Booking recommended on weekends.",
       "d.gallery":"Gallery","d.info":"Information","d.call":"Call","d.hours":"Mon – Sun","d.reviews.title":"Recent reviews",
@@ -742,11 +745,21 @@ a{color:inherit; text-decoration:none;}
     var list=offers.concat(offers.slice(0,2));
     document.getElementById("resCount").innerHTML='<b>128</b> '+t("res.results")+' · '+t("res.sortedby")+' <b>'+t("res.relevance")+'</b>';
     document.getElementById("rlist").innerHTML=list.map(function(o){
-      var open=o[8]?'<span class="pill pill-open"><span class="dot dot-open"></span>'+t("badge.open")+'</span>':'';
-      var cta=o[9]?t("btn.book"):t("btn.seecard");
-      return '<article class="rrow" data-goto="detail"><div class="rrow-media '+o[7]+'">'+icon(o[0])+'</div><div class="rrow-body"><h3>'+o[1]+'</h3>'+
-        '<div class="meta">'+t(o[2])+' · '+icon("ic-pin")+fmt(o[3])+' km</div><div style="display:flex;gap:12px;align-items:center">'+stars(o[4])+open+'</div>'+
-        '<div class="rrow-foot"><span class="price">'+priceHtml(o[5],o[6])+'</span><button class="btn btn-primary btn-sm">'+cta+'</button></div></div></article>';
+      var eta=Math.round(o[3]*10);
+      var openPill=o[8]?'<span class="pill pill-open"><span class="dot dot-open"></span>'+t("badge.open")+'</span>':'<span class="pill" style="background:var(--surface-2);color:var(--text-3)"><span class="dot dot-closed"></span>'+t("badge.closed")+'</span>';
+      var verified='<span class="pill pill-open">'+icon("ic-check")+t("label.verified")+'</span>';
+      return '<article class="rrow"><div class="rrow-media '+o[7]+'" data-goto="detail">'+icon(o[0])+'</div><div class="rrow-body">'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h3 data-goto="detail" style="cursor:pointer">'+o[1]+'</h3>'+verified+'</div>'+
+        '<div class="meta">'+t(o[2])+'</div>'+
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+stars(o[4])+openPill+
+          '<span class="meta">'+icon("ic-pin")+fmt(o[3])+' km</span>'+
+          '<span class="meta">'+icon("ic-clock")+eta+' '+t("unit.min")+'</span>'+
+          '<span class="price" style="margin-left:auto">'+priceHtml(o[5],o[6])+'</span></div>'+
+        '<div class="rrow-actions">'+
+          '<button class="btn btn-outline btn-sm">'+icon("ic-compass")+t("btn.itineraire")+'</button>'+
+          '<button class="btn btn-outline btn-sm">'+icon("ic-phone")+t("btn.appeler")+'</button>'+
+          '<button class="btn btn-primary btn-sm" data-goto="messages">'+icon("ic-chat")+t("btn.message")+'</button>'+
+        '</div></div></article>';
     }).join("");
   }
 

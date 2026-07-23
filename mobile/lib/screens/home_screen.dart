@@ -170,16 +170,15 @@ class _HomeScreenState extends State<HomeScreen> {
           final offres = snap.data!;
           return SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 260, mainAxisSpacing: 16, crossAxisSpacing: 16,
-                childAspectRatio: .78,
-              ),
+            sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, i) => OfferCard(
-                  offre: offres[i],
-                  onTap: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => DetailScreen(offre: offres[i]))),
+                (context, i) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: OfferCard(
+                    offre: offres[i],
+                    onTap: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => DetailScreen(offre: offres[i]))),
+                  ),
                 ),
                 childCount: offres.length,
               ),
