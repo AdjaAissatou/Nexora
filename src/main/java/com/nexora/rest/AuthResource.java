@@ -1,0 +1,49 @@
+package com.nexora.rest;
+
+import com.nexora.common.security.JwtService;
+import com.nexora.domain.user.Utilisateur;
+import com.nexora.dto.auth.AuthResponse;
+import com.nexora.dto.auth.LoginRequest;
+import com.nexora.dto.auth.RegisterRequest;
+import com.nexora.service.AuthService;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+/**
+ * Ressource REST d'authentification consommee par le web et le mobile Flutter.
+ * Renvoie un jeton JWT a l'inscription et a la connexion.
+ */
+@Path("/auth")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class AuthResource {
+
+    @Inject
+    private AuthService authService;
+
+    @Inject
+    private JwtService jwtService;
+
+    /** POST /api/auth/register */
+    @POST
+    @Path("/register")
+    public Response register(RegisterRequest req) {
+        Utilisateur u = authService.inscrire(req.getNom(), req.getPrenom(), req.getEmail(),
+                req.getTelephone(), req.getMotDePasse());
+        String token = jwtService.generateToken(u);
+        return Response.status(Response.Status.CREATED)
+                .entity(new AuthResponse(token, jwtService.getExpiresInSeconds(), u))
+                .build();
+    }
+
+    /** POST /api/auth/login */
+    @POST
+    @Path("/login")
+    public Response login(LoginRequest req) {
+        Utilisateur u = authService.connecter(req.getEmail(), req.getMotDePasse());
+        String token = jwtService.generateToken(u);
+        return Response.ok(new AuthResponse(token, jwtService.getExpiresInSeconds(), u)).build();
+    }
+}
