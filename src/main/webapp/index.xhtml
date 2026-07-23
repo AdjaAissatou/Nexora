@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="primefaces">
+<h:head>
+    <title>Nexora - Recherche intelligente</title>
+    <h:outputStylesheet name="css/nexora.css"/>
+</h:head>
+<h:body>
+    <div class="nx-header">
+        <h1>Nexora</h1>
+        <span>Trouvez instantanement un produit, un service ou un professionnel</span>
+    </div>
+
+    <h:form id="form">
+        <div class="nx-searchbar">
+            <p:inputText value="#{rechercheBean.criteria.motCle}"
+                         placeholder="Que recherchez-vous ? (ex: ordinateur, plombier, restaurant...)"
+                         styleClass="nx-search-input"/>
+            <p:commandButton value="Rechercher" action="#{rechercheBean.rechercher}"
+                             update="resultats" icon="pi pi-search"/>
+        </div>
+
+        <div class="nx-layout">
+            <p:panel header="Filtres" styleClass="nx-filters">
+                <h:panelGrid columns="1" cellpadding="4">
+                    <p:outputLabel value="Prix maximum"/>
+                    <p:inputNumber value="#{rechercheBean.criteria.prixMax}" symbol=" XOF" symbolPosition="s"/>
+
+                    <p:outputLabel value="Note minimale"/>
+                    <p:rating value="#{rechercheBean.criteria.noteMin}" stars="5"/>
+
+                    <p:outputLabel value="Ville"/>
+                    <p:inputText value="#{rechercheBean.criteria.ville}"/>
+
+                    <p:selectBooleanCheckbox value="#{rechercheBean.criteria.professionnelVerifie}"/>
+                    <p:outputLabel value="Vendeur verifie uniquement"/>
+
+                    <p:selectBooleanCheckbox value="#{rechercheBean.criteria.enPromotion}"/>
+                    <p:outputLabel value="En promotion"/>
+
+                    <p:outputLabel value="Trier par"/>
+                    <p:selectOneMenu value="#{rechercheBean.criteria.tri}">
+                        <f:selectItems value="#{rechercheBean.optionsTri}"/>
+                    </p:selectOneMenu>
+
+                    <p:commandButton value="Appliquer" action="#{rechercheBean.rechercher}"
+                                     update="resultats" styleClass="nx-btn-block"/>
+                    <p:commandButton value="Reinitialiser" action="#{rechercheBean.reinitialiser}"
+                                     update="@form" styleClass="nx-btn-block ui-button-secondary"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:outputPanel id="resultats" styleClass="nx-results">
+                <p:outputPanel rendered="#{rechercheBean.total gt 0}">
+                    <h3>#{rechercheBean.total} resultat(s)</h3>
+                </p:outputPanel>
+
+                <p:dataGrid value="#{rechercheBean.resultats}" var="offre"
+                            columns="3" layout="grid" emptyMessage="Aucune offre trouvee.">
+                    <p:card styleClass="nx-card">
+                        <f:facet name="title">#{offre.titre}</f:facet>
+                        <f:facet name="subtitle">
+                            <span>#{offre.espaceNom}</span>
+                            <p:tag value="Verifie" severity="success" rendered="#{offre.espaceVerifie}"/>
+                        </f:facet>
+                        <p:graphicImage value="#{offre.imagePrincipale}" width="100%"
+                                        rendered="#{not empty offre.imagePrincipale}"/>
+                        <p class="nx-price">#{offre.prix} XOF</p>
+                        <p class="nx-cat">#{offre.categorieNom}</p>
+                        <p:outputPanel rendered="#{not empty offre.distanceKm}">
+                            <i class="pi pi-map-marker"></i>
+                            <h:outputText value="#{offre.distanceKm}">
+                                <f:convertNumber maxFractionDigits="1"/>
+                            </h:outputText> km
+                        </p:outputPanel>
+                    </p:card>
+                </p:dataGrid>
+            </p:outputPanel>
+        </div>
+    </h:form>
+</h:body>
+</html>

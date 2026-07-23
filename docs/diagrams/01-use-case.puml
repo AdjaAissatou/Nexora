@@ -1,0 +1,60 @@
+@startuml nexora-use-case
+left to right direction
+skinparam packageStyle rectangle
+title Nexora - Diagramme de cas d'utilisation (vue synthetique)
+
+actor Visiteur
+actor Client
+actor Professionnel
+actor Livreur
+actor Moderateur
+actor "Gestionnaire financier" as Finance
+actor Administrateur
+
+Client --|> Visiteur
+Professionnel --|> Client
+
+rectangle Nexora {
+  usecase "Rechercher offre/service" as UC_SEARCH
+  usecase "Consulter une offre" as UC_VIEW
+  usecase "Geolocaliser / filtrer par distance" as UC_GEO
+  usecase "S'inscrire / se connecter" as UC_AUTH
+  usecase "Gerer favoris" as UC_FAV
+  usecase "Discuter (messagerie/appel)" as UC_CHAT
+  usecase "Passer une commande" as UC_ORDER
+  usecase "Payer (wallet/escrow)" as UC_PAY
+  usecase "Deposer un avis" as UC_REVIEW
+  usecase "Gerer espace professionnel" as UC_SPACE
+  usecase "Publier une offre" as UC_PUBLISH
+  usecase "Gerer promotions" as UC_PROMO
+  usecase "Assurer une livraison" as UC_DELIVER
+  usecase "Moderer / valider pro" as UC_MOD
+  usecase "Arbitrer un litige" as UC_LITIGE
+  usecase "Consulter rapports financiers" as UC_FIN
+  usecase "Administrer la plateforme" as UC_ADMIN
+}
+
+Visiteur --> UC_SEARCH
+Visiteur --> UC_VIEW
+Visiteur --> UC_GEO
+Visiteur --> UC_AUTH
+
+Client --> UC_FAV
+Client --> UC_CHAT
+Client --> UC_ORDER
+Client --> UC_PAY
+Client --> UC_REVIEW
+
+Professionnel --> UC_SPACE
+Professionnel --> UC_PUBLISH
+Professionnel --> UC_PROMO
+
+Livreur --> UC_DELIVER
+Moderateur --> UC_MOD
+Moderateur --> UC_LITIGE
+Finance --> UC_FIN
+Administrateur --> UC_ADMIN
+
+UC_ORDER ..> UC_PAY : <<include>>
+UC_SEARCH ..> UC_GEO : <<extend>>
+@enduml

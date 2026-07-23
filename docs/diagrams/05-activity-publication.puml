@@ -1,0 +1,27 @@
+@startuml nexora-activity-publication
+title Nexora - Diagramme d'activites : publication et validation d'une offre
+start
+:Professionnel cree une offre;
+:Choisir la categorie;
+note right: charge dynamiquement\nles Attribut de la categorie (EAV)
+:Saisir titre, prix, description, images;
+:Renseigner les attributs dynamiques;
+if (Attributs obligatoires remplis ?) then (non)
+  :Afficher erreurs de validation;
+  stop
+else (oui)
+  :Enregistrer (statut = EN_ATTENTE_VALIDATION);
+endif
+:Notifier un moderateur;
+if (Controle qualite OK ?) then (non)
+  :Statut = SUSPENDUE + motif;
+  :Notifier le professionnel;
+  stop
+else (oui)
+  :Statut = PUBLIEE;
+  :Indexer pour la recherche;
+  :Notifier le professionnel;
+endif
+:Offre visible et recherchable;
+stop
+@enduml

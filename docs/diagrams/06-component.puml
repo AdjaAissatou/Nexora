@@ -1,0 +1,38 @@
+@startuml nexora-component
+title Nexora - Diagramme de composants
+skinparam componentStyle rectangle
+
+package "Client" {
+  [Navigateur Web] as Web
+  [Application Android/iOS] as Mobile
+}
+
+package "Serveur d'application (Apache TomEE)" {
+  [JSF + PrimeFaces\n(Presentation Web)] as JSF
+  [ManagedBeans\n(Controleurs MVC2)] as MB
+  [API REST (JAX-RS)] as REST
+  [Services (EJB)] as SVC
+  [DAO / Repository] as DAO
+  [Securite (BCrypt / RBAC)] as SEC
+}
+
+database "PostgreSQL" as PG
+cloud "Services externes" {
+  [Passerelle paiement] as PAY
+  [Cartographie\n(Google Maps/OSM)] as MAP
+  [Push / SMS / Email] as NOTIF
+}
+
+Web --> JSF : HTTPS
+Mobile --> REST : HTTPS/JSON
+JSF --> MB
+MB --> SVC
+REST --> SVC
+SVC --> DAO
+SVC --> SEC
+DAO --> PG
+SVC --> PAY
+SVC --> NOTIF
+JSF --> MAP
+Mobile --> MAP
+@enduml

@@ -1,0 +1,39 @@
+@startuml nexora-deployment
+title Nexora - Diagramme de deploiement
+skinparam node {
+  BackgroundColor #F5F7FA
+}
+
+node "Poste client" {
+  artifact "Navigateur web" as browser
+}
+node "Terminal mobile" {
+  artifact "App Android/iOS" as app
+}
+
+cloud "Internet / HTTPS" as net
+
+node "Reverse proxy\n(Nginx)" as proxy
+
+node "Serveur applicatif\nApache TomEE" as tomee {
+  artifact "nexora.war" as war
+}
+
+node "Serveur base de donnees" as dbnode {
+  database "PostgreSQL" as pg
+}
+
+node "Stockage objet\n(images/videos)" as storage
+
+browser --> net
+app --> net
+net --> proxy
+proxy --> tomee : AJP/HTTP
+war --> pg : JDBC (datasource JTA)
+war --> storage : URLs medias
+
+note right of war
+  Datasource : java:app/jdbc/nexoraDS
+  Persistence unit : nexoraPU (JTA)
+end note
+@enduml

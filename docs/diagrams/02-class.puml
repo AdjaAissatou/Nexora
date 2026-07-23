@@ -1,0 +1,106 @@
+@startuml nexora-class
+title Nexora - Diagramme de classes (domaine, vue simplifiee)
+skinparam classAttributeIconSize 0
+hide methods
+
+abstract class BaseEntity {
+  createdAt : LocalDateTime
+  updatedAt : LocalDateTime
+  actif : boolean
+  createdBy : String
+}
+
+class Utilisateur { email; motDePasse; genre }
+class Profile { libelle }
+class Role { libelle }
+class Permission { libelle }
+
+class EspaceProfessionnel { nomCommercial; verifie; certifie; noteMoyenne }
+class Adresse { pays; ville; latitude; longitude }
+class Horaire { jourSemaine; heureOuverture; heureFermeture }
+class Certification { nom; valide }
+class CategorieEspace { nom; slug }
+class TypeEspaceProfessionnel { code; libelle }
+
+class Offre { titre; prix; statut; scorePertinence }
+class Produit { stock; neuf; marque }
+class ServicePro { typeService; tarif }
+class CategorieOffre { nom; slug; niveau }
+class TypeOffre { libelle }
+class TypeCategorie { code }
+class Image { url; principale }
+
+class Attribut { nom; filtrable; obligatoire }
+class ValeurAttributPossible { valeur }
+class OffreAttribut { valeurTexte; valeurNombre }
+class Typechamp { code }
+
+class Avis { note; commentaire }
+class Favori { dateFavori }
+class Conversation { dernierMessage }
+class Message { contenu; lu }
+class Appel { typeAppel; statut }
+class Notification { contenu; lu }
+
+class Commande { numeroCommande; statutCommande; total }
+class LigneCommande { quantite; prixUnitaire }
+class Panier
+class LignePanier { quantite }
+class Livraison { transporteur; statutLivraison }
+class Paiement { montant; devise }
+class Wallet { soldeDisponible; soldeBloque }
+class Escrow { montantBlocage; statut }
+class Promotion { codePromo }
+class Litige { motif; statut }
+
+BaseEntity <|-- Utilisateur
+BaseEntity <|-- EspaceProfessionnel
+BaseEntity <|-- Offre
+BaseEntity <|-- Avis
+BaseEntity <|-- CategorieOffre
+Offre <|-- Produit
+Offre <|-- ServicePro
+
+Utilisateur "*" --> "1" Profile
+Profile "*" --> "*" Role
+Role "*" --> "*" Permission
+Utilisateur "1" --> "1" Wallet
+Utilisateur "1" --> "1" Panier
+
+EspaceProfessionnel "1" --> "*" Adresse
+EspaceProfessionnel "1" --> "*" Horaire
+EspaceProfessionnel "1" --> "*" Certification
+EspaceProfessionnel "*" --> "1" TypeEspaceProfessionnel
+EspaceProfessionnel "*" --> "1" CategorieEspace
+EspaceProfessionnel "1" --> "*" Offre
+
+Offre "*" --> "1" CategorieOffre
+Offre "*" --> "1" TypeOffre
+Offre "1" --> "*" Image
+Offre "1" --> "*" OffreAttribut
+Offre "1" --> "*" Avis
+CategorieOffre "*" --> "1" TypeCategorie
+CategorieOffre "1" --> "*" Attribut
+CategorieOffre --> CategorieOffre : parent
+
+Attribut "*" --> "1" Typechamp
+Attribut "1" --> "*" ValeurAttributPossible
+OffreAttribut "*" --> "1" Attribut
+OffreAttribut "*" --> "0..1" ValeurAttributPossible
+
+Utilisateur "1" --> "*" Avis
+Utilisateur "1" --> "*" Favori
+Favori "*" --> "1" Offre
+Conversation "1" --> "*" Message
+Conversation "1" --> "*" Appel
+Utilisateur "1" --> "*" Notification
+
+Commande "1" --> "*" LigneCommande
+LigneCommande "*" --> "1" Offre
+Commande "1" --> "1" Livraison
+Commande "1" --> "1" Paiement
+Commande "1" --> "0..1" Escrow
+Commande "1" --> "0..1" Litige
+Panier "1" --> "*" LignePanier
+Wallet "1" --> "*" Transaction
+@enduml

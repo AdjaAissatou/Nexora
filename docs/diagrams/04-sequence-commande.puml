@@ -1,0 +1,27 @@
+@startuml nexora-seq-commande
+title Nexora - Sequence : commande, paiement et escrow
+actor Client
+participant "CommandeService" as CS
+participant "PaiementService" as PS
+participant "WalletService" as WS
+participant "EscrowService" as ES
+participant Professionnel
+
+Client -> CS : validerPanier(panier)
+CS -> CS : creer Commande + LigneCommande\n(statut = EN_ATTENTE)
+CS -> PS : initierPaiement(commande)
+PS -> WS : debiter(client, montant)
+WS --> PS : OK
+PS -> ES : bloquerFonds(commande)  // escrow
+ES --> PS : Escrow(statut = BLOQUE)
+PS --> CS : Paiement(statut = REGLE)
+CS -> CS : statut = CONFIRMEE\n+ HistoriqueStatutCommande
+CS -> Professionnel : notification "Nouvelle commande"
+Professionnel -> CS : livrer / realiser prestation
+Client -> CS : confirmationClient = true
+CS -> ES : libererFonds(commande)
+ES -> WS : crediter(professionnel, montantVendeur)
+ES -> WS : crediter(plateforme, commission)
+ES --> CS : Escrow(statut = LIBERE)
+CS --> Client : statut = LIVREE / TERMINEE
+@enduml
