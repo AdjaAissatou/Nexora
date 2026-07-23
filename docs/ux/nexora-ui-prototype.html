@@ -21,124 +21,88 @@
   --shadow-lg:0 24px 60px -20px rgba(16,40,34,.28);
   --shadow-emerald:0 14px 30px -12px rgba(5,150,105,.45);
   --r-lg:22px; --r-md:16px; --r-sm:12px; --r-pill:999px;
-  --sidebar:270px;
-  --ease:cubic-bezier(.22,.61,.36,1);
+  --sidebar:270px; --ease:cubic-bezier(.22,.61,.36,1);
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --bg:#0A0F1C; --surface:#0E1626; --surface-2:#131D30; --surface-3:#1B283F;
-    --card:#0F1A2B;
+    --bg:#0A0F1C; --surface:#0E1626; --surface-2:#131D30; --surface-3:#1B283F; --card:#0F1A2B;
     --text:#F1F5F9; --text-2:#A9B6C9; --text-3:#6B7A90;
-    --border:rgba(255,255,255,.08); --border-2:rgba(255,255,255,.14);
-    --glass:rgba(16,24,38,.66);
-    --emerald-50:rgba(16,185,129,.12); --emerald-100:rgba(16,185,129,.18);
-    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
-    --shadow-md:0 10px 30px -12px rgba(0,0,0,.6);
-    --shadow-lg:0 30px 70px -24px rgba(0,0,0,.7);
+    --border:rgba(255,255,255,.08); --border-2:rgba(255,255,255,.14); --glass:rgba(16,24,38,.66);
+    --emerald-50:rgba(16,185,129,.12); --emerald-100:rgba(16,185,129,.20);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 10px 30px -12px rgba(0,0,0,.6); --shadow-lg:0 30px 70px -24px rgba(0,0,0,.7);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0A0F1C; --surface:#0E1626; --surface-2:#131D30; --surface-3:#1B283F;
-  --card:#0F1A2B; --text:#F1F5F9; --text-2:#A9B6C9; --text-3:#6B7A90;
-  --border:rgba(255,255,255,.08); --border-2:rgba(255,255,255,.14);
-  --glass:rgba(16,24,38,.66); --emerald-50:rgba(16,185,129,.12); --emerald-100:rgba(16,185,129,.18);
+  --bg:#0A0F1C; --surface:#0E1626; --surface-2:#131D30; --surface-3:#1B283F; --card:#0F1A2B;
+  --text:#F1F5F9; --text-2:#A9B6C9; --text-3:#6B7A90;
+  --border:rgba(255,255,255,.08); --border-2:rgba(255,255,255,.14); --glass:rgba(16,24,38,.66);
+  --emerald-50:rgba(16,185,129,.12); --emerald-100:rgba(16,185,129,.20);
   --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 10px 30px -12px rgba(0,0,0,.6); --shadow-lg:0 30px 70px -24px rgba(0,0,0,.7);
 }
 :root[data-theme="light"]{
-  --bg:#FFFFFF; --surface:#F8FAFC; --surface-2:#F1F5F9; --surface-3:#E9EEF5;
-  --card:#FFFFFF; --text:#0F172A; --text-2:#475569; --text-3:#94A3B8;
+  --bg:#FFFFFF; --surface:#F8FAFC; --surface-2:#F1F5F9; --surface-3:#E9EEF5; --card:#FFFFFF;
+  --text:#0F172A; --text-2:#475569; --text-3:#94A3B8;
   --border:rgba(15,23,42,.08); --border-2:rgba(15,23,42,.12); --glass:rgba(255,255,255,.72);
   --emerald-50:#ECFDF5; --emerald-100:#D1FAE5;
 }
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
-body{
-  font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  background:var(--bg); color:var(--text);
-  -webkit-font-smoothing:antialiased; line-height:1.5; font-size:15px;
-}
+body{font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.5; font-size:15px;}
 h1,h2,h3,h4{margin:0; font-weight:600; letter-spacing:-.02em; text-wrap:balance;}
 p{margin:0;}
 button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
 a{color:inherit; text-decoration:none;}
 .ic{width:20px; height:20px; stroke:currentColor; stroke-width:1.75; fill:none; stroke-linecap:round; stroke-linejoin:round; flex:none;}
 .eyebrow{font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--emerald-600);}
+.tnum{font-variant-numeric:tabular-nums;}
 ::-webkit-scrollbar{width:10px; height:10px;}
 ::-webkit-scrollbar-thumb{background:var(--border-2); border-radius:99px; border:3px solid transparent; background-clip:content-box;}
 
 /* ============ APP SHELL ============ */
 .app{display:grid; grid-template-columns:var(--sidebar) 1fr; min-height:100vh;}
-
-/* Sidebar */
-.sidebar{
-  position:sticky; top:0; height:100vh; padding:22px 16px;
-  border-right:1px solid var(--border); background:var(--bg);
-  display:flex; flex-direction:column; gap:6px;
-}
-.brand{display:flex; align-items:center; gap:11px; padding:6px 8px 18px;}
+.sidebar{position:sticky; top:0; height:100vh; padding:22px 16px; border-right:1px solid var(--border); background:var(--bg); display:flex; flex-direction:column; gap:5px; overflow-y:auto;}
+.brand{display:flex; align-items:center; gap:11px; padding:6px 8px 16px;}
 .brand-mark{width:40px; height:40px; flex:none;}
 .brand-name{font-weight:700; font-size:20px; letter-spacing:-.03em;}
 .brand-name b{color:var(--emerald-600);}
 .nav-label{font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-3); padding:14px 12px 6px;}
-.nav-item{
-  display:flex; align-items:center; gap:13px; padding:11px 12px; border-radius:var(--r-sm);
-  color:var(--text-2); font-weight:500; font-size:14.5px; transition:.18s var(--ease);
-  position:relative; width:100%; text-align:left;
-}
+.nav-item{display:flex; align-items:center; gap:13px; padding:11px 12px; border-radius:var(--r-sm); color:var(--text-2); font-weight:500; font-size:14.5px; transition:.18s var(--ease); width:100%; text-align:left;}
 .nav-item:hover{background:var(--surface-2); color:var(--text);}
 .nav-item.active{background:var(--emerald-50); color:var(--emerald-700);}
 .nav-item.active .ic{stroke:var(--emerald-600);}
 .nav-item .badge{margin-left:auto; background:var(--emerald); color:#fff; font-size:11px; font-weight:600; min-width:20px; height:20px; padding:0 6px; border-radius:99px; display:grid; place-items:center;}
-.side-pro{
-  margin-top:auto; padding:16px; border-radius:var(--r-md);
-  background:linear-gradient(150deg,var(--nuit),#0f2560); color:#fff; position:relative; overflow:hidden;
-}
+.side-pro{margin-top:auto; padding:16px; border-radius:var(--r-md); background:linear-gradient(150deg,var(--nuit),#0f2560); color:#fff; position:relative; overflow:hidden;}
 .side-pro::after{content:""; position:absolute; right:-30px; bottom:-30px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(16,185,129,.5),transparent 70%);}
 .side-pro h4{font-size:15px; margin-bottom:4px;}
 .side-pro p{font-size:12.5px; color:rgba(255,255,255,.72); margin-bottom:12px;}
 .side-pro .btn-pro{background:var(--emerald); color:#fff; font-weight:600; font-size:13px; padding:9px 14px; border-radius:var(--r-pill); width:100%;}
 
-/* Main + topbar */
 .main{min-width:0; display:flex; flex-direction:column;}
-.topbar{
-  position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:14px;
-  padding:14px 30px; background:var(--glass); backdrop-filter:saturate(180%) blur(16px);
-  border-bottom:1px solid var(--border);
-}
+.topbar{position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:14px; padding:14px 30px; background:var(--glass); backdrop-filter:saturate(180%) blur(16px); border-bottom:1px solid var(--border);}
 .loc-chip{display:flex; align-items:center; gap:8px; padding:9px 14px; border-radius:var(--r-pill); background:var(--surface-2); font-size:13.5px; font-weight:500; color:var(--text-2);}
 .loc-chip .ic{width:17px; height:17px; stroke:var(--emerald-600);}
 .loc-chip b{color:var(--text); font-weight:600;}
-.top-search{flex:1; max-width:520px; display:flex; align-items:center; gap:10px; padding:10px 16px; background:var(--surface-2); border:1px solid transparent; border-radius:var(--r-pill); color:var(--text-3); transition:.2s;}
+.top-search{flex:1; max-width:480px; display:flex; align-items:center; gap:10px; padding:10px 16px; background:var(--surface-2); border:1px solid transparent; border-radius:var(--r-pill); color:var(--text-3); transition:.2s;}
 .top-search:focus-within{border-color:var(--emerald); background:var(--card); box-shadow:0 0 0 4px var(--emerald-50);}
 .top-search input{border:none; background:none; outline:none; flex:1; font:inherit; font-size:14px; color:var(--text);}
 .top-actions{margin-left:auto; display:flex; align-items:center; gap:8px;}
-.icon-btn{width:42px; height:42px; border-radius:var(--r-pill); display:grid; place-items:center; color:var(--text-2); background:var(--surface-2); transition:.18s var(--ease);}
+.icon-btn{height:42px; min-width:42px; padding:0 12px; border-radius:var(--r-pill); display:inline-flex; gap:7px; align-items:center; justify-content:center; color:var(--text-2); background:var(--surface-2); transition:.18s var(--ease); font-weight:600; font-size:13px;}
 .icon-btn:hover{background:var(--surface-3); color:var(--text); transform:translateY(-1px);}
-.avatar{width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--emerald),var(--nuit)); color:#fff; display:grid; place-items:center; font-weight:600; font-size:15px;}
+.icon-btn .ic{width:19px; height:19px;}
+.avatar{width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,var(--emerald),var(--nuit)); color:#fff; display:grid; place-items:center; font-weight:600; font-size:15px; flex:none;}
 
 .view{padding:30px; max-width:1240px; width:100%; margin:0 auto;}
 .view[hidden]{display:none;}
 
 /* ============ HERO ============ */
-.hero{
-  position:relative; border-radius:var(--r-lg); overflow:hidden; padding:56px 48px 46px;
-  background:
-    radial-gradient(1000px 340px at 82% -10%, rgba(16,185,129,.20), transparent 60%),
-    radial-gradient(700px 300px at 0% 120%, rgba(30,58,138,.16), transparent 60%),
-    var(--surface);
-  border:1px solid var(--border); box-shadow:var(--shadow-md);
-}
+.hero{position:relative; border-radius:var(--r-lg); overflow:hidden; padding:56px 48px 46px; background:radial-gradient(1000px 340px at 82% -10%, rgba(16,185,129,.20), transparent 60%),radial-gradient(700px 300px at 0% 120%, rgba(30,58,138,.16), transparent 60%),var(--surface); border:1px solid var(--border); box-shadow:var(--shadow-md);}
 .hero::before{content:""; position:absolute; inset:0; background-image:radial-gradient(var(--border) 1px, transparent 1px); background-size:22px 22px; opacity:.5; -webkit-mask-image:linear-gradient(180deg,transparent,#000,transparent);}
 .hero-inner{position:relative; max-width:660px;}
-.hero h1{font-size:clamp(30px,4.2vw,46px); line-height:1.08; font-weight:700;}
+.hero h1{font-size:clamp(30px,4.2vw,46px); line-height:1.08; font-weight:700; margin-top:12px;}
 .hero h1 .accent{color:var(--emerald-600);}
 .hero .lead{color:var(--text-2); font-size:17px; margin-top:14px; max-width:520px;}
-.searchbar{
-  margin-top:26px; display:flex; align-items:center; gap:8px; padding:8px 8px 8px 18px;
-  background:var(--card); border:1px solid var(--border); border-radius:var(--r-pill);
-  box-shadow:var(--shadow-lg); max-width:600px;
-}
+.searchbar{margin-top:26px; display:flex; align-items:center; gap:8px; padding:8px 8px 8px 18px; background:var(--card); border:1px solid var(--border); border-radius:var(--r-pill); box-shadow:var(--shadow-lg); max-width:600px;}
 .searchbar .ic{stroke:var(--text-3);}
 .searchbar input{flex:1; border:none; outline:none; background:none; font:inherit; font-size:15.5px; color:var(--text); min-width:0;}
 .searchbar input::placeholder{color:var(--text-3);}
@@ -159,39 +123,28 @@ a{color:inherit; text-decoration:none;}
 .sec-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:18px; gap:16px;}
 .sec-head h2{font-size:23px;}
 .sec-head p{color:var(--text-2); font-size:14px; margin-top:3px;}
-.link-more{color:var(--emerald-700); font-weight:600; font-size:14px; display:inline-flex; align-items:center; gap:5px;}
+.link-more{color:var(--emerald-700); font-weight:600; font-size:14px; display:inline-flex; align-items:center; gap:5px; cursor:pointer;}
 .link-more:hover{gap:9px;}
 
-/* Categories */
 .cat-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;}
-.cat{
-  display:flex; flex-direction:column; gap:12px; padding:18px; border-radius:var(--r-md);
-  background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow-sm);
-  transition:transform .22s var(--ease), box-shadow .22s, border-color .22s; text-align:left;
-}
+.cat{display:flex; flex-direction:column; gap:12px; padding:18px; border-radius:var(--r-md); background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow-sm); transition:transform .22s var(--ease), box-shadow .22s, border-color .22s; text-align:left;}
 .cat:hover{transform:translateY(-5px); box-shadow:var(--shadow-md); border-color:var(--emerald-100);}
 .cat-ic{width:50px; height:50px; border-radius:14px; display:grid; place-items:center; background:var(--emerald-50); color:var(--emerald-700);}
 .cat-ic .ic{width:25px; height:25px; stroke-width:1.6;}
 .cat h3{font-size:15.5px;}
 .cat span{font-size:12.5px; color:var(--text-3);}
 
-/* Offer cards */
 .cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px;}
-.card{
-  background:var(--card); border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden;
-  box-shadow:var(--shadow-sm); transition:transform .24s var(--ease), box-shadow .24s; display:flex; flex-direction:column;
-}
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow-sm); transition:transform .24s var(--ease), box-shadow .24s; display:flex; flex-direction:column;}
 .card:hover{transform:translateY(-6px); box-shadow:var(--shadow-lg);}
 .card-media{position:relative; height:170px; display:grid; place-items:center;}
-.card-media .glyph{width:54px; height:54px; color:#fff; opacity:.9;}
-.card-media .glyph .ic{width:54px; height:54px; stroke-width:1.4;}
+.card-media .glyph .ic{width:54px; height:54px; stroke-width:1.4; color:#fff; opacity:.9;}
 .badge-open{position:absolute; left:12px; top:12px; display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; padding:6px 11px; border-radius:var(--r-pill); background:var(--glass); backdrop-filter:blur(8px); color:var(--text);}
 .dot{width:7px; height:7px; border-radius:50%;}
 .dot-open{background:var(--emerald); box-shadow:0 0 0 3px var(--emerald-50);}
 .dot-closed{background:var(--text-3);}
 .fav{position:absolute; right:12px; top:12px; width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:var(--glass); backdrop-filter:blur(8px); color:var(--text); transition:.18s var(--ease);}
 .fav:hover{transform:scale(1.1);}
-.fav.on{color:var(--danger);}
 .fav.on .ic{fill:var(--danger); stroke:var(--danger);}
 .fav.pop{animation:pop .4s var(--ease);}
 @keyframes pop{0%{transform:scale(1);}45%{transform:scale(1.35);}100%{transform:scale(1);}}
@@ -206,8 +159,6 @@ a{color:inherit; text-decoration:none;}
 .price{font-size:14px; color:var(--text-2);}
 .price b{font-size:17px; color:var(--text); font-weight:600;}
 .btn-sm{padding:9px 16px; font-size:13.5px;}
-
-/* media gradients (duotone, retenus) */
 .g1{background:linear-gradient(135deg,#0f766e,#10B981);}
 .g2{background:linear-gradient(135deg,#1E3A8A,#3b82f6);}
 .g3{background:linear-gradient(135deg,#155e63,#0ea5a4);}
@@ -215,12 +166,9 @@ a{color:inherit; text-decoration:none;}
 .g5{background:linear-gradient(135deg,#047857,#34d399);}
 .g6{background:linear-gradient(135deg,#1e293b,#334155);}
 
-/* ============ NEARBY (map + list) ============ */
-.nearby{display:grid; grid-template-columns:1.15fr .85fr; gap:20px; align-items:stretch;}
-.map{
-  position:relative; border-radius:var(--r-md); overflow:hidden; min-height:420px;
-  border:1px solid var(--border); box-shadow:var(--shadow-sm); background:var(--surface-2);
-}
+/* ============ NEARBY / MAPS ============ */
+.nearby{display:grid; grid-template-columns:1.15fr .85fr; gap:20px;}
+.map{position:relative; border-radius:var(--r-md); overflow:hidden; min-height:420px; border:1px solid var(--border); box-shadow:var(--shadow-sm); background:var(--surface-2);}
 .map svg{position:absolute; inset:0; width:100%; height:100%;}
 .pin{position:absolute; transform:translate(-50%,-100%); cursor:pointer; transition:.2s var(--ease); filter:drop-shadow(0 6px 8px rgba(4,120,87,.35));}
 .pin svg{width:36px; height:44px;}
@@ -238,7 +186,7 @@ a{color:inherit; text-decoration:none;}
 .near-info .meta{font-size:12px;}
 .near-cta{align-self:center; color:var(--emerald-700);}
 
-/* ============ EXPLORE VIEW ============ */
+/* ============ EXPLORE ============ */
 .filters{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
 .filter{display:inline-flex; align-items:center; gap:8px; padding:10px 15px; border-radius:var(--r-pill); background:var(--card); border:1px solid var(--border); font-size:13.5px; font-weight:500; color:var(--text-2); transition:.16s var(--ease);}
 .filter .ic{width:16px; height:16px;}
@@ -258,7 +206,7 @@ a{color:inherit; text-decoration:none;}
 .rrow-body h3{font-size:17px;}
 .rrow-foot{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px;}
 
-/* ============ DETAIL VIEW ============ */
+/* ============ DETAIL ============ */
 .back-btn{display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14px; color:var(--text-2); margin-bottom:18px;}
 .back-btn:hover{color:var(--emerald-700);}
 .detail-hero{position:relative; height:340px; border-radius:var(--r-lg); overflow:hidden; display:grid; place-items:center; box-shadow:var(--shadow-md);}
@@ -267,22 +215,22 @@ a{color:inherit; text-decoration:none;}
 .detail-grid{display:grid; grid-template-columns:1fr 340px; gap:28px; margin-top:26px; align-items:start;}
 .d-title{font-size:30px; font-weight:700;}
 .d-sub{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:10px; color:var(--text-2); font-size:14px;}
-.d-sub .stars{font-size:14px;}
 .pill{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:var(--r-pill);}
 .pill-open{background:var(--emerald-50); color:var(--emerald-700);}
+.pill-warn{background:rgba(245,158,11,.14); color:#b45309;}
 .d-section{margin-top:26px;}
 .d-section h3{font-size:18px; margin-bottom:12px;}
 .d-section p{color:var(--text-2); font-size:14.5px; line-height:1.7;}
 .photos{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
 .photos div{height:92px; border-radius:12px;}
-.info-list{display:flex; flex-direction:column; gap:2px;}
+.info-list{display:flex; flex-direction:column;}
 .info-row{display:flex; align-items:center; gap:13px; padding:13px 0; border-bottom:1px solid var(--border); font-size:14px;}
 .info-row:last-child{border-bottom:none;}
 .info-row .ic{stroke:var(--emerald-600); width:19px; height:19px;}
-.info-row span{color:var(--text-3); margin-left:auto; color:var(--text-2);}
+.info-row span{margin-left:auto; color:var(--text-2);}
 .review{display:flex; gap:13px; padding:16px 0; border-bottom:1px solid var(--border);}
-.review .avatar{width:44px; height:44px; font-size:14px; flex:none;}
-.review h4{font-size:14.5px; display:flex; align-items:center; gap:8px;}
+.review .avatar{width:44px; height:44px; font-size:14px;}
+.review h4{font-size:14.5px;}
 .review .stars{font-size:12px; margin:4px 0 6px;}
 .review p{font-size:13.5px; color:var(--text-2);}
 .d-aside{position:sticky; top:92px; padding:22px; border-radius:var(--r-md); border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow-md); display:flex; flex-direction:column; gap:12px;}
@@ -292,58 +240,115 @@ a{color:inherit; text-decoration:none;}
 .d-map{height:150px; border-radius:12px; overflow:hidden; position:relative; margin-top:4px; background:var(--surface-2);}
 .d-map svg{position:absolute; inset:0; width:100%; height:100%;}
 
+/* ============ DASHBOARDS ============ */
+.page-head{margin-bottom:24px;}
+.page-head h1{font-size:27px; font-weight:700; margin-top:8px;}
+.page-head p{color:var(--text-2); font-size:14.5px; margin-top:4px;}
+.stat-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px;}
+.stat{padding:18px; border-radius:var(--r-md); background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow-sm); transition:.22s var(--ease);}
+.stat:hover{transform:translateY(-4px); box-shadow:var(--shadow-md);}
+.stat-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.stat-ic{width:40px; height:40px; border-radius:11px; display:grid; place-items:center; background:var(--emerald-50); color:var(--emerald-700);}
+.stat-ic .ic{width:20px; height:20px;}
+.trend{font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:3px; padding:3px 8px; border-radius:99px;}
+.trend .ic{width:13px; height:13px;}
+.trend-up{background:var(--emerald-50); color:var(--emerald-700);}
+.trend-down{background:rgba(239,68,68,.12); color:var(--danger);}
+.stat h3{font-size:27px; font-weight:700; letter-spacing:-.02em;}
+.stat span{font-size:12.5px; color:var(--text-3);}
+.panel-grid{display:grid; grid-template-columns:1.4fr 1fr; gap:20px; margin-top:20px;}
+.panel{padding:20px; border-radius:var(--r-md); background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow-sm);}
+.panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:10px;}
+.panel-head h3{font-size:16px;}
+.panel-head .big{font-size:22px; font-weight:700;}
+.chart{width:100%; margin-top:10px; display:block;}
+.legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px; font-size:12.5px; color:var(--text-2);}
+.legend b{color:var(--text); font-weight:600;}
+.legend i{width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:6px;}
+.mini-list{display:flex; flex-direction:column;}
+.mini-row{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); font-size:14px;}
+.mini-row:last-child{border-bottom:none;}
+.mini-row .avatar{width:38px; height:38px; font-size:13px;}
+.mini-row .r-name{font-weight:500;}
+.mini-row .r-sub{font-size:12px; color:var(--text-3);}
+.mini-row .r-end{margin-left:auto; text-align:right;}
+.mini-row .r-amt{font-weight:600;}
+.donut-wrap{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
+.donut{width:150px; height:150px; flex:none;}
+
+/* ============ MESSAGES ============ */
+.msg-wrap{display:grid; grid-template-columns:320px 1fr; border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow-sm); background:var(--card); height:calc(100vh - 150px); min-height:520px;}
+.conv-col{border-right:1px solid var(--border); display:flex; flex-direction:column; min-height:0;}
+.conv-search{padding:14px; border-bottom:1px solid var(--border);}
+.conv-search label{display:flex; align-items:center; gap:8px; padding:9px 13px; background:var(--surface-2); border-radius:var(--r-pill); color:var(--text-3);}
+.conv-search input{border:none; background:none; outline:none; font:inherit; font-size:13.5px; flex:1; color:var(--text);}
+.conv-list{overflow:auto; flex:1;}
+.conv{display:flex; gap:12px; padding:13px 14px; cursor:pointer; border-bottom:1px solid var(--border); transition:.15s;}
+.conv:hover{background:var(--surface-2);}
+.conv.active{background:var(--emerald-50);}
+.conv .avatar{width:46px; height:46px; position:relative;}
+.conv .avatar .on-dot{position:absolute; right:0; bottom:0; width:11px; height:11px; border-radius:50%; background:var(--emerald); border:2px solid var(--card);}
+.conv-info{min-width:0; flex:1;}
+.conv-info h4{font-size:14px; display:flex; justify-content:space-between; gap:8px;}
+.conv-info h4 time{font-size:11px; color:var(--text-3); font-weight:400;}
+.conv-info p{font-size:12.5px; color:var(--text-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.conv .unread{background:var(--emerald); color:#fff; font-size:10.5px; font-weight:600; min-width:18px; height:18px; padding:0 5px; border-radius:99px; display:grid; place-items:center; align-self:center;}
+.chat-col{display:flex; flex-direction:column; min-height:0; background:var(--surface);}
+.chat-head{display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--border); background:var(--card);}
+.chat-head .avatar{width:42px; height:42px;}
+.chat-head h4{font-size:15px;}
+.chat-head .st{font-size:12px; color:var(--emerald-600); font-weight:500;}
+.chat-head .icon-btn{background:var(--surface-2);}
+.chat-body{flex:1; overflow:auto; padding:20px; display:flex; flex-direction:column; gap:10px;}
+.bubble{max-width:74%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.45; box-shadow:var(--shadow-sm);}
+.bubble time{display:block; font-size:10.5px; margin-top:4px; opacity:.6;}
+.b-in{align-self:flex-start; background:var(--card); border:1px solid var(--border); border-bottom-left-radius:5px;}
+.b-out{align-self:flex-end; background:var(--emerald-600); color:#fff; border-bottom-right-radius:5px;}
+.b-out time{color:rgba(255,255,255,.8);}
+.chat-input{display:flex; align-items:center; gap:10px; padding:14px 16px; border-top:1px solid var(--border); background:var(--card);}
+.chat-input label{flex:1; display:flex; align-items:center; padding:11px 16px; background:var(--surface-2); border-radius:var(--r-pill);}
+.chat-input input{border:none; background:none; outline:none; font:inherit; font-size:14px; flex:1; color:var(--text);}
+.chat-send{width:46px; height:46px; border-radius:50%; background:var(--emerald-600); color:#fff; display:grid; place-items:center; flex:none; transition:.16s var(--ease); box-shadow:var(--shadow-emerald);}
+.chat-send:hover{transform:scale(1.06); background:var(--emerald-700);}
+
 /* ============ TOAST ============ */
-.toast{
-  position:fixed; bottom:28px; left:50%; transform:translate(-50%,140%);
-  display:flex; align-items:center; gap:12px; padding:13px 20px 13px 14px; z-index:120;
-  background:var(--nuit); color:#fff; border-radius:var(--r-pill); box-shadow:var(--shadow-lg);
-  font-size:14px; font-weight:500; transition:transform .5s var(--ease);
-}
+.toast{position:fixed; bottom:28px; left:50%; transform:translate(-50%,140%); display:flex; align-items:center; gap:12px; padding:13px 20px 13px 14px; z-index:120; background:var(--nuit); color:#fff; border-radius:var(--r-pill); box-shadow:var(--shadow-lg); font-size:14px; font-weight:500; transition:transform .5s var(--ease);}
 .toast.show{transform:translate(-50%,0);}
 .toast-check{width:30px; height:30px; border-radius:50%; background:var(--emerald); display:grid; place-items:center; flex:none;}
 .toast-check .ic{width:18px; height:18px; stroke:#fff; stroke-width:2.6; stroke-dasharray:26; stroke-dashoffset:26;}
 .toast.show .toast-check .ic{animation:draw .5s .15s var(--ease) forwards;}
 @keyframes draw{to{stroke-dashoffset:0;}}
 
-/* ============ MOBILE BOTTOM NAV ============ */
-.botnav{
-  display:none; position:fixed; bottom:0; left:0; right:0; z-index:60;
-  background:var(--glass); backdrop-filter:saturate(180%) blur(18px); border-top:1px solid var(--border);
-  padding:8px 6px calc(8px + env(safe-area-inset-bottom)); justify-content:space-around;
-}
+/* ============ BOTTOM NAV ============ */
+.botnav{display:none; position:fixed; bottom:0; left:0; right:0; z-index:60; background:var(--glass); backdrop-filter:saturate(180%) blur(18px); border-top:1px solid var(--border); padding:8px 6px calc(8px + env(safe-area-inset-bottom)); justify-content:space-around;}
 .botnav button{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10.5px; font-weight:500; color:var(--text-3); padding:5px 12px; border-radius:12px;}
 .botnav button.active{color:var(--emerald-700);}
 .botnav button.active .ic{stroke:var(--emerald-600);}
 .botnav .ic{width:23px; height:23px;}
 
-/* ============ SCROLL REVEAL ============ */
+/* ============ REVEAL ============ */
 .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s var(--ease), transform .6s var(--ease);}
 .reveal.in{opacity:1; transform:none;}
-@media (prefers-reduced-motion:reduce){
-  .reveal{opacity:1; transform:none; transition:none;}
-  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
-}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1; transform:none; transition:none;}*{animation-duration:.001ms !important; transition-duration:.001ms !important;}}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width:1024px){
   .nearby{grid-template-columns:1fr;} .near-list{max-height:none;}
   .explore-grid{grid-template-columns:1fr;} .explore-map{display:none;}
   .detail-grid{grid-template-columns:1fr;} .d-aside{position:static;}
+  .panel-grid{grid-template-columns:1fr;}
+  .msg-wrap{grid-template-columns:1fr; height:auto;} .chat-col{min-height:440px;}
 }
 @media (max-width:900px){
   :root{--sidebar:0px;}
-  .app{grid-template-columns:1fr;}
-  .sidebar{display:none;}
-  .botnav{display:flex;}
+  .app{grid-template-columns:1fr;} .sidebar{display:none;} .botnav{display:flex;}
   .main{padding-bottom:74px;}
   .topbar{padding:12px 16px;} .top-search{display:none;}
-  .view{padding:18px;}
-  .hero{padding:34px 22px;}
-  .photos{grid-template-columns:repeat(2,1fr);}
+  .view{padding:18px;} .hero{padding:34px 22px;} .photos{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 
-<!-- ============ ICON SPRITE (outline) ============ -->
+<!-- ============ ICON SPRITE ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="ic-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></symbol>
   <symbol id="ic-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></symbol>
@@ -372,11 +377,18 @@ a{color:inherit; text-decoration:none;}
   <symbol id="ic-cap" viewBox="0 0 24 24"><path d="m12 4 9 4-9 4-9-4z"/><path d="M6 10v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></symbol>
   <symbol id="ic-car" viewBox="0 0 24 24"><path d="M4 14l1.5-5A2 2 0 0 1 7.4 8h9.2a2 2 0 0 1 1.9 1l1.5 5"/><path d="M3 14h18v4h-2v-2H5v2H3z"/><circle cx="7.5" cy="16" r="1"/><circle cx="16.5" cy="16" r="1"/></symbol>
   <symbol id="ic-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12h18"/></symbol>
+  <symbol id="ic-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="ic-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24"><path d="M4 12 20 4l-6 16-3-7z"/><path d="m11 13 9-9"/></symbol>
+  <symbol id="ic-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+  <symbol id="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></symbol>
+  <symbol id="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+  <symbol id="ic-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
 </svg>
 
 <!-- ============ APP ============ -->
 <div class="app">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 44 44" fill="none" aria-hidden="true">
@@ -388,320 +400,502 @@ a{color:inherit; text-decoration:none;}
       <span class="brand-name">Nex<b>ora</b></span>
     </div>
 
-    <button class="nav-item active" data-goto="home"><svg class="ic"><use href="#ic-home"/></svg>Accueil</button>
-    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-compass"/></svg>Explorer</button>
-    <div class="nav-label">Catalogue</div>
-    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-bag"/></svg>Produits</button>
-    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-tools"/></svg>Services</button>
-    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-store"/></svg>Espaces</button>
-    <div class="nav-label">Mon compte</div>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-heart"/></svg>Favoris<span class="badge">6</span></button>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-package"/></svg>Mes commandes</button>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-chat"/></svg>Messages<span class="badge">3</span></button>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-bell"/></svg>Notifications</button>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-user"/></svg>Mon profil</button>
+    <button class="nav-item active" data-goto="home"><svg class="ic"><use href="#ic-home"/></svg><span data-i18n="nav.home"></span></button>
+    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-compass"/></svg><span data-i18n="nav.explore"></span></button>
+    <div class="nav-label" data-i18n="cat.catalog"></div>
+    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-bag"/></svg><span data-i18n="nav.products"></span></button>
+    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-tools"/></svg><span data-i18n="nav.services"></span></button>
+    <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-store"/></svg><span data-i18n="nav.spaces"></span></button>
+    <div class="nav-label" data-i18n="nav.account"></div>
+    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-heart"/></svg><span data-i18n="nav.favorites"></span><span class="badge">6</span></button>
+    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-package"/></svg><span data-i18n="nav.orders"></span></button>
+    <button class="nav-item" data-goto="messages"><svg class="ic"><use href="#ic-chat"/></svg><span data-i18n="nav.messages"></span><span class="badge">3</span></button>
+    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-bell"/></svg><span data-i18n="nav.notifications"></span></button>
+    <div class="nav-label" data-i18n="nav.pro"></div>
+    <button class="nav-item" data-goto="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span data-i18n="nav.dashboard"></span></button>
+    <button class="nav-item" data-goto="admin"><svg class="ic"><use href="#ic-shield"/></svg><span data-i18n="nav.admin"></span></button>
 
     <div class="side-pro">
-      <h4>Vous êtes pro&nbsp;?</h4>
-      <p>Créez votre espace et touchez des milliers de clients près de vous.</p>
-      <button class="btn-pro">Devenir partenaire</button>
+      <h4 data-i18n="pro.title"></h4>
+      <p data-i18n="pro.text"></p>
+      <button class="btn-pro" data-goto="dashboard" data-i18n="pro.cta"></button>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
     <header class="topbar">
       <div class="loc-chip"><svg class="ic"><use href="#ic-pin"/></svg><span>Dakar · <b>Plateau</b></span></div>
-      <label class="top-search"><svg class="ic"><use href="#ic-search"/></svg><input placeholder="Rechercher un produit, un service, une boutique…"/></label>
+      <label class="top-search"><svg class="ic"><use href="#ic-search"/></svg><input data-i18n-ph="search.ph"/></label>
       <div class="top-actions">
-        <button class="icon-btn" id="themeBtn" title="Thème"><svg class="ic"><use href="#ic-bell"/></svg></button>
+        <button class="icon-btn" id="langBtn"><svg class="ic"><use href="#ic-flag"/></svg><span id="langLabel">FR</span></button>
+        <button class="icon-btn" id="themeBtn" title="Theme"></button>
+        <button class="icon-btn" data-goto="home" title="Notifications"><svg class="ic"><use href="#ic-bell"/></svg></button>
         <div class="avatar">A</div>
       </div>
     </header>
 
-    <!-- ========== VUE ACCUEIL ========== -->
+    <!-- ACCUEIL -->
     <section class="view" id="view-home">
       <div class="hero reveal">
         <div class="hero-inner">
-          <span class="eyebrow">Marketplace de proximité</span>
-          <h1 style="margin-top:12px">Tout ce dont vous avez besoin,<br><span class="accent">près de vous.</span></h1>
-          <p class="lead">Trouvez un restaurant, réservez un hôtel, contactez un plombier ou découvrez une boutique — sans changer d'application.</p>
+          <span class="eyebrow" data-i18n="hero.eyebrow"></span>
+          <h1 data-i18n-html="hero.title"></h1>
+          <p class="lead" data-i18n="hero.lead"></p>
           <div class="searchbar">
             <svg class="ic"><use href="#ic-search"/></svg>
-            <input placeholder="Que recherchez-vous aujourd'hui&nbsp;?"/>
-            <button class="btn btn-primary" data-goto="explore">Rechercher</button>
+            <input data-i18n-ph="hero.search.ph"/>
+            <button class="btn btn-primary" data-goto="explore" data-i18n="btn.search"></button>
           </div>
           <div class="hero-chips">
-            <button class="chip"><svg class="ic"><use href="#ic-pin"/></svg>Autour de moi</button>
-            <button class="chip"><svg class="ic"><use href="#ic-fork"/></svg>Restaurants</button>
-            <button class="chip"><svg class="ic"><use href="#ic-health"/></svg>Pharmacies</button>
-            <button class="chip"><svg class="ic"><use href="#ic-tools"/></svg>Dépannage</button>
+            <button class="chip"><svg class="ic"><use href="#ic-pin"/></svg><span data-i18n="chip.around"></span></button>
+            <button class="chip"><svg class="ic"><use href="#ic-fork"/></svg><span data-i18n="c.resto"></span></button>
+            <button class="chip"><svg class="ic"><use href="#ic-health"/></svg><span data-i18n="chip.pharma"></span></button>
+            <button class="chip"><svg class="ic"><use href="#ic-tools"/></svg><span data-i18n="chip.repair"></span></button>
           </div>
         </div>
       </div>
 
-      <!-- Catégories -->
       <div class="sec reveal">
-        <div class="sec-head"><div><h2>Explorer par catégorie</h2><p>9 univers, des milliers de professionnels vérifiés.</p></div></div>
+        <div class="sec-head"><div><h2 data-i18n="sec.cat.title"></h2><p data-i18n="sec.cat.sub"></p></div></div>
         <div class="cat-grid" id="catGrid"></div>
       </div>
 
-      <!-- Meilleures offres -->
       <div class="sec reveal">
-        <div class="sec-head"><div><h2>Les meilleures offres</h2><p>Sélection près de chez vous, mise à jour en continu.</p></div><a class="link-more" data-goto="explore">Tout voir <svg class="ic" style="width:16px;height:16px"><use href="#ic-arrow"/></svg></a></div>
+        <div class="sec-head"><div><h2 data-i18n="sec.offers.title"></h2><p data-i18n="sec.offers.sub"></p></div><a class="link-more" data-goto="explore"><span data-i18n="sec.all"></span> <svg class="ic" style="width:16px;height:16px"><use href="#ic-arrow"/></svg></a></div>
         <div class="cards" id="offerGrid"></div>
       </div>
 
-      <!-- Services proches -->
       <div class="sec reveal">
-        <div class="sec-head"><div><h2>Les services proches</h2><p>Passez la souris sur un point de la carte.</p></div></div>
+        <div class="sec-head"><div><h2 data-i18n="sec.near.title"></h2><p data-i18n="sec.near.sub"></p></div></div>
         <div class="nearby">
-          <div class="map" id="homeMap">
-            <div class="map-badge"><svg class="ic"><use href="#ic-pin"/></svg>Plateau, Dakar</div>
-          </div>
+          <div class="map" id="homeMap"><div class="map-badge"><svg class="ic"><use href="#ic-pin"/></svg>Plateau, Dakar</div></div>
           <div class="near-list" id="nearList"></div>
         </div>
       </div>
     </section>
 
-    <!-- ========== VUE EXPLORER ========== -->
+    <!-- EXPLORER -->
     <section class="view" id="view-explore" hidden>
-      <div class="sec-head" style="margin-bottom:16px"><div><span class="eyebrow">Recherche</span><h2 style="margin-top:8px;font-size:26px">Résultats autour de vous</h2></div></div>
+      <div class="sec-head" style="margin-bottom:16px"><div><span class="eyebrow" data-i18n="ex.eyebrow"></span><h2 style="margin-top:8px;font-size:26px" data-i18n="ex.title"></h2></div></div>
       <div class="filters">
-        <button class="filter on"><svg class="ic"><use href="#ic-pin"/></svg>Distance · 5 km</button>
-        <button class="filter"><svg class="ic"><use href="#ic-coins"/></svg>Prix</button>
-        <button class="filter"><svg class="ic"><use href="#ic-star"/></svg>Note 4+</button>
-        <button class="filter"><svg class="ic"><use href="#ic-sliders"/></svg>Catégorie</button>
-        <button class="filter"><span class="dot dot-open"></span>Ouvert maintenant</button>
+        <button class="filter on"><svg class="ic"><use href="#ic-pin"/></svg><span data-i18n="f.distance"></span></button>
+        <button class="filter"><svg class="ic"><use href="#ic-coins"/></svg><span data-i18n="f.price"></span></button>
+        <button class="filter"><svg class="ic"><use href="#ic-star"/></svg><span data-i18n="f.rating"></span></button>
+        <button class="filter"><svg class="ic"><use href="#ic-sliders"/></svg><span data-i18n="f.category"></span></button>
+        <button class="filter"><span class="dot dot-open"></span><span data-i18n="f.open"></span></button>
       </div>
       <div class="explore-grid">
         <div>
-          <div class="result-count"><b>128</b> résultats · triés par <b>pertinence</b></div>
+          <div class="result-count" id="resCount"></div>
           <div class="rlist" id="rlist"></div>
         </div>
         <div class="explore-map" id="exploreMap"></div>
       </div>
     </section>
 
-    <!-- ========== VUE DÉTAIL ========== -->
+    <!-- DETAIL -->
     <section class="view" id="view-detail" hidden>
-      <button class="back-btn" data-goto="explore"><svg class="ic"><use href="#ic-back"/></svg>Retour aux résultats</button>
+      <button class="back-btn" data-goto="explore"><svg class="ic"><use href="#ic-back"/></svg><span data-i18n="back"></span></button>
       <div class="detail-hero g1">
         <div class="glyph"><svg class="ic"><use href="#ic-fork"/></svg></div>
         <button class="fav" aria-label="Favori"><svg class="ic"><use href="#ic-heart"/></svg></button>
       </div>
       <div class="detail-grid">
         <div>
-          <span class="pill pill-open"><span class="dot dot-open"></span>Ouvert · ferme à 23h30</span>
+          <span class="pill pill-open"><span class="dot dot-open"></span><span data-i18n="d.open"></span></span>
           <h1 class="d-title" style="margin-top:12px">Le Baobab Gourmand</h1>
           <div class="d-sub">
-            <span class="stars"><svg class="ic"><use href="#ic-star"/></svg>4.8 <small>(214 avis)</small></span>
-            <span>· Restaurant · Cuisine sénégalaise</span>
+            <span class="stars"><svg class="ic"><use href="#ic-star"/></svg>4.8 <small data-i18n="d.reviews"></small></span>
+            <span data-i18n="d.type"></span>
             <span class="meta"><svg class="ic"><use href="#ic-pin"/></svg>1,2 km</span>
           </div>
-          <div class="d-section">
-            <h3>À propos</h3>
-            <p>Une table chaleureuse au cœur du Plateau, réputée pour son thiéboudienne et ses jus de bissap maison. Cadre élégant, service attentionné, terrasse ouverte le soir. Réservation recommandée le week-end.</p>
-          </div>
-          <div class="d-section">
-            <h3>Galerie</h3>
-            <div class="photos"><div class="g3"></div><div class="g5"></div><div class="g4"></div><div class="g1"></div></div>
-          </div>
-          <div class="d-section">
-            <h3>Informations</h3>
+          <div class="d-section"><h3 data-i18n="d.about"></h3><p data-i18n="d.about.text"></p></div>
+          <div class="d-section"><h3 data-i18n="d.gallery"></h3><div class="photos"><div class="g3"></div><div class="g5"></div><div class="g4"></div><div class="g1"></div></div></div>
+          <div class="d-section"><h3 data-i18n="d.info"></h3>
             <div class="info-list">
-              <div class="info-row"><svg class="ic"><use href="#ic-pin"/></svg>Avenue Léopold Sédar Senghor, Plateau <span>1,2 km</span></div>
-              <div class="info-row"><svg class="ic"><use href="#ic-phone"/></svg>+221 33 800 00 00 <span>Appeler</span></div>
-              <div class="info-row"><svg class="ic"><use href="#ic-clock"/></svg>Lun – Dim <span>11h00 – 23h30</span></div>
+              <div class="info-row"><svg class="ic"><use href="#ic-pin"/></svg>Av. Léopold Sédar Senghor, Plateau <span>1,2 km</span></div>
+              <div class="info-row"><svg class="ic"><use href="#ic-phone"/></svg>+221 33 800 00 00 <span data-i18n="d.call"></span></div>
+              <div class="info-row"><svg class="ic"><use href="#ic-clock"/></svg><span data-i18n="d.hours" style="margin-left:0;color:var(--text)"></span><span>11:00 – 23:30</span></div>
             </div>
           </div>
-          <div class="d-section">
-            <h3>Avis récents</h3>
-            <div class="review"><div class="avatar">F</div><div><h4>Fatou N.</h4><span class="stars"><svg class="ic"><use href="#ic-star"/></svg>5.0</span><p>Le meilleur thiéboudienne du Plateau, sans hésiter. Accueil parfait&nbsp;!</p></div></div>
-            <div class="review"><div class="avatar" style="background:linear-gradient(135deg,#1E3A8A,#3b82f6)">M</div><div><h4>Moussa D.</h4><span class="stars"><svg class="ic"><use href="#ic-star"/></svg>4.5</span><p>Cadre très agréable, service rapide. Je recommande la terrasse le soir.</p></div></div>
+          <div class="d-section"><h3 data-i18n="d.reviews.title"></h3>
+            <div class="review"><div class="avatar">F</div><div><h4>Fatou N.</h4><span class="stars"><svg class="ic"><use href="#ic-star"/></svg>5.0</span><p data-i18n="rev.1"></p></div></div>
+            <div class="review"><div class="avatar" style="background:linear-gradient(135deg,#1E3A8A,#3b82f6)">M</div><div><h4>Moussa D.</h4><span class="stars"><svg class="ic"><use href="#ic-star"/></svg>4.5</span><p data-i18n="rev.2"></p></div></div>
           </div>
         </div>
         <aside class="d-aside">
-          <div class="price-lg">Prix moyen<br><b>7 500</b> FCFA / pers.</div>
-          <button class="btn btn-primary" id="reserveBtn"><svg class="ic"><use href="#ic-check"/></svg>Réserver une table</button>
-          <button class="btn btn-outline"><svg class="ic"><use href="#ic-chat"/></svg>Contacter</button>
-          <button class="btn btn-ghost"><svg class="ic"><use href="#ic-phone"/></svg>Appeler</button>
+          <div class="price-lg"><span data-i18n="d.avgprice"></span><br><b>7 500</b> FCFA <span data-i18n="d.perperson"></span></div>
+          <button class="btn btn-primary" id="reserveBtn"><svg class="ic"><use href="#ic-check"/></svg><span data-i18n="btn.reserveTable"></span></button>
+          <button class="btn btn-outline" data-goto="messages"><svg class="ic"><use href="#ic-chat"/></svg><span data-i18n="btn.contact"></span></button>
+          <button class="btn btn-ghost"><svg class="ic"><use href="#ic-phone"/></svg><span data-i18n="btn.call"></span></button>
           <div class="d-map" id="detailMap"></div>
         </aside>
+      </div>
+    </section>
+
+    <!-- DASHBOARD FOURNISSEUR -->
+    <section class="view" id="view-dashboard" hidden>
+      <div class="page-head reveal"><span class="eyebrow" data-i18n="db.eyebrow"></span><h1 data-i18n="db.title"></h1><p data-i18n="db.sub"></p></div>
+      <div class="stat-grid reveal" id="dbStats"></div>
+      <div class="panel-grid reveal">
+        <div class="panel">
+          <div class="panel-head"><h3 data-i18n="chart.views.title"></h3><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+18%</span></div>
+          <div id="viewsChart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3 data-i18n="db.recent"></h3></div>
+          <div class="mini-list" id="recentOrders"></div>
+        </div>
+      </div>
+      <div class="panel reveal" style="margin-top:20px">
+        <div class="panel-head"><h3 data-i18n="chart.rev.title"></h3><span class="big tnum">1,84M <span style="font-size:13px;color:var(--text-3);font-weight:500">FCFA</span></span></div>
+        <div id="revChart"></div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="view" id="view-admin" hidden>
+      <div class="page-head reveal"><span class="eyebrow" data-i18n="ad.eyebrow"></span><h1 data-i18n="ad.title"></h1></div>
+      <div class="stat-grid reveal" id="adStats"></div>
+      <div class="panel-grid reveal">
+        <div class="panel">
+          <div class="panel-head"><h3 data-i18n="ad.growth"></h3><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+24%</span></div>
+          <div id="growthChart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3 data-i18n="ad.split"></h3></div>
+          <div class="donut-wrap"><div id="donut" class="donut"></div><div class="legend" id="donutLegend" style="flex-direction:column;gap:10px"></div></div>
+        </div>
+      </div>
+      <div class="panel reveal" style="margin-top:20px">
+        <div class="panel-head"><h3 data-i18n="ad.moderation"></h3></div>
+        <div class="mini-list" id="modList"></div>
+      </div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="view" id="view-messages" hidden>
+      <div class="page-head reveal" style="margin-bottom:16px"><h1 data-i18n="msg.title" style="font-size:24px"></h1></div>
+      <div class="msg-wrap reveal">
+        <div class="conv-col">
+          <div class="conv-search"><label><svg class="ic" style="width:17px;height:17px"><use href="#ic-search"/></svg><input data-i18n-ph="msg.search"/></label></div>
+          <div class="conv-list" id="convList"></div>
+        </div>
+        <div class="chat-col">
+          <div class="chat-head">
+            <div class="avatar" style="background:linear-gradient(135deg,#0f766e,#10B981)">B</div>
+            <div style="flex:1"><h4>Le Baobab Gourmand</h4><div class="st" data-i18n="msg.online"></div></div>
+            <button class="icon-btn"><svg class="ic"><use href="#ic-phone"/></svg></button>
+          </div>
+          <div class="chat-body" id="chatBody"></div>
+          <div class="chat-input">
+            <label><input id="chatInput" data-i18n-ph="msg.ph"/></label>
+            <button class="chat-send" id="chatSend"><svg class="ic"><use href="#ic-send"/></svg></button>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 </div>
 
-<!-- MOBILE BOTTOM NAV -->
 <nav class="botnav">
-  <button class="active" data-goto="home"><svg class="ic"><use href="#ic-home"/></svg>Accueil</button>
-  <button data-goto="explore"><svg class="ic"><use href="#ic-compass"/></svg>Explorer</button>
-  <button data-goto="home"><svg class="ic"><use href="#ic-heart"/></svg>Favoris</button>
-  <button data-goto="home"><svg class="ic"><use href="#ic-chat"/></svg>Messages</button>
-  <button data-goto="home"><svg class="ic"><use href="#ic-user"/></svg>Profil</button>
+  <button class="active" data-goto="home"><svg class="ic"><use href="#ic-home"/></svg><span data-i18n="nav.home"></span></button>
+  <button data-goto="explore"><svg class="ic"><use href="#ic-compass"/></svg><span data-i18n="nav.explore"></span></button>
+  <button data-goto="home"><svg class="ic"><use href="#ic-heart"/></svg><span data-i18n="nav.favorites"></span></button>
+  <button data-goto="messages"><svg class="ic"><use href="#ic-chat"/></svg><span data-i18n="nav.messages"></span></button>
+  <button data-goto="home"><svg class="ic"><use href="#ic-user"/></svg><span data-i18n="nav.profile"></span></button>
 </nav>
 
-<!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-check"><svg class="ic"><use href="#ic-check"/></svg></span><span id="toastMsg">Réservation confirmée&nbsp;!</span></div>
+<div class="toast" id="toast"><span class="toast-check"><svg class="ic"><use href="#ic-check"/></svg></span><span id="toastMsg"></span></div>
 
 <script>
 (function(){
   "use strict";
+  var root=document.documentElement;
 
-  // ---------- Données ----------
-  var cats=[
-    ["ic-fork","Restaurants","1 240 lieux","g1"],
-    ["ic-health","Santé","860 pros","g2"],
-    ["ic-cart","Supermarchés","430 lieux","g5"],
-    ["ic-bed","Hôtels","210 lieux","g2"],
-    ["ic-cap","Écoles","320 lieux","g4"],
-    ["ic-tools","Services","2 100 pros","g3"],
-    ["ic-car","Transport","540 pros","g6"],
-    ["ic-briefcase","Emploi","180 offres","g4"],
-    ["ic-store","Immobilier","760 biens","g2"]
-  ];
+  /* ================= I18N ================= */
+  var I18N={
+    fr:{
+      "nav.home":"Accueil","nav.explore":"Explorer","cat.catalog":"Catalogue","nav.products":"Produits","nav.services":"Services","nav.spaces":"Espaces",
+      "nav.account":"Mon compte","nav.favorites":"Favoris","nav.orders":"Mes commandes","nav.messages":"Messages","nav.notifications":"Notifications","nav.profile":"Profil",
+      "nav.pro":"Espace pro","nav.dashboard":"Tableau de bord","nav.admin":"Administration",
+      "pro.title":"Vous êtes pro ?","pro.text":"Créez votre espace et touchez des milliers de clients près de vous.","pro.cta":"Accéder à mon espace",
+      "search.ph":"Rechercher un produit, un service, une boutique…",
+      "hero.eyebrow":"Marketplace de proximité","hero.title":"Tout ce dont vous avez besoin,<br><span class='accent'>près de vous.</span>",
+      "hero.lead":"Trouvez un restaurant, réservez un hôtel, contactez un plombier ou découvrez une boutique — sans changer d'application.",
+      "hero.search.ph":"Que recherchez-vous aujourd'hui ?","btn.search":"Rechercher",
+      "chip.around":"Autour de moi","chip.pharma":"Pharmacies","chip.repair":"Dépannage",
+      "sec.cat.title":"Explorer par catégorie","sec.cat.sub":"9 univers, des milliers de professionnels vérifiés.",
+      "sec.offers.title":"Les meilleures offres","sec.offers.sub":"Sélection près de chez vous, mise à jour en continu.","sec.all":"Tout voir",
+      "sec.near.title":"Les services proches","sec.near.sub":"Passez la souris sur un point de la carte.",
+      "unit.places":"lieux","unit.pros":"pros","unit.offers":"offres","unit.goods":"biens",
+      "label.from":"dès","label.seeprice":"Voir prix","badge.open":"Ouvert","badge.closed":"Fermé","btn.see":"Voir","btn.book":"Réserver",
+      "c.resto":"Restaurants","c.health":"Santé","c.market":"Supermarchés","c.hotel":"Hôtels","c.school":"Écoles","c.services":"Services","c.transport":"Transport","c.jobs":"Emploi","c.realestate":"Immobilier",
+      "ty.resto":"Restaurant","ty.hotel":"Hôtel · 4★","ty.plumb":"Service · Urgence","ty.market":"Supermarché","ty.pharma":"Pharmacie · 24/7","ty.transport":"Transport",
+      "ty.service":"Service","ty.grocery":"Épicerie","ty.realestate":"Immobilier",
+      "ex.eyebrow":"Recherche","ex.title":"Résultats autour de vous","f.distance":"Distance · 5 km","f.price":"Prix","f.rating":"Note 4+","f.category":"Catégorie","f.open":"Ouvert maintenant",
+      "res.results":"résultats","res.sortedby":"triés par","res.relevance":"pertinence","btn.seecard":"Voir la fiche",
+      "back":"Retour aux résultats","d.open":"Ouvert · ferme à 23h30","d.reviews":"(214 avis)","d.type":"· Restaurant · Cuisine sénégalaise",
+      "d.about":"À propos","d.about.text":"Une table chaleureuse au cœur du Plateau, réputée pour son thiéboudienne et ses jus de bissap maison. Cadre élégant, service attentionné, terrasse ouverte le soir. Réservation recommandée le week-end.",
+      "d.gallery":"Galerie","d.info":"Informations","d.call":"Appeler","d.hours":"Lun – Dim","d.reviews.title":"Avis récents",
+      "rev.1":"Le meilleur thiéboudienne du Plateau, sans hésiter. Accueil parfait !","rev.2":"Cadre très agréable, service rapide. Je recommande la terrasse le soir.",
+      "d.avgprice":"Prix moyen","d.perperson":"/ pers.","btn.reserveTable":"Réserver une table","btn.contact":"Contacter","btn.call":"Appeler",
+      "db.eyebrow":"Espace professionnel","db.title":"Bonjour, Le Baobab Gourmand","db.sub":"Voici votre activité des 30 derniers jours.",
+      "stat.views":"Vues","stat.contacts":"Contacts","stat.rating":"Note","stat.orders":"Commandes","stat.messages":"Messages","stat.revenue":"Revenus",
+      "chart.views.title":"Vues sur 14 jours","chart.rev.title":"Revenus par mois","db.recent":"Dernières commandes","order.new":"Nouvelle","order.done":"Terminée","order.progress":"En cours",
+      "ad.eyebrow":"Administration","ad.title":"Vue d'ensemble de la plateforme",
+      "ad.users":"Utilisateurs","ad.providers":"Fournisseurs","ad.products":"Produits","ad.services":"Services","ad.spaces":"Espaces","ad.reports":"Signalements",
+      "ad.growth":"Croissance des inscriptions","ad.split":"Répartition des annonces","ad.moderation":"À modérer","badge.pending":"En attente","mod.review":"Examiner",
+      "seg.products":"Produits","seg.services":"Services","seg.spaces":"Espaces","seg.other":"Autres",
+      "msg.title":"Messages","msg.search":"Rechercher une conversation","msg.online":"En ligne","msg.ph":"Écrivez un message…",
+      "toast.fav":"Ajouté à vos favoris","toast.reserve":"Réservation confirmée !","toast.sent":"Message envoyé"
+    },
+    en:{
+      "nav.home":"Home","nav.explore":"Explore","cat.catalog":"Catalog","nav.products":"Products","nav.services":"Services","nav.spaces":"Spaces",
+      "nav.account":"My account","nav.favorites":"Favorites","nav.orders":"My orders","nav.messages":"Messages","nav.notifications":"Notifications","nav.profile":"Profile",
+      "nav.pro":"Pro space","nav.dashboard":"Dashboard","nav.admin":"Administration",
+      "pro.title":"Are you a pro?","pro.text":"Create your space and reach thousands of customers near you.","pro.cta":"Go to my space",
+      "search.ph":"Search a product, a service, a shop…",
+      "hero.eyebrow":"Local marketplace","hero.title":"Everything you need,<br><span class='accent'>right near you.</span>",
+      "hero.lead":"Find a restaurant, book a hotel, contact a plumber or discover a shop — without switching apps.",
+      "hero.search.ph":"What are you looking for today?","btn.search":"Search",
+      "chip.around":"Around me","chip.pharma":"Pharmacies","chip.repair":"Repairs",
+      "sec.cat.title":"Explore by category","sec.cat.sub":"9 worlds, thousands of verified professionals.",
+      "sec.offers.title":"Top offers","sec.offers.sub":"A selection near you, updated continuously.","sec.all":"See all",
+      "sec.near.title":"Nearby services","sec.near.sub":"Hover a point on the map.",
+      "unit.places":"places","unit.pros":"pros","unit.offers":"listings","unit.goods":"properties",
+      "label.from":"from","label.seeprice":"See price","badge.open":"Open","badge.closed":"Closed","btn.see":"View","btn.book":"Book",
+      "c.resto":"Restaurants","c.health":"Health","c.market":"Supermarkets","c.hotel":"Hotels","c.school":"Schools","c.services":"Services","c.transport":"Transport","c.jobs":"Jobs","c.realestate":"Real estate",
+      "ty.resto":"Restaurant","ty.hotel":"Hotel · 4★","ty.plumb":"Service · Emergency","ty.market":"Supermarket","ty.pharma":"Pharmacy · 24/7","ty.transport":"Transport",
+      "ty.service":"Service","ty.grocery":"Grocery","ty.realestate":"Real estate",
+      "ex.eyebrow":"Search","ex.title":"Results around you","f.distance":"Distance · 5 km","f.price":"Price","f.rating":"Rating 4+","f.category":"Category","f.open":"Open now",
+      "res.results":"results","res.sortedby":"sorted by","res.relevance":"relevance","btn.seecard":"View listing",
+      "back":"Back to results","d.open":"Open · closes at 11:30 PM","d.reviews":"(214 reviews)","d.type":"· Restaurant · Senegalese cuisine",
+      "d.about":"About","d.about.text":"A warm table in the heart of Plateau, known for its thieboudienne and homemade bissap juices. Elegant setting, attentive service, terrace open in the evening. Booking recommended on weekends.",
+      "d.gallery":"Gallery","d.info":"Information","d.call":"Call","d.hours":"Mon – Sun","d.reviews.title":"Recent reviews",
+      "rev.1":"The best thieboudienne in Plateau, hands down. Perfect welcome!","rev.2":"Very pleasant setting, quick service. I recommend the terrace in the evening.",
+      "d.avgprice":"Average price","d.perperson":"/ person","btn.reserveTable":"Book a table","btn.contact":"Contact","btn.call":"Call",
+      "db.eyebrow":"Professional space","db.title":"Hello, Le Baobab Gourmand","db.sub":"Here is your activity for the last 30 days.",
+      "stat.views":"Views","stat.contacts":"Contacts","stat.rating":"Rating","stat.orders":"Orders","stat.messages":"Messages","stat.revenue":"Revenue",
+      "chart.views.title":"Views over 14 days","chart.rev.title":"Revenue per month","db.recent":"Recent orders","order.new":"New","order.done":"Done","order.progress":"Ongoing",
+      "ad.eyebrow":"Administration","ad.title":"Platform overview",
+      "ad.users":"Users","ad.providers":"Providers","ad.products":"Products","ad.services":"Services","ad.spaces":"Spaces","ad.reports":"Reports",
+      "ad.growth":"Signups growth","ad.split":"Listings breakdown","ad.moderation":"To moderate","badge.pending":"Pending","mod.review":"Review",
+      "seg.products":"Products","seg.services":"Services","seg.spaces":"Spaces","seg.other":"Other",
+      "msg.title":"Messages","msg.search":"Search a conversation","msg.online":"Online","msg.ph":"Type a message…",
+      "toast.fav":"Added to your favorites","toast.reserve":"Booking confirmed!","toast.sent":"Message sent"
+    }
+  };
+  var lang="fr";
+  function t(k){return (I18N[lang][k]!=null?I18N[lang][k]:(I18N.fr[k]!=null?I18N.fr[k]:k));}
+  function fmt(x){return lang==="fr"?String(x).replace(".",","):String(x);}
+
+  function applyI18n(){
+    document.querySelectorAll("[data-i18n]").forEach(function(el){el.textContent=t(el.getAttribute("data-i18n"));});
+    document.querySelectorAll("[data-i18n-html]").forEach(function(el){el.innerHTML=t(el.getAttribute("data-i18n-html"));});
+    document.querySelectorAll("[data-i18n-ph]").forEach(function(el){el.setAttribute("placeholder",t(el.getAttribute("data-i18n-ph")));});
+  }
+
+  /* ================= DATA ================= */
+  var cats=[["ic-fork","c.resto","1 240","unit.places","g1"],["ic-health","c.health","860","unit.pros","g2"],["ic-cart","c.market","430","unit.places","g5"],["ic-bed","c.hotel","210","unit.places","g2"],["ic-cap","c.school","320","unit.places","g4"],["ic-tools","c.services","2 100","unit.pros","g3"],["ic-car","c.transport","540","unit.pros","g6"],["ic-briefcase","c.jobs","180","unit.offers","g4"],["ic-store","c.realestate","760","unit.goods","g2"]];
   var offers=[
-    ["ic-fork","Le Baobab Gourmand","Restaurant","0,8 km","4.8","7 500 FCFA","g1",true],
-    ["ic-bed","Hôtel Téranga","Hôtel · 4★","2,1 km","4.6","45 000 FCFA","g2",true],
-    ["ic-tools","DépannPro Plomberie","Service · Urgence","1,4 km","4.9","dès 5 000 F","g3",true],
-    ["ic-cart","Casino Supermarché","Supermarché","0,5 km","4.3","—","g5",false],
-    ["ic-health","Pharmacie du Plateau","Pharmacie · 24/7","0,9 km","4.7","—","g4",true],
-    ["ic-car","Yobanté Transport","Transport","1,1 km","4.5","dès 1 500 F","g6",true]
+    ["ic-fork","Le Baobab Gourmand","ty.resto",0.8,"4.8",false,"7 500 FCFA","g1",true,true],
+    ["ic-bed","Hôtel Téranga","ty.hotel",2.1,"4.6",false,"45 000 FCFA","g2",true,true],
+    ["ic-tools","DépannPro Plomberie","ty.plumb",1.4,"4.9",true,"5 000 F","g3",true,false],
+    ["ic-cart","Casino Supermarché","ty.market",0.5,"4.3",false,null,"g5",false,false],
+    ["ic-health","Pharmacie du Plateau","ty.pharma",0.9,"4.7",false,null,"g4",true,false],
+    ["ic-car","Yobanté Transport","ty.transport",1.1,"4.5",true,"1 500 F","g6",true,false]
   ];
   var near=[
-    ["ic-tools","Électricien express","Service · Ouvert","0,6 km","4.9","g3",18,26],
-    ["ic-health","Clinique Pasteur","Santé · Ouvert","1,0 km","4.7","g2",54,40],
-    ["ic-fork","Chez Aïda","Restaurant · Ouvert","0,7 km","4.6","g1",40,66],
-    ["ic-cart","Mini Market Sandaga","Épicerie · Ouvert","0,4 km","4.2","g5",72,58],
-    ["ic-store","Agence Immo Corniche","Immobilier","1,8 km","4.4","g6",30,82]
+    ["ic-tools","Électricien express","ty.service",0.6,"4.9","g3",18,26,true],
+    ["ic-health","Clinique Pasteur","ty.health",1.0,"4.7","g2",54,40,true],
+    ["ic-fork","Chez Aïda","ty.resto",0.7,"4.6","g1",40,66,true],
+    ["ic-cart","Mini Market Sandaga","ty.grocery",0.4,"4.2","g5",72,58,true],
+    ["ic-store","Agence Immo Corniche","ty.realestate",1.8,"4.4","g6",30,82,false]
   ];
-
   function icon(id){return '<svg class="ic"><use href="#'+id+'"/></svg>';}
-  function stars(n){return '<span class="stars">'+icon("ic-star")+n+'</span>';}
+  function stars(n){return '<span class="stars">'+icon("ic-star")+fmt(n)+'</span>';}
+  function priceHtml(fromB,amt){return amt?((fromB?t("label.from")+' ':'')+'<b>'+amt+'</b>'):'<b>'+t("label.seeprice")+'</b>';}
 
-  // ---------- Rendu catégories ----------
-  document.getElementById("catGrid").innerHTML=cats.map(function(c){
-    return '<button class="cat" data-goto="explore"><span class="cat-ic">'+icon(c[0])+'</span><h3>'+c[1]+'</h3><span>'+c[2]+'</span></button>';
-  }).join("");
+  /* ================= RENDER ================= */
+  function renderCats(){
+    document.getElementById("catGrid").innerHTML=cats.map(function(c){
+      return '<button class="cat" data-goto="explore"><span class="cat-ic">'+icon(c[0])+'</span><h3>'+t(c[1])+'</h3><span>'+c[2]+' '+t(c[3])+'</span></button>';
+    }).join("");
+  }
+  function renderOffers(){
+    document.getElementById("offerGrid").innerHTML=offers.map(function(o){
+      var open=o[8]?'<span class="badge-open"><span class="dot dot-open"></span>'+t("badge.open")+'</span>':'<span class="badge-open"><span class="dot dot-closed"></span>'+t("badge.closed")+'</span>';
+      var cta=o[9]?t("btn.book"):t("btn.see");
+      return '<article class="card"><div class="card-media '+o[7]+'">'+open+'<button class="fav" aria-label="fav">'+icon("ic-heart")+'</button><span class="glyph">'+icon(o[0])+'</span></div>'+
+        '<div class="card-body"><h3>'+o[1]+'</h3><div class="meta">'+t(o[2])+' · '+icon("ic-pin")+fmt(o[3])+' km</div>'+stars(o[4])+
+        '<div class="card-foot"><span class="price">'+priceHtml(o[5],o[6])+'</span><button class="btn btn-primary btn-sm" data-goto="detail">'+cta+'</button></div></div></article>';
+    }).join("");
+  }
+  function renderNear(){
+    document.getElementById("nearList").innerHTML=near.map(function(n,i){
+      return '<div class="near" data-near="'+i+'" data-goto="detail"><span class="near-thumb '+n[5]+'">'+icon(n[0])+'</span>'+
+        '<div class="near-info"><h4>'+n[1]+'</h4><div class="meta">'+t(n[2])+' · '+t(n[8]?"badge.open":"badge.closed")+' · '+icon("ic-pin")+fmt(n[3])+' km</div>'+stars(n[4])+'</div><span class="near-cta">'+icon("ic-arrow")+'</span></div>';
+    }).join("");
+  }
+  function renderResults(){
+    var list=offers.concat(offers.slice(0,2));
+    document.getElementById("resCount").innerHTML='<b>128</b> '+t("res.results")+' · '+t("res.sortedby")+' <b>'+t("res.relevance")+'</b>';
+    document.getElementById("rlist").innerHTML=list.map(function(o){
+      var open=o[8]?'<span class="pill pill-open"><span class="dot dot-open"></span>'+t("badge.open")+'</span>':'';
+      var cta=o[9]?t("btn.book"):t("btn.seecard");
+      return '<article class="rrow" data-goto="detail"><div class="rrow-media '+o[7]+'">'+icon(o[0])+'</div><div class="rrow-body"><h3>'+o[1]+'</h3>'+
+        '<div class="meta">'+t(o[2])+' · '+icon("ic-pin")+fmt(o[3])+' km</div><div style="display:flex;gap:12px;align-items:center">'+stars(o[4])+open+'</div>'+
+        '<div class="rrow-foot"><span class="price">'+priceHtml(o[5],o[6])+'</span><button class="btn btn-primary btn-sm">'+cta+'</button></div></div></article>';
+    }).join("");
+  }
 
-  // ---------- Rendu offres ----------
-  document.getElementById("offerGrid").innerHTML=offers.map(function(o){
-    var open=o[7]?'<span class="badge-open"><span class="dot dot-open"></span>Ouvert</span>':'<span class="badge-open"><span class="dot dot-closed"></span>Fermé</span>';
-    var cta=o[2].indexOf("Restaurant")>-1||o[2].indexOf("Hôtel")>-1?"Réserver":"Voir";
-    return '<article class="card"><div class="card-media '+o[6]+'">'+open+
-      '<button class="fav" aria-label="Favori">'+icon("ic-heart")+'</button>'+
-      '<span class="glyph">'+icon(o[0])+'</span></div>'+
-      '<div class="card-body"><h3>'+o[1]+'</h3>'+
-      '<div class="meta">'+o[2]+' · '+icon("ic-pin")+o[3]+'</div>'+
-      stars(o[4])+'<div class="card-foot"><span class="price">'+(o[5]==="—"?'<b>Voir prix</b>':'dès <b>'+o[5]+'</b>')+'</span>'+
-      '<button class="btn btn-primary btn-sm" data-goto="detail">'+cta+'</button></div></div></article>';
-  }).join("");
-
-  // ---------- Rendu liste proches ----------
-  document.getElementById("nearList").innerHTML=near.map(function(n,i){
-    return '<div class="near" data-near="'+i+'" data-goto="detail"><span class="near-thumb '+n[5]+'">'+icon(n[0])+'</span>'+
-      '<div class="near-info"><h4>'+n[1]+'</h4><div class="meta">'+n[2]+' · '+icon("ic-pin")+n[3]+'</div>'+stars(n[4])+'</div>'+
-      '<span class="near-cta">'+icon("ic-arrow")+'</span></div>';
-  }).join("");
-
-  // ---------- Carte vectorielle ----------
+  /* -------- Maps -------- */
   function mapSVG(){
     return '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">'+
       '<rect width="100" height="100" fill="var(--surface-2)"/>'+
-      '<g fill="var(--surface-3)">'+
-      '<rect x="6" y="8" width="26" height="20" rx="3"/><rect x="38" y="6" width="24" height="16" rx="3"/>'+
-      '<rect x="68" y="10" width="26" height="22" rx="3"/><rect x="8" y="36" width="22" height="24" rx="3"/>'+
-      '<rect x="70" y="40" width="24" height="26" rx="3"/><rect x="10" y="70" width="28" height="22" rx="3"/>'+
-      '<rect x="46" y="70" width="20" height="22" rx="3"/><rect x="74" y="74" width="20" height="18" rx="3"/></g>'+
-      '<path d="M36 0 V100" stroke="var(--bg)" stroke-width="5" fill="none"/>'+
-      '<path d="M0 32 H100" stroke="var(--bg)" stroke-width="5" fill="none"/>'+
-      '<path d="M66 0 V100" stroke="var(--bg)" stroke-width="3.5" fill="none"/>'+
-      '<path d="M0 66 H100" stroke="var(--bg)" stroke-width="3.5" fill="none"/>'+
-      '<path d="M40 34 Q52 50 46 68" stroke="var(--emerald-100)" stroke-width="4" fill="none" opacity=".8"/>'+
-      '<rect x="40" y="24" width="24" height="16" rx="3" fill="var(--emerald-50)"/></svg>';
+      '<g fill="var(--surface-3)"><rect x="6" y="8" width="26" height="20" rx="3"/><rect x="38" y="6" width="24" height="16" rx="3"/><rect x="68" y="10" width="26" height="22" rx="3"/><rect x="8" y="36" width="22" height="24" rx="3"/><rect x="70" y="40" width="24" height="26" rx="3"/><rect x="10" y="70" width="28" height="22" rx="3"/><rect x="46" y="70" width="20" height="22" rx="3"/><rect x="74" y="74" width="20" height="18" rx="3"/></g>'+
+      '<path d="M36 0 V100" stroke="var(--bg)" stroke-width="5" fill="none"/><path d="M0 32 H100" stroke="var(--bg)" stroke-width="5" fill="none"/>'+
+      '<path d="M66 0 V100" stroke="var(--bg)" stroke-width="3.5" fill="none"/><path d="M0 66 H100" stroke="var(--bg)" stroke-width="3.5" fill="none"/>'+
+      '<path d="M40 34 Q52 50 46 68" stroke="var(--emerald-100)" stroke-width="4" fill="none" opacity=".8"/><rect x="40" y="24" width="24" height="16" rx="3" fill="var(--emerald-50)"/></svg>';
   }
-  function pinSVG(){
-    return '<svg viewBox="0 0 36 44"><path class="pin-body" d="M18 2C10 2 4 8 4 16c0 10 14 26 14 26s14-16 14-26C32 8 26 2 18 2z" fill="#059669"/><circle cx="18" cy="16" r="6" fill="#fff"/><circle cx="18" cy="16" r="2.6" fill="#059669"/></svg>';
-  }
+  function pinSVG(){return '<svg viewBox="0 0 36 44"><path class="pin-body" d="M18 2C10 2 4 8 4 16c0 10 14 26 14 26s14-16 14-26C32 8 26 2 18 2z" fill="#059669"/><circle cx="18" cy="16" r="6" fill="#fff"/><circle cx="18" cy="16" r="2.6" fill="#059669"/></svg>';}
   var homeMap=document.getElementById("homeMap");
   homeMap.insertAdjacentHTML("afterbegin",mapSVG());
-  near.forEach(function(n,i){
-    var p=document.createElement("button");
-    p.className="pin"; p.style.left=n[6]+"%"; p.style.top=n[7]+"%"; p.innerHTML=pinSVG();
-    p.setAttribute("data-pin",i);
-    homeMap.appendChild(p);
-  });
+  near.forEach(function(n,i){var p=document.createElement("button");p.className="pin";p.style.left=n[6]+"%";p.style.top=n[7]+"%";p.innerHTML=pinSVG();p.setAttribute("data-pin",i);homeMap.appendChild(p);});
   document.getElementById("exploreMap").innerHTML=mapSVG();
-  ["18|24","40|40","62|30","30|62","72|66","50|78"].forEach(function(pos){
-    var xy=pos.split("|"); var p=document.createElement("button");
-    p.className="pin"; p.style.left=xy[0]+"%"; p.style.top=xy[1]+"%"; p.innerHTML=pinSVG();
-    document.getElementById("exploreMap").appendChild(p);
-  });
+  ["18|24","40|40","62|30","30|62","72|66","50|78"].forEach(function(pos){var xy=pos.split("|");var p=document.createElement("button");p.className="pin";p.style.left=xy[0]+"%";p.style.top=xy[1]+"%";p.innerHTML=pinSVG();document.getElementById("exploreMap").appendChild(p);});
   document.getElementById("detailMap").innerHTML=mapSVG()+'<button class="pin active" style="left:50%;top:52%">'+pinSVG()+'</button>';
+  function linkPin(i,on){var pin=homeMap.querySelector('[data-pin="'+i+'"]');var row=document.querySelector('[data-near="'+i+'"]');if(pin)pin.classList.toggle("active",on);if(row)row.classList.toggle("active",on);}
+  homeMap.addEventListener("mouseover",function(e){var p=e.target.closest(".pin");if(p)linkPin(p.getAttribute("data-pin"),true);});
+  homeMap.addEventListener("mouseout",function(e){var p=e.target.closest(".pin");if(p)linkPin(p.getAttribute("data-pin"),false);});
+  document.getElementById("nearList").addEventListener("mouseover",function(e){var r=e.target.closest(".near");if(r)linkPin(r.getAttribute("data-near"),true);});
+  document.getElementById("nearList").addEventListener("mouseout",function(e){var r=e.target.closest(".near");if(r)linkPin(r.getAttribute("data-near"),false);});
 
-  // pin <-> liste
-  function linkPin(i,on){
-    var pin=homeMap.querySelector('[data-pin="'+i+'"]');
-    var row=document.querySelector('[data-near="'+i+'"]');
-    if(pin) pin.classList.toggle("active",on);
-    if(row) row.classList.toggle("active",on);
+  /* -------- Charts -------- */
+  function areaChart(vals,color){
+    var W=560,H=180,pad=14,max=Math.max.apply(null,vals)*1.15,min=0,n=vals.length;
+    function X(i){return pad+i*(W-2*pad)/(n-1);}
+    function Y(v){return H-pad-(v-min)/(max-min)*(H-2*pad);}
+    var line="";
+    vals.forEach(function(v,i){line+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)+" ";});
+    var area="M"+X(0).toFixed(1)+" "+(H-pad)+" "+line.replace("M","L")+"L"+X(n-1).toFixed(1)+" "+(H-pad)+" Z";
+    var grid="";for(var g=1;g<4;g++){var gy=pad+g*(H-2*pad)/4;grid+='<line x1="'+pad+'" y1="'+gy+'" x2="'+(W-pad)+'" y2="'+gy+'" stroke="var(--border)" stroke-width="1"/>';}
+    return '<svg class="chart" viewBox="0 0 '+W+' '+H+'"><defs><linearGradient id="ag'+color.replace("#","")+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'" stop-opacity=".28"/><stop offset="1" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'+
+      grid+'<path d="'+area+'" fill="url(#ag'+color.replace("#","")+')"/><path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(vals[n-1]).toFixed(1)+'" r="4.5" fill="'+color+'"/><circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(vals[n-1]).toFixed(1)+'" r="8" fill="'+color+'" opacity=".18"/></svg>';
   }
-  homeMap.addEventListener("mouseover",function(e){var p=e.target.closest(".pin"); if(p) linkPin(p.getAttribute("data-pin"),true);});
-  homeMap.addEventListener("mouseout",function(e){var p=e.target.closest(".pin"); if(p) linkPin(p.getAttribute("data-pin"),false);});
-  document.getElementById("nearList").addEventListener("mouseover",function(e){var r=e.target.closest(".near"); if(r) linkPin(r.getAttribute("data-near"),true);});
-  document.getElementById("nearList").addEventListener("mouseout",function(e){var r=e.target.closest(".near"); if(r) linkPin(r.getAttribute("data-near"),false);});
+  function barChart(vals,labels,color){
+    var W=560,H=190,pad=22,n=vals.length,max=Math.max.apply(null,vals)*1.15,bw=(W-2*pad)/n*.55;
+    var bars="";
+    vals.forEach(function(v,i){var x=pad+i*(W-2*pad)/n+((W-2*pad)/n-bw)/2;var h=(v/max)*(H-2*pad-16);var y=H-pad-16-h;
+      bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="5" fill="'+color+'" opacity="'+(i===n-1?1:.45)+'"/>';
+      bars+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-4)+'" fill="var(--text-3)" font-size="11" text-anchor="middle" font-family="Poppins">'+labels[i]+'</text>';});
+    return '<svg class="chart" viewBox="0 0 '+W+' '+H+'">'+bars+'</svg>';
+  }
+  function donut(segs){
+    var C=2*Math.PI*32,off=0,circ="";
+    segs.forEach(function(s){var len=s.val/100*C;circ+='<circle cx="42" cy="42" r="32" fill="none" stroke="'+s.color+'" stroke-width="16" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 42 42)"/>';off+=len;});
+    return '<svg viewBox="0 0 84 84" width="150" height="150">'+circ+'<text x="42" y="40" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)" font-family="Poppins">3 640</text><text x="42" y="53" text-anchor="middle" font-size="7.5" fill="var(--text-3)" font-family="Poppins">annonces</text></svg>';
+  }
 
-  // ---------- Rendu résultats explore ----------
-  document.getElementById("rlist").innerHTML=offers.concat(offers.slice(0,2)).map(function(o){
-    var open=o[7]?'<span class="pill pill-open"><span class="dot dot-open"></span>Ouvert</span>':'';
-    var cta=o[2].indexOf("Restaurant")>-1||o[2].indexOf("Hôtel")>-1?"Réserver":"Voir la fiche";
-    return '<article class="rrow" data-goto="detail"><div class="rrow-media '+o[6]+'">'+icon(o[0])+'</div>'+
-      '<div class="rrow-body"><h3>'+o[1]+'</h3><div class="meta">'+o[2]+' · '+icon("ic-pin")+o[3]+'</div>'+
-      '<div style="display:flex;gap:12px;align-items:center">'+stars(o[4])+open+'</div>'+
-      '<div class="rrow-foot"><span class="price">'+(o[5]==="—"?'<b>Voir prix</b>':'dès <b>'+o[5]+'</b>')+'</span>'+
-      '<button class="btn btn-primary btn-sm">'+cta+'</button></div></div></article>';
-  }).join("");
+  function renderDashboard(){
+    var s=[["ic-eye","stat.views","1 248","+12%",true],["ic-phone","stat.contacts","90","+8%",true],["ic-star","stat.rating","4.8","+0.2",true],["ic-package","stat.orders","32","+5%",true],["ic-chat","stat.messages","15","-3%",false],["ic-pin","stat.revenue","1,84M","+18%",true]];
+    document.getElementById("dbStats").innerHTML=s.map(function(x){
+      return '<div class="stat"><div class="stat-top"><span class="stat-ic">'+icon(x[0])+'</span><span class="trend '+(x[4]?"trend-up":"trend-down")+'">'+(x[4]?icon("ic-up"):'')+x[3]+'</span></div><h3 class="tnum">'+x[2]+'</h3><span>'+t(x[1])+'</span></div>';
+    }).join("");
+    document.getElementById("viewsChart").innerHTML=areaChart([120,145,132,170,160,190,210,205,240,232,268,255,290,310],"#10B981");
+    var mo=(lang==="fr"?["Fév","Mar","Avr","Mai","Juin","Juil"]:["Feb","Mar","Apr","May","Jun","Jul"]);
+    document.getElementById("revChart").innerHTML=barChart([210,265,240,320,290,360],mo,"#059669");
+    var ord=[["F","Fatou N.","order.done","12 000 F"],["M","Moussa D.","order.progress","7 500 F"],["A","Aïcha B.","order.new","24 000 F"],["S","Serigne L.","order.done","9 000 F"]];
+    document.getElementById("recentOrders").innerHTML=ord.map(function(o){
+      return '<div class="mini-row"><div class="avatar">'+o[0]+'</div><div><div class="r-name">'+o[1]+'</div><div class="r-sub">'+t(o[2])+'</div></div><div class="r-end"><div class="r-amt tnum">'+o[3]+'</div></div></div>';
+    }).join("");
+  }
+  function renderAdmin(){
+    var s=[["ic-user","ad.users","48 210","+24%",true],["ic-store","ad.providers","3 640","+12%",true],["ic-bag","ad.products","21 480","+9%",true],["ic-tools","ad.services","9 120","+15%",true],["ic-grid","ad.spaces","4 305","+6%",true],["ic-shield","ad.reports","37","-11%",false]];
+    document.getElementById("adStats").innerHTML=s.map(function(x){
+      return '<div class="stat"><div class="stat-top"><span class="stat-ic">'+icon(x[0])+'</span><span class="trend '+(x[4]?"trend-up":"trend-down")+'">'+(x[4]?icon("ic-up"):'')+x[3]+'</span></div><h3 class="tnum">'+x[2]+'</h3><span>'+t(x[1])+'</span></div>';
+    }).join("");
+    document.getElementById("growthChart").innerHTML=areaChart([1200,1500,1400,1800,2100,2000,2600,2900,3100,3600,3900,4300],"#1E3A8A");
+    var segs=[{k:"seg.products",val:52,color:"#10B981"},{k:"seg.services",val:26,color:"#1E3A8A"},{k:"seg.spaces",val:14,color:"#F59E0B"},{k:"seg.other",val:8,color:"#94A3B8"}];
+    document.getElementById("donut").innerHTML=donut(segs);
+    document.getElementById("donutLegend").innerHTML=segs.map(function(s2){return '<span><i style="background:'+s2.color+'"></i>'+t(s2.k)+' <b>'+s2.val+'%</b></span>';}).join("");
+    var mods=[["ic-store","Boutique Kaay Jënd","seg.products"],["ic-tools","Réparation Express","seg.services"],["ic-fork","Fast Food Teranga","seg.spaces"]];
+    document.getElementById("modList").innerHTML=mods.map(function(m){
+      return '<div class="mini-row"><span class="stat-ic" style="width:38px;height:38px">'+icon(m[0])+'</span><div><div class="r-name">'+m[1]+'</div><div class="r-sub">'+t(m[2])+'</div></div><div class="r-end" style="display:flex;gap:8px;align-items:center"><span class="pill pill-warn">'+t("badge.pending")+'</span><button class="btn btn-outline btn-sm">'+t("mod.review")+'</button></div></div>';
+    }).join("");
+  }
 
-  // ---------- Navigation entre vues ----------
-  var views={home:document.getElementById("view-home"),explore:document.getElementById("view-explore"),detail:document.getElementById("view-detail")};
+  /* -------- Messages -------- */
+  var convos=[["B","Le Baobab Gourmand","Parfait, à 20h alors !","09:24",true,0],["T","Hôtel Téranga","Votre réservation est confirmée.","Hier",false,2],["D","DépannPro","Le technicien arrive dans 15 min.","Lun",true,0],["P","Pharmacie Plateau","Oui, nous l'avons en stock.","Lun",false,1]];
+  var thread=[["in","Bonjour ! Bienvenue au Baobab Gourmand 🌿","09:10"],["out","Bonjour, avez-vous une table pour 2 ce soir ?","09:12"],["in","Oui, à quelle heure souhaitez-vous venir ?","09:14"],["out","Vers 20h si possible.","09:20"],["in","Parfait, à 20h alors !","09:24"]];
+  function renderMessages(){
+    document.getElementById("convList").innerHTML=convos.map(function(c,i){
+      var dot=c[4]?'<span class="on-dot"></span>':'';
+      var unread=c[5]?'<span class="unread">'+c[5]+'</span>':'';
+      var grad=(i===0)?'style="background:linear-gradient(135deg,#0f766e,#10B981)"':'';
+      return '<div class="conv'+(i===0?" active":"")+'"><div class="avatar" '+grad+'>'+c[0]+dot+'</div><div class="conv-info"><h4>'+c[1]+'<time>'+c[3]+'</time></h4><p>'+c[2]+'</p></div>'+unread+'</div>';
+    }).join("");
+    document.getElementById("chatBody").innerHTML=thread.map(function(m){
+      return '<div class="bubble '+(m[0]==="in"?"b-in":"b-out")+'">'+m[1]+'<time>'+m[2]+'</time></div>';
+    }).join("");
+  }
+  function sendMsg(){
+    var inp=document.getElementById("chatInput");if(!inp.value.trim())return;
+    var now=new Date();var hh=(""+now.getHours()).padStart(2,"0")+":"+(""+now.getMinutes()).padStart(2,"0");
+    var b=document.createElement("div");b.className="bubble b-out";b.innerHTML=inp.value.replace(/</g,"&lt;")+'<time>'+hh+'</time>';
+    document.getElementById("chatBody").appendChild(b);inp.value="";
+    var cb=document.getElementById("chatBody");cb.scrollTop=cb.scrollHeight;showToast(t("toast.sent"));
+  }
+
+  function renderAll(){renderCats();renderOffers();renderNear();renderResults();renderDashboard();renderAdmin();renderMessages();applyI18n();}
+
+  /* ================= NAV ================= */
+  var views={home:"view-home",explore:"view-explore",detail:"view-detail",dashboard:"view-dashboard",admin:"view-admin",messages:"view-messages"};
   function goto(name){
-    Object.keys(views).forEach(function(k){views[k].hidden=(k!==name);});
-    document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-goto")===name && (name!=="detail"));});
+    Object.keys(views).forEach(function(k){document.getElementById(views[k]).hidden=(k!==name);});
+    document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-goto")===name);});
     document.querySelectorAll(".botnav button").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-goto")===name);});
-    document.querySelector(".main").scrollTo?window.scrollTo({top:0,behavior:"smooth"}):window.scrollTo(0,0);
-    revealNow();
+    window.scrollTo({top:0,behavior:"smooth"});revealNow();
   }
   document.addEventListener("click",function(e){
-    var t=e.target.closest("[data-goto]");
-    if(t){e.preventDefault(); goto(t.getAttribute("data-goto")); return;}
+    var g=e.target.closest("[data-goto]");
+    if(g){e.preventDefault();goto(g.getAttribute("data-goto"));return;}
     var f=e.target.closest(".fav");
-    if(f){f.classList.toggle("on"); f.classList.add("pop"); setTimeout(function(){f.classList.remove("pop");},400);
-      if(f.classList.contains("on")) showToast("Ajouté à vos favoris"); return;}
+    if(f){f.classList.toggle("on");f.classList.add("pop");setTimeout(function(){f.classList.remove("pop");},400);if(f.classList.contains("on"))showToast(t("toast.fav"));return;}
+    var cv=e.target.closest(".conv");
+    if(cv){document.querySelectorAll(".conv").forEach(function(c){c.classList.remove("active");});cv.classList.add("active");return;}
   });
+  document.getElementById("reserveBtn").addEventListener("click",function(){showToast(t("toast.reserve"));});
+  document.getElementById("chatSend").addEventListener("click",sendMsg);
+  document.getElementById("chatInput").addEventListener("keydown",function(e){if(e.key==="Enter")sendMsg();});
 
-  // ---------- Réservation (validation) ----------
-  document.getElementById("reserveBtn").addEventListener("click",function(){showToast("Réservation confirmée&nbsp;!");});
+  /* -------- Toast -------- */
   var toast=document.getElementById("toast"),toastMsg=document.getElementById("toastMsg"),tmr;
-  function showToast(msg){toastMsg.innerHTML=msg; toast.classList.add("show"); clearTimeout(tmr); tmr=setTimeout(function(){toast.classList.remove("show");},2600);}
+  function showToast(msg){toastMsg.innerHTML=msg;toast.classList.add("show");clearTimeout(tmr);tmr=setTimeout(function(){toast.classList.remove("show");},2600);}
 
-  // ---------- Thème ----------
-  document.getElementById("themeBtn").addEventListener("click",function(){
-    var root=document.documentElement;
-    var dark=(root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark";
-    root.setAttribute("data-theme",dark?"light":"dark");
+  /* -------- Theme -------- */
+  var themeBtn=document.getElementById("themeBtn");
+  function isDark(){var a=root.getAttribute("data-theme");return a?a==="dark":matchMedia("(prefers-color-scheme:dark)").matches;}
+  function updThemeIcon(){themeBtn.innerHTML=icon(isDark()?"ic-sun":"ic-moon");}
+  themeBtn.addEventListener("click",function(){root.setAttribute("data-theme",isDark()?"light":"dark");updThemeIcon();});
+  try{matchMedia("(prefers-color-scheme:dark)").addEventListener("change",updThemeIcon);}catch(e){}
+  updThemeIcon();
+
+  /* -------- Language -------- */
+  document.getElementById("langBtn").addEventListener("click",function(){
+    lang=(lang==="fr")?"en":"fr";
+    document.getElementById("langLabel").textContent=lang.toUpperCase();
+    root.setAttribute("lang",lang);
+    renderAll();revealNow();
   });
 
-  // ---------- Scroll reveal ----------
-  var io=("IntersectionObserver" in window)?new IntersectionObserver(function(es){
-    es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in"); io.unobserve(en.target);}});
-  },{threshold:.12}):null;
-  function revealNow(){
-    document.querySelectorAll(".view:not([hidden]) .reveal").forEach(function(el){
-      if(io){io.observe(el);} else {el.classList.add("in");}
-      var r=el.getBoundingClientRect(); if(r.top<innerHeight){el.classList.add("in");}
-    });
-  }
-  revealNow();
+  /* -------- Reveal -------- */
+  var io=("IntersectionObserver" in window)?new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}});},{threshold:.12}):null;
+  function revealNow(){document.querySelectorAll(".view:not([hidden]) .reveal").forEach(function(el){if(io){io.observe(el);}else{el.classList.add("in");}var r=el.getBoundingClientRect();if(r.top<innerHeight){el.classList.add("in");}});}
+
+  /* ================= INIT ================= */
+  renderAll();revealNow();
 })();
 </script>
