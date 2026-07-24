@@ -20,14 +20,20 @@ class ApiService {
   final String baseUrl;
   String? _token;
   String? _user;
+  bool _fournisseur = false;
 
   static const _offline = 'demo-offline';
 
   bool get connecte => _token != null;
   String get utilisateur => _user ?? 'Invité';
+
+  /// Statut derive : true si l'utilisateur possede au moins un espace pro.
+  bool get estFournisseur => _fournisseur;
+
   void deconnexion() {
     _token = null;
     _user = null;
+    _fournisseur = false;
   }
 
   Map<String, String> get _headers => {
@@ -48,6 +54,7 @@ class ApiService {
         final b = jsonDecode(res.body) as Map<String, dynamic>;
         _token = b['token'] as String?;
         _user = (b['utilisateur']?['nom'] as String?) ?? email;
+        _fournisseur = (b['utilisateur']?['estFournisseur'] ?? false) as bool;
         return true;
       }
       if (res.statusCode == 400 || res.statusCode == 401) return false;
@@ -56,6 +63,7 @@ class ApiService {
     }
     _token = _offline;
     _user = email.split('@').first;
+    _fournisseur = false;
     return true;
   }
 
@@ -77,12 +85,14 @@ class ApiService {
         final b = jsonDecode(res.body) as Map<String, dynamic>;
         _token = b['token'] as String?;
         _user = nom;
+        _fournisseur = (b['utilisateur']?['estFournisseur'] ?? false) as bool;
         return true;
       }
       if (res.statusCode == 400) return false;
     } catch (_) {}
     _token = _offline;
     _user = nom.isNotEmpty ? nom : email.split('@').first;
+    _fournisseur = false;
     return true;
   }
 
@@ -137,12 +147,18 @@ class ApiService {
   // ======================= ESPACE PRO / PUBLICATION =======================
 
   Future<bool> creerEspace(Map<String, dynamic> espace) async {
-    if (_token == _offline) return true; // simulation hors ligne
+    if (_token == _offline) {
+      _fournisseur = true; // devient fournisseur (mode démo)
+      return true;
+    }
     try {
       final res = await http.post(Uri.parse('$baseUrl/espaces'),
           headers: _headers, body: jsonEncode(espace));
-      return res.statusCode == 201;
+      final ok = res.statusCode == 201;
+      if (ok) _fournisseur = true; // possede desormais un espace
+      return ok;
     } catch (_) {
+      _fournisseur = true;
       return true;
     }
   }

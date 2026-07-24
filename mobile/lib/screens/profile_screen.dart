@@ -42,9 +42,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 16),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(api.connecte ? api.utilisateur : 'Invité',
-                    style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700)),
-                Text(api.connecte ? 'Espace utilisateur Nexora' : 'Non connecté',
+                Row(children: [
+                  Flexible(
+                    child: Text(api.connecte ? api.utilisateur : 'Invité',
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700)),
+                  ),
+                  if (api.connecte && api.estFournisseur) ...[
+                    const SizedBox(width: 8),
+                    _fournisseurBadge(),
+                  ],
+                ]),
+                Text(
+                    api.connecte
+                        ? (api.estFournisseur ? 'Compte professionnel' : 'Espace utilisateur Nexora')
+                        : 'Non connecté',
                     style: const TextStyle(color: NexoraColors.text2)),
               ]),
             ),
@@ -81,6 +93,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _fournisseurBadge() => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+        decoration: BoxDecoration(
+          color: NexoraColors.emerald.withOpacity(.14),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.verified, size: 13, color: NexoraColors.emerald700),
+          const SizedBox(width: 4),
+          Text('Fournisseur',
+              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600,
+                  color: NexoraColors.emerald700)),
+        ]),
+      );
+
   Widget _section(String t) => Padding(
         padding: const EdgeInsets.only(top: 16, bottom: 8, left: 4),
         child: Text(t.toUpperCase(),
@@ -115,8 +142,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(children: [
             Expanded(
               child: FilledButton.icon(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => CreerEspaceScreen(api: widget.api))),
+                onPressed: () async {
+                  await Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => CreerEspaceScreen(api: widget.api)));
+                  if (mounted) setState(() {}); // rafraichit le badge Fournisseur
+                },
                 style: FilledButton.styleFrom(backgroundColor: NexoraColors.emerald,
                     padding: const EdgeInsets.symmetric(vertical: 12)),
                 icon: const Icon(Icons.add_business_outlined, size: 18),
