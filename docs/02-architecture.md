@@ -80,6 +80,7 @@ d'echange deja definis, et API REST exposee des l'origine.
 createdb nexora
 psql -d nexora -f docs/mpd/schema.sql
 psql -d nexora -f docs/mpd/seed.sql
+psql -d nexora -f docs/mpd/seed_catalogue.sql   # referentiel & catalogue (dropdowns)
 
 # 2. Build
 mvn clean package        # produit target/nexora.war

@@ -505,6 +505,37 @@ CREATE TABLE litige (
     id_commande    BIGINT NOT NULL UNIQUE REFERENCES commande(id_commande) ON DELETE CASCADE
 );
 
+-- ===================== REFERENTIEL (listes deroulantes) =============
+
+CREATE TABLE pays (
+    id_pays   BIGSERIAL PRIMARY KEY,
+    code      VARCHAR(2)   NOT NULL UNIQUE,
+    nom       VARCHAR(100) NOT NULL,
+    indicatif VARCHAR(8),
+    actif     BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE region (
+    id_region BIGSERIAL PRIMARY KEY,
+    nom       VARCHAR(120) NOT NULL,
+    id_pays   BIGINT NOT NULL REFERENCES pays(id_pays) ON DELETE CASCADE
+);
+CREATE INDEX idx_region_pays ON region(id_pays);
+
+CREATE TABLE ville (
+    id_ville  BIGSERIAL PRIMARY KEY,
+    nom       VARCHAR(120) NOT NULL,
+    id_region BIGINT NOT NULL REFERENCES region(id_region) ON DELETE CASCADE
+);
+CREATE INDEX idx_ville_region ON ville(id_region);
+
+CREATE TABLE devise (
+    id_devise BIGSERIAL PRIMARY KEY,
+    code      VARCHAR(8)  NOT NULL UNIQUE,
+    libelle   VARCHAR(80) NOT NULL,
+    symbole   VARCHAR(8)
+);
+
 -- =====================================================================
---  Fin du schema. Voir seed.sql pour les donnees de configuration.
+--  Fin du schema. Voir seed.sql + seed_catalogue.sql pour les donnees.
 -- =====================================================================

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'services/api_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/explore_screen.dart';
+import 'screens/profile_screen.dart';
 import 'theme.dart';
 
 void main() => runApp(const NexoraApp());
@@ -43,7 +44,7 @@ class _RootNavState extends State<RootNav> {
       ExploreScreen(api: _api),
       const _Placeholder(icon: Icons.favorite_border, label: 'Favoris'),
       const _Placeholder(icon: Icons.chat_bubble_outline, label: 'Messages'),
-      const _Placeholder(icon: Icons.person_outline, label: 'Profil'),
+      ProfileScreen(api: _api),
     ];
     return Scaffold(
       body: IndexedStack(index: _index, children: pages),

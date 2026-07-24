@@ -53,6 +53,25 @@ Chaque `OffreDTO` porte désormais les champs de la **carte de résultat premium
 ### GET `/offres/{id}`
 Détail d'une offre (incrémente le compteur de vues).
 
+## Référentiel — listes déroulantes (public)
+Alimente les formulaires pour minimiser la saisie manuelle.
+
+| Méthode | Route | Retour |
+|---|---|---|
+| GET | `/ref/types-espace` | Types d'espace (`RefItem[]`) |
+| GET | `/ref/categories-espace` | Catégories d'espace |
+| GET | `/ref/types-offre` | PRODUIT / SERVICE |
+| GET | `/ref/modes-paiement` | Wave, Orange Money, Free Money, Espèces… |
+| GET | `/ref/devises` | XOF, EUR, USD… |
+| GET | `/ref/pays` | Pays (code + indicatif dans `extra`) |
+| GET | `/ref/regions?pays={id}` | Régions d'un pays (`GeoDTO[]`) |
+| GET | `/ref/villes?region={id}` | Villes d'une région |
+| GET | `/categories/all` | Toutes les catégories |
+| GET | `/categories/{id}/attributs` | **Attributs dynamiques + valeurs possibles** → formulaire en dropdowns (`AttributDTO[]`) |
+
+`AttributDTO` : `id`, `nom`, `typeChamp` (LIST / MULTI_LIST / NUMBER / BOOLEAN / TEXT…),
+`obligatoire`, `unite`, `valeurs[]` (`{id, valeur}`).
+
 ## Espace professionnel (protégé — `Secured`)
 Toute connexion mène à un espace utilisateur ; l'utilisateur peut y créer ses
 espaces professionnels (boutique, service, clinique…) et publier ses offres.
