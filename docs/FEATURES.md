@@ -54,11 +54,22 @@ Recherche vocale ⛔ (extension mobile).
 et certification** des espaces professionnels, **arbitrage des litiges**.
 DAOs d'agrégation (`StatDao`, `LitigeDao`).
 
-## 8. Espaces professionnels ✅🟡
+## 8. Espaces professionnels ✅
 - Entité riche (contacts, réseaux sociaux, RCCM/NINEA/FISCAL, réputation) ✅.
 - Adresses géolocalisées, horaires, certifications ✅ (modèle + cascade).
-- Validation/certification côté admin ✅. CRUD public (création/édition par le
-  pro) 🟡 à exposer.
+- Validation/certification côté admin ✅.
+- **Création par l'utilisateur connecté** (`POST /api/espaces`) + « mes espaces »,
+  et **publication d'offres** (`POST /api/offres`) avec attributs EAV ✅.
+
+## 8b. Référentiel & listes déroulantes ✅ (saisie minimale)
+- Tables de référence Pays / Régions (14 du Sénégal) / Villes / Devises +
+  `seed_catalogue.sql` (types d'espace, catégories, **attributs avec valeurs
+  prédéfinies**, modes de paiement Wave/Orange Money/Free Money…).
+- Endpoints `/api/ref/*` et `/api/categories/{id}/attributs` : les formulaires
+  (création d'espace, publication d'offre) sont **quasi 100 % en dropdowns**.
+- Parcours fournisseur Flutter complet : connexion → ajouter mon espace
+  (dropdowns cascadés pays→région→ville) → publier une offre (catégorie →
+  attributs dynamiques). Prototype web : vue « Publier » équivalente.
 
 ## 9. Présentation web (JSF / PrimeFaces) ✅
 - Page de recherche `index.xhtml` + `RechercheBean` (MVC2) branchés sur
