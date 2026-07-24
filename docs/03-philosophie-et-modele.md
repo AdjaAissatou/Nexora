@@ -15,13 +15,35 @@ fait une plateforme où **tout produit, service ou espace s'ajoute sans modifier
 la base**, grâce à `Offre`, `CategorieOffre`, `Attribut`,
 `ValeurAttributPossible` et `OffreAttribut`.
 
+## 2bis. Le fournisseur n'est pas une personne, c'est l'espace
+Tout le monde commence **UTILISATEUR** (recherche, achat, messages, avis,
+favoris). Il n'existe **pas** de classe/profil `Client` ni `Fournisseur`.
+
+Le jour où l'utilisateur veut vendre, il ne crée pas un nouveau compte : il
+clique sur **« Créer mon espace professionnel »**. Le système crée un
+`EspaceProfessionnel` (avec un `TypeEspace` : Boutique, Cabinet, Clinique,
+Pharmacie, Restaurant, Prestataire de services, Artisan, Entreprise…),
+rattaché à son compte. C'est **l'espace** qui vend : `Offre.espace` pointe vers
+l'`EspaceProfessionnel`, jamais directement vers `Utilisateur`.
+
+Un utilisateur possède **0..\*** espaces (ex. Adja : « Cabinet Dentaire Adja »
+*et* « Adja Informatique »), le tout sur **un seul compte**.
+
+Le statut « fournisseur » est donc **dérivé**, pas attribué :
+```
+Utilisateur → possède ≥ 1 EspaceProfessionnel → il est fournisseur.
+```
+Concrètement : `AuthResponse.utilisateur.estFournisseur` est calculé à la
+connexion via `EspaceProfessionnelDao.countByProprietaire(...) > 0`
+(comme Facebook Marketplace, Google Business, LinkedIn, WhatsApp Business).
+
 ## 2. Pourquoi chaque classe — et où elle vit dans le code
 
 | Concept | Raison d'être | Classe (fichier) | État |
 |---|---|---|---|
 | **BaseEntity** | Mutualiser id/audit (createdAt, updatedAt, actif, createdBy) au lieu de les répéter dans 30 classes | `common/entity/BaseEntity.java` (`@MappedSuperclass`) | ✅ |
 | **Utilisateur** | Un seul compte, plusieurs rôles (Adja = cliente + vendeuse + prestataire) | `domain/user/Utilisateur.java` | ✅ |
-| **Role / Permission / Profile** | Ajouter livreur, modérateur, support… sans toucher au code (`isAdmin` figé = à proscrire) | `domain/user/{Role,Permission,Profile}.java` | ✅ |
+| **Role / Permission / Profile** | Profils = **UTILISATEUR + ADMIN** (+ staff : modérateur, support, livreur). Pas de profil « Client » ni « Fournisseur » : voir §2bis | `domain/user/{Role,Permission,Profile}.java` | ✅ |
 | **EspaceProfessionnel** | Ce n'est pas la personne qui vend, c'est sa boutique. Un compte → plusieurs espaces (ADJA TECH, Adja Beauty) | `domain/space/EspaceProfessionnel.java` | ✅ |
 | **Offre** | Classe centrale : produits **et** services sont des offres → recherchés de la même façon | `domain/catalog/Offre.java` (racine `SINGLE_TABLE`) | ✅ |
 | **Produit** | Spécifique aux biens physiques : stock, état, marque, garantie | `domain/catalog/Produit.java` | ✅ (poids/dimensions ⛔) |

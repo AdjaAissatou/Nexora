@@ -28,6 +28,19 @@ public class EspaceProfessionnelDao extends GenericDao<EspaceProfessionnel, Long
                 .getResultList();
     }
 
+    /**
+     * Nombre d'espaces possedes par un utilisateur. Sert a deriver le statut
+     * "fournisseur" : un utilisateur est fournisseur des lors qu'il possede
+     * au moins un espace professionnel (aucun role dedie n'est necessaire).
+     */
+    public long countByProprietaire(Long idProprietaire) {
+        return em().createQuery(
+                        "select count(e) from EspaceProfessionnel e "
+                                + "where e.proprietaire.idUtilisateur = :id", Long.class)
+                .setParameter("id", idProprietaire)
+                .getSingleResult();
+    }
+
     /** Nombre d'offres publiees rattachees a un espace. */
     public long countOffres(Long idEspace) {
         return em().createQuery(

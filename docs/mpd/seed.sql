@@ -18,10 +18,14 @@ INSERT INTO type_champ (code, libelle, composant_ui) VALUES
  ('MULTI_LIST', 'Liste (choix multiple)','selectManyCheckbox');
 
 -- ---------- Profils & roles (RBAC) -----------------------------------
+-- Philosophie : tout le monde est UTILISATEUR. Le statut "fournisseur" n'est
+-- PAS un profil : il est DERIVE (l'utilisateur possede au moins un
+-- EspaceProfessionnel). Les autres profils sont des roles operationnels
+-- reellement attribues par l'administration (staff / livreur).
 INSERT INTO profile (libelle) VALUES
- ('VISITEUR'), ('CLIENT'), ('PROFESSIONNEL'), ('VENDEUR'), ('PRESTATAIRE'),
- ('LIVREUR'), ('MODERATEUR'), ('SUPPORT'), ('CONTROLEUR_QUALITE'),
- ('GESTIONNAIRE_FINANCIER'), ('ADMIN'), ('SUPER_ADMIN');
+ ('UTILISATEUR'), ('ADMIN'), ('SUPER_ADMIN'),
+ ('MODERATEUR'), ('SUPPORT'), ('CONTROLEUR_QUALITE'),
+ ('GESTIONNAIRE_FINANCIER'), ('LIVREUR');
 
 INSERT INTO role (libelle, date_attribution) VALUES
  ('ROLE_CLIENT', now()), ('ROLE_PRO', now()), ('ROLE_ADMIN', now()),

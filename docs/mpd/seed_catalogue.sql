@@ -80,7 +80,9 @@ INSERT INTO type_espace_professionnel (code, libelle) VALUES
  ('ADMINISTRATION','Administration'), ('ONG','ONG'), ('ASSOCIATION','Association'),
  ('COWORKING','Espace de coworking'), ('SALLE_EVENEMENT','Salle d''evenement'),
  ('STATION','Station-service'), ('CENTRE_FORMATION','Centre de formation'),
- ('INSTITUT_BEAUTE','Institut de beaute'), ('SALLE_SPORT','Salle de sport')
+ ('INSTITUT_BEAUTE','Institut de beaute'), ('SALLE_SPORT','Salle de sport'),
+ ('PRESTATAIRE','Prestataire de services'), ('HOPITAL','Hopital'),
+ ('CLINIQUE','Clinique'), ('ARTISAN','Artisan'), ('AGENCE_IMMO','Agence immobiliere')
 ON CONFLICT (code) DO NOTHING;
 
 -- ===================== TYPES DE CATEGORIE (complement) =============

@@ -34,6 +34,8 @@ public class AuthResponse implements Serializable {
         private String prenom;
         private String email;
         private String profile;
+        /** Statut derive : true si l'utilisateur possede au moins un espace. */
+        private boolean estFournisseur;
 
         public UserSummary() {
         }
