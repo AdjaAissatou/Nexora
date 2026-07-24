@@ -359,6 +359,34 @@ a{color:inherit; text-decoration:none;}
   .topbar{padding:12px 16px;} .top-search{display:none;}
   .view{padding:18px;} .hero{padding:34px 22px;} .photos{grid-template-columns:repeat(2,1fr);}
 }
+
+/* ============ PAGE DE CONNEXION (gate) ============ */
+.auth-gate{position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:20px;
+  background:radial-gradient(1200px 500px at 72% -10%, rgba(16,185,129,.18), transparent 60%), var(--bg);}
+.auth-gate.hidden{display:none;}
+.auth-card{display:grid; grid-template-columns:1.05fr 1fr; width:min(920px,100%); background:var(--card);
+  border:1px solid var(--border); border-radius:24px; overflow:hidden; box-shadow:var(--shadow-lg);}
+.auth-brand{position:relative; padding:44px 40px; color:#fff; background:linear-gradient(150deg,#047857,#0f2560);
+  display:flex; flex-direction:column; gap:16px; overflow:hidden;}
+.auth-brand::after{content:""; position:absolute; right:-60px; bottom:-60px; width:220px; height:220px; border-radius:50%;
+  background:radial-gradient(circle,rgba(16,185,129,.5),transparent 70%);}
+.auth-logo{width:46px; height:46px; position:relative;}
+.auth-brand h1{font-size:29px; font-weight:700; position:relative;}
+.auth-brand p{color:rgba(255,255,255,.82); font-size:14.5px; max-width:320px; position:relative;}
+.auth-feats{display:flex; flex-direction:column; gap:12px; margin-top:auto; position:relative;}
+.auth-feat{display:flex; gap:11px; align-items:center; font-size:13.5px; color:rgba(255,255,255,.92);}
+.auth-feat .ic{width:18px; height:18px; stroke:#fff;}
+.auth-form{padding:44px 40px; display:flex; flex-direction:column; justify-content:center;}
+.auth-form h2{font-size:24px; font-weight:700;}
+.auth-sub{color:var(--text-2); font-size:14px; margin:6px 0 22px;}
+.auth-form label{display:block; font-size:13px; font-weight:500; color:var(--text-2); margin:0 0 6px;}
+.auth-form input{width:100%; padding:13px 15px; border-radius:12px; border:1px solid var(--border); background:var(--surface-2);
+  color:var(--text); font:inherit; font-size:14.5px; margin-bottom:16px;}
+.auth-form input:focus{outline:none; border-color:var(--emerald); background:var(--card); box-shadow:0 0 0 4px var(--emerald-50);}
+.auth-form .btn-primary{width:100%; margin-top:4px;}
+.auth-links{display:flex; justify-content:space-between; gap:10px; margin-top:16px; flex-wrap:wrap;}
+.auth-links button{color:var(--emerald-700); font-weight:600; font-size:13.5px;}
+@media(max-width:760px){.auth-card{grid-template-columns:1fr;} .auth-brand{display:none;}}
 </style>
 
 <!-- ============ ICON SPRITE ============ -->
@@ -399,6 +427,34 @@ a{color:inherit; text-decoration:none;}
   <symbol id="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
   <symbol id="ic-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
 </svg>
+
+<!-- ============ PAGE DE CONNEXION ============ -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <svg class="auth-logo" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect width="44" height="44" rx="13" fill="#10B981"/><path d="M14 31V14.5c0-.6.7-.9 1.2-.5L29 25.2V15" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29" cy="30" r="3.4" fill="#fff"/><circle cx="29" cy="30" r="1.3" fill="#047857"/></svg>
+      <h1>Bienvenue sur Nexora</h1>
+      <p>Trouvez, comparez, contactez et reservez tout ce dont vous avez besoin, pres de vous.</p>
+      <div class="auth-feats">
+        <div class="auth-feat"><svg class="ic"><use href="#ic-search"/></svg>Recherche intelligente & geolocalisee</div>
+        <div class="auth-feat"><svg class="ic"><use href="#ic-store"/></svg>Creez votre espace pro en un clic</div>
+        <div class="auth-feat"><svg class="ic"><use href="#ic-chat"/></svg>Discutez et reservez en direct</div>
+      </div>
+    </div>
+    <div class="auth-form">
+      <h2 id="authTitle">Connexion</h2>
+      <p class="auth-sub" id="authSub">Accedez a votre espace Nexora.</p>
+      <div id="authNameField" style="display:none"><label>Nom complet</label><input id="authNom" placeholder="Ex : Adja Diop"/></div>
+      <label>Email</label><input id="authEmail" type="email" placeholder="vous@exemple.com"/>
+      <label>Mot de passe</label><input id="authPwd" type="password" placeholder="********"/>
+      <button class="btn btn-primary" id="authSubmit">Se connecter</button>
+      <div class="auth-links">
+        <button id="authToggle">Nouveau ? Creer un compte</button>
+        <button id="authGuest">Continuer en visiteur</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ============ APP ============ -->
 <div class="app">
@@ -956,6 +1012,34 @@ a{color:inherit; text-decoration:none;}
   /* -------- Reveal -------- */
   var io=("IntersectionObserver" in window)?new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}});},{threshold:.12}):null;
   function revealNow(){document.querySelectorAll(".view:not([hidden]) .reveal").forEach(function(el){if(io){io.observe(el);}else{el.classList.add("in");}var r=el.getBoundingClientRect();if(r.top<innerHeight){el.classList.add("in");}});}
+
+  /* -------- Page de connexion (gate) -------- */
+  (function(){
+    var gate=document.getElementById("authGate");
+    if(!gate) return;
+    var mode="login";
+    function maj(){
+      document.getElementById("authTitle").textContent=(mode==="login")?"Connexion":"Creer un compte";
+      document.getElementById("authSub").textContent=(mode==="login")?"Accedez a votre espace Nexora.":"Rejoignez Nexora en 30 secondes.";
+      document.getElementById("authSubmit").textContent=(mode==="login")?"Se connecter":"Creer mon compte";
+      document.getElementById("authNameField").style.display=(mode==="register")?"block":"none";
+      document.getElementById("authToggle").textContent=(mode==="login")?"Nouveau ? Creer un compte":"Deja un compte ? Se connecter";
+    }
+    function entrer(nom){
+      gate.classList.add("hidden");
+      if(nom){var av=document.querySelector(".topbar .avatar"); if(av) av.textContent=nom.charAt(0).toUpperCase();}
+      showToast("Bienvenue sur Nexora");
+    }
+    document.getElementById("authToggle").addEventListener("click",function(){mode=(mode==="login")?"register":"login"; maj();});
+    document.getElementById("authGuest").addEventListener("click",function(){entrer("");});
+    document.getElementById("authSubmit").addEventListener("click",function(){
+      var email=document.getElementById("authEmail").value.trim();
+      var pwd=document.getElementById("authPwd").value;
+      if(!email||!pwd){showToast("Email et mot de passe requis");return;}
+      var nom=(document.getElementById("authNom").value||"").trim();
+      entrer(nom||email);
+    });
+  })();
 
   /* ================= INIT ================= */
   renderAll();renderPublier();revealNow();

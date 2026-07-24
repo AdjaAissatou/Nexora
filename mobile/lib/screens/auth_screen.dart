@@ -5,10 +5,13 @@ import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/nx_fields.dart';
 
-/// Écran de connexion / inscription. Renvoie `true` en cas de succès.
+/// Écran de connexion / inscription. Utilisé au démarrage (page d'entrée) et
+/// depuis le profil. Si [onDone] est fourni il est appelé au succès / mode
+/// visiteur ; sinon l'écran se ferme avec `true`.
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, required this.api});
+  const AuthScreen({super.key, required this.api, this.onDone});
   final ApiService api;
+  final VoidCallback? onDone;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -35,9 +38,17 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!mounted) return;
     setState(() => _loading = false);
     if (ok) {
-      Navigator.pop(context, true);
+      _terminer();
     } else {
       _erreur('Identifiants invalides.');
+    }
+  }
+
+  void _terminer() {
+    if (widget.onDone != null) {
+      widget.onDone!();
+    } else {
+      Navigator.pop(context, true);
     }
   }
 
@@ -84,6 +95,13 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Text(_inscription
                   ? 'Déjà un compte ? Se connecter'
                   : 'Nouveau ? Créer un compte'),
+            ),
+          ),
+          Center(
+            child: TextButton(
+              onPressed: _terminer, // continuer sans compte (visiteur)
+              child: const Text('Continuer en visiteur',
+                  style: TextStyle(color: NexoraColors.text3)),
             ),
           ),
         ],

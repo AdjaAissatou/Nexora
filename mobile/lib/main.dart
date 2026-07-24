@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'services/api_service.dart';
+import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/explore_screen.dart';
 import 'screens/profile_screen.dart';
@@ -18,33 +19,55 @@ class NexoraApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: NexoraTheme.light,
       darkTheme: NexoraTheme.dark,
-      themeMode: ThemeMode.system, // suit le thème système (clair par défaut)
-      home: const RootNav(),
+      themeMode: ThemeMode.system,
+      home: const StartupGate(),
     );
+  }
+}
+
+/// Point d'entrée : l'application démarre sur la **page de connexion**.
+/// Après connexion (ou « Continuer en visiteur »), on entre dans l'app.
+class StartupGate extends StatefulWidget {
+  const StartupGate({super.key});
+
+  @override
+  State<StartupGate> createState() => _StartupGateState();
+}
+
+class _StartupGateState extends State<StartupGate> {
+  final _api = ApiService();
+  bool _entre = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_entre) {
+      return AuthScreen(api: _api, onDone: () => setState(() => _entre = true));
+    }
+    return RootNav(api: _api);
   }
 }
 
 /// Navigation principale — barre du bas (Accueil · Explorer · Favoris ·
 /// Messages · Profil), façon Airbnb / Instagram.
 class RootNav extends StatefulWidget {
-  const RootNav({super.key});
+  const RootNav({super.key, required this.api});
+  final ApiService api;
 
   @override
   State<RootNav> createState() => _RootNavState();
 }
 
 class _RootNavState extends State<RootNav> {
-  final _api = ApiService();
   int _index = 0;
 
   @override
   Widget build(BuildContext context) {
     final pages = [
-      HomeScreen(api: _api),
-      ExploreScreen(api: _api),
+      HomeScreen(api: widget.api),
+      ExploreScreen(api: widget.api),
       const _Placeholder(icon: Icons.favorite_border, label: 'Favoris'),
       const _Placeholder(icon: Icons.chat_bubble_outline, label: 'Messages'),
-      ProfileScreen(api: _api),
+      ProfileScreen(api: widget.api),
     ];
     return Scaffold(
       body: IndexedStack(index: _index, children: pages),
