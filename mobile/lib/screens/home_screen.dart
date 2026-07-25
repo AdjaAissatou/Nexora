@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: OfferCard(
                     offre: offres[i],
                     onTap: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => DetailScreen(offre: offres[i]))),
+                        MaterialPageRoute(builder: (_) => DetailScreen(offre: offres[i], api: widget.api))),
                   ),
                 ),
                 childCount: offres.length,

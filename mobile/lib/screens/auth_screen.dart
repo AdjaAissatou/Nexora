@@ -5,20 +5,42 @@ import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/nx_fields.dart';
 
-/// Écran de connexion / inscription. Utilisé au démarrage (page d'entrée) et
-/// depuis le profil. Si [onDone] est fourni il est appelé au succès / mode
-/// visiteur ; sinon l'écran se ferme avec `true`.
+/// Exige une connexion pour une action réservée (commander, réserver, créer un
+/// espace…). Ouvre l'écran d'inscription si besoin et retourne `true` si
+/// l'utilisateur est (devenu) connecté.
+Future<bool> exigerConnexion(BuildContext context, ApiService api, {String? raison}) async {
+  if (api.connecte) return true;
+  final ok = await Navigator.push<bool>(
+    context,
+    MaterialPageRoute(
+      builder: (_) => AuthScreen(api: api, raison: raison, inscriptionParDefaut: true),
+    ),
+  );
+  return ok == true && api.connecte;
+}
+
+/// Écran de connexion / inscription. On ne s'inscrit que lorsqu'une action le
+/// requiert (commander, créer un espace) : [raison] affiche alors le contexte,
+/// et [inscriptionParDefaut] ouvre directement le formulaire d'inscription.
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, required this.api, this.onDone});
+  const AuthScreen({
+    super.key,
+    required this.api,
+    this.onDone,
+    this.raison,
+    this.inscriptionParDefaut = false,
+  });
   final ApiService api;
   final VoidCallback? onDone;
+  final String? raison;
+  final bool inscriptionParDefaut;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool _inscription = false;
+  late bool _inscription = widget.inscriptionParDefaut;
   bool _loading = false;
   final _nom = TextEditingController();
   final _prenom = TextEditingController();
@@ -68,6 +90,25 @@ class _AuthScreenState extends State<AuthScreen> {
           const SizedBox(height: 4),
           const Text('Accédez à votre espace, vos favoris, vos messages et votre espace pro.',
               style: TextStyle(color: NexoraColors.text2)),
+          if (widget.raison != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: NexoraColors.emerald.withOpacity(.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(children: [
+                const Icon(Icons.info_outline, size: 18, color: NexoraColors.emerald700),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text('Créez un compte ${widget.raison}.',
+                      style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500,
+                          color: NexoraColors.emerald700)),
+                ),
+              ]),
+            ),
+          ],
           const SizedBox(height: 24),
           if (_inscription) ...[
             nxText(label: 'Nom', controller: _nom, obligatoire: true),

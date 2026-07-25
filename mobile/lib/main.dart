@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
 import 'services/api_service.dart';
-import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/explore_screen.dart';
 import 'screens/profile_screen.dart';
 import 'theme.dart';
 
-void main() => runApp(const NexoraApp());
+void main() => runApp(NexoraApp());
 
 class NexoraApp extends StatelessWidget {
-  const NexoraApp({super.key});
+  NexoraApp({super.key});
+
+  final _api = ApiService();
 
   @override
   Widget build(BuildContext context) {
@@ -20,30 +21,10 @@ class NexoraApp extends StatelessWidget {
       theme: NexoraTheme.light,
       darkTheme: NexoraTheme.dark,
       themeMode: ThemeMode.system,
-      home: const StartupGate(),
+      // L'app démarre en mode visiteur : on ne s'inscrit que pour commander
+      // ou créer un espace (voir AuthGate.exiger).
+      home: RootNav(api: _api),
     );
-  }
-}
-
-/// Point d'entrée : l'application démarre sur la **page de connexion**.
-/// Après connexion (ou « Continuer en visiteur »), on entre dans l'app.
-class StartupGate extends StatefulWidget {
-  const StartupGate({super.key});
-
-  @override
-  State<StartupGate> createState() => _StartupGateState();
-}
-
-class _StartupGateState extends State<StartupGate> {
-  final _api = ApiService();
-  bool _entre = false;
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_entre) {
-      return AuthScreen(api: _api, onDone: () => setState(() => _entre = true));
-    }
-    return RootNav(api: _api);
   }
 }
 

@@ -63,16 +63,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ]),
           const SizedBox(height: 24),
 
-          if (!api.connecte)
-            FilledButton.icon(
-              onPressed: _connexion,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-                backgroundColor: NexoraColors.emerald600,
-              ),
-              icon: const Icon(Icons.login),
-              label: const Text('Se connecter / Créer un compte'),
-            ),
+          // Espace pro visible pour tout le monde : l'inscription n'est
+          // demandée qu'au moment de créer l'espace ou de publier.
+          _proCard(),
+          const SizedBox(height: 8),
 
           if (api.connecte) ...[
             _section('Mon compte'),
@@ -80,14 +74,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _tile(Icons.receipt_long_outlined, 'Mes commandes', () {}),
             _tile(Icons.chat_bubble_outline, 'Messages', () {}),
             const SizedBox(height: 8),
-            _proCard(),
-            const SizedBox(height: 8),
             _section('Paramètres'),
             _tile(Icons.logout, 'Se déconnecter', () {
               api.deconnexion();
               setState(() {});
             }, danger: true),
-          ],
+          ] else
+            TextButton.icon(
+              onPressed: _connexion,
+              icon: const Icon(Icons.login, size: 18),
+              label: const Text('J\'ai déjà un compte — Se connecter'),
+            ),
         ],
       ),
     );
@@ -143,8 +140,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Expanded(
               child: FilledButton.icon(
                 onPressed: () async {
-                  await Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => CreerEspaceScreen(api: widget.api)));
+                  if (await exigerConnexion(context, widget.api,
+                      raison: 'pour créer votre espace')) {
+                    if (!mounted) return;
+                    await Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => CreerEspaceScreen(api: widget.api)));
+                  }
                   if (mounted) setState(() {}); // rafraichit le badge Fournisseur
                 },
                 style: FilledButton.styleFrom(backgroundColor: NexoraColors.emerald,
@@ -156,8 +157,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => PublierOffreScreen(api: widget.api))),
+                onPressed: () async {
+                  if (await exigerConnexion(context, widget.api,
+                      raison: 'pour publier une offre')) {
+                    if (!mounted) return;
+                    await Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => PublierOffreScreen(api: widget.api)));
+                    if (mounted) setState(() {});
+                  }
+                },
                 style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white24),

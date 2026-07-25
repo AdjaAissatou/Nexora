@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/offre.dart';
+import '../services/api_service.dart';
 import '../theme.dart';
+import 'auth_screen.dart';
 
 /// Fiche détail d'une offre / d'un espace professionnel.
 class DetailScreen extends StatelessWidget {
-  const DetailScreen({super.key, required this.offre});
+  const DetailScreen({super.key, required this.offre, required this.api});
   final Offre offre;
+  final ApiService api;
 
   @override
   Widget build(BuildContext context) {
@@ -85,17 +88,23 @@ class DetailScreen extends StatelessWidget {
           child: Row(children: [
             Expanded(
               child: FilledButton.icon(
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Demande envoyée ✓'),
-                      backgroundColor: NexoraColors.nuit),
-                ),
-                icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                label: const Text('Contacter'),
+                onPressed: () async {
+                  // On ne s'inscrit que pour réserver / commander.
+                  if (await exigerConnexion(context, api, raison: 'pour réserver')) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Réservation envoyée ✓'),
+                          backgroundColor: NexoraColors.nuit));
+                    }
+                  }
+                },
+                icon: const Icon(Icons.event_available_outlined, size: 18),
+                label: const Text('Réserver'),
               ),
             ),
             const SizedBox(width: 12),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () {}, // appel téléphonique : pas de compte requis
               icon: const Icon(Icons.phone_outlined, size: 18),
               label: const Text('Appeler'),
               style: OutlinedButton.styleFrom(

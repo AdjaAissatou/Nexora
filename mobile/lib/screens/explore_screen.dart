@@ -87,7 +87,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   itemBuilder: (context, i) => OfferCard(
                     offre: list[i],
                     onTap: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => DetailScreen(offre: list[i]))),
+                        MaterialPageRoute(builder: (_) => DetailScreen(offre: list[i], api: widget.api))),
                   ),
                 );
               },
