@@ -23,6 +23,7 @@ class _PublierOffreScreenState extends State<PublierOffreScreen> {
   final _titre = TextEditingController();
   final _prix = TextEditingController();
   final _desc = TextEditingController();
+  final List<TextEditingController> _photos = [TextEditingController()];
 
   List<Categorie> _categories = [];
   Categorie? _categorie;
@@ -74,6 +75,9 @@ class _PublierOffreScreenState extends State<PublierOffreScreen> {
       if (set.isNotEmpty) attributsTexte['$k'] = set.join(', ');
     });
 
+    final images =
+        _photos.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList();
+
     setState(() => _saving = true);
     final ok = await widget.api.publierOffre({
       'type': _type,
@@ -81,6 +85,7 @@ class _PublierOffreScreenState extends State<PublierOffreScreen> {
       'description': _desc.text.trim(),
       'prix': double.tryParse(_prix.text.replaceAll(' ', '')),
       'idCategorie': _categorie!.id,
+      'images': images,
       'attributsTexte': attributsTexte,
     });
     if (!mounted) return;
@@ -142,6 +147,8 @@ class _PublierOffreScreenState extends State<PublierOffreScreen> {
 
           nxText(label: 'Description', controller: _desc, maxLines: 3,
               hint: 'Détaillez votre offre (facultatif)'),
+          const SizedBox(height: 6),
+          _photosSection(),
           const SizedBox(height: 8),
           FilledButton.icon(
             onPressed: _saving ? null : _publier,
@@ -157,6 +164,90 @@ class _PublierOffreScreenState extends State<PublierOffreScreen> {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+
+  /// Section photos : une ou plusieurs URLs, avec aperçu et ajout dynamique.
+  /// La première photo saisie devient l'image principale de l'annonce.
+  Widget _photosSection() {
+    final urls =
+        _photos.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        nxLabel('Photos (liens)'),
+        for (int i = 0; i < _photos.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(children: [
+              Expanded(
+                child: TextField(
+                  controller: _photos[i],
+                  keyboardType: TextInputType.url,
+                  onChanged: (_) => setState(() {}),
+                  decoration: InputDecoration(
+                    hintText: 'https://…/photo.jpg',
+                    prefixIcon: const Icon(Icons.link, size: 20),
+                  ),
+                ),
+              ),
+              if (_photos.length > 1)
+                IconButton(
+                  tooltip: 'Retirer',
+                  onPressed: () => setState(() => _photos.removeAt(i)),
+                  icon: const Icon(Icons.close, size: 20),
+                ),
+            ]),
+          ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: () => setState(() => _photos.add(TextEditingController())),
+            icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+            label: const Text('Ajouter une photo'),
+          ),
+        ),
+        if (urls.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (int i = 0; i < urls.length; i++)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Stack(children: [
+                    Image.network(
+                      urls[i],
+                      width: 72,
+                      height: 72,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 72,
+                        height: 72,
+                        color: NexoraColors.surface2,
+                        child: const Icon(Icons.broken_image_outlined,
+                            color: NexoraColors.text3, size: 20),
+                      ),
+                    ),
+                    if (i == 0)
+                      Positioned(
+                        left: 0,
+                        bottom: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          color: NexoraColors.emerald700,
+                          child: const Text('Principale',
+                              style: TextStyle(color: Colors.white, fontSize: 9)),
+                        ),
+                      ),
+                  ]),
+                ),
+            ],
+          ),
+        ],
+        const SizedBox(height: 14),
+      ],
     );
   }
 

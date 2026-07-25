@@ -13,6 +13,7 @@ class Offre {
   final double? noteEspace;
   final int nombreAvis;
   final String? imagePrincipale;
+  final List<String> galerie;
   final double? distanceKm;
   final bool ouvert;
   final int? dureeEstimeeMin;
@@ -35,6 +36,7 @@ class Offre {
     this.noteEspace,
     this.nombreAvis = 0,
     this.imagePrincipale,
+    this.galerie = const [],
     this.distanceKm,
     this.ouvert = false,
     this.dureeEstimeeMin,
@@ -58,6 +60,11 @@ class Offre {
         noteEspace: (j['noteEspace'] as num?)?.toDouble(),
         nombreAvis: (j['nombreAvis'] ?? 0) as int,
         imagePrincipale: j['imagePrincipale'] as String?,
+        galerie: (j['galerie'] as List?)
+                ?.map((e) => e.toString())
+                .where((e) => e.isNotEmpty)
+                .toList() ??
+            const [],
         distanceKm: (j['distanceKm'] as num?)?.toDouble(),
         ouvert: (j['ouvert'] ?? false) as bool,
         dureeEstimeeMin: (j['dureeEstimeeMin'] as num?)?.toInt(),

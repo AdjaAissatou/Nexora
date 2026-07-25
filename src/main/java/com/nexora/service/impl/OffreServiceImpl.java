@@ -98,6 +98,20 @@ public class OffreServiceImpl implements OffreService {
         }
         em.persist(offre);
 
+        // Photos : la premiere URL non vide devient l'image principale.
+        if (req.getImages() != null) {
+            int ordre = 0;
+            for (String url : req.getImages()) {
+                if (url == null || url.isBlank()) continue;
+                Image img = new Image();
+                img.setOffre(offre);
+                img.setUrl(url.trim());
+                img.setPrincipale(ordre == 0);
+                img.setOrdre(ordre++);
+                em.persist(img);
+            }
+        }
+
         // Valeurs d'attributs dynamiques (EAV) fournies sous forme texte.
         if (req.getAttributsTexte() != null) {
             for (Map.Entry<Long, String> e : req.getAttributsTexte().entrySet()) {

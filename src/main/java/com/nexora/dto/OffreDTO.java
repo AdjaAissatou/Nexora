@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Vue exposee d'une offre (JSF / REST). Decouple la couche presentation du
@@ -30,6 +31,7 @@ public class OffreDTO implements Serializable {
     private Double noteEspace;
     private int nombreAvis;
     private String imagePrincipale;
+    private List<String> galerie;        // toutes les photos de l'offre, ordonnees
     private Double distanceKm;
 
     // --- Champs de la carte de resultat premium ---

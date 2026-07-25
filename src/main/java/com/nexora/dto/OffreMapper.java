@@ -5,6 +5,9 @@ import com.nexora.domain.catalog.Offre;
 import com.nexora.domain.space.Adresse;
 import com.nexora.domain.space.EspaceProfessionnel;
 
+import java.util.Comparator;
+import java.util.List;
+
 /** Convertit une entite {@link Offre} en {@link OffreDTO}. */
 public final class OffreMapper {
 
@@ -39,10 +42,18 @@ public final class OffreMapper {
                 dto.setAdresseCourte((quartier + (quartier.isEmpty() || ville.isEmpty() ? "" : ", ") + ville).trim());
             });
         }
+        // Galerie complete (ordonnee) + image principale avec repli sur la 1re.
+        List<String> galerie = o.getImages().stream()
+                .sorted(Comparator.comparingInt(Image::getOrdre))
+                .map(Image::getUrl)
+                .toList();
+        dto.setGalerie(galerie);
         o.getImages().stream()
                 .filter(Image::isPrincipale)
                 .findFirst()
-                .ifPresent(img -> dto.setImagePrincipale(img.getUrl()));
+                .map(Image::getUrl)
+                .or(() -> galerie.stream().findFirst())
+                .ifPresent(dto::setImagePrincipale);
         return dto;
     }
 }

@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +37,9 @@ public class OffreRequest implements Serializable {
     private String typeService;
     private BigDecimal tarif;
     private Boolean aDomicile;
+
+    // Photos de l'offre (URLs). La premiere devient l'image principale.
+    private List<String> images;
 
     // Attributs dynamiques (EAV)
     private Map<Long, String> attributsTexte;

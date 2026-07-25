@@ -50,15 +50,9 @@ class _OfferCardState extends State<OfferCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 78,
-                    height: 78,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      gradient: LinearGradient(colors: grad,
-                          begin: Alignment.topLeft, end: Alignment.bottomRight),
-                    ),
-                    child: const Icon(Icons.storefront_outlined, color: Colors.white70, size: 32),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: SizedBox(width: 78, height: 78, child: _thumb(o, grad)),
                   ),
                   const SizedBox(width: 13),
                   Expanded(
@@ -153,6 +147,28 @@ class _OfferCardState extends State<OfferCard> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Vignette : photo réelle de l'offre, avec repli dégradé + icône
+  /// (si aucune image, erreur réseau ou chargement en cours).
+  Widget _thumb(Offre o, List<Color> grad) {
+    final fallback = Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: grad,
+            begin: Alignment.topLeft, end: Alignment.bottomRight),
+      ),
+      child: const Icon(Icons.storefront_outlined, color: Colors.white70, size: 32),
+    );
+    final url = o.imagePrincipale;
+    if (url == null || url.isEmpty) return fallback;
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      width: 78,
+      height: 78,
+      errorBuilder: (_, __, ___) => fallback,
+      loadingBuilder: (ctx, child, progress) => progress == null ? child : fallback,
     );
   }
 

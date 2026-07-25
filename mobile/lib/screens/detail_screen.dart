@@ -21,15 +21,7 @@ class DetailScreen extends StatelessWidget {
             expandedHeight: 240,
             pinned: true,
             backgroundColor: NexoraColors.emerald700,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(colors: [Color(0xFF0F766E), Color(0xFF10B981)],
-                      begin: Alignment.topLeft, end: Alignment.bottomRight),
-                ),
-                child: const Center(child: Icon(Icons.restaurant_outlined, size: 78, color: Colors.white70)),
-              ),
-            ),
+            flexibleSpace: FlexibleSpaceBar(background: _hero()),
             actions: [
               IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border, color: Colors.white)),
             ],
@@ -71,6 +63,34 @@ class DetailScreen extends StatelessWidget {
                       'Un établissement de proximité réputé, mis en avant sur Nexora. '
                           'Contactez-le, consultez ses horaires et réservez en un geste.',
                       style: const TextStyle(color: NexoraColors.text2, height: 1.6)),
+                  if (offre.galerie.length > 1) ...[
+                    const SizedBox(height: 22),
+                    Text('Galerie', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 92,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: offre.galerie.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 10),
+                        itemBuilder: (_, i) => ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            offre.galerie[i],
+                            width: 128,
+                            height: 92,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              width: 128,
+                              height: 92,
+                              color: NexoraColors.surface2,
+                              child: const Icon(Icons.image_outlined, color: NexoraColors.text3),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 22),
                   _infoRow(Icons.place_outlined, 'Plateau, Dakar',
                       offre.distanceKm != null ? '${offre.distanceKm!.toStringAsFixed(1)} km' : ''),
@@ -115,6 +135,25 @@ class DetailScreen extends StatelessWidget {
           ]),
         ),
       ),
+    );
+  }
+
+  /// En-tête : photo principale de l'offre, avec repli dégradé + icône.
+  Widget _hero() {
+    const fallback = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [Color(0xFF0F766E), Color(0xFF10B981)],
+            begin: Alignment.topLeft, end: Alignment.bottomRight),
+      ),
+      child: Center(child: Icon(Icons.storefront_outlined, size: 78, color: Colors.white70)),
+    );
+    final url = offre.imagePrincipale;
+    if (url == null || url.isEmpty) return fallback;
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => fallback,
+      loadingBuilder: (ctx, child, progress) => progress == null ? child : fallback,
     );
   }
 
