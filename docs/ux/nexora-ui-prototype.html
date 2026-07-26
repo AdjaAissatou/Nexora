@@ -498,20 +498,13 @@ a{color:inherit; text-decoration:none;}
     <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-bag"/></svg><span data-i18n="nav.products"></span></button>
     <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-tools"/></svg><span data-i18n="nav.services"></span></button>
     <button class="nav-item" data-goto="explore"><svg class="ic"><use href="#ic-store"/></svg><span data-i18n="nav.spaces"></span></button>
-    <div class="nav-label" data-i18n="nav.account"></div>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-heart"/></svg><span data-i18n="nav.favorites"></span><span class="badge">6</span></button>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-package"/></svg><span data-i18n="nav.orders"></span></button>
-    <button class="nav-item" data-goto="messages"><svg class="ic"><use href="#ic-chat"/></svg><span data-i18n="nav.messages"></span><span class="badge">3</span></button>
-    <button class="nav-item" data-goto="home"><svg class="ic"><use href="#ic-bell"/></svg><span data-i18n="nav.notifications"></span></button>
-    <div class="nav-label" data-i18n="nav.pro"></div>
-    <button class="nav-item" data-goto="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span data-i18n="nav.dashboard"></span></button>
-    <button class="nav-item" data-goto="admin"><svg class="ic"><use href="#ic-shield"/></svg><span data-i18n="nav.admin"></span></button>
-    <button class="nav-item" data-goto="publier"><svg class="ic"><use href="#ic-bag"/></svg>Publier une offre</button>
+    <div id="navAccount"></div>
+    <div id="navPro"></div>
 
-    <div class="side-pro">
+    <div class="side-pro" id="sideProCard">
       <h4 data-i18n="pro.title"></h4>
       <p data-i18n="pro.text"></p>
-      <button class="btn-pro" data-goto="dashboard" data-i18n="pro.cta"></button>
+      <button class="btn-pro" id="btnCreerEspace" data-i18n="pro.cta"></button>
     </div>
   </aside>
 
@@ -522,8 +515,8 @@ a{color:inherit; text-decoration:none;}
       <div class="top-actions">
         <button class="icon-btn" id="langBtn"><svg class="ic"><use href="#ic-flag"/></svg><span id="langLabel">FR</span></button>
         <button class="icon-btn" id="themeBtn" title="Theme"></button>
-        <button class="icon-btn" data-goto="home" title="Notifications"><svg class="ic"><use href="#ic-bell"/></svg></button>
-        <div class="avatar">A</div>
+        <button class="icon-btn" id="topBell" title="Notifications"><svg class="ic"><use href="#ic-bell"/></svg></button>
+        <div id="topAccount"></div>
       </div>
     </header>
 
@@ -699,6 +692,35 @@ a{color:inherit; text-decoration:none;}
         <button class="btn btn-primary" id="pubSubmit" style="margin-top:6px">Publier l'offre</button>
       </div>
     </section>
+
+    <!-- CREER MON ESPACE -->
+    <section class="view" id="view-creer-espace" hidden>
+      <button class="back-btn" data-goto="home"><svg class="ic"><use href="#ic-back"/></svg><span data-i18n="back"></span></button>
+      <div class="page-head reveal"><span class="eyebrow">Espace professionnel</span><h1 data-i18n="esp.create.title">Créer mon espace</h1><p data-i18n="esp.create.sub">Un espace unique pour votre activité. Vous pourrez y proposer des produits, des services, ou les deux.</p></div>
+      <div class="nx-form reveal">
+        <div class="nx-field"><label data-i18n="esp.name">Nom commercial *</label><input id="espNom" placeholder="Ex : Chez Awa"/></div>
+        <div class="nx-field"><label data-i18n="esp.offer">Que proposez-vous ? *</label>
+          <div style="display:flex;gap:22px;margin-top:6px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer"><input type="checkbox" id="espProd" style="width:auto"/> <span data-i18n="esp.products">Des produits (boutique)</span></label>
+            <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer"><input type="checkbox" id="espServ" style="width:auto"/> <span data-i18n="esp.services">Des services (prestataire)</span></label>
+          </div>
+        </div>
+        <div class="nx-field"><label data-i18n="esp.city">Ville</label><select id="espVille"><option>Dakar</option><option>Thiès</option><option>Saint-Louis</option><option>Touba</option><option>Ziguinchor</option><option>Mbour</option></select></div>
+        <div class="nx-field"><label data-i18n="esp.phone">Téléphone</label><input id="espTel" placeholder="+221 ..."/></div>
+        <button class="btn btn-primary" id="espSubmit" style="margin-top:6px" data-i18n="esp.create.cta">Créer mon espace</button>
+      </div>
+    </section>
+
+    <!-- MON ESPACE (hub pro) -->
+    <section class="view" id="view-espace" hidden>
+      <div class="page-head reveal">
+        <span class="eyebrow" data-i18n="nav.myspace">Mon espace</span>
+        <h1 id="espTitre">Mon espace</h1>
+        <p id="espMeta"></p>
+      </div>
+      <div class="seg reveal" id="espTabs"></div>
+      <div id="espContent" class="reveal"></div>
+    </section>
   </div>
 </div>
 
@@ -722,8 +744,10 @@ a{color:inherit; text-decoration:none;}
     fr:{
       "nav.home":"Accueil","nav.explore":"Explorer","cat.catalog":"Catalogue","nav.products":"Produits","nav.services":"Services","nav.spaces":"Espaces",
       "nav.account":"Mon compte","nav.favorites":"Favoris","nav.orders":"Mes commandes","nav.messages":"Messages","nav.notifications":"Notifications","nav.profile":"Profil",
-      "nav.pro":"Espace pro","nav.dashboard":"Tableau de bord","nav.admin":"Administration",
-      "pro.title":"Vous êtes pro ?","pro.text":"Créez votre espace et touchez des milliers de clients près de vous.","pro.cta":"Accéder à mon espace",
+      "nav.pro":"Espace pro","nav.dashboard":"Tableau de bord","nav.admin":"Administration","nav.myspace":"Mon espace","nav.stats":"Statistiques","nav.login":"Se connecter",
+      "pro.title":"Vous êtes pro ?","pro.text":"Créez votre espace et touchez des milliers de clients près de vous.","pro.cta":"Créer mon espace",
+      "esp.create.title":"Créer mon espace","esp.create.sub":"Un espace unique pour votre activité. Vous pourrez y proposer des produits, des services, ou les deux.","esp.name":"Nom commercial *","esp.offer":"Que proposez-vous ? *","esp.products":"Des produits (boutique)","esp.services":"Des services (prestataire)","esp.city":"Ville","esp.phone":"Téléphone","esp.create.cta":"Créer mon espace",
+      "esp.tab.products":"Produits","esp.tab.services":"Services","esp.addProduct":"Ajouter un produit","esp.addService":"Ajouter un service","esp.empty.products":"Aucun produit pour l'instant. Ajoutez votre premier produit.","esp.empty.services":"Aucun service pour l'instant. Ajoutez votre premier service.","esp.category":"Catégorie *","esp.serviceType":"Type de service *","esp.title":"Titre *","esp.price":"Prix (FCFA)","esp.save":"Enregistrer","esp.cancel":"Annuler","esp.published":"Ajouté ! En attente de validation.","esp.created":"Espace créé — bienvenue dans votre espace pro !",
       "search.ph":"Rechercher un produit, un service, une boutique…",
       "hero.eyebrow":"Marketplace de proximité","hero.title":"Tout ce dont vous avez besoin,<br><span class='accent'>près de vous.</span>",
       "hero.lead":"Trouvez un restaurant, réservez un hôtel, contactez un plombier ou découvrez une boutique — sans changer d'application.",
@@ -757,8 +781,10 @@ a{color:inherit; text-decoration:none;}
     en:{
       "nav.home":"Home","nav.explore":"Explore","cat.catalog":"Catalog","nav.products":"Products","nav.services":"Services","nav.spaces":"Spaces",
       "nav.account":"My account","nav.favorites":"Favorites","nav.orders":"My orders","nav.messages":"Messages","nav.notifications":"Notifications","nav.profile":"Profile",
-      "nav.pro":"Pro space","nav.dashboard":"Dashboard","nav.admin":"Administration",
-      "pro.title":"Are you a pro?","pro.text":"Create your space and reach thousands of customers near you.","pro.cta":"Go to my space",
+      "nav.pro":"Pro space","nav.dashboard":"Dashboard","nav.admin":"Administration","nav.myspace":"My space","nav.stats":"Statistics","nav.login":"Sign in",
+      "pro.title":"Are you a pro?","pro.text":"Create your space and reach thousands of customers near you.","pro.cta":"Create my space",
+      "esp.create.title":"Create my space","esp.create.sub":"A single space for your business. You can offer products, services, or both.","esp.name":"Business name *","esp.offer":"What do you offer? *","esp.products":"Products (shop)","esp.services":"Services (provider)","esp.city":"City","esp.phone":"Phone","esp.create.cta":"Create my space",
+      "esp.tab.products":"Products","esp.tab.services":"Services","esp.addProduct":"Add a product","esp.addService":"Add a service","esp.empty.products":"No product yet. Add your first product.","esp.empty.services":"No service yet. Add your first service.","esp.category":"Category *","esp.serviceType":"Service type *","esp.title":"Title *","esp.price":"Price (FCFA)","esp.save":"Save","esp.cancel":"Cancel","esp.published":"Added! Pending validation.","esp.created":"Space created — welcome to your pro space!",
       "search.ph":"Search a product, a service, a shop…",
       "hero.eyebrow":"Local marketplace","hero.title":"Everything you need,<br><span class='accent'>right near you.</span>",
       "hero.lead":"Find a restaurant, book a hotel, contact a plumber or discover a shop — without switching apps.",
@@ -993,6 +1019,38 @@ a{color:inherit; text-decoration:none;}
     8:[{n:'Type de cuisine',o:true,v:['Senegalaise','Africaine','Europeenne','Asiatique','Libanaise','Fast-food','Grillades']}],
     10:[{n:'Specialite',o:true,v:['Generaliste','Dentiste','Cardiologue','Pediatre','Gynecologue','Dermatologue','Ophtalmologue']},{n:'Mode de consultation',o:true,v:['Au cabinet','A domicile','En ligne']}]
   };
+  // Attributs supplementaires cote services
+  PUB_ATTRS[9]=[{n:'Categorie',o:true,v:['1 etoile','2 etoiles','3 etoiles','4 etoiles','5 etoiles']},{n:'Services',o:false,v:['Piscine','Wifi','Parking','Restaurant','Climatisation']}];
+  PUB_ATTRS[11]=[{n:'Prestation',o:true,v:['Coiffure','Maquillage','Manucure','Soins visage','Barbier','Tresses']},{n:'A domicile',o:false,v:['Oui','Non']}];
+  PUB_ATTRS[12]=[{n:'Type d\'intervention',o:true,v:['Fuite d\'eau','Installation sanitaire','Debouchage','Chauffe-eau']},{n:'Urgence 24/7',o:false,v:['Oui','Non']}];
+  PUB_ATTRS[13]=[{n:'Type d\'intervention',o:true,v:['Installation','Depannage','Mise aux normes','Domotique']},{n:'Urgence 24/7',o:false,v:['Oui','Non']}];
+  // Regroupement des categories : un groupe (categorie parente) contient des sous-categories.
+  var CAT_GROUPS={
+    PRODUIT:[
+      {g:'Mode & Habillement', items:[{id:1,nom:'Vetements'},{id:2,nom:'Chaussures'}]},
+      {g:'Electronique',       items:[{id:3,nom:'Telephones'},{id:4,nom:'Ordinateurs portables'}]},
+      {g:'Vehicules',          items:[{id:5,nom:'Voitures'}]},
+      {g:'Immobilier',         items:[{id:7,nom:'Immobilier'}]}
+    ],
+    SERVICE:[
+      {g:'Restauration & Hotellerie', items:[{id:8,nom:'Restaurant'},{id:9,nom:'Hotel'}]},
+      {g:'Sante',                     items:[{id:10,nom:'Medecin'}]},
+      {g:'Beaute & Bien-etre',        items:[{id:11,nom:'Coiffure & Beaute'}]},
+      {g:'Batiment & Artisanat',      items:[{id:12,nom:'Plomberie'},{id:13,nom:'Electricien'}]}
+    ]
+  };
+  function catName(id){var r=null;Object.keys(CAT_GROUPS).forEach(function(k){CAT_GROUPS[k].forEach(function(gr){gr.items.forEach(function(it){if(String(it.id)===String(id))r=it.nom;});});});return r;}
+  function catSelectOpts(kind){
+    var groups=CAT_GROUPS[kind]||[];
+    var ph=(kind==='SERVICE')?'Choisir un type de service...':'Choisir une categorie...';
+    return '<option value="" disabled selected>'+ph+'</option>'+groups.map(function(gr){
+      return '<optgroup label="'+gr.g+'">'+gr.items.map(function(it){return '<option value="'+it.id+'">'+it.nom+'</option>';}).join('')+'</optgroup>';
+    }).join('');
+  }
+  function attrsHtml(catId){
+    var attrs=PUB_ATTRS[catId]||[];
+    return attrs.length?('<div class="attr-grid">'+attrs.map(function(a){return '<div class="nx-field"><label>'+a.n+(a.o?' *':'')+'</label><select>'+pubOpts(a.v)+'</select></div>';}).join('')+'</div>'):'';
+  }
   function pubOpts(list){return '<option value="" disabled selected>Selectionner...</option>'+list.map(function(x){return '<option>'+x+'</option>';}).join('');}
   function renderPublier(){
     var sel=document.getElementById("pubCat");
@@ -1010,12 +1068,26 @@ a{color:inherit; text-decoration:none;}
   }
 
   /* ================= NAV ================= */
-  var views={home:"view-home",explore:"view-explore",detail:"view-detail",dashboard:"view-dashboard",admin:"view-admin",messages:"view-messages",publier:"view-publier"};
-  function goto(name){
-    Object.keys(views).forEach(function(k){document.getElementById(views[k]).hidden=(k!==name);});
-    document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-goto")===name);});
-    document.querySelectorAll(".botnav button").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-goto")===name);});
+  var views={home:"view-home",explore:"view-explore",detail:"view-detail",dashboard:"view-dashboard",admin:"view-admin",messages:"view-messages",publier:"view-publier","creer-espace":"view-creer-espace",espace:"view-espace"};
+  var currentView="home";
+  var AUTH_VIEWS={espace:1,"creer-espace":1,dashboard:1,admin:1,messages:1};   // exigent un compte
+  var ESPACE_VIEWS={espace:1,dashboard:1};                                      // exigent un espace pro
+  var RAISONS={"creer-espace":"pour creer votre espace",espace:"pour acceder a votre espace",dashboard:"pour voir vos statistiques",messages:"pour acceder a la messagerie",admin:"pour l'administration"};
+  function afficherVue(name){
+    Object.keys(views).forEach(function(k){var el=document.getElementById(views[k]);if(el)el.hidden=(k!==name);});
+    currentView=name; majActifNav();
+    if(name==="espace") renderEspace();
     window.scrollTo({top:0,behavior:"smooth"});revealNow();
+  }
+  function majActifNav(){
+    document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-goto")===currentView);});
+    document.querySelectorAll(".botnav button").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-goto")===currentView);});
+  }
+  function goto(name){
+    if(!views[name]) return;
+    if(AUTH_VIEWS[name] && !session.connecte){ requireAuth(RAISONS[name]||"pour continuer",function(){goto(name);}); return; }
+    if(ESPACE_VIEWS[name] && !session.espace){ afficherVue("creer-espace"); return; }
+    afficherVue(name);
   }
   document.addEventListener("click",function(e){
     var g=e.target.closest("[data-goto]");
@@ -1046,16 +1118,48 @@ a{color:inherit; text-decoration:none;}
     lang=(lang==="fr")?"en":"fr";
     document.getElementById("langLabel").textContent=lang.toUpperCase();
     root.setAttribute("lang",lang);
-    renderAll();revealNow();
+    renderAll();renderCompte();if(currentView==="espace")renderEspace();revealNow();
   });
 
   /* -------- Reveal -------- */
   var io=("IntersectionObserver" in window)?new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}});},{threshold:.12}):null;
   function revealNow(){document.querySelectorAll(".view:not([hidden]) .reveal").forEach(function(el){if(io){io.observe(el);}else{el.classList.add("in");}var r=el.getBoundingClientRect();if(r.top<innerHeight){el.classList.add("in");}});}
 
-  /* -------- Compte (inscription a la demande : commander / creer un espace) -------- */
+  /* -------- Compte + Espace pro (etat de session) -------- */
   var authGate=document.getElementById("authGate");
-  var sessionActif=false, authPending=null, authMode="register";
+  var session={connecte:false, nom:null, admin:false, espace:null};
+  var authPending=null, authMode="register";
+
+  function navItem(g,ic,label,badge){return '<button class="nav-item" data-goto="'+g+'"><svg class="ic"><use href="#'+ic+'"/></svg><span>'+label+'</span>'+(badge?'<span class="badge">'+badge+'</span>':'')+'</button>';}
+  function renderTopAccount(){
+    var el=document.getElementById("topAccount"); if(!el)return;
+    if(session.connecte){
+      el.innerHTML='<div class="avatar" id="avatarBtn" title="'+(session.nom||'')+'">'+(session.nom||'U').charAt(0).toUpperCase()+'</div>';
+    }else{
+      el.innerHTML='<button class="btn btn-primary btn-sm" id="btnLogin">'+t("nav.login")+'</button>';
+      document.getElementById("btnLogin").addEventListener("click",function(){ouvrirAuth("",false);});
+    }
+  }
+  function renderNav(){
+    var acc=document.getElementById("navAccount"), pro=document.getElementById("navPro");
+    if(acc) acc.innerHTML=session.connecte?(
+      '<div class="nav-label">'+t("nav.account")+'</div>'
+      +navItem("home","ic-heart",t("nav.favorites"),"6")
+      +navItem("home","ic-package",t("nav.orders"))
+      +navItem("messages","ic-chat",t("nav.messages"),"3")
+      +navItem("home","ic-bell",t("nav.notifications"))
+    ):"";
+    if(pro) pro.innerHTML=session.espace?(
+      '<div class="nav-label">'+t("nav.pro")+'</div>'
+      +navItem("espace","ic-store",t("nav.myspace"))
+      +navItem("dashboard","ic-grid",t("nav.stats"))
+      +(session.admin?navItem("admin","ic-shield",t("nav.admin")):"")
+    ):"";
+    var card=document.getElementById("sideProCard"); if(card) card.style.display=session.espace?"none":"";
+    majActifNav();
+  }
+  function renderCompte(){ renderTopAccount(); renderNav(); }
+
   function authMaj(){
     document.getElementById("authTitle").textContent=(authMode==="login")?"Connexion":"Creer un compte";
     document.getElementById("authSub").textContent=(authMode==="login")?"Accedez a votre espace Nexora.":"Un compte suffit pour commander, reserver et creer votre espace.";
@@ -1070,7 +1174,7 @@ a{color:inherit; text-decoration:none;}
   }
   function fermerAuth(){ authGate.classList.add("hidden"); authPending=null; }
   function requireAuth(raison, action){
-    if(sessionActif){ if(action)action(); return; }
+    if(session.connecte){ if(action)action(); return; }
     authPending=action||null;
     ouvrirAuth("Creez un compte "+raison, true);
   }
@@ -1082,16 +1186,92 @@ a{color:inherit; text-decoration:none;}
     var pwd=document.getElementById("authPwd").value;
     if(!email||!pwd){showToast("Email et mot de passe requis"); return;}
     var nom=(document.getElementById("authNom").value||"").trim();
-    sessionActif=true;
-    var av=document.querySelector(".topbar .avatar"); if(av) av.textContent=(nom||email).charAt(0).toUpperCase();
+    session.connecte=true; session.nom=nom||email.split("@")[0];
+    renderCompte();
     authGate.classList.add("hidden");
     showToast(authMode==="register"?"Compte cree, bienvenue sur Nexora !":"Content de vous revoir !");
     var a=authPending; authPending=null; if(a)a();
   });
-  var topAvatar=document.querySelector(".topbar .avatar");
-  if(topAvatar) topAvatar.addEventListener("click",function(){ if(!sessionActif) ouvrirAuth("Connectez-vous a votre compte", false); });
+  document.getElementById("topAccount").addEventListener("click",function(e){
+    if(e.target.closest("#avatarBtn") && session.espace) goto("espace");
+  });
+
+  /* -------- Creer mon espace -------- */
+  document.getElementById("btnCreerEspace").addEventListener("click",function(){ goto("creer-espace"); });
+  document.getElementById("espSubmit").addEventListener("click",function(){
+    var nom=document.getElementById("espNom").value.trim();
+    var prod=document.getElementById("espProd").checked, serv=document.getElementById("espServ").checked;
+    if(!nom){showToast("Le nom commercial est obligatoire"); return;}
+    if(!prod && !serv){showToast("Choisissez au moins produits ou services"); return;}
+    requireAuth("pour creer votre espace",function(){
+      session.espace={nom:nom, produits:prod, services:serv,
+        ville:document.getElementById("espVille").value, tel:document.getElementById("espTel").value,
+        listeProduits:[], listeServices:[], tab:(prod?"produits":"services")};
+      renderCompte();
+      showToast(t("esp.created"));
+      goto("espace");
+    });
+  });
+
+  /* -------- Mon espace (onglets Produits / Services / Stats) -------- */
+  function renderEspace(){
+    var e=session.espace; if(!e)return;
+    document.getElementById("espTitre").textContent=e.nom;
+    var nat=[]; if(e.produits)nat.push(t("esp.tab.products")); if(e.services)nat.push(t("esp.tab.services"));
+    document.getElementById("espMeta").innerHTML=icon("ic-check")+' Espace verifie · '+nat.join(" + ")+' · '+e.ville;
+    var tabs=[]; if(e.produits)tabs.push(["produits",t("esp.tab.products")]); if(e.services)tabs.push(["services",t("esp.tab.services")]); tabs.push(["stats",t("nav.stats")]);
+    if(!e.tab || (e.tab==="produits"&&!e.produits) || (e.tab==="services"&&!e.services)) e.tab=tabs[0][0];
+    document.getElementById("espTabs").innerHTML=tabs.map(function(tb){return '<button data-esptab="'+tb[0]+'"'+(tb[0]===e.tab?' class="on"':'')+'>'+tb[1]+'</button>';}).join("");
+    renderEspaceTab();
+  }
+  function renderEspaceTab(){
+    var e=session.espace, host=document.getElementById("espContent");
+    if(e.tab==="stats"){
+      host.innerHTML='<p style="color:var(--text-2);margin:6px 0 16px">Suivez vos vues, commandes et revenus dans le tableau de bord.</p>'
+        +'<button class="btn btn-primary" data-goto="dashboard">'+icon("ic-grid")+' Ouvrir le tableau de bord</button>';
+      return;
+    }
+    var kind=(e.tab==="produits")?"PRODUIT":"SERVICE";
+    var liste=(e.tab==="produits")?e.listeProduits:e.listeServices;
+    var addLabel=(e.tab==="produits")?t("esp.addProduct"):t("esp.addService");
+    var emptyMsg=(e.tab==="produits")?t("esp.empty.products"):t("esp.empty.services");
+    var items=liste.length?('<div class="cards">'+liste.map(function(o){
+        return '<article class="card"><div class="card-body"><h3>'+o.titre+'</h3><div class="meta">'+o.cat+(o.attrs?' · '+o.attrs:'')+'</div><div class="card-foot"><span class="price">'+(o.prix?'<b>'+o.prix+' FCFA</b>':t("label.seeprice"))+'</span><span class="pill pill-open">'+icon("ic-check")+'En ligne</span></div></div></article>';
+      }).join("")+'</div>'):('<p style="color:var(--text-3);margin:8px 0 16px">'+emptyMsg+'</p>');
+    host.innerHTML='<div style="display:flex;justify-content:flex-end;margin-bottom:14px"><button class="btn btn-primary" id="btnAdd">'+icon("ic-bag")+addLabel+'</button></div>'
+      +items+'<div id="addForm"></div>';
+    document.getElementById("btnAdd").addEventListener("click",function(){ ouvrirFormOffre(kind); });
+  }
+  function ouvrirFormOffre(kind){
+    var host=document.getElementById("addForm"); var isServ=(kind==="SERVICE");
+    host.innerHTML='<div class="nx-form" style="margin-top:6px;background:var(--surface-2);padding:18px;border-radius:16px">'
+      +'<div class="nx-field"><label>'+(isServ?t("esp.serviceType"):t("esp.category"))+'</label><select id="ofCat">'+catSelectOpts(kind)+'</select></div>'
+      +'<div id="ofAttrs"></div>'
+      +'<div class="nx-field"><label>'+t("esp.title")+'</label><input id="ofTitre" placeholder="'+(isServ?'Ex : Depannage plomberie 24/7':'Ex : iPhone 13 Pro 256 Go')+'"/></div>'
+      +'<div class="nx-field"><label>'+t("esp.price")+'</label><input id="ofPrix" type="number" placeholder="Ex : 15000"/></div>'
+      +'<div style="display:flex;gap:10px"><button class="btn btn-primary" id="ofSave">'+t("esp.save")+'</button><button class="btn btn-outline" id="ofCancel">'+t("esp.cancel")+'</button></div></div>';
+    var cat=document.getElementById("ofCat");
+    cat.addEventListener("change",function(){ document.getElementById("ofAttrs").innerHTML=attrsHtml(cat.value); });
+    document.getElementById("ofCancel").addEventListener("click",function(){host.innerHTML="";});
+    document.getElementById("ofSave").addEventListener("click",function(){
+      var titre=document.getElementById("ofTitre").value.trim();
+      if(!cat.value){showToast("Choisissez une categorie"); return;}
+      if(!titre){showToast("Le titre est obligatoire"); return;}
+      var attrsSel=[].slice.call(document.querySelectorAll("#ofAttrs select")).map(function(s){return s.value;}).filter(function(v){return v && v.indexOf("Selectionner")<0;});
+      var item={titre:titre, cat:catName(cat.value), prix:document.getElementById("ofPrix").value, attrs:attrsSel.join(", ")};
+      if(kind==="PRODUIT") session.espace.listeProduits.push(item); else session.espace.listeServices.push(item);
+      showToast(t("esp.published"));
+      renderEspaceTab();
+    });
+  }
+  document.getElementById("espTabs").addEventListener("click",function(e){
+    var b=e.target.closest("[data-esptab]"); if(!b || !session.espace)return;
+    session.espace.tab=b.getAttribute("data-esptab");
+    document.querySelectorAll("#espTabs button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+    renderEspaceTab();
+  });
 
   /* ================= INIT ================= */
-  renderAll();renderPublier();revealNow();
+  renderAll();renderPublier();renderCompte();afficherVue("home");revealNow();
 })();
 </script>
