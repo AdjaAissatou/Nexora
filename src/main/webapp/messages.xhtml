@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets">
+    <ui:param name="titre" value="Messages"/>
+    <ui:define name="content">
+        <div class="view">
+            <div class="page-head reveal" style="margin-bottom:16px"><h1 style="font-size:24px">Messagerie</h1></div>
+            <div class="msg-wrap reveal">
+                <div class="conv-col">
+                    <div class="conv-search"><label><svg class="ic" style="width:17px;height:17px"><use href="#ic-search"/></svg><input type="text" placeholder="Rechercher une conversation"/></label></div>
+                    <div class="conv-list">
+                        <div class="conv active"><div class="avatar" style="background:linear-gradient(135deg,#0f766e,#10B981)">B</div><div class="conv-info"><h4>Le Baobab Gourmand<time>10:24</time></h4><p>Votre table est confirmée pour 20h.</p></div></div>
+                        <div class="conv"><div class="avatar" style="background:linear-gradient(135deg,#1E3A8A,#3b82f6)">D</div><div class="conv-info"><h4>DépannPro<time>Hier</time></h4><p>Le technicien passe demain matin.</p></div></div>
+                    </div>
+                </div>
+                <div class="chat-col">
+                    <div class="chat-head">
+                        <div class="avatar" style="background:linear-gradient(135deg,#0f766e,#10B981)">B</div>
+                        <div style="flex:1"><h4>Le Baobab Gourmand</h4><div class="st">En ligne</div></div>
+                        <button type="button" class="icon-btn"><svg class="ic"><use href="#ic-phone"/></svg></button>
+                    </div>
+                    <div class="chat-body">
+                        <div class="bubble in">Bonjour, avez-vous une table pour 2 ce soir ?</div>
+                        <div class="bubble out">Bonjour ! Oui, à 20h. Je vous réserve ça ?</div>
+                        <div class="bubble in">Parfait, merci !</div>
+                    </div>
+                    <div class="chat-input">
+                        <label><input type="text" placeholder="Écrire un message…"/></label>
+                        <button type="button" class="chat-send"><svg class="ic"><use href="#ic-send"/></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

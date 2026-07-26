@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets">
+    <ui:param name="titre" value="Accueil"/>
+    <ui:define name="content">
+        <div class="view">
+            <div class="hero reveal">
+                <div class="hero-inner">
+                    <span class="eyebrow">Marketplace de proximité</span>
+                    <h1>Tout ce dont vous avez besoin,<br/><span class="accent">près de vous.</span></h1>
+                    <p class="lead">Trouvez un restaurant, réservez un hôtel, contactez un plombier ou découvrez une boutique — sans changer d'application.</p>
+                    <div class="searchbar">
+                        <svg class="ic"><use href="#ic-search"/></svg>
+                        <input type="text" placeholder="Que recherchez-vous aujourd'hui ?"/>
+                        <h:link styleClass="btn btn-primary" outcome="explorer" value="Rechercher"/>
+                    </div>
+                    <div class="hero-chips">
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-pin"/></svg><span>Autour de moi</span></h:link>
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-fork"/></svg><span>Restaurants</span></h:link>
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-health"/></svg><span>Pharmacies</span></h:link>
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-tools"/></svg><span>Dépannage</span></h:link>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec reveal">
+                <div class="sec-head"><div><h2>Explorer par catégorie</h2><p>9 univers, des milliers de professionnels vérifiés.</p></div></div>
+                <div class="cat-grid">
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-fork"/></svg></span><h3>Restaurants</h3><span>1 240 lieux</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-health"/></svg></span><h3>Santé</h3><span>860 pros</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-cart"/></svg></span><h3>Supermarchés</h3><span>430 lieux</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-bed"/></svg></span><h3>Hôtels</h3><span>210 lieux</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-cap"/></svg></span><h3>Écoles</h3><span>320 lieux</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span><h3>Services</h3><span>2 100 pros</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-car"/></svg></span><h3>Transport</h3><span>540 pros</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-briefcase"/></svg></span><h3>Emploi</h3><span>180 offres</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-store"/></svg></span><h3>Immobilier</h3><span>760 biens</span></h:link>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

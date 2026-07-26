@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets">
+    <ui:param name="titre" value="Administration"/>
+    <ui:define name="content">
+        <div class="view">
+            <div class="page-head reveal">
+                <span class="eyebrow">Administration</span>
+                <h1>Vue d'ensemble de la plateforme</h1>
+            </div>
+            <div class="stat-grid reveal">
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-store"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+12%</span></div><h3 class="tnum">3 640</h3><span>Espaces pro</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-bag"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+8%</span></div><h3 class="tnum">18 210</h3><span>Annonces</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-user"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+15%</span></div><h3 class="tnum">54 900</h3><span>Utilisateurs</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span><span class="trend trend-down">-3%</span></div><h3 class="tnum">42</h3><span>À modérer</span></div>
+            </div>
+            <div class="panel reveal" style="margin-top:20px">
+                <div class="panel-head"><h3>Modération</h3></div>
+                <p class="meta">Validation des espaces, arbitrage des litiges et suivi des annonces signalées. Alimenté par <code>AdminService</code> côté backend.</p>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:a="jakarta.faces.passthrough">
+    <ui:param name="titre" value="Mon espace"/>
+    <ui:define name="content">
+        <div class="view">
+
+            <!-- Aucun espace : invitation a en creer un -->
+            <h:panelGroup layout="block" rendered="#{not session.aEspace}">
+                <div class="page-head reveal">
+                    <span class="eyebrow">Espace professionnel</span>
+                    <h1>Vous n'avez pas encore d'espace</h1>
+                    <p>Créez votre espace pour proposer vos produits et services.</p>
+                </div>
+                <h:link styleClass="btn btn-primary" outcome="#{session.connecte ? 'creer-espace' : 'connexion'}" value="Créer mon espace">
+                    <f:param name="dest" value="creer-espace"/>
+                </h:link>
+            </h:panelGroup>
+
+            <!-- Espace existant -->
+            <h:panelGroup layout="block" rendered="#{session.aEspace}">
+                <div class="page-head reveal">
+                    <span class="eyebrow">Mon espace</span>
+                    <h1>#{session.espace.nom}</h1>
+                    <p><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#ic-check"/></svg>
+                       Espace vérifié · #{session.espace.nature} · #{session.espace.ville}</p>
+                </div>
+
+                <h:form id="esp">
+                    <h:messages globalOnly="true" styleClass="meta" style="color:var(--emerald-700);margin-bottom:10px"/>
+
+                    <div class="seg reveal">
+                        <h:commandLink styleClass="#{session.espace.ongletActif eq 'produits' ? 'on' : ''}"
+                                       value="Produits" rendered="#{session.espace.produits}"
+                                       action="#{espaceBean.changerOnglet('produits')}"><f:ajax render="@form"/></h:commandLink>
+                        <h:commandLink styleClass="#{session.espace.ongletActif eq 'services' ? 'on' : ''}"
+                                       value="Services" rendered="#{session.espace.services}"
+                                       action="#{espaceBean.changerOnglet('services')}"><f:ajax render="@form"/></h:commandLink>
+                        <h:commandLink styleClass="#{session.espace.ongletActif eq 'stats' ? 'on' : ''}"
+                                       value="Statistiques"
+                                       action="#{espaceBean.changerOnglet('stats')}"><f:ajax render="@form"/></h:commandLink>
+                    </div>
+
+                    <!-- ======== Onglet STATISTIQUES ======== -->
+                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{session.espace.ongletActif eq 'stats'}">
+                        <p class="meta" style="margin:6px 0 16px">Suivez vos vues, commandes et revenus dans le tableau de bord.</p>
+                        <h:link styleClass="btn btn-primary" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>Ouvrir le tableau de bord</span></h:link>
+                    </h:panelGroup>
+
+                    <!-- ======== Onglets PRODUITS / SERVICES ======== -->
+                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{session.espace.ongletActif ne 'stats'}">
+                        <ui:param name="estService" value="#{session.espace.ongletActif eq 'services'}"/>
+                        <ui:param name="liste" value="#{estService ? session.espace.listeServices : session.espace.listeProduits}"/>
+
+                        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+                            <h:commandButton styleClass="btn btn-primary" rendered="#{not espaceBean.formOuvert}"
+                                             value="#{estService ? 'Ajouter un service' : 'Ajouter un produit'}"
+                                             action="#{espaceBean.ouvrirForm(estService ? 'SERVICE' : 'PRODUIT')}">
+                                <f:ajax render="@form"/>
+                            </h:commandButton>
+                        </div>
+
+                        <!-- Liste des offres -->
+                        <h:panelGroup layout="block" styleClass="cards" rendered="#{not empty liste}">
+                            <ui:repeat value="#{liste}" var="o">
+                                <article class="card"><div class="card-body">
+                                    <h3>#{o.titre}</h3>
+                                    <div class="meta">#{o.categorie}<h:outputText rendered="#{not empty o.attributs}" value=" · #{o.attributs}"/></div>
+                                    <div class="card-foot">
+                                        <span class="price"><h:outputText rendered="#{not empty o.prix}" escape="false" value="&lt;b&gt;#{o.prix} FCFA&lt;/b&gt;"/><h:outputText rendered="#{empty o.prix}" value="Voir prix"/></span>
+                                        <span class="pill pill-open"><svg class="ic"><use href="#ic-check"/></svg>En ligne</span>
+                                    </div>
+                                </div></article>
+                            </ui:repeat>
+                        </h:panelGroup>
+                        <h:outputText rendered="#{empty liste}" styleClass="meta" style="display:block;margin:8px 0 16px"
+                            value="#{estService ? 'Aucun service pour le moment. Ajoutez votre premier service.' : 'Aucun produit pour le moment. Ajoutez votre premier produit.'}"/>
+
+                        <!-- Formulaire d'ajout (EAV) -->
+                        <h:panelGroup layout="block" rendered="#{espaceBean.formOuvert}"
+                                      styleClass="nx-form" style="margin-top:14px;background:var(--surface-2);padding:18px;border-radius:16px">
+                            <div class="nx-field">
+                                <label>#{estService ? 'Type de service *' : 'Catégorie *'}</label>
+                                <h:selectOneMenu value="#{espaceBean.categorieId}" converter="jakarta.faces.Long">
+                                    <f:selectItem itemValue="#{null}" itemLabel="#{estService ? 'Choisir un type de service...' : 'Choisir une catégorie...'}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{estService ? catalogue.categoriesService : catalogue.categoriesProduit}"/>
+                                    <f:ajax listener="#{espaceBean.onCategorieChange}" render="attrsBloc"/>
+                                </h:selectOneMenu>
+                            </div>
+
+                            <h:panelGroup layout="block" id="attrsBloc">
+                                <h:panelGroup layout="block" styleClass="attr-grid" rendered="#{not empty espaceBean.attributsCourants}">
+                                    <ui:repeat value="#{espaceBean.attributsCourants}" var="attr">
+                                        <div class="nx-field">
+                                            <label>#{attr.nom}#{attr.obligatoire ? ' *' : ''}</label>
+                                            <h:selectOneMenu value="#{espaceBean.valeursAttributs[attr.nom]}">
+                                                <f:selectItem itemValue="" itemLabel="Sélectionner..." noSelectionOption="true"/>
+                                                <f:selectItems value="#{attr.valeurs}"/>
+                                            </h:selectOneMenu>
+                                        </div>
+                                    </ui:repeat>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <div class="nx-field"><label>Titre *</label>
+                                <h:inputText value="#{espaceBean.titre}" a:placeholder="#{estService ? 'Ex : Dépannage plomberie 24/7' : 'Ex : iPhone 13 Pro 256 Go'}"/></div>
+                            <div class="nx-field"><label>Prix (FCFA)</label>
+                                <h:inputText value="#{espaceBean.prix}" a:type="number" a:placeholder="Ex : 15000"/></div>
+
+                            <div style="display:flex;gap:10px">
+                                <h:commandButton styleClass="btn btn-primary" value="Enregistrer" action="#{espaceBean.enregistrer}"><f:ajax render="@form"/></h:commandButton>
+                                <h:commandButton styleClass="btn btn-outline" value="Annuler" immediate="true" action="#{espaceBean.annuler}"><f:ajax render="@form"/></h:commandButton>
+                            </div>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </ui:define>
+</ui:composition>
