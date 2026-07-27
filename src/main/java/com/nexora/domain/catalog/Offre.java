@@ -69,6 +69,10 @@ public class Offre extends BaseEntity {
     @Column(name = "date_expiration")
     private LocalDateTime dateExpiration;
 
+    /** Motif de rejet renseigne par l'administration lorsque statut = REJETEE. */
+    @Column(name = "motif_rejet", length = 500)
+    private String motifRejet;
+
     // --- Compteurs de reputation / pertinence ---
     @Column(name = "score_pertinence")
     private double scorePertinence = 0d;

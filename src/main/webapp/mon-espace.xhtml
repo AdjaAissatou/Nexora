@@ -69,8 +69,10 @@
                                     <div class="card-foot">
                                         <span class="price"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA" style="font-weight:700"/><h:outputText rendered="#{empty o.prix}" value="#{msg['esp.seePrice']}"/></span>
                                         <h:panelGroup styleClass="pill pill-open" rendered="#{o.statut eq 'PUBLIEE'}"><svg class="ic"><use href="#ic-check"/></svg>#{msg['esp.online']}</h:panelGroup>
-                                        <h:panelGroup styleClass="pill" rendered="#{o.statut ne 'PUBLIEE'}" style="background:var(--surface-2);color:var(--text-3)">#{msg['esp.pending']}</h:panelGroup>
+                                        <h:panelGroup styleClass="pill" rendered="#{o.statut eq 'EN_ATTENTE_VALIDATION'}" style="background:var(--surface-2);color:var(--text-3)">#{msg['esp.pending']}</h:panelGroup>
+                                        <h:panelGroup styleClass="pill" rendered="#{o.statut eq 'REJETEE'}" style="background:rgba(239,68,68,.12);color:var(--danger)">#{msg['esp.rejected']}</h:panelGroup>
                                     </div>
+                                    <h:outputText rendered="#{o.statut eq 'REJETEE' and not empty o.motifRejet}" styleClass="meta" style="display:block;margin-top:6px;color:var(--danger)" value="#{msg['esp.motif']} : #{o.motifRejet}"/>
                                 </div></article>
                             </ui:repeat>
                         </h:panelGroup>

@@ -87,7 +87,27 @@ public class AdminServiceImpl implements AdminService {
         Offre o = em.find(Offre.class, idOffre);
         if (o == null) throw new ResourceNotFoundException("Offre", idOffre);
         o.setStatut(StatutOffre.PUBLIEE);
+        o.setMotifRejet(null);
         em.merge(o);
+    }
+
+    @Override
+    public void rejeterOffre(Long idOffre, String motif) {
+        Offre o = em.find(Offre.class, idOffre);
+        if (o == null) throw new ResourceNotFoundException("Offre", idOffre);
+        o.setStatut(StatutOffre.REJETEE);
+        o.setMotifRejet(motif);
+        em.merge(o);
+    }
+
+    @Override
+    public List<EspaceAdminDTO> espacesVerifies() {
+        return em.createQuery(
+                        "select e from EspaceProfessionnel e where e.verifie = true order by e.nomCommercial",
+                        EspaceProfessionnel.class)
+                .getResultList().stream()
+                .map(e -> new EspaceAdminDTO(e, espaceDao.countOffres(e.getIdEspace())))
+                .toList();
     }
 
     @Override

@@ -24,6 +24,7 @@ public final class OffreMapper {
         dto.setPrix(o.getPrix());
         dto.setDisponible(o.isDisponible());
         dto.setStatut(o.getStatut() != null ? o.getStatut().name() : null);
+        dto.setMotifRejet(o.getMotifRejet());
         if (o.getCategorie() != null) {
             dto.setCategorieNom(o.getCategorie().getNom());
         }

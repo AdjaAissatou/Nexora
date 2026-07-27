@@ -25,6 +25,12 @@ public interface AdminService {
     /** Valide une offre : passe son statut a PUBLIEE (visible en recherche). */
     void validerOffre(Long idOffre);
 
+    /** Rejette une offre avec un motif (statut REJETEE, non visible). */
+    void rejeterOffre(Long idOffre, String motif);
+
+    /** Espaces deja verifies (pour la certification). */
+    java.util.List<EspaceAdminDTO> espacesVerifies();
+
     /** Active ou retire le badge "certifie" d'un espace. */
     void certifierEspace(Long idEspace, boolean certifie);
 

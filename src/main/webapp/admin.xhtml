@@ -3,7 +3,8 @@
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
                 xmlns:f="jakarta.faces.core"
-                xmlns:ui="jakarta.faces.facelets">
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:a="jakarta.faces.passthrough">
     <ui:param name="titre" value="#{msg['nav.admin']}"/>
     <ui:define name="content">
         <f:event type="preRenderView" listener="#{sessionBean.exigerAdmin}"/>
@@ -24,7 +25,7 @@
                     <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{adminBean.stats.signalements}</h3><span>#{msg['ad.reports']}</span></div>
                 </div>
 
-                <!-- Espaces en attente -->
+                <!-- Espaces en attente de validation -->
                 <div class="panel reveal" style="margin-top:20px">
                     <div class="panel-head"><h3>#{msg['ad.pending']} (#{adminBean.espacesEnAttente.size()})</h3></div>
                     <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.espacesEnAttente}">
@@ -32,27 +33,56 @@
                             <div class="mini-row">
                                 <span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#ic-store"/></svg></span>
                                 <div style="flex:1"><div class="r-name">#{e.nomCommercial}</div><div class="r-sub">#{e.typeEspace} · #{e.nombreOffres} annonce(s)</div></div>
-                                <h:commandButton styleClass="btn btn-primary btn-sm" value="#{msg['ad.validate']}" action="#{adminBean.validerEspace(e.id)}">
-                                    <f:ajax render="@form"/>
-                                </h:commandButton>
+                                <h:commandButton styleClass="btn btn-primary btn-sm" value="#{msg['ad.validate']}" action="#{adminBean.validerEspace(e.id)}"><f:ajax render="@form"/></h:commandButton>
                             </div>
                         </ui:repeat>
                     </h:panelGroup>
                     <h:outputText rendered="#{empty adminBean.espacesEnAttente}" styleClass="meta" value="#{msg['ad.none']}"/>
                 </div>
 
-                <!-- Offres en attente -->
+                <!-- Espaces vérifiés : certification -->
+                <div class="panel reveal" style="margin-top:20px">
+                    <div class="panel-head"><h3>#{msg['ad.verifiedSpaces']} (#{adminBean.espacesVerifies.size()})</h3></div>
+                    <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.espacesVerifies}">
+                        <ui:repeat value="#{adminBean.espacesVerifies}" var="e">
+                            <div class="mini-row">
+                                <span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#ic-store"/></svg></span>
+                                <div style="flex:1"><div class="r-name">#{e.nomCommercial}
+                                    <h:panelGroup styleClass="pill pill-open" style="margin-left:8px" rendered="#{e.certifie}"><svg class="ic"><use href="#ic-check"/></svg>#{msg['ad.certified']}</h:panelGroup>
+                                </div><div class="r-sub">#{e.typeEspace}</div></div>
+                                <h:commandButton styleClass="btn btn-primary btn-sm" rendered="#{not e.certifie}" value="#{msg['ad.certify']}" action="#{adminBean.certifier(e.id, true)}"><f:ajax render="@form"/></h:commandButton>
+                                <h:commandButton styleClass="btn btn-outline btn-sm" rendered="#{e.certifie}" value="#{msg['ad.uncertify']}" action="#{adminBean.certifier(e.id, false)}"><f:ajax render="@form"/></h:commandButton>
+                            </div>
+                        </ui:repeat>
+                    </h:panelGroup>
+                    <h:outputText rendered="#{empty adminBean.espacesVerifies}" styleClass="meta" value="#{msg['ad.noVerified']}"/>
+                </div>
+
+                <!-- Offres en attente : valider / rejeter -->
                 <div class="panel reveal" style="margin-top:20px">
                     <div class="panel-head"><h3>#{msg['ad.pendingOffers']} (#{adminBean.offresEnAttente.size()})</h3></div>
+
+                    <!-- Panneau de rejet (motif) -->
+                    <h:panelGroup layout="block" rendered="#{adminBean.rejetEnCours}" styleClass="nx-form"
+                                  style="background:var(--surface-2);padding:16px;border-radius:14px;margin-bottom:14px">
+                        <div class="nx-field">
+                            <label>#{msg['ad.rejecting']} : <b>#{adminBean.offreARejeterTitre}</b></label>
+                            <h:inputTextarea value="#{adminBean.motifRejet}" rows="2" style="width:100%" a:placeholder="#{msg['ad.rejectReason']}"/>
+                        </div>
+                        <div style="display:flex;gap:10px">
+                            <h:commandButton styleClass="btn btn-primary" value="#{msg['ad.confirmReject']}" action="#{adminBean.confirmerRejet}"><f:ajax execute="@form" render="@form"/></h:commandButton>
+                            <h:commandButton styleClass="btn btn-outline" value="#{msg['ad.cancel']}" immediate="true" action="#{adminBean.annulerRejet}"><f:ajax render="@form"/></h:commandButton>
+                        </div>
+                    </h:panelGroup>
+
                     <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.offresEnAttente}">
                         <ui:repeat value="#{adminBean.offresEnAttente}" var="o">
                             <div class="mini-row">
                                 <span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#{o.type eq 'SERVICE' ? '#ic-tools' : '#ic-package'}"/></svg></span>
                                 <div style="flex:1"><div class="r-name">#{o.titre}</div><div class="r-sub">#{o.categorieNom} · #{o.espaceNom}</div></div>
                                 <span class="price" style="margin-right:12px"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA"/></span>
-                                <h:commandButton styleClass="btn btn-primary btn-sm" value="#{msg['ad.validate']}" action="#{adminBean.validerOffre(o.id)}">
-                                    <f:ajax render="@form"/>
-                                </h:commandButton>
+                                <h:commandButton styleClass="btn btn-primary btn-sm" value="#{msg['ad.validate']}" action="#{adminBean.validerOffre(o.id)}"><f:ajax render="@form"/></h:commandButton>
+                                <h:commandButton styleClass="btn btn-outline btn-sm" style="margin-left:8px;border-color:var(--danger);color:var(--danger)" value="#{msg['ad.reject']}" action="#{adminBean.demarrerRejet(o.id, o.titre)}"><f:ajax render="@form"/></h:commandButton>
                             </div>
                         </ui:repeat>
                     </h:panelGroup>

@@ -202,6 +202,7 @@ CREATE TABLE offre (
     date_creation     TIMESTAMP,
     date_modification TIMESTAMP,
     date_expiration   TIMESTAMP,
+    motif_rejet       VARCHAR(500),
     score_pertinence  DOUBLE PRECISION DEFAULT 0,
     nb_consultation   BIGINT DEFAULT 0,
     nb_commandes      BIGINT DEFAULT 0,
