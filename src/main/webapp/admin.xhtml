@@ -6,6 +6,7 @@
                 xmlns:ui="jakarta.faces.facelets">
     <ui:param name="titre" value="#{msg['nav.admin']}"/>
     <ui:define name="content">
+        <f:event type="preRenderView" listener="#{sessionBean.exigerAdmin}"/>
         <div class="view">
             <div class="page-head reveal">
                 <span class="eyebrow">#{msg['ad.eyebrow']}</span>

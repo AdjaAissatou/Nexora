@@ -55,6 +55,9 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException("Identifiants invalides.");
         }
         u.setDerniereConnexion(LocalDateTime.now());
+        // Force l'initialisation du profil (LAZY) tant que la transaction est
+        // ouverte, pour que la couche web puisse lire le libelle (droits admin).
+        if (u.getProfile() != null) u.getProfile().getLibelle();
         return utilisateurDao.update(u);
     }
 }

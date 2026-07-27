@@ -3,8 +3,12 @@ package com.nexora.web.bean;
 import com.nexora.domain.user.Utilisateur;
 import com.nexora.dto.EspaceViewDTO;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.FacesException;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ComponentSystemEvent;
 import jakarta.inject.Named;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -49,6 +53,30 @@ public class SessionBean implements Serializable {
         this.admin = u.getProfile() != null
                 && u.getProfile().getLibelle() != null
                 && u.getProfile().getLibelle().toUpperCase().contains("ADMIN");
+    }
+
+    /**
+     * Garde d'acces des pages reservees a l'administration : redirige vers
+     * l'accueil si l'utilisateur n'est pas administrateur. A brancher via
+     * {@code <f:event type="preRenderView" listener="#{sessionBean.exigerAdmin}"/>}.
+     */
+    public void exigerAdmin(ComponentSystemEvent e) {
+        if (!admin) rediriger("/accueil.xhtml");
+    }
+
+    /** Garde d'acces des pages necessitant une connexion. */
+    public void exigerConnexion(ComponentSystemEvent e) {
+        if (!isConnecte()) rediriger("/connexion.xhtml");
+    }
+
+    private void rediriger(String vue) {
+        FacesContext fc = FacesContext.getCurrentInstance();
+        try {
+            fc.getExternalContext().redirect(fc.getExternalContext().getRequestContextPath() + vue);
+            fc.responseComplete();
+        } catch (IOException ex) {
+            throw new FacesException(ex);
+        }
     }
 
     public String deconnecter() {

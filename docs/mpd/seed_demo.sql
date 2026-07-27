@@ -46,6 +46,15 @@ INSERT INTO utilisateur (nom, prenom, email, telephone, mot_de_passe, statut_com
          'x$demo-not-a-real-hash-compte-vitrine-nexora-000000000000000', TRUE, TRUE, TRUE, NOW())
 ON CONFLICT (email) DO NOTHING;
 
+-- ---------- Compte administrateur de demonstration -------------------
+--  Identifiants : admin@nexora.sn / admin123  (hachage BCrypt).
+--  Profil ADMIN (seede par seed.sql) -> acces a l'administration.
+INSERT INTO utilisateur (nom, prenom, email, telephone, mot_de_passe, statut_compte, email_verifie, actif, created_at, id_profile)
+ VALUES ('Admin', 'Nexora', 'admin@nexora.sn', '+221770000001',
+         '$2a$12$pfD3F0OGuHHFAxmgCaG26.t3L5PTqR9GXUdN.1SW4LyXDhjiuB73O', TRUE, TRUE, TRUE, NOW(),
+         (SELECT id_profile FROM profile WHERE libelle = 'ADMIN'))
+ON CONFLICT (email) DO NOTHING;
+
 -- ---------- Espaces professionnels -----------------------------------
 INSERT INTO espace_professionnel
   (nom_commercial, slug, description, telephone_principal, verifie, certifie, etat, note_moyenne, nombre_avis,
