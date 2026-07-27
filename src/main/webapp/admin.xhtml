@@ -2,6 +2,7 @@
 <ui:composition template="/WEB-INF/templates/layout.xhtml"
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets">
     <ui:param name="titre" value="#{msg['nav.admin']}"/>
     <ui:define name="content">
@@ -10,22 +11,53 @@
                 <span class="eyebrow">#{msg['ad.eyebrow']}</span>
                 <h1>#{msg['ad.title']}</h1>
             </div>
-            <div class="stat-grid reveal">
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-user"/></svg></span></div><h3 class="tnum">#{adminBean.stats.utilisateurs}</h3><span>#{msg['ad.users']}</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-store"/></svg></span></div><h3 class="tnum">#{adminBean.stats.espaces}</h3><span>#{msg['ad.spaces']}</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span></div><h3 class="tnum">#{adminBean.stats.produits}</h3><span>#{msg['ad.products']}</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span></div><h3 class="tnum">#{adminBean.stats.services}</h3><span>#{msg['ad.services']}</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{adminBean.stats.signalements}</h3><span>#{msg['ad.reports']}</span></div>
-            </div>
-            <div class="panel reveal" style="margin-top:20px">
-                <div class="panel-head"><h3>#{msg['ad.pending']} (#{adminBean.enAttente.size()})</h3></div>
-                <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.enAttente}">
-                    <ui:repeat value="#{adminBean.enAttente}" var="e">
-                        <div class="mini-row"><span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#ic-store"/></svg></span><div><div class="r-name">#{e.nomCommercial}</div></div></div>
-                    </ui:repeat>
-                </h:panelGroup>
-                <h:outputText rendered="#{empty adminBean.enAttente}" styleClass="meta" value="#{msg['ad.none']}"/>
-            </div>
+
+            <h:form id="adm">
+                <h:messages globalOnly="true" styleClass="meta" style="color:var(--emerald-700);margin-bottom:12px"/>
+
+                <div class="stat-grid reveal">
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-user"/></svg></span></div><h3 class="tnum">#{adminBean.stats.utilisateurs}</h3><span>#{msg['ad.users']}</span></div>
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-store"/></svg></span></div><h3 class="tnum">#{adminBean.stats.espaces}</h3><span>#{msg['ad.spaces']}</span></div>
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span></div><h3 class="tnum">#{adminBean.stats.produits}</h3><span>#{msg['ad.products']}</span></div>
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span></div><h3 class="tnum">#{adminBean.stats.services}</h3><span>#{msg['ad.services']}</span></div>
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{adminBean.stats.signalements}</h3><span>#{msg['ad.reports']}</span></div>
+                </div>
+
+                <!-- Espaces en attente -->
+                <div class="panel reveal" style="margin-top:20px">
+                    <div class="panel-head"><h3>#{msg['ad.pending']} (#{adminBean.espacesEnAttente.size()})</h3></div>
+                    <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.espacesEnAttente}">
+                        <ui:repeat value="#{adminBean.espacesEnAttente}" var="e">
+                            <div class="mini-row">
+                                <span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#ic-store"/></svg></span>
+                                <div style="flex:1"><div class="r-name">#{e.nomCommercial}</div><div class="r-sub">#{e.typeEspace} · #{e.nombreOffres} annonce(s)</div></div>
+                                <h:commandButton styleClass="btn btn-primary btn-sm" value="#{msg['ad.validate']}" action="#{adminBean.validerEspace(e.id)}">
+                                    <f:ajax render="@form"/>
+                                </h:commandButton>
+                            </div>
+                        </ui:repeat>
+                    </h:panelGroup>
+                    <h:outputText rendered="#{empty adminBean.espacesEnAttente}" styleClass="meta" value="#{msg['ad.none']}"/>
+                </div>
+
+                <!-- Offres en attente -->
+                <div class="panel reveal" style="margin-top:20px">
+                    <div class="panel-head"><h3>#{msg['ad.pendingOffers']} (#{adminBean.offresEnAttente.size()})</h3></div>
+                    <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.offresEnAttente}">
+                        <ui:repeat value="#{adminBean.offresEnAttente}" var="o">
+                            <div class="mini-row">
+                                <span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#{o.type eq 'SERVICE' ? '#ic-tools' : '#ic-package'}"/></svg></span>
+                                <div style="flex:1"><div class="r-name">#{o.titre}</div><div class="r-sub">#{o.categorieNom} · #{o.espaceNom}</div></div>
+                                <span class="price" style="margin-right:12px"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA"/></span>
+                                <h:commandButton styleClass="btn btn-primary btn-sm" value="#{msg['ad.validate']}" action="#{adminBean.validerOffre(o.id)}">
+                                    <f:ajax render="@form"/>
+                                </h:commandButton>
+                            </div>
+                        </ui:repeat>
+                    </h:panelGroup>
+                    <h:outputText rendered="#{empty adminBean.offresEnAttente}" styleClass="meta" value="#{msg['ad.noOffers']}"/>
+                </div>
+            </h:form>
         </div>
     </ui:define>
 </ui:composition>

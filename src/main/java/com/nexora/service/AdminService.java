@@ -19,6 +19,12 @@ public interface AdminService {
     /** Valide (verifie) un espace professionnel. */
     void validerEspace(Long idEspace);
 
+    /** Offres en attente de validation (toutes categories). */
+    java.util.List<com.nexora.dto.OffreDTO> offresEnAttente();
+
+    /** Valide une offre : passe son statut a PUBLIEE (visible en recherche). */
+    void validerOffre(Long idOffre);
+
     /** Active ou retire le badge "certifie" d'un espace. */
     void certifierEspace(Long idEspace, boolean certifie);
 

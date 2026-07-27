@@ -1,8 +1,12 @@
 package com.nexora.service.impl;
 
+import com.nexora.common.enums.StatutOffre;
 import com.nexora.common.exception.ResourceNotFoundException;
+import com.nexora.domain.catalog.Offre;
 import com.nexora.domain.dispute.Litige;
 import com.nexora.domain.space.EspaceProfessionnel;
+import com.nexora.dto.OffreDTO;
+import com.nexora.dto.OffreMapper;
 import com.nexora.dto.admin.*;
 import com.nexora.repository.EspaceProfessionnelDao;
 import com.nexora.repository.LitigeDao;
@@ -10,6 +14,8 @@ import com.nexora.repository.StatDao;
 import com.nexora.service.AdminService;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +33,9 @@ public class AdminServiceImpl implements AdminService {
     private EspaceProfessionnelDao espaceDao;
     @Inject
     private LitigeDao litigeDao;
+
+    @PersistenceContext(unitName = "nexoraPU")
+    private EntityManager em;
 
     @Override
     public AdminStatsDTO statistiquesGlobales() {
@@ -61,6 +70,24 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new ResourceNotFoundException("EspaceProfessionnel", idEspace));
         e.setVerifie(true);
         espaceDao.update(e);
+    }
+
+    @Override
+    public List<OffreDTO> offresEnAttente() {
+        return em.createQuery(
+                        "select o from Offre o where o.statut = :st order by o.dateCreation desc",
+                        Offre.class)
+                .setParameter("st", StatutOffre.EN_ATTENTE_VALIDATION)
+                .getResultList()
+                .stream().map(OffreMapper::toDto).toList();
+    }
+
+    @Override
+    public void validerOffre(Long idOffre) {
+        Offre o = em.find(Offre.class, idOffre);
+        if (o == null) throw new ResourceNotFoundException("Offre", idOffre);
+        o.setStatut(StatutOffre.PUBLIEE);
+        em.merge(o);
     }
 
     @Override
