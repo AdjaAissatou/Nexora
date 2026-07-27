@@ -12,7 +12,7 @@
             <div class="page-head reveal">
                 <span class="eyebrow">Espace professionnel</span>
                 <h1>Créer mon espace</h1>
-                <p>Un espace unique pour votre activité. Vous pourrez y proposer des produits, des services, ou les deux.</p>
+                <p>Un espace unique pour votre activité : vous pourrez y publier des produits et des services.</p>
             </div>
 
             <h:form styleClass="nx-form reveal">
@@ -22,19 +22,6 @@
                     <label>Nom commercial *</label>
                     <h:inputText value="#{espaceBean.nomCommercial}" a:placeholder="Ex : Chez Awa"/>
                 </div>
-
-                <div class="nx-field">
-                    <label>Que proposez-vous ? *</label>
-                    <div style="display:flex;gap:22px;margin-top:6px;flex-wrap:wrap">
-                        <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer">
-                            <h:selectBooleanCheckbox value="#{espaceBean.produits}"/> <span>Des produits (boutique)</span>
-                        </label>
-                        <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer">
-                            <h:selectBooleanCheckbox value="#{espaceBean.services}"/> <span>Des services (prestataire)</span>
-                        </label>
-                    </div>
-                </div>
-
                 <div class="nx-field">
                     <label>Ville</label>
                     <h:selectOneMenu value="#{espaceBean.ville}">
@@ -46,7 +33,6 @@
                         <f:selectItem itemValue="Mbour" itemLabel="Mbour"/>
                     </h:selectOneMenu>
                 </div>
-
                 <div class="nx-field">
                     <label>Téléphone</label>
                     <h:inputText value="#{espaceBean.telephone}" a:placeholder="+221 ..."/>

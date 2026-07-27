@@ -126,6 +126,20 @@ public class OffreServiceImpl implements OffreService {
         return OffreMapper.toDto(offre);
     }
 
+    @Override
+    public java.util.List<OffreDTO> offresDeEspace(Long idEspace) {
+        List<Offre> offres = em.createQuery(
+                        "select o from Offre o where o.espace.idEspace = :id order by o.dateCreation desc",
+                        Offre.class)
+                .setParameter("id", idEspace)
+                .getResultList();
+        return offres.stream().map(o -> {
+            OffreDTO dto = OffreMapper.toDto(o);
+            dto.setOuvert(estOuvert(o.getEspace()));
+            return dto;
+        }).toList();
+    }
+
     private Produit nouveauProduit(OffreRequest req) {
         Produit p = new Produit();
         p.setMarque(req.getMarque());

@@ -1,6 +1,13 @@
 package com.nexora.web.bean;
 
-import jakarta.annotation.PostConstruct;
+import com.nexora.dto.EspaceRequest;
+import com.nexora.dto.EspaceViewDTO;
+import com.nexora.dto.OffreDTO;
+import com.nexora.dto.OffreRequest;
+import com.nexora.dto.ref.AttributDTO;
+import com.nexora.service.CategorieService;
+import com.nexora.service.EspaceService;
+import com.nexora.service.OffreService;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -8,13 +15,17 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Bean de creation d'espace et de gestion des offres (produits / services)
- * dans "Mon espace". Les formulaires s'appuient sur {@link CatalogueBean}
- * pour des categories imbriquees et des attributs a listes deroulantes (EAV).
+ * Creation d'espace et gestion des offres (produits / services) dans
+ * "Mon espace". Persistance reelle : {@link EspaceService} et
+ * {@link OffreService}. Les categories/attributs viennent de
+ * {@link CategorieService}. Aucune donnee simulee.
  */
 @Named("espaceBean")
 @ViewScoped
@@ -23,51 +34,67 @@ public class EspaceBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private SessionBean session;
-    @Inject private CatalogueBean catalogue;
+    @Inject private EspaceService espaceService;
+    @Inject private OffreService offreService;
+    @Inject private CategorieService categorieService;
 
     // --- Creation d'espace ---
     private String nomCommercial;
-    private boolean produits;
-    private boolean services;
     private String ville = "Dakar";
     private String telephone;
 
-    // --- Ajout d'une offre (produit ou service) ---
+    // --- Onglet + formulaire d'ajout ---
+    private String onglet = "produits";         // produits | services | stats
     private boolean formOuvert;
-    private String kind = "PRODUIT";                     // PRODUIT | SERVICE
+    private String kind = "PRODUIT";            // PRODUIT | SERVICE
     private Long categorieId;
     private String titre;
     private String prix;
-    private Map<String, String> valeursAttributs = new LinkedHashMap<>();
+    private Map<Long, String> valeursAttributs = new LinkedHashMap<>();
 
-    @PostConstruct
-    public void init() {
-        // Pre-coche selon la nature de l'espace existant (creation initiale).
-        if (session.getEspace() != null) {
-            this.produits = session.getEspace().isProduits();
-            this.services = session.getEspace().isServices();
-        }
-    }
+    // --- Caches (charges depuis la base) ---
+    private List<OffreDTO> produits;
+    private List<OffreDTO> services;
 
     // ------------------------------------------------------- Creation d'espace
     public String creer() {
+        if (!session.isConnecte()) return "connexion?faces-redirect=true";
         if (nomCommercial == null || nomCommercial.isBlank()) {
             avertir("Le nom commercial est obligatoire.");
             return null;
         }
-        if (!produits && !services) {
-            avertir("Choisissez au moins des produits ou des services.");
+        EspaceRequest req = new EspaceRequest();
+        req.setNomCommercial(nomCommercial.trim());
+        req.setTelephonePrincipal(telephone);
+        req.setPays("Sénégal");
+        req.setRegion("Dakar");
+        req.setVille(ville);
+        try {
+            EspaceViewDTO vue = espaceService.creer(session.getIdUtilisateur(), req);
+            session.setEspace(vue, ville);
+        } catch (Exception ex) {
+            avertir("Création impossible : " + racine(ex));
             return null;
         }
-        session.creerEspace(nomCommercial.trim(), produits, services, ville, telephone);
         return "mon-espace?faces-redirect=true";
     }
 
     // ------------------------------------------------------------- Mon espace
-    public void changerOnglet(String onglet) {
-        if (session.getEspace() != null) session.getEspace().setOngletActif(onglet);
-        annuler();
+    private void recharger() {
+        produits = new ArrayList<>();
+        services = new ArrayList<>();
+        if (session.getEspaceId() == null) return;
+        for (OffreDTO o : offreService.offresDeEspace(session.getEspaceId())) {
+            if ("SERVICE".equals(o.getType())) services.add(o);
+            else produits.add(o);
+        }
     }
+
+    public List<OffreDTO> getProduits() { if (produits == null) recharger(); return produits; }
+    public List<OffreDTO> getServices() { if (services == null) recharger(); return services; }
+
+    public String getOnglet() { return onglet; }
+    public void changerOnglet(String o) { this.onglet = o; annuler(); }
 
     public void ouvrirForm(String kind) {
         this.kind = kind;
@@ -86,38 +113,45 @@ public class EspaceBean implements Serializable {
         this.valeursAttributs = new LinkedHashMap<>();
     }
 
-    /** Recharge les attributs quand la categorie change (ajax). */
-    public void onCategorieChange() {
-        this.valeursAttributs = new LinkedHashMap<>();
+    public void onCategorieChange() { this.valeursAttributs = new LinkedHashMap<>(); }
+
+    public List<AttributDTO> getAttributsCourants() {
+        return categorieId == null ? List.of() : categorieService.attributsDeCategorie(categorieId);
     }
 
     public void enregistrer() {
         if (categorieId == null) { avertir("Choisissez une catégorie."); return; }
         if (titre == null || titre.isBlank()) { avertir("Le titre est obligatoire."); return; }
 
-        StringBuilder resume = new StringBuilder();
-        for (CatalogueBean.Attr a : catalogue.attributs(categorieId)) {
-            String v = valeursAttributs.get(a.getNom());
-            if (v != null && !v.isBlank()) {
-                if (resume.length() > 0) resume.append(", ");
-                resume.append(v);
-            }
-        }
-        SessionBean.Offre offre = new SessionBean.Offre(
-                titre.trim(), catalogue.nomDe(categorieId), prix, resume.toString());
-
-        SessionBean.Espace e = session.getEspace();
-        if (e != null) {
-            if ("SERVICE".equals(kind)) e.getListeServices().add(offre);
-            else e.getListeProduits().add(offre);
+        OffreRequest req = new OffreRequest();
+        req.setType(kind);
+        req.setTitre(titre.trim());
+        req.setPrix(parsePrix(prix));
+        req.setIdEspace(session.getEspaceId());
+        req.setIdCategorie(categorieId);
+        Map<Long, String> attrs = new LinkedHashMap<>();
+        valeursAttributs.forEach((k, v) -> { if (v != null && !v.isBlank()) attrs.put(k, v); });
+        req.setAttributsTexte(attrs);
+        try {
+            offreService.publier(req);
+        } catch (Exception ex) {
+            avertir("Publication impossible : " + racine(ex));
+            return;
         }
         FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Ajouté ! En attente de validation.", null));
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Publié ! En attente de validation.", null));
         annuler();
+        recharger();
     }
 
-    public java.util.List<CatalogueBean.Attr> getAttributsCourants() {
-        return catalogue.attributs(categorieId);
+    private static BigDecimal parsePrix(String p) {
+        if (p == null || p.isBlank()) return null;
+        try { return new BigDecimal(p.replaceAll("[^0-9.]", "")); } catch (Exception e) { return null; }
+    }
+
+    private static String racine(Throwable t) {
+        while (t.getCause() != null && t.getCause() != t) t = t.getCause();
+        return t.getMessage() != null ? t.getMessage() : t.getClass().getSimpleName();
     }
 
     private void avertir(String m) {
@@ -128,10 +162,6 @@ public class EspaceBean implements Serializable {
     // --- Getters / Setters ---
     public String getNomCommercial()        { return nomCommercial; }
     public void setNomCommercial(String v)  { this.nomCommercial = v; }
-    public boolean isProduits()             { return produits; }
-    public void setProduits(boolean v)      { this.produits = v; }
-    public boolean isServices()             { return services; }
-    public void setServices(boolean v)      { this.services = v; }
     public String getVille()                { return ville; }
     public void setVille(String v)          { this.ville = v; }
     public String getTelephone()            { return telephone; }
@@ -139,13 +169,12 @@ public class EspaceBean implements Serializable {
 
     public boolean isFormOuvert()           { return formOuvert; }
     public String getKind()                 { return kind; }
-    public void setKind(String v)           { this.kind = v; }
     public Long getCategorieId()            { return categorieId; }
     public void setCategorieId(Long v)      { this.categorieId = v; }
     public String getTitre()                { return titre; }
     public void setTitre(String v)          { this.titre = v; }
     public String getPrix()                 { return prix; }
     public void setPrix(String v)           { this.prix = v; }
-    public Map<String, String> getValeursAttributs()       { return valeursAttributs; }
-    public void setValeursAttributs(Map<String, String> v) { this.valeursAttributs = v; }
+    public Map<Long, String> getValeursAttributs()       { return valeursAttributs; }
+    public void setValeursAttributs(Map<Long, String> v) { this.valeursAttributs = v; }
 }

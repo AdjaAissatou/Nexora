@@ -8,18 +8,19 @@
         <div class="view">
             <div class="page-head reveal">
                 <span class="eyebrow">Espace professionnel</span>
-                <h1>Bonjour, #{sessionBean.possedeEspace ? sessionBean.espace.nom : 'cher pro'}</h1>
-                <p>Voici votre activité des 30 derniers jours.</p>
+                <h1>Bonjour, #{sessionBean.possedeEspace ? sessionBean.espaceNom : 'cher pro'}</h1>
+                <p>Vos annonces et leur statut de validation.</p>
             </div>
             <div class="stat-grid reveal">
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-eye"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+18%</span></div><h3 class="tnum">12 480</h3><span>Vues du profil</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+9%</span></div><h3 class="tnum">327</h3><span>Commandes</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-chat"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+24%</span></div><h3 class="tnum">1 902</h3><span>Messages reçus</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-coins"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+31%</span></div><h3 class="tnum">1,84M</h3><span>Revenus (FCFA)</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-bag"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbOffres}</h3><span>Annonces</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbProduits}</h3><span>Produits</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbServices}</h3><span>Services</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-check"/></svg></span><span class="trend trend-up">en ligne</span></div><h3 class="tnum">#{dashboardBean.nbEnLigne}</h3><span>Publiées</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-clock"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbEnAttente}</h3><span>En attente</span></div>
             </div>
             <div class="panel reveal" style="margin-top:20px">
-                <div class="panel-head"><h3>Astuce</h3></div>
-                <p class="meta">Les graphiques interactifs (vues, revenus, répartition) sont détaillés dans le prototype de référence. Cette page JSF présente les indicateurs clés ; les courbes peuvent être branchées sur les statistiques réelles de l'espace.</p>
+                <div class="panel-head"><h3>Validation</h3></div>
+                <p class="meta">Les annonces publiées passent en <b>attente de validation</b> ; une fois validées par un administrateur, elles apparaissent dans la recherche (Explorer).</p>
             </div>
         </div>
     </ui:define>

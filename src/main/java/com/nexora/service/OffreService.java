@@ -16,4 +16,7 @@ public interface OffreService {
 
     /** Publie une nouvelle offre (produit ou service) sous un espace. */
     OffreDTO publier(OffreRequest req);
+
+    /** Toutes les offres d'un espace (tous statuts), pour la gestion "Mon espace". */
+    java.util.List<OffreDTO> offresDeEspace(Long idEspace);
 }

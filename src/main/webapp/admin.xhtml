@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui:composition template="/WEB-INF/templates/layout.xhtml"
                 xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
                 xmlns:ui="jakarta.faces.facelets">
     <ui:param name="titre" value="Administration"/>
     <ui:define name="content">
@@ -10,14 +11,20 @@
                 <h1>Vue d'ensemble de la plateforme</h1>
             </div>
             <div class="stat-grid reveal">
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-store"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+12%</span></div><h3 class="tnum">3 640</h3><span>Espaces pro</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-bag"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+8%</span></div><h3 class="tnum">18 210</h3><span>Annonces</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-user"/></svg></span><span class="trend trend-up"><svg class="ic"><use href="#ic-up"/></svg>+15%</span></div><h3 class="tnum">54 900</h3><span>Utilisateurs</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span><span class="trend trend-down">-3%</span></div><h3 class="tnum">42</h3><span>À modérer</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-user"/></svg></span></div><h3 class="tnum">#{adminBean.stats.utilisateurs}</h3><span>Utilisateurs</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-store"/></svg></span></div><h3 class="tnum">#{adminBean.stats.espaces}</h3><span>Espaces pro</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span></div><h3 class="tnum">#{adminBean.stats.produits}</h3><span>Produits</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span></div><h3 class="tnum">#{adminBean.stats.services}</h3><span>Services</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{adminBean.stats.signalements}</h3><span>Signalements</span></div>
             </div>
             <div class="panel reveal" style="margin-top:20px">
-                <div class="panel-head"><h3>Modération</h3></div>
-                <p class="meta">Validation des espaces, arbitrage des litiges et suivi des annonces signalées. Alimenté par <code>AdminService</code> côté backend.</p>
+                <div class="panel-head"><h3>Espaces en attente de validation (#{adminBean.enAttente.size()})</h3></div>
+                <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.enAttente}">
+                    <ui:repeat value="#{adminBean.enAttente}" var="e">
+                        <div class="mini-row"><span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#ic-store"/></svg></span><div><div class="r-name">#{e.nomCommercial}</div></div></div>
+                    </ui:repeat>
+                </h:panelGroup>
+                <h:outputText rendered="#{empty adminBean.enAttente}" styleClass="meta" value="Aucun espace en attente."/>
             </div>
         </div>
     </ui:define>

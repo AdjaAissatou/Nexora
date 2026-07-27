@@ -17,6 +17,8 @@ public final class OffreMapper {
     public static OffreDTO toDto(Offre o) {
         OffreDTO dto = new OffreDTO();
         dto.setId(o.getIdOffre());
+        dto.setType(o instanceof com.nexora.domain.catalog.ServicePro ? "SERVICE"
+                : o instanceof com.nexora.domain.catalog.Produit ? "PRODUIT" : "OFFRE");
         dto.setTitre(o.getTitre());
         dto.setDescription(o.getDescription());
         dto.setPrix(o.getPrix());
