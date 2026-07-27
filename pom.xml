@@ -39,12 +39,13 @@
             <artifactId>jakarta.jakartaee-api</artifactId>
         </dependency>
 
-        <!-- JPA provider: Hibernate ORM -->
+        <!-- JPA provider: Hibernate ORM (embarque dans le WAR : aucun serveur
+             Jakarta EE ne fournit Hibernate par defaut, l'app apporte son
+             fournisseur JPA, conformement a persistence.xml). -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- PostgreSQL JDBC driver -->

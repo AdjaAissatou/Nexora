@@ -39,7 +39,7 @@
             <h:link styleClass="nav-item" outcome="explorer"><svg class="ic"><use href="#ic-store"/></svg><span>Espaces</span></h:link>
 
             <!-- Section compte : seulement si connecte -->
-            <h:panelGroup layout="block" rendered="#{session.connecte}">
+            <h:panelGroup layout="block" rendered="#{sessionBean.connecte}">
                 <div class="nav-label">Mon compte</div>
                 <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-heart"/></svg><span>Favoris</span><span class="badge">6</span></h:link>
                 <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-package"/></svg><span>Mes commandes</span></h:link>
@@ -48,18 +48,18 @@
             </h:panelGroup>
 
             <!-- Section espace pro : seulement si l'utilisateur a un espace -->
-            <h:panelGroup layout="block" rendered="#{session.aEspace}">
+            <h:panelGroup layout="block" rendered="#{sessionBean.possedeEspace}">
                 <div class="nav-label">Espace pro</div>
                 <h:link styleClass="#{view.viewId eq '/mon-espace.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="mon-espace"><svg class="ic"><use href="#ic-store"/></svg><span>Mon espace</span></h:link>
                 <h:link styleClass="#{view.viewId eq '/dashboard.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>Statistiques</span></h:link>
-                <h:link styleClass="nav-item" outcome="admin" rendered="#{session.admin}"><svg class="ic"><use href="#ic-shield"/></svg><span>Administration</span></h:link>
+                <h:link styleClass="nav-item" outcome="admin" rendered="#{sessionBean.admin}"><svg class="ic"><use href="#ic-shield"/></svg><span>Administration</span></h:link>
             </h:panelGroup>
 
             <!-- Carte "Vous etes pro ?" : seulement si pas encore d'espace -->
-            <h:panelGroup layout="block" styleClass="side-pro" rendered="#{not session.aEspace}">
+            <h:panelGroup layout="block" styleClass="side-pro" rendered="#{not sessionBean.possedeEspace}">
                 <h4>Vous êtes pro ?</h4>
                 <p>Créez votre espace et touchez des milliers de clients près de vous.</p>
-                <h:link styleClass="btn-pro" outcome="#{session.connecte ? 'creer-espace' : 'connexion'}" value="Créer mon espace">
+                <h:link styleClass="btn-pro" outcome="#{sessionBean.connecte ? 'creer-espace' : 'connexion'}" value="Créer mon espace">
                     <f:param name="dest" value="creer-espace"/>
                 </h:link>
             </h:panelGroup>
@@ -76,10 +76,10 @@
                     <button type="button" class="icon-btn" id="themeBtn" title="Thème"></button>
                     <button type="button" class="icon-btn" title="Notifications"><svg class="ic"><use href="#ic-bell"/></svg></button>
 
-                    <h:link styleClass="avatar" rendered="#{session.connecte}"
-                            outcome="#{session.aEspace ? 'mon-espace' : 'accueil'}"
-                            value="#{session.initiale}" title="#{session.nom}"/>
-                    <h:link styleClass="btn btn-primary btn-sm" rendered="#{not session.connecte}"
+                    <h:link styleClass="avatar" rendered="#{sessionBean.connecte}"
+                            outcome="#{sessionBean.possedeEspace ? 'mon-espace' : 'accueil'}"
+                            value="#{sessionBean.initiale}" title="#{sessionBean.nom}"/>
+                    <h:link styleClass="btn btn-primary btn-sm" rendered="#{not sessionBean.connecte}"
                             outcome="connexion" value="Se connecter"/>
                 </div>
             </header>
@@ -92,9 +92,9 @@
     <nav class="botnav">
         <h:link outcome="accueil"><svg class="ic"><use href="#ic-home"/></svg><span>Accueil</span></h:link>
         <h:link outcome="explorer"><svg class="ic"><use href="#ic-compass"/></svg><span>Explorer</span></h:link>
-        <h:link outcome="#{session.connecte ? 'accueil' : 'connexion'}"><svg class="ic"><use href="#ic-heart"/></svg><span>Favoris</span></h:link>
-        <h:link outcome="#{session.connecte ? 'messages' : 'connexion'}"><svg class="ic"><use href="#ic-chat"/></svg><span>Messages</span></h:link>
-        <h:link outcome="#{session.aEspace ? 'mon-espace' : (session.connecte ? 'accueil' : 'connexion')}"><svg class="ic"><use href="#ic-user"/></svg><span>Profil</span></h:link>
+        <h:link outcome="#{sessionBean.connecte ? 'accueil' : 'connexion'}"><svg class="ic"><use href="#ic-heart"/></svg><span>Favoris</span></h:link>
+        <h:link outcome="#{sessionBean.connecte ? 'messages' : 'connexion'}"><svg class="ic"><use href="#ic-chat"/></svg><span>Messages</span></h:link>
+        <h:link outcome="#{sessionBean.possedeEspace ? 'mon-espace' : (sessionBean.connecte ? 'accueil' : 'connexion')}"><svg class="ic"><use href="#ic-user"/></svg><span>Profil</span></h:link>
     </nav>
 
     <h:outputScript name="js/nexora.js"/>

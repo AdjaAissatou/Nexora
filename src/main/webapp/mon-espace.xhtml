@@ -10,51 +10,51 @@
         <div class="view">
 
             <!-- Aucun espace : invitation a en creer un -->
-            <h:panelGroup layout="block" rendered="#{not session.aEspace}">
+            <h:panelGroup layout="block" rendered="#{not sessionBean.possedeEspace}">
                 <div class="page-head reveal">
                     <span class="eyebrow">Espace professionnel</span>
                     <h1>Vous n'avez pas encore d'espace</h1>
                     <p>Créez votre espace pour proposer vos produits et services.</p>
                 </div>
-                <h:link styleClass="btn btn-primary" outcome="#{session.connecte ? 'creer-espace' : 'connexion'}" value="Créer mon espace">
+                <h:link styleClass="btn btn-primary" outcome="#{sessionBean.connecte ? 'creer-espace' : 'connexion'}" value="Créer mon espace">
                     <f:param name="dest" value="creer-espace"/>
                 </h:link>
             </h:panelGroup>
 
             <!-- Espace existant -->
-            <h:panelGroup layout="block" rendered="#{session.aEspace}">
+            <h:panelGroup layout="block" rendered="#{sessionBean.possedeEspace}">
                 <div class="page-head reveal">
                     <span class="eyebrow">Mon espace</span>
-                    <h1>#{session.espace.nom}</h1>
+                    <h1>#{sessionBean.espace.nom}</h1>
                     <p><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#ic-check"/></svg>
-                       Espace vérifié · #{session.espace.nature} · #{session.espace.ville}</p>
+                       Espace vérifié · #{sessionBean.espace.nature} · #{sessionBean.espace.ville}</p>
                 </div>
 
                 <h:form id="esp">
                     <h:messages globalOnly="true" styleClass="meta" style="color:var(--emerald-700);margin-bottom:10px"/>
 
                     <div class="seg reveal">
-                        <h:commandLink styleClass="#{session.espace.ongletActif eq 'produits' ? 'on' : ''}"
-                                       value="Produits" rendered="#{session.espace.produits}"
+                        <h:commandLink styleClass="#{sessionBean.espace.ongletActif eq 'produits' ? 'on' : ''}"
+                                       value="Produits" rendered="#{sessionBean.espace.produits}"
                                        action="#{espaceBean.changerOnglet('produits')}"><f:ajax render="@form"/></h:commandLink>
-                        <h:commandLink styleClass="#{session.espace.ongletActif eq 'services' ? 'on' : ''}"
-                                       value="Services" rendered="#{session.espace.services}"
+                        <h:commandLink styleClass="#{sessionBean.espace.ongletActif eq 'services' ? 'on' : ''}"
+                                       value="Services" rendered="#{sessionBean.espace.services}"
                                        action="#{espaceBean.changerOnglet('services')}"><f:ajax render="@form"/></h:commandLink>
-                        <h:commandLink styleClass="#{session.espace.ongletActif eq 'stats' ? 'on' : ''}"
+                        <h:commandLink styleClass="#{sessionBean.espace.ongletActif eq 'stats' ? 'on' : ''}"
                                        value="Statistiques"
                                        action="#{espaceBean.changerOnglet('stats')}"><f:ajax render="@form"/></h:commandLink>
                     </div>
 
                     <!-- ======== Onglet STATISTIQUES ======== -->
-                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{session.espace.ongletActif eq 'stats'}">
+                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{sessionBean.espace.ongletActif eq 'stats'}">
                         <p class="meta" style="margin:6px 0 16px">Suivez vos vues, commandes et revenus dans le tableau de bord.</p>
                         <h:link styleClass="btn btn-primary" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>Ouvrir le tableau de bord</span></h:link>
                     </h:panelGroup>
 
                     <!-- ======== Onglets PRODUITS / SERVICES ======== -->
-                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{session.espace.ongletActif ne 'stats'}">
-                        <ui:param name="estService" value="#{session.espace.ongletActif eq 'services'}"/>
-                        <ui:param name="liste" value="#{estService ? session.espace.listeServices : session.espace.listeProduits}"/>
+                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{sessionBean.espace.ongletActif ne 'stats'}">
+                        <ui:param name="estService" value="#{sessionBean.espace.ongletActif eq 'services'}"/>
+                        <ui:param name="liste" value="#{estService ? sessionBean.espace.listeServices : sessionBean.espace.listeProduits}"/>
 
                         <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
                             <h:commandButton styleClass="btn btn-primary" rendered="#{not espaceBean.formOuvert}"
@@ -112,7 +112,7 @@
                                 <h:inputText value="#{espaceBean.prix}" a:type="number" a:placeholder="Ex : 15000"/></div>
 
                             <div style="display:flex;gap:10px">
-                                <h:commandButton styleClass="btn btn-primary" value="Enregistrer" action="#{espaceBean.enregistrer}"><f:ajax render="@form"/></h:commandButton>
+                                <h:commandButton styleClass="btn btn-primary" value="Enregistrer" action="#{espaceBean.enregistrer}"><f:ajax execute="@form" render="@form"/></h:commandButton>
                                 <h:commandButton styleClass="btn btn-outline" value="Annuler" immediate="true" action="#{espaceBean.annuler}"><f:ajax render="@form"/></h:commandButton>
                             </div>
                         </h:panelGroup>

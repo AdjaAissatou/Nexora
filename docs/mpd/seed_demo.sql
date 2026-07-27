@@ -83,12 +83,12 @@ WHERE (SELECT id_espace FROM espace_professionnel WHERE slug = v.slug) IS NOT NU
 
 -- ---------- Offres PUBLIEES ------------------------------------------
 INSERT INTO offre (type_offre_dtype, titre, description, prix, disponible, statut, date_creation,
-                   id_espace, id_categorie, id_type_offre, type_service, actif, created_at)
+                   id_espace, id_categorie, id_type_offre, type_service, service_disponible, actif, created_at)
 SELECT v.dtype, v.titre, v.descr, v.prix, TRUE, 'PUBLIEE', NOW(),
        (SELECT id_espace    FROM espace_professionnel WHERE slug = v.eslug),
        (SELECT id_categorie FROM categorie_offre      WHERE slug = v.cslug),
        (SELECT id_type_offre FROM type_offre          WHERE libelle = v.tlib),
-       v.tservice, TRUE, NOW()
+       v.tservice, TRUE, TRUE, NOW()
 FROM (VALUES
   ('OFFRE',   'Le Baobab Gourmand',    'Table conviviale, cuisine senegalaise, terrasse ouverte le soir.', 7500::numeric,  'le-baobab-gourmand',   'restaurant',  'SERVICE', NULL),
   ('OFFRE',   'Hotel Teranga',         'Chambre double avec petit-dejeuner, piscine et wifi.',            45000::numeric,  'hotel-teranga',        'hotels',      'SERVICE', NULL),

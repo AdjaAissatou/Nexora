@@ -20,7 +20,7 @@ import java.util.List;
  * et la publication delegueraient a {@code EspaceService} / {@code OffreService}
  * (deja disponibles) ; l'IHM et le parcours restent identiques.</p>
  */
-@Named("session")
+@Named("sessionBean")
 @SessionScoped
 public class SessionBean implements Serializable {
 
@@ -42,7 +42,7 @@ public class SessionBean implements Serializable {
     public String  getNom()      { return nom; }
     public void    setNom(String nom) { this.nom = nom; }
 
-    public boolean isAEspace()   { return espace != null; }
+    public boolean isPossedeEspace() { return espace != null; }
     public Espace  getEspace()   { return espace; }
 
     public String getInitiale() {

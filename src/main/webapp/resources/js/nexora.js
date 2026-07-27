@@ -24,4 +24,15 @@
   }
   if (document.readyState !== "loading") reveal();
   else document.addEventListener("DOMContentLoaded", reveal);
+
+  // Re-revele apres chaque rendu partiel JSF (ajax), sinon les sous-arbres
+  // re-rendus resteraient a opacity:0.
+  function hookAjax() {
+    try {
+      if (window.faces && faces.ajax) { faces.ajax.addOnEvent(function (d) { if (d.status === "success") reveal(); }); }
+      else if (window.jsf && jsf.ajax) { jsf.ajax.addOnEvent(function (d) { if (d.status === "success") reveal(); }); }
+    } catch (e) {}
+  }
+  if (document.readyState !== "loading") hookAjax();
+  else document.addEventListener("DOMContentLoaded", hookAjax);
 })();

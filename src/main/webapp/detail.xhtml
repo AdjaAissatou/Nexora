@@ -30,7 +30,7 @@
                 </div>
                 <aside class="d-aside">
                     <div class="price-lg">Prix moyen<br/><b>7 500</b> FCFA / pers.</div>
-                    <h:link styleClass="btn btn-primary" outcome="#{session.connecte ? 'detail' : 'connexion'}"><svg class="ic"><use href="#ic-check"/></svg><span>Réserver une table</span></h:link>
+                    <h:link styleClass="btn btn-primary" outcome="#{sessionBean.connecte ? 'detail' : 'connexion'}"><svg class="ic"><use href="#ic-check"/></svg><span>Réserver une table</span></h:link>
                     <h:link styleClass="btn btn-outline" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>Contacter</span></h:link>
                     <button type="button" class="btn btn-ghost"><svg class="ic"><use href="#ic-phone"/></svg>Appeler</button>
                 </aside>
