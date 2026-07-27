@@ -5,7 +5,7 @@
   Reference par persistence.xml : java:app/jdbc/nexoraDS
 -->
 <resources>
-    <Resource id="nexoraDS" type="jakarta.sql.DataSource">
+    <Resource id="nexoraDS" type="javax.sql.DataSource">
         JdbcDriver = org.postgresql.Driver
         JdbcUrl = jdbc:postgresql://localhost:5432/nexora
         UserName = nexora
