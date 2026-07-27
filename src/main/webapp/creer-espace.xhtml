@@ -7,6 +7,7 @@
                 xmlns:a="jakarta.faces.passthrough">
     <ui:param name="titre" value="#{msg['esp.create.title']}"/>
     <ui:define name="content">
+        <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}"/>
         <div class="view">
             <h:link styleClass="back-btn" outcome="accueil"><svg class="ic"><use href="#ic-back"/></svg><span>#{msg['esp.back']}</span></h:link>
             <div class="page-head reveal">
