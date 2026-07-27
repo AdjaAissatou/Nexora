@@ -4,13 +4,13 @@
                 xmlns:h="jakarta.faces.html"
                 xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets">
-    <ui:param name="titre" value="Connexion"/>
+    <ui:param name="titre" value="#{msg['auth.login']}"/>
     <ui:define name="content">
         <div class="view">
             <div class="page-head reveal">
-                <span class="eyebrow">Compte Nexora</span>
-                <h1>#{auth.register ? 'Créer un compte' : 'Connexion'}</h1>
-                <p>#{auth.register ? 'Un compte suffit pour commander, réserver et créer votre espace.' : 'Accédez à votre espace Nexora.'}</p>
+                <span class="eyebrow">#{msg['auth.eyebrow']}</span>
+                <h1>#{auth.register ? msg['auth.register'] : msg['auth.login']}</h1>
+                <p>#{auth.register ? msg['auth.register.sub'] : msg['auth.login.sub']}</p>
             </div>
 
             <h:form styleClass="nx-form reveal">
@@ -18,24 +18,24 @@
                 <h:inputHidden value="#{auth.dest}"/>
 
                 <h:panelGroup layout="block" styleClass="nx-field" rendered="#{auth.register}">
-                    <label>Nom complet</label>
+                    <label>#{msg['auth.name']}</label>
                     <h:inputText value="#{auth.nom}" a:placeholder="Ex : Adja Diop" xmlns:a="jakarta.faces.passthrough"/>
                 </h:panelGroup>
                 <div class="nx-field">
-                    <label>Email</label>
+                    <label>#{msg['auth.email']}</label>
                     <h:inputText value="#{auth.email}" a:type="email" a:placeholder="vous@exemple.com" xmlns:a="jakarta.faces.passthrough"/>
                 </div>
                 <div class="nx-field">
-                    <label>Mot de passe</label>
+                    <label>#{msg['auth.password']}</label>
                     <h:inputSecret value="#{auth.motDePasse}" a:placeholder="********" xmlns:a="jakarta.faces.passthrough"/>
                 </div>
 
                 <h:commandButton styleClass="btn btn-primary" style="width:100%"
-                                 value="#{auth.register ? 'Créer mon compte' : 'Se connecter'}"
+                                 value="#{auth.register ? msg['auth.register.btn'] : msg['auth.login.btn']}"
                                  action="#{auth.seConnecter}"/>
 
                 <div style="text-align:center;margin-top:14px">
-                    <h:commandLink value="#{auth.register ? 'Déjà un compte ? Se connecter' : 'Nouveau ? Créer un compte'}"
+                    <h:commandLink value="#{auth.register ? msg['auth.toLogin'] : msg['auth.toRegister']}"
                                    action="#{auth.basculer}" styleClass="meta" style="color:var(--emerald-600)">
                         <f:ajax render="@form"/>
                     </h:commandLink>

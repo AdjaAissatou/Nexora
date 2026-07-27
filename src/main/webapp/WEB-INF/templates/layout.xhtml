@@ -11,6 +11,7 @@
     <h:outputStylesheet name="css/nexora.css"/>
 </h:head>
 <h:body>
+    <f:event type="preRenderView" listener="#{lang.appliquer}"/>
     <ui:include src="/WEB-INF/templates/sprite.xhtml"/>
 
     <div class="app">
@@ -27,39 +28,36 @@
             </div>
 
             <h:link styleClass="#{view.viewId eq '/accueil.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="accueil">
-                <svg class="ic"><use href="#ic-home"/></svg><span>Accueil</span>
+                <svg class="ic"><use href="#ic-home"/></svg><span>#{msg['nav.home']}</span>
             </h:link>
             <h:link styleClass="#{view.viewId eq '/explorer.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="explorer">
-                <svg class="ic"><use href="#ic-compass"/></svg><span>Explorer</span>
+                <svg class="ic"><use href="#ic-compass"/></svg><span>#{msg['nav.explore']}</span>
             </h:link>
 
-            <div class="nav-label">Catalogue</div>
-            <h:link styleClass="nav-item" outcome="explorer"><svg class="ic"><use href="#ic-bag"/></svg><span>Produits</span></h:link>
-            <h:link styleClass="nav-item" outcome="explorer"><svg class="ic"><use href="#ic-tools"/></svg><span>Services</span></h:link>
-            <h:link styleClass="nav-item" outcome="explorer"><svg class="ic"><use href="#ic-store"/></svg><span>Espaces</span></h:link>
+            <div class="nav-label">#{msg['nav.catalog']}</div>
+            <h:link styleClass="nav-item" outcome="explorer"><svg class="ic"><use href="#ic-bag"/></svg><span>#{msg['nav.products']}</span></h:link>
+            <h:link styleClass="nav-item" outcome="explorer"><svg class="ic"><use href="#ic-tools"/></svg><span>#{msg['nav.services']}</span></h:link>
+            <h:link styleClass="nav-item" outcome="explorer"><svg class="ic"><use href="#ic-store"/></svg><span>#{msg['nav.spaces']}</span></h:link>
 
-            <!-- Section compte : seulement si connecte -->
             <h:panelGroup layout="block" rendered="#{sessionBean.connecte}">
-                <div class="nav-label">Mon compte</div>
-                <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-heart"/></svg><span>Favoris</span><span class="badge">6</span></h:link>
-                <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-package"/></svg><span>Mes commandes</span></h:link>
-                <h:link styleClass="#{view.viewId eq '/messages.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>Messages</span><span class="badge">3</span></h:link>
-                <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-bell"/></svg><span>Notifications</span></h:link>
+                <div class="nav-label">#{msg['nav.account']}</div>
+                <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-heart"/></svg><span>#{msg['nav.favorites']}</span></h:link>
+                <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-package"/></svg><span>#{msg['nav.orders']}</span></h:link>
+                <h:link styleClass="#{view.viewId eq '/messages.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['nav.messages']}</span></h:link>
+                <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-bell"/></svg><span>#{msg['nav.notifications']}</span></h:link>
             </h:panelGroup>
 
-            <!-- Section espace pro : seulement si l'utilisateur a un espace -->
             <h:panelGroup layout="block" rendered="#{sessionBean.possedeEspace}">
-                <div class="nav-label">Espace pro</div>
-                <h:link styleClass="#{view.viewId eq '/mon-espace.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="mon-espace"><svg class="ic"><use href="#ic-store"/></svg><span>Mon espace</span></h:link>
-                <h:link styleClass="#{view.viewId eq '/dashboard.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>Statistiques</span></h:link>
-                <h:link styleClass="nav-item" outcome="admin" rendered="#{sessionBean.admin}"><svg class="ic"><use href="#ic-shield"/></svg><span>Administration</span></h:link>
+                <div class="nav-label">#{msg['nav.pro']}</div>
+                <h:link styleClass="#{view.viewId eq '/mon-espace.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="mon-espace"><svg class="ic"><use href="#ic-store"/></svg><span>#{msg['nav.myspace']}</span></h:link>
+                <h:link styleClass="#{view.viewId eq '/dashboard.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>#{msg['nav.stats']}</span></h:link>
+                <h:link styleClass="nav-item" outcome="admin" rendered="#{sessionBean.admin}"><svg class="ic"><use href="#ic-shield"/></svg><span>#{msg['nav.admin']}</span></h:link>
             </h:panelGroup>
 
-            <!-- Carte "Vous etes pro ?" : seulement si pas encore d'espace -->
             <h:panelGroup layout="block" styleClass="side-pro" rendered="#{not sessionBean.possedeEspace}">
-                <h4>Vous êtes pro ?</h4>
-                <p>Créez votre espace et touchez des milliers de clients près de vous.</p>
-                <h:link styleClass="btn-pro" outcome="#{sessionBean.connecte ? 'creer-espace' : 'connexion'}" value="Créer mon espace">
+                <h4>#{msg['pro.title']}</h4>
+                <p>#{msg['pro.text']}</p>
+                <h:link styleClass="btn-pro" outcome="#{sessionBean.connecte ? 'creer-espace' : 'connexion'}" value="#{msg['pro.cta']}">
                     <f:param name="dest" value="creer-espace"/>
                 </h:link>
             </h:panelGroup>
@@ -70,9 +68,12 @@
             <header class="topbar">
                 <div class="loc-chip"><svg class="ic"><use href="#ic-pin"/></svg><span>Dakar · <b>Plateau</b></span></div>
                 <label class="top-search"><svg class="ic"><use href="#ic-search"/></svg>
-                    <input type="text" placeholder="Rechercher un produit, un service, une boutique…"/>
+                    <input type="text" placeholder="#{msg['topbar.search']}"/>
                 </label>
                 <div class="top-actions">
+                    <h:form style="display:inline">
+                        <h:commandButton styleClass="icon-btn" style="width:auto;padding:0 12px;font-weight:600" value="#{lang.code}" action="#{lang.basculer}" title="FR / EN"/>
+                    </h:form>
                     <button type="button" class="icon-btn" id="themeBtn" title="Thème"></button>
                     <button type="button" class="icon-btn" title="Notifications"><svg class="ic"><use href="#ic-bell"/></svg></button>
 
@@ -80,7 +81,7 @@
                             outcome="#{sessionBean.possedeEspace ? 'mon-espace' : 'accueil'}"
                             value="#{sessionBean.initiale}" title="#{sessionBean.nom}"/>
                     <h:link styleClass="btn btn-primary btn-sm" rendered="#{not sessionBean.connecte}"
-                            outcome="connexion" value="Se connecter"/>
+                            outcome="connexion" value="#{msg['nav.login']}"/>
                 </div>
             </header>
 
@@ -90,11 +91,11 @@
 
     <!-- ============ BOTTOM NAV (mobile) ============ -->
     <nav class="botnav">
-        <h:link outcome="accueil"><svg class="ic"><use href="#ic-home"/></svg><span>Accueil</span></h:link>
-        <h:link outcome="explorer"><svg class="ic"><use href="#ic-compass"/></svg><span>Explorer</span></h:link>
-        <h:link outcome="#{sessionBean.connecte ? 'accueil' : 'connexion'}"><svg class="ic"><use href="#ic-heart"/></svg><span>Favoris</span></h:link>
-        <h:link outcome="#{sessionBean.connecte ? 'messages' : 'connexion'}"><svg class="ic"><use href="#ic-chat"/></svg><span>Messages</span></h:link>
-        <h:link outcome="#{sessionBean.possedeEspace ? 'mon-espace' : (sessionBean.connecte ? 'accueil' : 'connexion')}"><svg class="ic"><use href="#ic-user"/></svg><span>Profil</span></h:link>
+        <h:link outcome="accueil"><svg class="ic"><use href="#ic-home"/></svg><span>#{msg['nav.home']}</span></h:link>
+        <h:link outcome="explorer"><svg class="ic"><use href="#ic-compass"/></svg><span>#{msg['nav.explore']}</span></h:link>
+        <h:link outcome="#{sessionBean.connecte ? 'accueil' : 'connexion'}"><svg class="ic"><use href="#ic-heart"/></svg><span>#{msg['nav.favorites']}</span></h:link>
+        <h:link outcome="#{sessionBean.connecte ? 'messages' : 'connexion'}"><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['nav.messages']}</span></h:link>
+        <h:link outcome="#{sessionBean.possedeEspace ? 'mon-espace' : (sessionBean.connecte ? 'accueil' : 'connexion')}"><svg class="ic"><use href="#ic-user"/></svg><span>#{msg['nav.profile']}</span></h:link>
     </nav>
 
     <h:outputScript name="js/nexora.js"/>

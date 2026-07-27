@@ -5,18 +5,18 @@
                 xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets"
                 xmlns:a="jakarta.faces.passthrough">
-    <ui:param name="titre" value="Mon espace"/>
+    <ui:param name="titre" value="#{msg['nav.myspace']}"/>
     <ui:define name="content">
         <div class="view">
 
             <!-- Aucun espace -->
             <h:panelGroup layout="block" rendered="#{not sessionBean.possedeEspace}">
                 <div class="page-head reveal">
-                    <span class="eyebrow">Espace professionnel</span>
-                    <h1>Vous n'avez pas encore d'espace</h1>
-                    <p>Créez votre espace pour proposer vos produits et services.</p>
+                    <span class="eyebrow">#{msg['nav.pro']}</span>
+                    <h1>#{msg['esp.noEspace']}</h1>
+                    <p>#{msg['esp.noEspace.sub']}</p>
                 </div>
-                <h:link styleClass="btn btn-primary" outcome="#{sessionBean.connecte ? 'creer-espace' : 'connexion'}" value="Créer mon espace">
+                <h:link styleClass="btn btn-primary" outcome="#{sessionBean.connecte ? 'creer-espace' : 'connexion'}" value="#{msg['esp.create.cta']}">
                     <f:param name="dest" value="creer-espace"/>
                 </h:link>
             </h:panelGroup>
@@ -24,27 +24,27 @@
             <!-- Espace existant -->
             <h:panelGroup layout="block" rendered="#{sessionBean.possedeEspace}">
                 <div class="page-head reveal">
-                    <span class="eyebrow">Mon espace</span>
+                    <span class="eyebrow">#{msg['nav.myspace']}</span>
                     <h1>#{sessionBean.espaceNom}</h1>
-                    <p><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#ic-pin"/></svg> #{sessionBean.espaceVille} · en attente de validation</p>
+                    <p><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#ic-pin"/></svg> #{sessionBean.espaceVille} · #{msg['esp.pendingValidation']}</p>
                 </div>
 
                 <h:form id="esp">
                     <h:messages globalOnly="true" styleClass="meta" style="color:var(--emerald-700);margin-bottom:10px"/>
 
                     <div class="seg reveal">
-                        <h:commandLink styleClass="#{espaceBean.onglet eq 'produits' ? 'on' : ''}" value="Produits"
+                        <h:commandLink styleClass="#{espaceBean.onglet eq 'produits' ? 'on' : ''}" value="#{msg['esp.tab.products']}"
                                        action="#{espaceBean.changerOnglet('produits')}"><f:ajax render="@form"/></h:commandLink>
-                        <h:commandLink styleClass="#{espaceBean.onglet eq 'services' ? 'on' : ''}" value="Services"
+                        <h:commandLink styleClass="#{espaceBean.onglet eq 'services' ? 'on' : ''}" value="#{msg['esp.tab.services']}"
                                        action="#{espaceBean.changerOnglet('services')}"><f:ajax render="@form"/></h:commandLink>
-                        <h:commandLink styleClass="#{espaceBean.onglet eq 'stats' ? 'on' : ''}" value="Statistiques"
+                        <h:commandLink styleClass="#{espaceBean.onglet eq 'stats' ? 'on' : ''}" value="#{msg['esp.tab.stats']}"
                                        action="#{espaceBean.changerOnglet('stats')}"><f:ajax render="@form"/></h:commandLink>
                     </div>
 
                     <!-- STATISTIQUES -->
                     <h:panelGroup layout="block" styleClass="reveal" rendered="#{espaceBean.onglet eq 'stats'}">
-                        <p class="meta" style="margin:6px 0 16px">Suivez vos annonces et leur validation dans le tableau de bord.</p>
-                        <h:link styleClass="btn btn-primary" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>Ouvrir le tableau de bord</span></h:link>
+                        <p class="meta" style="margin:6px 0 16px">#{msg['esp.statsHint']}</p>
+                        <h:link styleClass="btn btn-primary" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>#{msg['esp.openDashboard']}</span></h:link>
                     </h:panelGroup>
 
                     <!-- PRODUITS / SERVICES -->
@@ -54,7 +54,7 @@
 
                         <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
                             <h:commandButton styleClass="btn btn-primary" rendered="#{not espaceBean.formOuvert}"
-                                             value="#{estService ? 'Ajouter un service' : 'Ajouter un produit'}"
+                                             value="#{estService ? msg['esp.addService'] : msg['esp.addProduct']}"
                                              action="#{espaceBean.ouvrirForm(estService ? 'SERVICE' : 'PRODUIT')}">
                                 <f:ajax render="@form"/>
                             </h:commandButton>
@@ -66,23 +66,23 @@
                                     <h3>#{o.titre}</h3>
                                     <div class="meta">#{o.categorieNom}</div>
                                     <div class="card-foot">
-                                        <span class="price"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA" style="font-weight:700"/><h:outputText rendered="#{empty o.prix}" value="Voir prix"/></span>
-                                        <h:panelGroup styleClass="pill pill-open" rendered="#{o.statut eq 'PUBLIEE'}"><svg class="ic"><use href="#ic-check"/></svg>En ligne</h:panelGroup>
-                                        <h:panelGroup styleClass="pill" rendered="#{o.statut ne 'PUBLIEE'}" style="background:var(--surface-2);color:var(--text-3)">En attente</h:panelGroup>
+                                        <span class="price"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA" style="font-weight:700"/><h:outputText rendered="#{empty o.prix}" value="#{msg['esp.seePrice']}"/></span>
+                                        <h:panelGroup styleClass="pill pill-open" rendered="#{o.statut eq 'PUBLIEE'}"><svg class="ic"><use href="#ic-check"/></svg>#{msg['esp.online']}</h:panelGroup>
+                                        <h:panelGroup styleClass="pill" rendered="#{o.statut ne 'PUBLIEE'}" style="background:var(--surface-2);color:var(--text-3)">#{msg['esp.pending']}</h:panelGroup>
                                     </div>
                                 </div></article>
                             </ui:repeat>
                         </h:panelGroup>
                         <h:outputText rendered="#{empty liste}" styleClass="meta" style="display:block;margin:8px 0 16px"
-                            value="#{estService ? 'Aucun service pour le moment. Ajoutez votre premier service.' : 'Aucun produit pour le moment. Ajoutez votre premier produit.'}"/>
+                            value="#{estService ? msg['esp.empty.services'] : msg['esp.empty.products']}"/>
 
                         <!-- Formulaire d'ajout (EAV reel) -->
                         <h:panelGroup layout="block" rendered="#{espaceBean.formOuvert}"
                                       styleClass="nx-form" style="margin-top:14px;background:var(--surface-2);padding:18px;border-radius:16px">
                             <div class="nx-field">
-                                <label>#{estService ? 'Type de service' : 'Catégorie'} *</label>
+                                <label>#{estService ? msg['esp.serviceType'] : msg['esp.category']} *</label>
                                 <h:selectOneMenu value="#{espaceBean.categorieId}" converter="jakarta.faces.Long">
-                                    <f:selectItem itemValue="#{null}" itemLabel="Choisir une catégorie..." noSelectionOption="true"/>
+                                    <f:selectItem itemValue="#{null}" itemLabel="#{msg['esp.chooseCategory']}" noSelectionOption="true"/>
                                     <f:selectItems value="#{catalogue.categorieItems}"/>
                                     <f:ajax listener="#{espaceBean.onCategorieChange}" render="attrsBloc"/>
                                 </h:selectOneMenu>
@@ -94,7 +94,7 @@
                                         <div class="nx-field">
                                             <label>#{attr.nom}#{attr.obligatoire ? ' *' : ''}</label>
                                             <h:selectOneMenu value="#{espaceBean.valeursAttributs[attr.id]}" rendered="#{not empty attr.valeurs}">
-                                                <f:selectItem itemValue="" itemLabel="Sélectionner..." noSelectionOption="true"/>
+                                                <f:selectItem itemValue="" itemLabel="#{msg['esp.select']}" noSelectionOption="true"/>
                                                 <f:selectItems value="#{attr.valeurs}" var="v" itemValue="#{v.valeur}" itemLabel="#{v.valeur}"/>
                                             </h:selectOneMenu>
                                             <h:inputText value="#{espaceBean.valeursAttributs[attr.id]}" rendered="#{empty attr.valeurs}"/>
@@ -103,14 +103,14 @@
                                 </h:panelGroup>
                             </h:panelGroup>
 
-                            <div class="nx-field"><label>Titre *</label>
+                            <div class="nx-field"><label>#{msg['esp.title']} *</label>
                                 <h:inputText value="#{espaceBean.titre}" a:placeholder="#{estService ? 'Ex : Dépannage plomberie 24/7' : 'Ex : iPhone 13 Pro 256 Go'}"/></div>
-                            <div class="nx-field"><label>Prix (FCFA)</label>
+                            <div class="nx-field"><label>#{msg['esp.price']}</label>
                                 <h:inputText value="#{espaceBean.prix}" a:type="number" a:placeholder="Ex : 15000"/></div>
 
                             <div style="display:flex;gap:10px">
-                                <h:commandButton styleClass="btn btn-primary" value="Enregistrer" action="#{espaceBean.enregistrer}"><f:ajax execute="@form" render="@form"/></h:commandButton>
-                                <h:commandButton styleClass="btn btn-outline" value="Annuler" immediate="true" action="#{espaceBean.annuler}"><f:ajax render="@form"/></h:commandButton>
+                                <h:commandButton styleClass="btn btn-primary" value="#{msg['esp.save']}" action="#{espaceBean.enregistrer}"><f:ajax execute="@form" render="@form"/></h:commandButton>
+                                <h:commandButton styleClass="btn btn-outline" value="#{msg['esp.cancel']}" immediate="true" action="#{espaceBean.annuler}"><f:ajax render="@form"/></h:commandButton>
                             </div>
                         </h:panelGroup>
                     </h:panelGroup>

@@ -11,5 +11,9 @@
             <supported-locale>fr</supported-locale>
             <supported-locale>en</supported-locale>
         </locale-config>
+        <resource-bundle>
+            <base-name>i18n.msg</base-name>
+            <var>msg</var>
+        </resource-bundle>
     </application>
 </faces-config>

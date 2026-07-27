@@ -5,24 +5,24 @@
                 xmlns:f="jakarta.faces.core"
                 xmlns:ui="jakarta.faces.facelets"
                 xmlns:a="jakarta.faces.passthrough">
-    <ui:param name="titre" value="Explorer"/>
+    <ui:param name="titre" value="#{msg['nav.explore']}"/>
     <ui:define name="content">
         <div class="view">
             <div class="sec-head" style="margin-bottom:16px">
-                <div><span class="eyebrow">Recherche</span><h2 style="margin-top:8px;font-size:26px">Résultats autour de vous</h2></div>
+                <div><span class="eyebrow">#{msg['explore.eyebrow']}</span><h2 style="margin-top:8px;font-size:26px">#{msg['explore.title']}</h2></div>
             </div>
 
             <h:form id="rech">
                 <div class="searchbar" style="margin-bottom:18px">
                     <svg class="ic"><use href="#ic-search"/></svg>
-                    <h:inputText value="#{rechercheBean.criteria.motCle}" a:placeholder="Que recherchez-vous ? (restaurant, plombier, iPhone…)"/>
-                    <h:commandButton styleClass="btn btn-primary" value="Rechercher" action="#{rechercheBean.rechercher}">
+                    <h:inputText value="#{rechercheBean.criteria.motCle}" a:placeholder="#{msg['explore.searchph']}"/>
+                    <h:commandButton styleClass="btn btn-primary" value="#{msg['explore.search']}" action="#{rechercheBean.rechercher}">
                         <f:ajax execute="@form" render="reslist"/>
                     </h:commandButton>
                 </div>
 
                 <h:panelGroup layout="block" id="reslist">
-                    <p class="meta" style="margin-bottom:12px"><b>#{rechercheBean.total}</b> résultat(s)</p>
+                    <p class="meta" style="margin-bottom:12px"><b>#{rechercheBean.total}</b> #{msg['explore.results']}</p>
 
                     <div class="rlist">
                         <ui:repeat value="#{rechercheBean.resultats}" var="o">
@@ -34,27 +34,26 @@
                                 <div class="rrow-body">
                                     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                                         <h3>#{o.titre}</h3>
-                                        <h:panelGroup styleClass="pill pill-open" rendered="#{o.espaceVerifie}"><svg class="ic"><use href="#ic-check"/></svg>Vérifié Nexora</h:panelGroup>
+                                        <h:panelGroup styleClass="pill pill-open" rendered="#{o.espaceVerifie}"><svg class="ic"><use href="#ic-check"/></svg>#{msg['explore.verified']}</h:panelGroup>
                                     </div>
                                     <div class="meta">#{o.categorieNom} · #{o.espaceNom}</div>
                                     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
                                         <span class="stars"><svg class="ic"><use href="#ic-star"/></svg><h:outputText value="#{o.noteEspace}"><f:convertNumber maxFractionDigits="1"/></h:outputText></span>
-                                        <h:panelGroup styleClass="pill pill-open" rendered="#{o.ouvert}"><span class="dot dot-open"></span>Ouvert</h:panelGroup>
+                                        <h:panelGroup styleClass="pill pill-open" rendered="#{o.ouvert}"><span class="dot dot-open"></span>#{msg['esp.online']}</h:panelGroup>
                                         <h:panelGroup styleClass="meta" rendered="#{not empty o.distanceKm}"><svg class="ic"><use href="#ic-pin"/></svg><h:outputText value="#{o.distanceKm}"><f:convertNumber maxFractionDigits="1"/></h:outputText> km</h:panelGroup>
-                                        <span class="price" style="margin-left:auto"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA"/><h:outputText rendered="#{empty o.prix}" value="Voir prix"/></span>
+                                        <span class="price" style="margin-left:auto"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA"/><h:outputText rendered="#{empty o.prix}" value="#{msg['esp.seePrice']}"/></span>
                                     </div>
                                     <div class="rrow-actions">
-                                        <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-compass"/></svg>Itinéraire</button>
-                                        <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-phone"/></svg>Appeler</button>
-                                        <h:link styleClass="btn btn-primary btn-sm" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>Message</span></h:link>
+                                        <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-compass"/></svg>#{msg['explore.route']}</button>
+                                        <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-phone"/></svg>#{msg['explore.call']}</button>
+                                        <h:link styleClass="btn btn-primary btn-sm" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['explore.message']}</span></h:link>
                                     </div>
                                 </div>
                             </article>
                         </ui:repeat>
                     </div>
 
-                    <h:outputText rendered="#{empty rechercheBean.resultats}" styleClass="meta"
-                                  value="Aucune offre trouvée. (Les résultats proviennent de la base — exécutez le backend + la base pour les voir.)"/>
+                    <h:outputText rendered="#{empty rechercheBean.resultats}" styleClass="meta" value="#{msg['explore.empty']}"/>
                 </h:panelGroup>
             </h:form>
         </div>

@@ -3,28 +3,28 @@
                 xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="jakarta.faces.html"
                 xmlns:ui="jakarta.faces.facelets">
-    <ui:param name="titre" value="Administration"/>
+    <ui:param name="titre" value="#{msg['nav.admin']}"/>
     <ui:define name="content">
         <div class="view">
             <div class="page-head reveal">
-                <span class="eyebrow">Administration</span>
-                <h1>Vue d'ensemble de la plateforme</h1>
+                <span class="eyebrow">#{msg['ad.eyebrow']}</span>
+                <h1>#{msg['ad.title']}</h1>
             </div>
             <div class="stat-grid reveal">
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-user"/></svg></span></div><h3 class="tnum">#{adminBean.stats.utilisateurs}</h3><span>Utilisateurs</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-store"/></svg></span></div><h3 class="tnum">#{adminBean.stats.espaces}</h3><span>Espaces pro</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span></div><h3 class="tnum">#{adminBean.stats.produits}</h3><span>Produits</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span></div><h3 class="tnum">#{adminBean.stats.services}</h3><span>Services</span></div>
-                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{adminBean.stats.signalements}</h3><span>Signalements</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-user"/></svg></span></div><h3 class="tnum">#{adminBean.stats.utilisateurs}</h3><span>#{msg['ad.users']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-store"/></svg></span></div><h3 class="tnum">#{adminBean.stats.espaces}</h3><span>#{msg['ad.spaces']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span></div><h3 class="tnum">#{adminBean.stats.produits}</h3><span>#{msg['ad.products']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span></div><h3 class="tnum">#{adminBean.stats.services}</h3><span>#{msg['ad.services']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{adminBean.stats.signalements}</h3><span>#{msg['ad.reports']}</span></div>
             </div>
             <div class="panel reveal" style="margin-top:20px">
-                <div class="panel-head"><h3>Espaces en attente de validation (#{adminBean.enAttente.size()})</h3></div>
+                <div class="panel-head"><h3>#{msg['ad.pending']} (#{adminBean.enAttente.size()})</h3></div>
                 <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty adminBean.enAttente}">
                     <ui:repeat value="#{adminBean.enAttente}" var="e">
                         <div class="mini-row"><span class="stat-ic" style="width:38px;height:38px"><svg class="ic"><use href="#ic-store"/></svg></span><div><div class="r-name">#{e.nomCommercial}</div></div></div>
                     </ui:repeat>
                 </h:panelGroup>
-                <h:outputText rendered="#{empty adminBean.enAttente}" styleClass="meta" value="Aucun espace en attente."/>
+                <h:outputText rendered="#{empty adminBean.enAttente}" styleClass="meta" value="#{msg['ad.none']}"/>
             </div>
         </div>
     </ui:define>
