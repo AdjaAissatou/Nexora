@@ -31,15 +31,15 @@
                     <h:link styleClass="btn btn-outline btn-sm" outcome="parametres" style="margin-top:12px"><svg class="ic"><use href="#ic-sliders"/></svg><span>#{msg['par.settingsBtn']}</span></h:link>
                 </div>
 
-                <!-- Vue d'ensemble -->
-                <div class="stat-grid reveal" style="margin-bottom:22px">
-                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-bag"/></svg></span></div><h3 class="tnum">#{espaceBean.nbTotal}</h3><span>#{msg['esp.total']}</span></div>
-                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-check"/></svg></span></div><h3 class="tnum">#{espaceBean.nbEnLigne}</h3><span>#{msg['esp.online']}</span></div>
-                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-clock"/></svg></span></div><h3 class="tnum">#{espaceBean.nbEnAttente}</h3><span>#{msg['esp.pending']}</span></div>
-                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{espaceBean.nbRejete}</h3><span>#{msg['esp.rejected']}</span></div>
-                </div>
-
                 <h:form id="esp">
+                    <!-- Vue d'ensemble (dans le form pour se rafraîchir en ajax) -->
+                    <div class="stat-grid reveal" style="margin-bottom:22px">
+                        <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-bag"/></svg></span></div><h3 class="tnum">#{espaceBean.nbTotal}</h3><span>#{msg['esp.total']}</span></div>
+                        <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-check"/></svg></span></div><h3 class="tnum">#{espaceBean.nbEnLigne}</h3><span>#{msg['esp.online']}</span></div>
+                        <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-clock"/></svg></span></div><h3 class="tnum">#{espaceBean.nbEnAttente}</h3><span>#{msg['esp.pending']}</span></div>
+                        <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{espaceBean.nbRejete}</h3><span>#{msg['esp.rejected']}</span></div>
+                    </div>
+
                     <h:messages globalOnly="true" styleClass="meta" style="color:var(--emerald-700);margin-bottom:10px"/>
 
                     <div class="seg reveal">
