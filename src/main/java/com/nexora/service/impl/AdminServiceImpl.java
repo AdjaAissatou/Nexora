@@ -33,9 +33,17 @@ public class AdminServiceImpl implements AdminService {
     private EspaceProfessionnelDao espaceDao;
     @Inject
     private LitigeDao litigeDao;
+    @Inject
+    private com.nexora.service.NotificationService notificationService;
 
     @PersistenceContext(unitName = "nexoraPU")
     private EntityManager em;
+
+    /** Id du proprietaire de l'espace portant l'offre (ou null). */
+    private Long proprietaireDe(Offre o) {
+        return o.getEspace() != null && o.getEspace().getProprietaire() != null
+                ? o.getEspace().getProprietaire().getIdUtilisateur() : null;
+    }
 
     @Override
     public AdminStatsDTO statistiquesGlobales() {
@@ -70,6 +78,11 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new ResourceNotFoundException("EspaceProfessionnel", idEspace));
         e.setVerifie(true);
         espaceDao.update(e);
+        if (e.getProprietaire() != null) {
+            notificationService.notifier(e.getProprietaire().getIdUtilisateur(),
+                    "Votre espace « " + e.getNomCommercial() + " » a été vérifié.",
+                    "/mon-espace.xhtml", "SUCCES");
+        }
     }
 
     @Override
@@ -89,6 +102,9 @@ public class AdminServiceImpl implements AdminService {
         o.setStatut(StatutOffre.PUBLIEE);
         o.setMotifRejet(null);
         em.merge(o);
+        notificationService.notifier(proprietaireDe(o),
+                "Votre annonce « " + o.getTitre() + " » a été validée et publiée.",
+                "/mon-espace.xhtml", "SUCCES");
     }
 
     @Override
@@ -98,6 +114,9 @@ public class AdminServiceImpl implements AdminService {
         o.setStatut(StatutOffre.REJETEE);
         o.setMotifRejet(motif);
         em.merge(o);
+        notificationService.notifier(proprietaireDe(o),
+                "Votre annonce « " + o.getTitre() + " » a été rejetée. Motif : " + motif,
+                "/mon-espace.xhtml", "ALERTE");
     }
 
     @Override

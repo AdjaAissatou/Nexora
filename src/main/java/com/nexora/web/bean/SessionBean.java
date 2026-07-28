@@ -32,6 +32,7 @@ public class SessionBean implements Serializable {
     private Long espaceId;
     private String espaceNom;
     private String espaceVille;
+    private String espaceNature;   // BOUTIQUE | PRESTATAIRE | MIXTE
 
     // ------------------------------------------------------------------ Auth
     public boolean isConnecte()  { return idUtilisateur != null; }
@@ -94,11 +95,25 @@ public class SessionBean implements Serializable {
     public Long getEspaceId()        { return espaceId; }
     public String getEspaceNom()     { return espaceNom; }
     public String getEspaceVille()   { return espaceVille; }
+    public String getEspaceNature()  { return espaceNature; }
+
+    public boolean isBoutique()      { return "BOUTIQUE".equals(espaceNature); }
+    public boolean isPrestataire()   { return "PRESTATAIRE".equals(espaceNature); }
+    public boolean isMixte()         { return espaceNature == null || "MIXTE".equals(espaceNature); }
+    public boolean isAffProduits()   { return isBoutique() || isMixte(); }
+    public boolean isAffServices()   { return isPrestataire() || isMixte(); }
+
+    public String getNatureLibelle() {
+        if (isBoutique()) return "Boutique";
+        if (isPrestataire()) return "Prestataire de services";
+        return "Boutique & Services";
+    }
 
     /** Memorise l'espace de l'utilisateur (apres creation ou chargement). */
     public void setEspace(EspaceViewDTO e, String ville) {
         this.espaceId = e.getId();
         this.espaceNom = e.getNomCommercial();
+        this.espaceNature = e.getNature();
         this.espaceVille = ville;
     }
 }

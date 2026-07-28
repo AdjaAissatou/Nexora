@@ -22,100 +22,101 @@
                 </h:link>
             </h:panelGroup>
 
-            <!-- Espace existant -->
+            <!-- Back-office de l'espace -->
             <h:panelGroup layout="block" rendered="#{sessionBean.possedeEspace}">
                 <div class="page-head reveal">
-                    <span class="eyebrow">#{msg['nav.myspace']}</span>
+                    <span class="eyebrow">#{sessionBean.natureLibelle}</span>
                     <h1>#{sessionBean.espaceNom}</h1>
                     <p><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#ic-pin"/></svg> #{sessionBean.espaceVille} · #{msg['esp.pendingValidation']}</p>
+                </div>
+
+                <!-- Vue d'ensemble -->
+                <div class="stat-grid reveal" style="margin-bottom:22px">
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-bag"/></svg></span></div><h3 class="tnum">#{espaceBean.nbTotal}</h3><span>#{msg['esp.total']}</span></div>
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-check"/></svg></span></div><h3 class="tnum">#{espaceBean.nbEnLigne}</h3><span>#{msg['esp.online']}</span></div>
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-clock"/></svg></span></div><h3 class="tnum">#{espaceBean.nbEnAttente}</h3><span>#{msg['esp.pending']}</span></div>
+                    <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-shield"/></svg></span></div><h3 class="tnum">#{espaceBean.nbRejete}</h3><span>#{msg['esp.rejected']}</span></div>
                 </div>
 
                 <h:form id="esp">
                     <h:messages globalOnly="true" styleClass="meta" style="color:var(--emerald-700);margin-bottom:10px"/>
 
                     <div class="seg reveal">
-                        <h:commandLink styleClass="#{espaceBean.onglet eq 'produits' ? 'on' : ''}" value="#{msg['esp.tab.products']}"
+                        <h:commandLink rendered="#{sessionBean.affProduits}" styleClass="#{espaceBean.onglet eq 'produits' ? 'on' : ''}" value="#{msg['esp.tab.products']}"
                                        action="#{espaceBean.changerOnglet('produits')}"><f:ajax render="@form"/></h:commandLink>
-                        <h:commandLink styleClass="#{espaceBean.onglet eq 'services' ? 'on' : ''}" value="#{msg['esp.tab.services']}"
+                        <h:commandLink rendered="#{sessionBean.affServices}" styleClass="#{espaceBean.onglet eq 'services' ? 'on' : ''}" value="#{msg['esp.tab.services']}"
                                        action="#{espaceBean.changerOnglet('services')}"><f:ajax render="@form"/></h:commandLink>
-                        <h:commandLink styleClass="#{espaceBean.onglet eq 'stats' ? 'on' : ''}" value="#{msg['esp.tab.stats']}"
-                                       action="#{espaceBean.changerOnglet('stats')}"><f:ajax render="@form"/></h:commandLink>
                     </div>
 
-                    <!-- STATISTIQUES -->
-                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{espaceBean.onglet eq 'stats'}">
-                        <p class="meta" style="margin:6px 0 16px">#{msg['esp.statsHint']}</p>
-                        <h:link styleClass="btn btn-primary" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>#{msg['esp.openDashboard']}</span></h:link>
+                    <ui:param name="estService" value="#{espaceBean.onglet eq 'services'}"/>
+                    <ui:param name="liste" value="#{estService ? espaceBean.services : espaceBean.produits}"/>
+
+                    <div style="display:flex;justify-content:flex-end;margin:14px 0">
+                        <h:commandButton styleClass="btn btn-primary" rendered="#{not espaceBean.formOuvert}"
+                                         value="#{estService ? msg['esp.addService'] : msg['esp.addProduct']}"
+                                         action="#{espaceBean.ouvrirForm(estService ? 'SERVICE' : 'PRODUIT')}">
+                            <f:ajax render="@form"/>
+                        </h:commandButton>
+                    </div>
+
+                    <h:panelGroup layout="block" styleClass="cards" rendered="#{not empty liste}">
+                        <ui:repeat value="#{liste}" var="o">
+                            <article class="card"><div class="card-body">
+                                <h3>#{o.titre}</h3>
+                                <div class="meta">#{o.categorieNom}</div>
+                                <div class="card-foot">
+                                    <span class="price"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA" style="font-weight:700"/><h:outputText rendered="#{empty o.prix}" value="#{msg['esp.seePrice']}"/></span>
+                                    <h:panelGroup styleClass="pill pill-open" rendered="#{o.statut eq 'PUBLIEE'}"><svg class="ic"><use href="#ic-check"/></svg>#{msg['esp.online']}</h:panelGroup>
+                                    <h:panelGroup styleClass="pill" rendered="#{o.statut eq 'EN_ATTENTE_VALIDATION'}" style="background:var(--surface-2);color:var(--text-3)">#{msg['esp.pending']}</h:panelGroup>
+                                    <h:panelGroup styleClass="pill" rendered="#{o.statut eq 'REJETEE'}" style="background:rgba(239,68,68,.12);color:var(--danger)">#{msg['esp.rejected']}</h:panelGroup>
+                                </div>
+                                <h:panelGroup layout="block" rendered="#{o.statut eq 'REJETEE'}">
+                                    <h:outputText rendered="#{not empty o.motifRejet}" styleClass="meta" style="display:block;margin-top:6px;color:var(--danger)" value="#{msg['esp.motif']} : #{o.motifRejet}"/>
+                                    <h:commandButton styleClass="btn btn-primary btn-sm" style="margin-top:10px" value="#{msg['esp.correct']}" action="#{espaceBean.ouvrirEdition(o)}"><f:ajax render="@form"/></h:commandButton>
+                                </h:panelGroup>
+                            </div></article>
+                        </ui:repeat>
                     </h:panelGroup>
+                    <h:outputText rendered="#{empty liste and not espaceBean.formOuvert}" styleClass="meta" style="display:block;margin:8px 0 16px"
+                        value="#{estService ? msg['esp.empty.services'] : msg['esp.empty.products']}"/>
 
-                    <!-- PRODUITS / SERVICES -->
-                    <h:panelGroup layout="block" styleClass="reveal" rendered="#{espaceBean.onglet ne 'stats'}">
-                        <ui:param name="estService" value="#{espaceBean.onglet eq 'services'}"/>
-                        <ui:param name="liste" value="#{estService ? espaceBean.services : espaceBean.produits}"/>
-
-                        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
-                            <h:commandButton styleClass="btn btn-primary" rendered="#{not espaceBean.formOuvert}"
-                                             value="#{estService ? msg['esp.addService'] : msg['esp.addProduct']}"
-                                             action="#{espaceBean.ouvrirForm(estService ? 'SERVICE' : 'PRODUIT')}">
-                                <f:ajax render="@form"/>
-                            </h:commandButton>
+                    <!-- Formulaire d'ajout / correction (EAV) -->
+                    <h:panelGroup layout="block" rendered="#{espaceBean.formOuvert}"
+                                  styleClass="nx-form" style="margin-top:14px;background:var(--surface-2);padding:18px;border-radius:16px">
+                        <h:outputText rendered="#{espaceBean.edition}" styleClass="eyebrow" style="display:block;margin-bottom:10px" value="#{msg['esp.editTitle']}"/>
+                        <div class="nx-field">
+                            <label>#{estService ? msg['esp.serviceType'] : msg['esp.category']} *</label>
+                            <h:selectOneMenu value="#{espaceBean.categorieId}" converter="jakarta.faces.Long">
+                                <f:selectItem itemValue="#{null}" itemLabel="#{msg['esp.chooseCategory']}" noSelectionOption="true"/>
+                                <f:selectItems value="#{catalogue.categorieItems}"/>
+                                <f:ajax listener="#{espaceBean.onCategorieChange}" render="attrsBloc"/>
+                            </h:selectOneMenu>
                         </div>
 
-                        <h:panelGroup layout="block" styleClass="cards" rendered="#{not empty liste}">
-                            <ui:repeat value="#{liste}" var="o">
-                                <article class="card"><div class="card-body">
-                                    <h3>#{o.titre}</h3>
-                                    <div class="meta">#{o.categorieNom}</div>
-                                    <div class="card-foot">
-                                        <span class="price"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA" style="font-weight:700"/><h:outputText rendered="#{empty o.prix}" value="#{msg['esp.seePrice']}"/></span>
-                                        <h:panelGroup styleClass="pill pill-open" rendered="#{o.statut eq 'PUBLIEE'}"><svg class="ic"><use href="#ic-check"/></svg>#{msg['esp.online']}</h:panelGroup>
-                                        <h:panelGroup styleClass="pill" rendered="#{o.statut eq 'EN_ATTENTE_VALIDATION'}" style="background:var(--surface-2);color:var(--text-3)">#{msg['esp.pending']}</h:panelGroup>
-                                        <h:panelGroup styleClass="pill" rendered="#{o.statut eq 'REJETEE'}" style="background:rgba(239,68,68,.12);color:var(--danger)">#{msg['esp.rejected']}</h:panelGroup>
+                        <h:panelGroup layout="block" id="attrsBloc">
+                            <h:panelGroup layout="block" styleClass="attr-grid" rendered="#{not empty espaceBean.attributsCourants}">
+                                <ui:repeat value="#{espaceBean.attributsCourants}" var="attr">
+                                    <div class="nx-field">
+                                        <label>#{attr.nom}#{attr.obligatoire ? ' *' : ''}</label>
+                                        <h:selectOneMenu value="#{espaceBean.valeursAttributs[attr.id]}" rendered="#{not empty attr.valeurs}">
+                                            <f:selectItem itemValue="" itemLabel="#{msg['esp.select']}" noSelectionOption="true"/>
+                                            <f:selectItems value="#{attr.valeurs}" var="v" itemValue="#{v.valeur}" itemLabel="#{v.valeur}"/>
+                                        </h:selectOneMenu>
+                                        <h:inputText value="#{espaceBean.valeursAttributs[attr.id]}" rendered="#{empty attr.valeurs}"/>
                                     </div>
-                                    <h:outputText rendered="#{o.statut eq 'REJETEE' and not empty o.motifRejet}" styleClass="meta" style="display:block;margin-top:6px;color:var(--danger)" value="#{msg['esp.motif']} : #{o.motifRejet}"/>
-                                </div></article>
-                            </ui:repeat>
-                        </h:panelGroup>
-                        <h:outputText rendered="#{empty liste}" styleClass="meta" style="display:block;margin:8px 0 16px"
-                            value="#{estService ? msg['esp.empty.services'] : msg['esp.empty.products']}"/>
-
-                        <!-- Formulaire d'ajout (EAV reel) -->
-                        <h:panelGroup layout="block" rendered="#{espaceBean.formOuvert}"
-                                      styleClass="nx-form" style="margin-top:14px;background:var(--surface-2);padding:18px;border-radius:16px">
-                            <div class="nx-field">
-                                <label>#{estService ? msg['esp.serviceType'] : msg['esp.category']} *</label>
-                                <h:selectOneMenu value="#{espaceBean.categorieId}" converter="jakarta.faces.Long">
-                                    <f:selectItem itemValue="#{null}" itemLabel="#{msg['esp.chooseCategory']}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{catalogue.categorieItems}"/>
-                                    <f:ajax listener="#{espaceBean.onCategorieChange}" render="attrsBloc"/>
-                                </h:selectOneMenu>
-                            </div>
-
-                            <h:panelGroup layout="block" id="attrsBloc">
-                                <h:panelGroup layout="block" styleClass="attr-grid" rendered="#{not empty espaceBean.attributsCourants}">
-                                    <ui:repeat value="#{espaceBean.attributsCourants}" var="attr">
-                                        <div class="nx-field">
-                                            <label>#{attr.nom}#{attr.obligatoire ? ' *' : ''}</label>
-                                            <h:selectOneMenu value="#{espaceBean.valeursAttributs[attr.id]}" rendered="#{not empty attr.valeurs}">
-                                                <f:selectItem itemValue="" itemLabel="#{msg['esp.select']}" noSelectionOption="true"/>
-                                                <f:selectItems value="#{attr.valeurs}" var="v" itemValue="#{v.valeur}" itemLabel="#{v.valeur}"/>
-                                            </h:selectOneMenu>
-                                            <h:inputText value="#{espaceBean.valeursAttributs[attr.id]}" rendered="#{empty attr.valeurs}"/>
-                                        </div>
-                                    </ui:repeat>
-                                </h:panelGroup>
+                                </ui:repeat>
                             </h:panelGroup>
-
-                            <div class="nx-field"><label>#{msg['esp.title']} *</label>
-                                <h:inputText value="#{espaceBean.titre}" a:placeholder="#{estService ? 'Ex : Dépannage plomberie 24/7' : 'Ex : iPhone 13 Pro 256 Go'}"/></div>
-                            <div class="nx-field"><label>#{msg['esp.price']}</label>
-                                <h:inputText value="#{espaceBean.prix}" a:type="number" a:placeholder="Ex : 15000"/></div>
-
-                            <div style="display:flex;gap:10px">
-                                <h:commandButton styleClass="btn btn-primary" value="#{msg['esp.save']}" action="#{espaceBean.enregistrer}"><f:ajax execute="@form" render="@form"/></h:commandButton>
-                                <h:commandButton styleClass="btn btn-outline" value="#{msg['esp.cancel']}" immediate="true" action="#{espaceBean.annuler}"><f:ajax render="@form"/></h:commandButton>
-                            </div>
                         </h:panelGroup>
+
+                        <div class="nx-field"><label>#{msg['esp.title']} *</label>
+                            <h:inputText value="#{espaceBean.titre}" a:placeholder="#{estService ? 'Ex : Dépannage plomberie 24/7' : 'Ex : iPhone 13 Pro 256 Go'}"/></div>
+                        <div class="nx-field"><label>#{msg['esp.price']}</label>
+                            <h:inputText value="#{espaceBean.prix}" a:type="number" a:placeholder="Ex : 15000"/></div>
+
+                        <div style="display:flex;gap:10px">
+                            <h:commandButton styleClass="btn btn-primary" value="#{msg['esp.save']}" action="#{espaceBean.enregistrer}"><f:ajax execute="@form" render="@form"/></h:commandButton>
+                            <h:commandButton styleClass="btn btn-outline" value="#{msg['esp.cancel']}" immediate="true" action="#{espaceBean.annuler}"><f:ajax render="@form"/></h:commandButton>
+                        </div>
                     </h:panelGroup>
                 </h:form>
             </h:panelGroup>

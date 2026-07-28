@@ -27,6 +27,7 @@ public class OffreDTO implements Serializable {
     private String statut;
     private String motifRejet;
     private String categorieNom;
+    private Long idCategorie;
     private String espaceNom;
     private boolean espaceVerifie;
     private boolean espaceCertifie;

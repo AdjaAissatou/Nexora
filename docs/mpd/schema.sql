@@ -93,6 +93,7 @@ CREATE TABLE espace_professionnel (
     id_espace            BIGSERIAL PRIMARY KEY,
     nom_commercial       VARCHAR(200) NOT NULL,
     slug                 VARCHAR(220) UNIQUE,
+    nature               VARCHAR(20),          -- BOUTIQUE | PRESTATAIRE | MIXTE
     description          TEXT,
     logo                 VARCHAR(500),
     banniere             VARCHAR(500),

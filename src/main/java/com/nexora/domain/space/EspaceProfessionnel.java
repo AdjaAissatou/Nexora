@@ -38,6 +38,10 @@ public class EspaceProfessionnel extends BaseEntity {
     @Column(name = "slug", unique = true, length = 220)
     private String slug;
 
+    /** Nature de l'espace : BOUTIQUE (produits) | PRESTATAIRE (services) | MIXTE. */
+    @Column(name = "nature", length = 20)
+    private String nature;
+
     @Column(name = "description", columnDefinition = "text")
     private String description;
 

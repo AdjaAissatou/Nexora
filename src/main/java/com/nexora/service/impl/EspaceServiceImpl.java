@@ -40,6 +40,7 @@ public class EspaceServiceImpl implements EspaceService {
         }
         EspaceProfessionnel e = new EspaceProfessionnel();
         e.setNomCommercial(req.getNomCommercial());
+        e.setNature(req.getNature() != null ? req.getNature() : "MIXTE");
         e.setDescription(req.getDescription());
         e.setTelephonePrincipal(req.getTelephonePrincipal());
         e.setEmail1(req.getEmail1());

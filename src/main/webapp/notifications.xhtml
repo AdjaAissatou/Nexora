@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+    <ui:param name="titre" value="#{msg['notif.title']}"/>
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}"/>
+        <f:event type="preRenderView" listener="#{notif.ouvrir}"/>
+        <div class="view">
+            <div class="page-head reveal">
+                <span class="eyebrow">#{msg['nav.account']}</span>
+                <h1>#{msg['notif.title']}</h1>
+            </div>
+            <div class="panel reveal">
+                <h:panelGroup layout="block" styleClass="mini-list" rendered="#{not empty notif.listePage}">
+                    <ui:repeat value="#{notif.listePage}" var="n">
+                        <div class="mini-row">
+                            <span class="stat-ic" style="width:38px;height:38px;#{n.importance eq 'ALERTE' ? 'background:rgba(239,68,68,.12);color:var(--danger)' : ''}"><svg class="ic"><use href="#{n.importance eq 'ALERTE' ? '#ic-shield' : '#ic-check'}"/></svg></span>
+                            <div style="flex:1">
+                                <div class="r-name" style="font-weight:#{n.lu ? '500' : '700'}">#{n.contenu}</div>
+                                <div class="r-sub"><h:outputText value="#{n.dateCreation}"><f:convertDateTime pattern="dd/MM/yyyy · HH:mm" type="localDateTime"/></h:outputText></div>
+                            </div>
+                            <h:panelGroup styleClass="pill pill-open" rendered="#{not n.lu}" style="background:var(--emerald-50)">•</h:panelGroup>
+                        </div>
+                    </ui:repeat>
+                </h:panelGroup>
+                <h:outputText rendered="#{empty notif.listePage}" styleClass="meta" value="#{msg['notif.empty']}"/>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

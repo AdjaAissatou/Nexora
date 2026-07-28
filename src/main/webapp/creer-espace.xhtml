@@ -23,6 +23,14 @@
                     <h:inputText value="#{espaceBean.nomCommercial}" a:placeholder="Ex : Chez Awa"/>
                 </div>
                 <div class="nx-field">
+                    <label>#{msg['esp.nature']}</label>
+                    <h:selectOneRadio value="#{espaceBean.nature}" layout="pageDirection" style="line-height:2">
+                        <f:selectItem itemValue="BOUTIQUE" itemLabel="#{msg['esp.nature.boutique']}"/>
+                        <f:selectItem itemValue="PRESTATAIRE" itemLabel="#{msg['esp.nature.prestataire']}"/>
+                        <f:selectItem itemValue="MIXTE" itemLabel="#{msg['esp.nature.mixte']}"/>
+                    </h:selectOneRadio>
+                </div>
+                <div class="nx-field">
                     <label>#{msg['esp.city']}</label>
                     <h:selectOneMenu value="#{espaceBean.ville}">
                         <f:selectItem itemValue="Dakar" itemLabel="Dakar"/>

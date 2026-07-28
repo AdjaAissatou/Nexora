@@ -8,6 +8,7 @@ import com.nexora.dto.ref.AttributDTO;
 import com.nexora.service.CategorieService;
 import com.nexora.service.EspaceService;
 import com.nexora.service.OffreService;
+import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -40,8 +41,12 @@ public class EspaceBean implements Serializable {
 
     // --- Creation d'espace ---
     private String nomCommercial;
+    private String nature = "MIXTE";       // BOUTIQUE | PRESTATAIRE | MIXTE
     private String ville = "Dakar";
     private String telephone;
+
+    // --- Edition (correction d'une annonce rejetee) ---
+    private Long editionId;
 
     // --- Onglet + formulaire d'ajout ---
     private String onglet = "produits";         // produits | services | stats
@@ -56,6 +61,12 @@ public class EspaceBean implements Serializable {
     private List<OffreDTO> produits;
     private List<OffreDTO> services;
 
+    @PostConstruct
+    public void init() {
+        // Onglet par defaut adapte a la nature : un prestataire demarre sur Services.
+        if (session.getEspaceId() != null && !session.isAffProduits()) this.onglet = "services";
+    }
+
     // ------------------------------------------------------- Creation d'espace
     public String creer() {
         if (!session.isConnecte()) return "connexion?faces-redirect=true";
@@ -65,6 +76,7 @@ public class EspaceBean implements Serializable {
         }
         EspaceRequest req = new EspaceRequest();
         req.setNomCommercial(nomCommercial.trim());
+        req.setNature(nature);
         req.setTelephonePrincipal(telephone);
         req.setPays("Sénégal");
         req.setRegion("Dakar");
@@ -93,11 +105,26 @@ public class EspaceBean implements Serializable {
     public List<OffreDTO> getProduits() { if (produits == null) recharger(); return produits; }
     public List<OffreDTO> getServices() { if (services == null) recharger(); return services; }
 
+    // --- Compteurs d'apercu (tableau de bord de l'espace) ---
+    public int getNbProduits()  { return getProduits().size(); }
+    public int getNbServices()  { return getServices().size(); }
+    public long getNbTotal()    { return getNbProduits() + getNbServices(); }
+    public long getNbEnLigne()  { return parStatut("PUBLIEE"); }
+    public long getNbEnAttente(){ return parStatut("EN_ATTENTE_VALIDATION"); }
+    public long getNbRejete()   { return parStatut("REJETEE"); }
+    private long parStatut(String s) {
+        long c = 0;
+        for (OffreDTO o : getProduits()) if (s.equals(o.getStatut())) c++;
+        for (OffreDTO o : getServices()) if (s.equals(o.getStatut())) c++;
+        return c;
+    }
+
     public String getOnglet() { return onglet; }
     public void changerOnglet(String o) { this.onglet = o; annuler(); }
 
     public void ouvrirForm(String kind) {
         this.kind = kind;
+        this.editionId = null;
         this.formOuvert = true;
         this.categorieId = null;
         this.titre = null;
@@ -105,8 +132,20 @@ public class EspaceBean implements Serializable {
         this.valeursAttributs = new LinkedHashMap<>();
     }
 
+    /** Ouvre le formulaire pré-rempli pour corriger une annonce (ex. rejetée). */
+    public void ouvrirEdition(OffreDTO o) {
+        this.editionId = o.getId();
+        this.kind = "SERVICE".equals(o.getType()) ? "SERVICE" : "PRODUIT";
+        this.formOuvert = true;
+        this.categorieId = o.getIdCategorie();
+        this.titre = o.getTitre();
+        this.prix = o.getPrix() != null ? o.getPrix().toPlainString() : null;
+        this.valeursAttributs = new LinkedHashMap<>();
+    }
+
     public void annuler() {
         this.formOuvert = false;
+        this.editionId = null;
         this.categorieId = null;
         this.titre = null;
         this.prix = null;
@@ -132,14 +171,16 @@ public class EspaceBean implements Serializable {
         Map<Long, String> attrs = new LinkedHashMap<>();
         valeursAttributs.forEach((k, v) -> { if (v != null && !v.isBlank()) attrs.put(k, v); });
         req.setAttributsTexte(attrs);
+        boolean edition = editionId != null;
         try {
-            offreService.publier(req);
+            if (edition) offreService.modifier(editionId, req);
+            else offreService.publier(req);
         } catch (Exception ex) {
-            avertir("Publication impossible : " + racine(ex));
+            avertir((edition ? "Correction" : "Publication") + " impossible : " + racine(ex));
             return;
         }
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Publié ! En attente de validation.", null));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                edition ? "Annonce corrigée et renvoyée en validation." : "Publié ! En attente de validation.", null));
         annuler();
         recharger();
     }
@@ -162,6 +203,9 @@ public class EspaceBean implements Serializable {
     // --- Getters / Setters ---
     public String getNomCommercial()        { return nomCommercial; }
     public void setNomCommercial(String v)  { this.nomCommercial = v; }
+    public String getNature()               { return nature; }
+    public void setNature(String v)         { this.nature = v; }
+    public boolean isEdition()              { return editionId != null; }
     public String getVille()                { return ville; }
     public void setVille(String v)          { this.ville = v; }
     public String getTelephone()            { return telephone; }

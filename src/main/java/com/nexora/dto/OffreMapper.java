@@ -27,6 +27,7 @@ public final class OffreMapper {
         dto.setMotifRejet(o.getMotifRejet());
         if (o.getCategorie() != null) {
             dto.setCategorieNom(o.getCategorie().getNom());
+            dto.setIdCategorie(o.getCategorie().getIdCategorie());
         }
         EspaceProfessionnel e = o.getEspace();
         if (e != null) {

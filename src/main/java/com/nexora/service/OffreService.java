@@ -17,6 +17,12 @@ public interface OffreService {
     /** Publie une nouvelle offre (produit ou service) sous un espace. */
     OffreDTO publier(OffreRequest req);
 
+    /**
+     * Met a jour une offre (titre, prix, categorie, attributs) et la renvoie
+     * en validation (statut EN_ATTENTE_VALIDATION, motif de rejet efface).
+     */
+    OffreDTO modifier(Long idOffre, OffreRequest req);
+
     /** Toutes les offres d'un espace (tous statuts), pour la gestion "Mon espace". */
     java.util.List<OffreDTO> offresDeEspace(Long idEspace);
 }

@@ -13,6 +13,7 @@ public class EspaceViewDTO implements Serializable {
 
     private Long id;
     private String nomCommercial;
+    private String nature;
     private String slug;
     private String typeEspace;
     private boolean verifie;
@@ -30,6 +31,7 @@ public class EspaceViewDTO implements Serializable {
     public EspaceViewDTO(EspaceProfessionnel e, long nombreOffres) {
         this.id = e.getIdEspace();
         this.nomCommercial = e.getNomCommercial();
+        this.nature = e.getNature();
         this.slug = e.getSlug();
         this.typeEspace = e.getTypeEspace() != null ? e.getTypeEspace().getLibelle() : null;
         this.verifie = e.isVerifie();

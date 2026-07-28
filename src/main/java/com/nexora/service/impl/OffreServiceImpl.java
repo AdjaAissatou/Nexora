@@ -127,6 +127,35 @@ public class OffreServiceImpl implements OffreService {
     }
 
     @Override
+    public OffreDTO modifier(Long idOffre, OffreRequest req) {
+        Offre offre = offreDao.findById(idOffre)
+                .orElseThrow(() -> new ResourceNotFoundException("Offre", idOffre));
+        offre.setTitre(req.getTitre());
+        offre.setDescription(req.getDescription());
+        offre.setPrix(req.getPrix());
+        if (req.getIdCategorie() != null) {
+            offre.setCategorie(em.getReference(CategorieOffre.class, req.getIdCategorie()));
+        }
+        offre.setStatut(StatutOffre.EN_ATTENTE_VALIDATION);
+        offre.setMotifRejet(null);
+        offre.setDateModification(LocalDateTime.now());
+        // Remplacement des valeurs d'attributs (EAV).
+        offre.getAttributs().clear();
+        if (req.getAttributsTexte() != null) {
+            for (Map.Entry<Long, String> e : req.getAttributsTexte().entrySet()) {
+                if (e.getValue() == null || e.getValue().isBlank()) continue;
+                OffreAttribut oa = new OffreAttribut();
+                oa.setOffre(offre);
+                oa.setAttribut(em.getReference(Attribut.class, e.getKey()));
+                oa.setValeurTexte(e.getValue());
+                offre.getAttributs().add(oa);
+            }
+        }
+        offreDao.update(offre);
+        return OffreMapper.toDto(offre);
+    }
+
+    @Override
     public java.util.List<OffreDTO> offresDeEspace(Long idEspace) {
         List<Offre> offres = em.createQuery(
                         "select o from Offre o where o.espace.idEspace = :id order by o.dateCreation desc",

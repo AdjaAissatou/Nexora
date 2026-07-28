@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class EspaceRequest implements Serializable {
 
     private String nomCommercial;
+    private String nature;          // BOUTIQUE | PRESTATAIRE | MIXTE
     private String description;
     private Integer idTypeEspace;
     private Long idCategorieEspace;
