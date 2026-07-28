@@ -51,6 +51,7 @@
                 <div class="nav-label">#{msg['nav.pro']}</div>
                 <h:link styleClass="#{view.viewId eq '/mon-espace.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="mon-espace"><svg class="ic"><use href="#ic-store"/></svg><span>#{msg['nav.myspace']}</span></h:link>
                 <h:link styleClass="#{view.viewId eq '/dashboard.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="dashboard"><svg class="ic"><use href="#ic-grid"/></svg><span>#{msg['nav.stats']}</span></h:link>
+                <h:link styleClass="#{view.viewId eq '/parametres.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="parametres"><svg class="ic"><use href="#ic-sliders"/></svg><span>#{msg['nav.settings']}</span></h:link>
             </h:panelGroup>
 
             <h:panelGroup layout="block" rendered="#{sessionBean.admin}">

@@ -13,4 +13,10 @@ public interface EspaceService {
 
     /** Liste les espaces professionnels d'un utilisateur. */
     List<EspaceViewDTO> mesEspaces(Long idProprietaire);
+
+    /** Charge les parametres editables d'un espace (pre-remplissage du formulaire). */
+    EspaceRequest parametres(Long idEspace);
+
+    /** Met a jour les infos/parametres d'un espace (et son adresse principale). */
+    EspaceViewDTO modifier(Long idEspace, EspaceRequest req);
 }

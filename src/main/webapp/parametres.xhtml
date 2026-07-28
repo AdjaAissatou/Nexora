@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:a="jakarta.faces.passthrough">
+    <ui:param name="titre" value="#{msg['par.title']}"/>
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}"/>
+        <div class="view">
+
+            <h:panelGroup layout="block" rendered="#{not sessionBean.possedeEspace}">
+                <div class="page-head reveal"><span class="eyebrow">#{msg['nav.pro']}</span><h1>#{msg['esp.noEspace']}</h1></div>
+                <h:link styleClass="btn btn-primary" outcome="creer-espace" value="#{msg['esp.create.cta']}"/>
+            </h:panelGroup>
+
+            <h:panelGroup layout="block" rendered="#{sessionBean.possedeEspace}">
+                <div class="page-head reveal">
+                    <span class="eyebrow">#{msg['nav.myspace']}</span>
+                    <h1>#{msg['par.title']}</h1>
+                    <p>#{msg['par.sub']}</p>
+                </div>
+
+                <h:form styleClass="nx-form reveal" style="max-width:720px">
+                    <h:messages globalOnly="true" styleClass="meta" style="color:var(--emerald-700);margin-bottom:12px"/>
+
+                    <h3 style="margin:4px 0 12px">#{msg['par.identity']}</h3>
+                    <div class="nx-field"><label>#{msg['esp.name']} *</label>
+                        <h:inputText value="#{parametresBean.form.nomCommercial}"/></div>
+                    <div class="nx-field"><label>#{msg['esp.nature']}</label>
+                        <h:selectOneRadio value="#{parametresBean.form.nature}" layout="pageDirection" style="line-height:2">
+                            <f:selectItem itemValue="BOUTIQUE" itemLabel="#{msg['esp.nature.boutique']}"/>
+                            <f:selectItem itemValue="PRESTATAIRE" itemLabel="#{msg['esp.nature.prestataire']}"/>
+                            <f:selectItem itemValue="MIXTE" itemLabel="#{msg['esp.nature.mixte']}"/>
+                        </h:selectOneRadio></div>
+                    <div class="nx-field"><label>#{msg['par.description']}</label>
+                        <h:inputTextarea value="#{parametresBean.form.description}" rows="3" style="width:100%"
+                                         a:placeholder="Présentez votre activité en quelques mots."/></div>
+
+                    <div class="divider" style="height:1px;background:var(--border);margin:20px 0"></div>
+                    <h3 style="margin:4px 0 12px">#{msg['par.contact']}</h3>
+                    <div class="attr-grid">
+                        <div class="nx-field"><label>#{msg['par.phone']}</label><h:inputText value="#{parametresBean.form.telephonePrincipal}" a:placeholder="+221 ..."/></div>
+                        <div class="nx-field"><label>#{msg['par.email']}</label><h:inputText value="#{parametresBean.form.email1}" a:type="email" a:placeholder="contact@exemple.sn"/></div>
+                        <div class="nx-field"><label>WhatsApp</label><h:inputText value="#{parametresBean.form.whatsapp}" a:placeholder="+221 ..."/></div>
+                        <div class="nx-field"><label>#{msg['par.web']}</label><h:inputText value="#{parametresBean.form.siteWeb}" a:placeholder="https://..."/></div>
+                    </div>
+
+                    <div class="divider" style="height:1px;background:var(--border);margin:20px 0"></div>
+                    <h3 style="margin:4px 0 12px">#{msg['par.social']}</h3>
+                    <div class="attr-grid">
+                        <div class="nx-field"><label>Facebook</label><h:inputText value="#{parametresBean.form.facebook}" a:placeholder="https://facebook.com/..."/></div>
+                        <div class="nx-field"><label>Instagram</label><h:inputText value="#{parametresBean.form.instagram}" a:placeholder="https://instagram.com/..."/></div>
+                    </div>
+
+                    <div class="divider" style="height:1px;background:var(--border);margin:20px 0"></div>
+                    <h3 style="margin:4px 0 12px">#{msg['par.location']}</h3>
+                    <div class="attr-grid">
+                        <div class="nx-field"><label>#{msg['esp.city']}</label><h:inputText value="#{parametresBean.form.ville}"/></div>
+                        <div class="nx-field"><label>#{msg['par.quartier']}</label><h:inputText value="#{parametresBean.form.quartier}"/></div>
+                    </div>
+                    <div class="nx-field"><label>#{msg['par.logo']}</label><h:inputText value="#{parametresBean.form.logo}" a:placeholder="https://.../logo.png"/></div>
+
+                    <h:commandButton styleClass="btn btn-primary" style="margin-top:8px" value="#{msg['par.save']}" action="#{parametresBean.enregistrer}"/>
+                </h:form>
+            </h:panelGroup>
+        </div>
+    </ui:define>
+</ui:composition>

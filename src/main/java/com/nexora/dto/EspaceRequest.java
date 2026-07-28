@@ -23,6 +23,8 @@ public class EspaceRequest implements Serializable {
     private String email1;
     private String siteWeb;
     private String whatsapp;
+    private String facebook;
+    private String instagram;
     private String logo;
 
     // Adresse principale

@@ -75,6 +75,60 @@ public class EspaceServiceImpl implements EspaceService {
     }
 
     @Override
+    public EspaceRequest parametres(Long idEspace) {
+        EspaceProfessionnel e = espaceDao.findById(idEspace)
+                .orElseThrow(() -> new BusinessException("Espace introuvable."));
+        EspaceRequest r = new EspaceRequest();
+        r.setNomCommercial(e.getNomCommercial());
+        r.setNature(e.getNature());
+        r.setDescription(e.getDescription());
+        r.setTelephonePrincipal(e.getTelephonePrincipal());
+        r.setEmail1(e.getEmail1());
+        r.setSiteWeb(e.getSiteWeb());
+        r.setWhatsapp(e.getWhatsapp());
+        r.setFacebook(e.getFacebook());
+        r.setInstagram(e.getInstagram());
+        r.setLogo(e.getLogo());
+        e.getAdresses().stream().findFirst().ifPresent(a -> {
+            r.setPays(a.getPays());
+            r.setRegion(a.getRegion());
+            r.setVille(a.getVille());
+            r.setQuartier(a.getQuartier());
+        });
+        return r;
+    }
+
+    @Override
+    public EspaceViewDTO modifier(Long idEspace, EspaceRequest req) {
+        EspaceProfessionnel e = espaceDao.findById(idEspace)
+                .orElseThrow(() -> new BusinessException("Espace introuvable."));
+        if (req.getNomCommercial() != null && !req.getNomCommercial().isBlank()) {
+            e.setNomCommercial(req.getNomCommercial().trim());
+        }
+        if (req.getNature() != null) e.setNature(req.getNature());
+        e.setDescription(req.getDescription());
+        e.setTelephonePrincipal(req.getTelephonePrincipal());
+        e.setEmail1(req.getEmail1());
+        e.setSiteWeb(req.getSiteWeb());
+        e.setWhatsapp(req.getWhatsapp());
+        e.setFacebook(req.getFacebook());
+        e.setInstagram(req.getInstagram());
+        e.setLogo(req.getLogo());
+        Adresse a = e.getAdresses().stream().findFirst().orElse(null);
+        if (a == null) {
+            a = new Adresse();
+            a.setEspace(e);
+            e.getAdresses().add(a);
+        }
+        a.setPays(req.getPays());
+        a.setRegion(req.getRegion());
+        a.setVille(req.getVille());
+        a.setQuartier(req.getQuartier());
+        espaceDao.update(e);
+        return new EspaceViewDTO(e, espaceDao.countOffres(idEspace));
+    }
+
+    @Override
     public List<EspaceViewDTO> mesEspaces(Long idProprietaire) {
         List<EspaceProfessionnel> espaces = em.createQuery(
                         "select e from EspaceProfessionnel e where e.proprietaire.idUtilisateur = :id "
