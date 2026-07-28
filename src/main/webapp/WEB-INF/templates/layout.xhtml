@@ -43,7 +43,7 @@
                 <div class="nav-label">#{msg['nav.account']}</div>
                 <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-heart"/></svg><span>#{msg['nav.favorites']}</span></h:link>
                 <h:link styleClass="nav-item" outcome="accueil"><svg class="ic"><use href="#ic-package"/></svg><span>#{msg['nav.orders']}</span></h:link>
-                <h:link styleClass="#{view.viewId eq '/messages.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['nav.messages']}</span><h:panelGroup styleClass="badge" rendered="#{msgBean.nbNonLus gt 0}">#{msgBean.nbNonLus}</h:panelGroup></h:link>
+                <h:link styleClass="#{view.viewId eq '/messages.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['nav.messages']}</span><h:panelGroup id="msgBadgeSide" layout="block" style="display:contents"><h:panelGroup styleClass="badge" rendered="#{msgBean.nbNonLus gt 0}">#{msgBean.nbNonLus}</h:panelGroup></h:panelGroup></h:link>
                 <h:link styleClass="#{view.viewId eq '/notifications.xhtml' ? 'nav-item active' : 'nav-item'}" outcome="notifications"><svg class="ic"><use href="#ic-bell"/></svg><span>#{msg['nav.notifications']}</span><h:panelGroup styleClass="badge" rendered="#{notif.count gt 0}">#{notif.count}</h:panelGroup></h:link>
             </h:panelGroup>
 
@@ -82,8 +82,10 @@
                     <button type="button" class="icon-btn" id="themeBtn" title="Thème"></button>
                     <h:link styleClass="icon-btn" rendered="#{sessionBean.connecte}" outcome="messages" style="position:relative" title="#{msg['nav.messages']}">
                         <svg class="ic"><use href="#ic-chat"/></svg>
-                        <h:panelGroup styleClass="badge" rendered="#{msgBean.nbNonLus gt 0}"
-                                      style="position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;font-size:10px">#{msgBean.nbNonLus}</h:panelGroup>
+                        <h:panelGroup id="msgBadgeTop" layout="block" style="position:absolute;top:-3px;right:-3px">
+                            <h:panelGroup styleClass="badge" rendered="#{msgBean.nbNonLus gt 0}"
+                                          style="min-width:16px;height:16px;font-size:10px">#{msgBean.nbNonLus}</h:panelGroup>
+                        </h:panelGroup>
                     </h:link>
                     <h:link styleClass="icon-btn" outcome="notifications" style="position:relative" title="#{msg['nav.notifications']}">
                         <svg class="ic"><use href="#ic-bell"/></svg>

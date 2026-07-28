@@ -22,4 +22,7 @@ public interface MessageService {
 
     /** Nombre de messages non lus reçus par l'utilisateur (toutes conversations). */
     long nbNonLus(Long idUtilisateur);
+
+    /** Marque comme lus les messages d'une conversation reçus par le lecteur. */
+    void marquerLu(Long idConversation, Long idLecteur);
 }

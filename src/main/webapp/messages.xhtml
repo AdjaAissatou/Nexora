@@ -17,7 +17,7 @@
                     <div class="conv-list">
                         <ui:repeat value="#{msgBean.conversations}" var="c">
                             <h:commandLink styleClass="conv #{msgBean.active(c.id) ? 'active' : ''}" action="#{msgBean.selectionner(c.id)}">
-                                <f:ajax render="@form"/>
+                                <f:ajax render="@form :msgBadgeTop :msgBadgeSide"/>
                                 <span class="avatar">#{c.initiale}</span>
                                 <div class="conv-info">
                                     <h4>#{c.titre}<time><h:outputText value="#{c.dateDernierMessage}" rendered="#{not empty c.dateDernierMessage}"><f:convertDateTime pattern="dd/MM" type="localDateTime"/></h:outputText></time></h4>

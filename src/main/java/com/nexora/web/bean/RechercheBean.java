@@ -38,6 +38,7 @@ public class RechercheBean implements Serializable {
     private long total;
     private transient Part photo;
     private String motCleReconnu;
+    private String photoApercu;
 
     @PostConstruct
     public void init() {
@@ -51,9 +52,11 @@ public class RechercheBean implements Serializable {
      */
     public void rechercheParPhoto() {
         motCleReconnu = null;
+        photoApercu = null;
         if (photo == null || photo.getSize() == 0) { rechercher(); return; }
         try {
             byte[] bytes = photo.getInputStream().readAllBytes();
+            photoApercu = vignetteDataUri(bytes);
             String motCle = visionService.motCleDepuisImage(bytes);
             if (motCle != null && !motCle.isBlank()) {
                 criteria.setMotCle(motCle);
@@ -69,6 +72,32 @@ public class RechercheBean implements Serializable {
             photo = null;
         }
         rechercher();
+    }
+
+    /** Miniature JPEG (max 96 px) encodee en data URI, pour l'apercu dans le bandeau. */
+    private static String vignetteDataUri(byte[] bytes) {
+        try {
+            java.awt.image.BufferedImage src =
+                    javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(bytes));
+            if (src == null) return null;
+            int max = 96;
+            int w = src.getWidth(), h = src.getHeight();
+            double r = Math.min((double) max / w, (double) max / h);
+            int nw = Math.max(1, (int) Math.round(w * r));
+            int nh = Math.max(1, (int) Math.round(h * r));
+            java.awt.image.BufferedImage dst =
+                    new java.awt.image.BufferedImage(nw, nh, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics2D g = dst.createGraphics();
+            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+                    java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.drawImage(src, 0, 0, nw, nh, null);
+            g.dispose();
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            javax.imageio.ImageIO.write(dst, "jpeg", out);
+            return "data:image/jpeg;base64," + java.util.Base64.getEncoder().encodeToString(out.toByteArray());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void rechercher() {
@@ -107,4 +136,5 @@ public class RechercheBean implements Serializable {
     public Part getPhoto()             { return photo; }
     public void setPhoto(Part photo)   { this.photo = photo; }
     public String getMotCleReconnu()   { return motCleReconnu; }
+    public String getPhotoApercu()     { return photoApercu; }
 }

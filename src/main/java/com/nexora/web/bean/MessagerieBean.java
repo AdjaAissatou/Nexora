@@ -39,6 +39,7 @@ public class MessagerieBean implements Serializable {
             List<ConversationDTO> l = getConversations();
             if (!l.isEmpty()) selectedId = l.get(0).getId();
         }
+        if (selectedId != null) messageService.marquerLu(selectedId, session.getIdUtilisateur());
     }
 
     public List<ConversationDTO> getConversations() {
@@ -49,7 +50,10 @@ public class MessagerieBean implements Serializable {
         return selectedId != null ? messageService.messages(selectedId, session.getIdUtilisateur()) : List.of();
     }
 
-    public void selectionner(Long id) { this.selectedId = id; }
+    public void selectionner(Long id) {
+        this.selectedId = id;
+        if (id != null) messageService.marquerLu(id, session.getIdUtilisateur());
+    }
 
     public void envoyer() {
         if (selectedId != null && texte != null && !texte.isBlank()) {

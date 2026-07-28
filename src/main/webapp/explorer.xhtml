@@ -28,8 +28,11 @@
                 </div>
 
                 <h:panelGroup layout="block" styleClass="reveal" rendered="#{not empty rechercheBean.motCleReconnu}"
-                              style="margin-bottom:12px;padding:10px 14px;background:var(--surface-2);border-radius:12px;display:inline-flex;align-items:center;gap:8px">
-                    <svg class="ic"><use href="#ic-camera"/></svg>
+                              style="margin-bottom:12px;padding:8px 14px 8px 8px;background:var(--surface-2);border-radius:14px;display:inline-flex;align-items:center;gap:10px">
+                    <h:graphicImage value="#{rechercheBean.photoApercu}" rendered="#{not empty rechercheBean.photoApercu}"
+                                    a:alt="#{msg['explore.photo']}"
+                                    style="width:44px;height:44px;object-fit:cover;border-radius:10px;display:block"/>
+                    <svg class="ic" style="width:18px;height:18px"><use href="#ic-camera"/></svg>
                     <span class="meta">#{msg['explore.recognized']} <b>#{rechercheBean.motCleReconnu}</b></span>
                 </h:panelGroup>
                 <h:messages globalOnly="true" styleClass="meta" style="display:block;margin-bottom:10px"/>

@@ -138,6 +138,19 @@ public class MessageServiceImpl implements MessageService {
                 .getSingleResult();
     }
 
+    @Override
+    public void marquerLu(Long idConversation, Long idLecteur) {
+        if (idConversation == null || idLecteur == null) return;
+        em.createQuery(
+                        "update Message m set m.lu = true "
+                                + "where m.conversation.idConversation = :conv "
+                                + "  and m.expediteur.idUtilisateur <> :lecteur "
+                                + "  and m.lu = false")
+                .setParameter("conv", idConversation)
+                .setParameter("lecteur", idLecteur)
+                .executeUpdate();
+    }
+
     private static String nomAffichage(Utilisateur u) {
         if (u == null) return "un utilisateur";
         if (u.getPrenom() != null && !u.getPrenom().isBlank()) return u.getPrenom();

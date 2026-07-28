@@ -25,7 +25,8 @@ public class AuthBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Set<String> DEST_OK = Set.of("creer-espace", "mon-espace", "accueil", "explorer");
+    private static final Set<String> DEST_OK = Set.of("creer-espace", "mon-espace", "accueil",
+            "explorer", "messages", "notifications");
 
     @Inject private AuthService authService;
     @Inject private EspaceService espaceService;
