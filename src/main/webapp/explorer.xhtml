@@ -12,18 +12,27 @@
                 <div><span class="eyebrow">#{msg['explore.eyebrow']}</span><h2 style="margin-top:8px;font-size:26px">#{msg['explore.title']}</h2></div>
             </div>
 
-            <h:form id="rech">
+            <h:form id="rech" enctype="multipart/form-data">
                 <div class="searchbar" style="margin-bottom:14px">
                     <svg class="ic"><use href="#ic-search"/></svg>
                     <h:inputText value="#{rechercheBean.criteria.motCle}" a:placeholder="#{msg['explore.searchph']}"/>
-                    <label class="btn btn-outline btn-sm" title="#{msg['explore.photo']}" style="cursor:pointer;margin-right:6px">
+                    <label for="rech:photo" class="btn btn-outline btn-sm" title="#{msg['explore.photo']}" style="cursor:pointer;margin-right:6px">
                         <svg class="ic"><use href="#ic-camera"/></svg>
-                        <input type="file" accept="image/*" style="display:none" onchange="nexPhoto(this)"/>
                     </label>
+                    <h:inputFile id="photo" value="#{rechercheBean.photo}" style="display:none" a:accept="image/*"
+                                 a:onchange="document.getElementById('rech:photoGo').click()"/>
+                    <h:commandButton id="photoGo" action="#{rechercheBean.rechercheParPhoto}" style="display:none"/>
                     <h:commandButton id="go" styleClass="btn btn-primary" value="#{msg['explore.search']}" action="#{rechercheBean.rechercher}">
                         <f:ajax execute="@form" render="reslist"/>
                     </h:commandButton>
                 </div>
+
+                <h:panelGroup layout="block" styleClass="reveal" rendered="#{not empty rechercheBean.motCleReconnu}"
+                              style="margin-bottom:12px;padding:10px 14px;background:var(--surface-2);border-radius:12px;display:inline-flex;align-items:center;gap:8px">
+                    <svg class="ic"><use href="#ic-camera"/></svg>
+                    <span class="meta">#{msg['explore.recognized']} <b>#{rechercheBean.motCleReconnu}</b></span>
+                </h:panelGroup>
+                <h:messages globalOnly="true" styleClass="meta" style="display:block;margin-bottom:10px"/>
 
                 <!-- Panneau de filtres -->
                 <div class="filters reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;background:var(--surface-2);padding:16px;border-radius:16px;margin-bottom:16px">
@@ -127,14 +136,6 @@
                     var s = document.getElementById('rech:tri'); if(s){ s.value='PROXIMITE'; }
                     document.getElementById('rech:go').click();
                 }, function(){ alert('#{msg['explore.nearMe']} : position indisponible'); });
-            }
-            function nexPhoto(input){
-                if(input.files &amp;&amp; input.files[0]){
-                    var n = input.files[0].name.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ');
-                    var box = document.querySelector('#rech .searchbar input[type=text]');
-                    if(box){ box.value = n; }
-                    document.getElementById('rech:go').click();
-                }
             }
             //]]>
             </script>

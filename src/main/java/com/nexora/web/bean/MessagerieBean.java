@@ -66,6 +66,11 @@ public class MessagerieBean implements Serializable {
         return "";
     }
 
+    /** Nombre de messages non lus, pour le badge de la barre. */
+    public long getNbNonLus() {
+        return session.isConnecte() ? messageService.nbNonLus(session.getIdUtilisateur()) : 0;
+    }
+
     public boolean active(Long id)     { return id != null && id.equals(selectedId); }
     public Long getSelectedId()        { return selectedId; }
     public String getTexte()           { return texte; }

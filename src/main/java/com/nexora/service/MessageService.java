@@ -19,4 +19,7 @@ public interface MessageService {
 
     /** Envoie un message dans une conversation. */
     void envoyer(Long idConversation, Long idExpediteur, String contenu);
+
+    /** Nombre de messages non lus reçus par l'utilisateur (toutes conversations). */
+    long nbNonLus(Long idUtilisateur);
 }

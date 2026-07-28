@@ -124,6 +124,20 @@ public class MessageServiceImpl implements MessageService {
                 "/messages.xhtml", "NORMALE");
     }
 
+    @Override
+    public long nbNonLus(Long idUtilisateur) {
+        if (idUtilisateur == null) return 0;
+        return em.createQuery(
+                        "select count(m) from Message m "
+                                + "where m.lu = false "
+                                + "  and m.expediteur.idUtilisateur <> :id "
+                                + "  and (m.conversation.client.idUtilisateur = :id "
+                                + "       or m.conversation.espace.proprietaire.idUtilisateur = :id)",
+                        Long.class)
+                .setParameter("id", idUtilisateur)
+                .getSingleResult();
+    }
+
     private static String nomAffichage(Utilisateur u) {
         if (u == null) return "un utilisateur";
         if (u.getPrenom() != null && !u.getPrenom().isBlank()) return u.getPrenom();
