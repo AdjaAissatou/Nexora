@@ -7,6 +7,8 @@ import com.nexora.domain.user.Utilisateur;
 import com.nexora.dto.ConversationDTO;
 import com.nexora.dto.MessageDTO;
 import com.nexora.service.MessageService;
+import com.nexora.service.NotificationService;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,6 +22,9 @@ public class MessageServiceImpl implements MessageService {
 
     @PersistenceContext(unitName = "nexoraPU")
     private EntityManager em;
+
+    @EJB
+    private NotificationService notificationService;
 
     @Override
     public List<ConversationDTO> conversations(Long idUtilisateur) {
@@ -102,5 +107,26 @@ public class MessageServiceImpl implements MessageService {
         String apercu = contenu.trim();
         c.setDernierMessage(apercu.length() > 120 ? apercu.substring(0, 120) : apercu);
         c.setDateDernierMessage(LocalDateTime.now());
+
+        // Notifie le destinataire (l'autre partie de la conversation).
+        Utilisateur client = c.getClient();
+        Utilisateur proprietaire = c.getEspace() != null ? c.getEspace().getProprietaire() : null;
+        boolean envoyeurEstClient = client != null && client.getIdUtilisateur().equals(idExpediteur);
+        Long destinataire = envoyeurEstClient
+                ? (proprietaire != null ? proprietaire.getIdUtilisateur() : null)
+                : (client != null ? client.getIdUtilisateur() : null);
+        String expediteur = envoyeurEstClient
+                ? nomAffichage(client)
+                : (c.getEspace() != null ? c.getEspace().getNomCommercial() : "un utilisateur");
+        String extrait = apercu.length() > 60 ? apercu.substring(0, 60) + "…" : apercu;
+        notificationService.notifier(destinataire,
+                "Nouveau message de « " + expediteur + " » : " + extrait,
+                "/messages.xhtml", "NORMALE");
+    }
+
+    private static String nomAffichage(Utilisateur u) {
+        if (u == null) return "un utilisateur";
+        if (u.getPrenom() != null && !u.getPrenom().isBlank()) return u.getPrenom();
+        return u.getNom() != null ? u.getNom() : "un utilisateur";
     }
 }

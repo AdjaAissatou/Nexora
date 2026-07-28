@@ -13,13 +13,68 @@
             </div>
 
             <h:form id="rech">
-                <div class="searchbar" style="margin-bottom:18px">
+                <div class="searchbar" style="margin-bottom:14px">
                     <svg class="ic"><use href="#ic-search"/></svg>
                     <h:inputText value="#{rechercheBean.criteria.motCle}" a:placeholder="#{msg['explore.searchph']}"/>
-                    <h:commandButton styleClass="btn btn-primary" value="#{msg['explore.search']}" action="#{rechercheBean.rechercher}">
+                    <label class="btn btn-outline btn-sm" title="#{msg['explore.photo']}" style="cursor:pointer;margin-right:6px">
+                        <svg class="ic"><use href="#ic-camera"/></svg>
+                        <input type="file" accept="image/*" style="display:none" onchange="nexPhoto(this)"/>
+                    </label>
+                    <h:commandButton id="go" styleClass="btn btn-primary" value="#{msg['explore.search']}" action="#{rechercheBean.rechercher}">
                         <f:ajax execute="@form" render="reslist"/>
                     </h:commandButton>
                 </div>
+
+                <!-- Panneau de filtres -->
+                <div class="filters reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;background:var(--surface-2);padding:16px;border-radius:16px;margin-bottom:16px">
+                    <div class="nx-field">
+                        <label>#{msg['explore.category']}</label>
+                        <h:selectOneMenu value="#{rechercheBean.criteria.idCategorie}" converter="jakarta.faces.Long">
+                            <f:selectItem itemValue="#{null}" itemLabel="#{msg['explore.allCategories']}" noSelectionOption="true"/>
+                            <f:selectItems value="#{catalogue.categorieItems}"/>
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="nx-field">
+                        <label>#{msg['explore.priceMin']}</label>
+                        <h:inputText value="#{rechercheBean.criteria.prixMin}" a:type="number" a:placeholder="0"/>
+                    </div>
+                    <div class="nx-field">
+                        <label>#{msg['explore.priceMax']}</label>
+                        <h:inputText value="#{rechercheBean.criteria.prixMax}" a:type="number" a:placeholder="—"/>
+                    </div>
+                    <div class="nx-field">
+                        <label>#{msg['explore.sort']}</label>
+                        <h:selectOneMenu id="tri" value="#{rechercheBean.criteria.tri}">
+                            <f:selectItem itemValue="PERTINENCE"   itemLabel="#{msg['sort.PERTINENCE']}"/>
+                            <f:selectItem itemValue="PROXIMITE"    itemLabel="#{msg['sort.PROXIMITE']}"/>
+                            <f:selectItem itemValue="PRIX_ASC"     itemLabel="#{msg['sort.PRIX_ASC']}"/>
+                            <f:selectItem itemValue="PRIX_DESC"    itemLabel="#{msg['sort.PRIX_DESC']}"/>
+                            <f:selectItem itemValue="NOTE"         itemLabel="#{msg['sort.NOTE']}"/>
+                            <f:selectItem itemValue="POPULARITE"   itemLabel="#{msg['sort.POPULARITE']}"/>
+                            <f:selectItem itemValue="RECENT"       itemLabel="#{msg['sort.RECENT']}"/>
+                            <f:selectItem itemValue="ALPHABETIQUE" itemLabel="#{msg['sort.ALPHABETIQUE']}"/>
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="nx-field" style="justify-content:flex-end">
+                        <label class="meta" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                            <h:selectBooleanCheckbox value="#{rechercheBean.criteria.professionnelVerifie}"/> #{msg['explore.verifiedOnly']}
+                        </label>
+                        <label class="meta" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:6px">
+                            <h:selectBooleanCheckbox value="#{rechercheBean.criteria.disponibleUniquement}"/> #{msg['explore.availableOnly']}
+                        </label>
+                    </div>
+                    <div class="nx-field" style="justify-content:flex-end">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="nexNearMe();return false">
+                            <svg class="ic"><use href="#ic-compass"/></svg><span>#{msg['explore.nearMe']}</span>
+                        </button>
+                        <h:commandButton styleClass="btn btn-outline btn-sm" style="margin-top:6px" value="#{msg['explore.reset']}" action="#{rechercheBean.reinitialiser}" immediate="true">
+                            <f:ajax execute="@this" render="rech"/>
+                        </h:commandButton>
+                    </div>
+                </div>
+
+                <h:inputHidden id="lat" value="#{rechercheBean.criteria.latitude}"/>
+                <h:inputHidden id="lng" value="#{rechercheBean.criteria.longitude}"/>
 
                 <h:panelGroup layout="block" id="reslist">
                     <p class="meta" style="margin-bottom:12px"><b>#{rechercheBean.total}</b> #{msg['explore.results']}</p>
@@ -36,16 +91,21 @@
                                         <h3>#{o.titre}</h3>
                                         <h:panelGroup styleClass="pill pill-open" rendered="#{o.espaceVerifie}"><svg class="ic"><use href="#ic-check"/></svg>#{msg['explore.verified']}</h:panelGroup>
                                     </div>
-                                    <div class="meta">#{o.categorieNom} · #{o.espaceNom}</div>
+                                    <div class="meta">#{o.categorieNom} · #{o.espaceNom}<h:outputText rendered="#{not empty o.adresseCourte}" value=" · #{o.adresseCourte}"/></div>
                                     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
                                         <span class="stars"><svg class="ic"><use href="#ic-star"/></svg><h:outputText value="#{o.noteEspace}"><f:convertNumber maxFractionDigits="1"/></h:outputText></span>
                                         <h:panelGroup styleClass="pill pill-open" rendered="#{o.ouvert}"><span class="dot dot-open"></span>#{msg['esp.online']}</h:panelGroup>
-                                        <h:panelGroup styleClass="meta" rendered="#{not empty o.distanceKm}"><svg class="ic"><use href="#ic-pin"/></svg><h:outputText value="#{o.distanceKm}"><f:convertNumber maxFractionDigits="1"/></h:outputText> km</h:panelGroup>
+                                        <h:panelGroup styleClass="meta" rendered="#{not empty o.distanceKm}"><svg class="ic"><use href="#ic-pin"/></svg><h:outputText value="#{o.distanceKm}"><f:convertNumber maxFractionDigits="1"/></h:outputText> km<h:outputText rendered="#{not empty o.dureeEstimeeMin}" value=" · #{o.dureeEstimeeMin} min"/></h:panelGroup>
                                         <span class="price" style="margin-left:auto"><h:outputText rendered="#{not empty o.prix}" value="#{o.prix} FCFA"/><h:outputText rendered="#{empty o.prix}" value="#{msg['esp.seePrice']}"/></span>
                                     </div>
                                     <div class="rrow-actions">
-                                        <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-compass"/></svg>#{msg['explore.route']}</button>
-                                        <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-phone"/></svg>#{msg['explore.call']}</button>
+                                        <h:outputLink styleClass="btn btn-outline btn-sm" value="https://www.google.com/maps/dir/?api=1&amp;destination=#{o.latitude},#{o.longitude}"
+                                                      target="_blank" rendered="#{not empty o.latitude and not empty o.longitude}">
+                                            <svg class="ic"><use href="#ic-compass"/></svg>#{msg['explore.route']}
+                                        </h:outputLink>
+                                        <h:outputLink styleClass="btn btn-outline btn-sm" value="tel:#{o.telephone}" rendered="#{not empty o.telephone}">
+                                            <svg class="ic"><use href="#ic-phone"/></svg>#{msg['explore.call']}
+                                        </h:outputLink>
                                         <h:link styleClass="btn btn-primary btn-sm" outcome="messages"><f:param name="espace" value="#{o.espaceId}"/><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['explore.message']}</span></h:link>
                                     </div>
                                 </div>
@@ -56,6 +116,28 @@
                     <h:outputText rendered="#{empty rechercheBean.resultats}" styleClass="meta" value="#{msg['explore.empty']}"/>
                 </h:panelGroup>
             </h:form>
+
+            <script>
+            //<![CDATA[
+            function nexNearMe(){
+                if(!navigator.geolocation){alert('#{msg['explore.nearMe']} : indisponible');return;}
+                navigator.geolocation.getCurrentPosition(function(p){
+                    document.getElementById('rech:lat').value = p.coords.latitude;
+                    document.getElementById('rech:lng').value = p.coords.longitude;
+                    var s = document.getElementById('rech:tri'); if(s){ s.value='PROXIMITE'; }
+                    document.getElementById('rech:go').click();
+                }, function(){ alert('#{msg['explore.nearMe']} : position indisponible'); });
+            }
+            function nexPhoto(input){
+                if(input.files &amp;&amp; input.files[0]){
+                    var n = input.files[0].name.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ');
+                    var box = document.querySelector('#rech .searchbar input[type=text]');
+                    if(box){ box.value = n; }
+                    document.getElementById('rech:go').click();
+                }
+            }
+            //]]>
+            </script>
         </div>
     </ui:define>
 </ui:composition>
