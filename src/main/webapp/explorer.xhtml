@@ -46,7 +46,7 @@
                                     <div class="rrow-actions">
                                         <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-compass"/></svg>#{msg['explore.route']}</button>
                                         <button type="button" class="btn btn-outline btn-sm"><svg class="ic"><use href="#ic-phone"/></svg>#{msg['explore.call']}</button>
-                                        <h:link styleClass="btn btn-primary btn-sm" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['explore.message']}</span></h:link>
+                                        <h:link styleClass="btn btn-primary btn-sm" outcome="messages"><f:param name="espace" value="#{o.espaceId}"/><svg class="ic"><use href="#ic-chat"/></svg><span>#{msg['explore.message']}</span></h:link>
                                     </div>
                                 </div>
                             </article>

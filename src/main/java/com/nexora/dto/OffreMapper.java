@@ -32,6 +32,7 @@ public final class OffreMapper {
         EspaceProfessionnel e = o.getEspace();
         if (e != null) {
             dto.setEspaceNom(e.getNomCommercial());
+            dto.setEspaceId(e.getIdEspace());
             dto.setEspaceVerifie(e.isVerifie());
             dto.setEspaceCertifie(Boolean.TRUE.equals(e.getCertifie()));
             dto.setNoteEspace(e.getNoteMoyenne());

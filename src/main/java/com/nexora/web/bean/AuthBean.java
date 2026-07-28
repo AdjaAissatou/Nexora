@@ -1,7 +1,11 @@
 package com.nexora.web.bean;
 
 import com.nexora.domain.user.Utilisateur;
+import com.nexora.dto.EspaceViewDTO;
 import com.nexora.service.AuthService;
+import com.nexora.service.EspaceService;
+
+import java.util.List;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -24,6 +28,7 @@ public class AuthBean implements Serializable {
     private static final Set<String> DEST_OK = Set.of("creer-espace", "mon-espace", "accueil", "explorer");
 
     @Inject private AuthService authService;
+    @Inject private EspaceService espaceService;
     @Inject private SessionBean session;
 
     private String email;
@@ -42,6 +47,13 @@ public class AuthBean implements Serializable {
                     ? authService.inscrire(nom, null, email.trim(), null, motDePasse)
                     : authService.connecter(email.trim(), motDePasse);
             session.connecter(u);
+            // Recharge l'espace existant de l'utilisateur (fournisseur qui revient).
+            List<EspaceViewDTO> espaces = espaceService.mesEspaces(u.getIdUtilisateur());
+            if (!espaces.isEmpty()) {
+                EspaceViewDTO e = espaces.get(0);
+                String ville = espaceService.parametres(e.getId()).getVille();
+                session.setEspace(e, ville);
+            }
         } catch (Exception ex) {
             message(isRegister()
                     ? "Inscription impossible : " + racine(ex)

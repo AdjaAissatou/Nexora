@@ -75,6 +75,7 @@
                                     <h:outputText rendered="#{not empty o.motifRejet}" styleClass="meta" style="display:block;margin-top:6px;color:var(--danger)" value="#{msg['esp.motif']} : #{o.motifRejet}"/>
                                     <h:commandButton styleClass="btn btn-primary btn-sm" style="margin-top:10px" value="#{msg['esp.correct']}" action="#{espaceBean.ouvrirEdition(o)}"><f:ajax render="@form"/></h:commandButton>
                                 </h:panelGroup>
+                                <h:commandButton styleClass="btn btn-outline btn-sm" style="margin-top:10px" rendered="#{o.statut ne 'REJETEE'}" value="#{msg['esp.edit']}" action="#{espaceBean.ouvrirEdition(o)}"><f:ajax render="@form"/></h:commandButton>
                             </div></article>
                         </ui:repeat>
                     </h:panelGroup>
