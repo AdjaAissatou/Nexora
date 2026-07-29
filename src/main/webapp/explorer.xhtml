@@ -95,7 +95,9 @@
                         <ui:repeat value="#{rechercheBean.resultats}" var="o">
                             <article class="rrow">
                                 <div class="rrow-media">
-                                    <h:graphicImage value="#{o.imagePrincipale}" styleClass="media-img" rendered="#{not empty o.imagePrincipale}" a:alt="#{o.titre}"/>
+                                    <span class="media-ph"><svg class="ic"><use href="#ic-store"/></svg></span>
+                                    <h:graphicImage value="#{o.imagePrincipale}" styleClass="media-img" rendered="#{not empty o.imagePrincipale}"
+                                                    a:alt="#{o.titre}" a:loading="lazy" a:onerror="this.style.display='none'"/>
                                     <span class="rrow-cat"><svg class="ic"><use href="#ic-store"/></svg></span>
                                 </div>
                                 <div class="rrow-body">

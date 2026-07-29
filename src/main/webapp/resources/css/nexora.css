@@ -147,7 +147,13 @@ a{color:inherit; text-decoration:none;}
 .fav.on .ic{fill:var(--danger); stroke:var(--danger);}
 .fav.pop{animation:pop .4s var(--ease);}
 /* --- vraies photos --- */
-.media-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0;}
+.media-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:1;}
+/* Placeholder de vignette : visible quand aucune photo (ou photo en echec).
+   Zero requete reseau, valable pour toute annonce sans image. */
+.media-ph{position:absolute; inset:0; z-index:0; display:grid; place-items:center;
+          background:linear-gradient(135deg,var(--surface-2),var(--surface-3));
+          color:var(--emerald-600);}
+.media-ph .ic{width:42px; height:42px; opacity:.4;}
 .card-media{overflow:hidden;}
 .card-media::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(15,23,42,.02) 45%, rgba(15,23,42,.42)); z-index:1;}
 .card-media .badge-open,.card-media .fav,.card-media .glyph-badge{z-index:2;}
