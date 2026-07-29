@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nexora</groupId>
+    <artifactId>nexora-vision</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <!--
+      Microservice de reconnaissance d'image de Nexora.
+
+      Process autonome (aucun serveur d'application) qui charge le modele
+      MobileNetV2 (ONNX) et expose une petite API HTTP :
+        POST /recognize   corps = octets d'une image (JPEG/PNG)
+                          reponse = {"keyword":"robe","label":"gown"}
+        GET  /health      reponse = {"status":"UP"}
+
+      Dissocie du WAR : le runtime ONNX (~87 Mo natif) et le modele vivent
+      ici, ce qui allege le serveur applicatif et permet de scaler la vision
+      independamment (plusieurs instances, autre hote, etc.).
+    -->
+
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <onnxruntime.version>1.17.1</onnxruntime.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.microsoft.onnxruntime</groupId>
+            <artifactId>onnxruntime</artifactId>
+            <version>${onnxruntime.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>nexora-vision</finalName>
+        <plugins>
+            <!-- Jar executable autonome (fat jar). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.nexora.vision.VisionServer</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

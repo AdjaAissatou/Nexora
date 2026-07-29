@@ -33,3 +33,6 @@ target/
 .classpath
 .project
 .vscode/
+
+# Shade plugin artifact
+dependency-reduced-pom.xml
