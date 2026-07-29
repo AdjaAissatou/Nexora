@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets">
+    <ui:param name="titre" value="#{msg['nav.stats']}"/>
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}"/>
+        <div class="view">
+            <div class="page-head reveal">
+                <span class="eyebrow">#{msg['db.eyebrow']}</span>
+                <h1>#{msg['db.hello']} #{sessionBean.possedeEspace ? sessionBean.espaceNom : ''}</h1>
+                <p>#{msg['db.sub']}</p>
+            </div>
+            <div class="stat-grid reveal">
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-bag"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbOffres}</h3><span>#{msg['db.offers']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-package"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbProduits}</h3><span>#{msg['db.products']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbServices}</h3><span>#{msg['db.services']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-check"/></svg></span><span class="trend trend-up">#{msg['db.online']}</span></div><h3 class="tnum">#{dashboardBean.nbEnLigne}</h3><span>#{msg['db.published']}</span></div>
+                <div class="stat"><div class="stat-top"><span class="stat-ic"><svg class="ic"><use href="#ic-clock"/></svg></span></div><h3 class="tnum">#{dashboardBean.nbEnAttente}</h3><span>#{msg['db.pending']}</span></div>
+            </div>
+            <div class="panel reveal" style="margin-top:20px">
+                <div class="panel-head"><h3>#{msg['db.validation.title']}</h3></div>
+                <p class="meta">#{msg['db.validation.text']}</p>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

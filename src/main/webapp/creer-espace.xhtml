@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:a="jakarta.faces.passthrough">
+    <ui:param name="titre" value="#{msg['esp.create.title']}"/>
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}"/>
+        <div class="view">
+            <h:link styleClass="back-btn" outcome="accueil"><svg class="ic"><use href="#ic-back"/></svg><span>#{msg['esp.back']}</span></h:link>
+            <div class="page-head reveal">
+                <span class="eyebrow">#{msg['nav.pro']}</span>
+                <h1>#{msg['esp.create.title']}</h1>
+                <p>#{msg['esp.create.sub']}</p>
+            </div>
+
+            <h:form styleClass="nx-form reveal">
+                <h:messages globalOnly="true" styleClass="meta" style="color:var(--danger);margin-bottom:12px"/>
+                <div class="nx-field">
+                    <label>#{msg['esp.name']} *</label>
+                    <h:inputText value="#{espaceBean.nomCommercial}" a:placeholder="Ex : Chez Awa"/>
+                </div>
+                <div class="nx-field">
+                    <label>#{msg['esp.nature']}</label>
+                    <h:selectOneRadio value="#{espaceBean.nature}" layout="pageDirection" style="line-height:2">
+                        <f:selectItem itemValue="BOUTIQUE" itemLabel="#{msg['esp.nature.boutique']}"/>
+                        <f:selectItem itemValue="PRESTATAIRE" itemLabel="#{msg['esp.nature.prestataire']}"/>
+                        <f:selectItem itemValue="MIXTE" itemLabel="#{msg['esp.nature.mixte']}"/>
+                    </h:selectOneRadio>
+                </div>
+                <div class="nx-field">
+                    <label>#{msg['esp.city']}</label>
+                    <h:selectOneMenu value="#{espaceBean.ville}">
+                        <f:selectItem itemValue="Dakar" itemLabel="Dakar"/>
+                        <f:selectItem itemValue="Thiès" itemLabel="Thiès"/>
+                        <f:selectItem itemValue="Saint-Louis" itemLabel="Saint-Louis"/>
+                        <f:selectItem itemValue="Touba" itemLabel="Touba"/>
+                        <f:selectItem itemValue="Ziguinchor" itemLabel="Ziguinchor"/>
+                        <f:selectItem itemValue="Mbour" itemLabel="Mbour"/>
+                    </h:selectOneMenu>
+                </div>
+                <div class="nx-field">
+                    <label>#{msg['esp.phone']}</label>
+                    <h:inputText value="#{espaceBean.telephone}" a:placeholder="+221 ..."/>
+                </div>
+                <h:commandButton styleClass="btn btn-primary" value="#{msg['esp.create.cta']}" action="#{espaceBean.creer}"/>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

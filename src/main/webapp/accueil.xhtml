@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets">
+    <ui:param name="titre" value="#{msg['nav.home']}"/>
+    <ui:define name="content">
+        <div class="view">
+            <div class="hero reveal">
+                <div class="hero-inner">
+                    <span class="eyebrow">#{msg['home.eyebrow']}</span>
+                    <h1>#{msg['home.title1']}<br/><span class="accent">#{msg['home.title2']}</span></h1>
+                    <p class="lead">#{msg['home.lead']}</p>
+                    <div class="searchbar">
+                        <svg class="ic"><use href="#ic-search"/></svg>
+                        <input type="text" placeholder="#{msg['home.searchph']}"/>
+                        <h:link styleClass="btn btn-primary" outcome="explorer" value="#{msg['home.search']}"/>
+                    </div>
+                    <div class="hero-chips">
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-pin"/></svg><span>#{msg['nav.spaces']}</span></h:link>
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-fork"/></svg><span>Restaurants</span></h:link>
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-health"/></svg><span>Pharmacies</span></h:link>
+                        <h:link styleClass="chip" outcome="explorer"><svg class="ic"><use href="#ic-tools"/></svg><span>#{msg['nav.services']}</span></h:link>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec reveal">
+                <div class="sec-head"><div><h2>#{msg['home.cat.title']}</h2><p>#{msg['home.cat.sub']}</p></div></div>
+                <div class="cat-grid">
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-fork"/></svg></span><h3>Restaurants</h3><span>1 240</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-health"/></svg></span><h3>Santé</h3><span>860</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-cart"/></svg></span><h3>Supermarchés</h3><span>430</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-bed"/></svg></span><h3>Hôtels</h3><span>210</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-cap"/></svg></span><h3>Écoles</h3><span>320</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-tools"/></svg></span><h3>#{msg['nav.services']}</h3><span>2 100</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-car"/></svg></span><h3>Transport</h3><span>540</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-briefcase"/></svg></span><h3>Emploi</h3><span>180</span></h:link>
+                    <h:link styleClass="cat" outcome="explorer"><span class="cat-ic"><svg class="ic"><use href="#ic-store"/></svg></span><h3>Immobilier</h3><span>760</span></h:link>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

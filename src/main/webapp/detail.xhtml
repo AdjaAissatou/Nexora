@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets">
+    <ui:param name="titre" value="Fiche"/>
+    <ui:define name="content">
+        <div class="view">
+            <h:link styleClass="back-btn" outcome="explorer"><svg class="ic"><use href="#ic-back"/></svg><span>Retour aux résultats</span></h:link>
+            <div class="detail-hero g1">
+                <div class="glyph"><svg class="ic"><use href="#ic-fork"/></svg></div>
+            </div>
+            <div class="detail-grid">
+                <div>
+                    <span class="pill pill-open"><span class="dot dot-open"></span>Ouvert · ferme à 23h30</span>
+                    <h1 class="d-title" style="margin-top:12px">Le Baobab Gourmand</h1>
+                    <div class="d-sub">
+                        <span class="stars"><svg class="ic"><use href="#ic-star"/></svg>4.8 <small>(214 avis)</small></span>
+                        <span>· Restaurant · Cuisine sénégalaise</span>
+                        <span class="meta"><svg class="ic"><use href="#ic-pin"/></svg>1,2 km</span>
+                    </div>
+                    <div class="d-section"><h3>À propos</h3><p>Une table chaleureuse au cœur du Plateau, réputée pour son thiéboudienne et ses jus de bissap maison. Cadre élégant, service attentionné, terrasse ouverte le soir.</p></div>
+                    <div class="d-section"><h3>Informations</h3>
+                        <div class="info-list">
+                            <div class="info-row"><svg class="ic"><use href="#ic-pin"/></svg>Av. Léopold Sédar Senghor, Plateau <span>1,2 km</span></div>
+                            <div class="info-row"><svg class="ic"><use href="#ic-phone"/></svg>+221 33 800 00 00 <span>Appeler</span></div>
+                            <div class="info-row"><svg class="ic"><use href="#ic-clock"/></svg>Lun – Dim <span>11:00 – 23:30</span></div>
+                        </div>
+                    </div>
+                </div>
+                <aside class="d-aside">
+                    <div class="price-lg">Prix moyen<br/><b>7 500</b> FCFA / pers.</div>
+                    <h:link styleClass="btn btn-primary" outcome="#{sessionBean.connecte ? 'detail' : 'connexion'}"><svg class="ic"><use href="#ic-check"/></svg><span>Réserver une table</span></h:link>
+                    <h:link styleClass="btn btn-outline" outcome="messages"><svg class="ic"><use href="#ic-chat"/></svg><span>Contacter</span></h:link>
+                    <button type="button" class="btn btn-ghost"><svg class="ic"><use href="#ic-phone"/></svg>Appeler</button>
+                </aside>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

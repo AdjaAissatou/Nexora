@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:a="jakarta.faces.passthrough">
+    <ui:param name="titre" value="#{msg['msg.title']}"/>
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}"/>
+        <f:event type="preRenderView" listener="#{msgBean.entree}"/>
+        <div class="view">
+            <div class="page-head reveal" style="margin-bottom:16px"><h1 style="font-size:24px">#{msg['msg.title']}</h1></div>
+
+            <h:form id="msg" styleClass="msg-wrap reveal">
+                <div class="conv-col">
+                    <div class="conv-list">
+                        <ui:repeat value="#{msgBean.conversations}" var="c">
+                            <h:commandLink styleClass="conv #{msgBean.active(c.id) ? 'active' : ''}" action="#{msgBean.selectionner(c.id)}">
+                                <f:ajax render="@form :msgBadgeTop :msgBadgeSide"/>
+                                <span class="avatar">#{c.initiale}</span>
+                                <div class="conv-info">
+                                    <h4>#{c.titre}<time><h:outputText value="#{c.dateDernierMessage}" rendered="#{not empty c.dateDernierMessage}"><f:convertDateTime pattern="dd/MM" type="localDateTime"/></h:outputText></time></h4>
+                                    <p>#{empty c.dernierMessage ? '—' : c.dernierMessage}</p>
+                                </div>
+                            </h:commandLink>
+                        </ui:repeat>
+                        <h:outputText rendered="#{empty msgBean.conversations}" styleClass="meta" style="padding:8px" value="#{msg['msg.empty']}"/>
+                    </div>
+                </div>
+
+                <div class="chat-col">
+                    <h:panelGroup layout="block" styleClass="chat-body" rendered="#{empty msgBean.selectedId}">
+                        <p class="meta" style="margin:auto">#{msg['msg.pick']}</p>
+                    </h:panelGroup>
+
+                    <h:panelGroup layout="block" rendered="#{not empty msgBean.selectedId}" style="display:flex;flex-direction:column;height:100%">
+                        <div class="chat-head">
+                            <span class="avatar">#{empty msgBean.selectedTitre ? '?' : msgBean.selectedTitre.substring(0,1)}</span>
+                            <div style="flex:1"><h4>#{msgBean.selectedTitre}</h4></div>
+                        </div>
+                        <div class="chat-body">
+                            <ui:repeat value="#{msgBean.messages}" var="m">
+                                <div class="bubble #{m.deMoi ? 'out' : 'in'}">#{m.contenu}</div>
+                            </ui:repeat>
+                            <h:outputText rendered="#{empty msgBean.messages}" styleClass="meta" value="#{msg['msg.emptyThread']}"/>
+                        </div>
+                        <div class="chat-input">
+                            <label><h:inputText value="#{msgBean.texte}" a:placeholder="#{msg['msg.ph']}"/></label>
+                            <h:commandLink styleClass="chat-send" action="#{msgBean.envoyer}" title="#{msg['msg.send']}">
+                                <f:ajax execute="@form" render="@form"/>
+                                <svg class="ic"><use href="#ic-send"/></svg>
+                            </h:commandLink>
+                        </div>
+                    </h:panelGroup>
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,22 @@
+@startuml nexora-seq-recherche
+title Nexora - Sequence : recherche intelligente multi-criteres
+actor Utilisateur
+participant "index.xhtml\n(PrimeFaces)" as UI
+participant "RechercheBean\n(ManagedBean)" as Bean
+participant "OffreServiceImpl\n(EJB)" as Service
+participant "OffreDao\n(Criteria)" as Dao
+database PostgreSQL as DB
+
+Utilisateur -> UI : saisit mot-cle + filtres + tri
+UI -> Bean : rechercher()
+Bean -> Service : rechercher(RechercheCriteria)
+Service -> Dao : rechercher(criteria)
+Dao -> Dao : construirePredicats()\n(mot-cle, prix, categorie,\n geo bounding-box, EAV facettes)
+Dao -> DB : SELECT ... WHERE ... (pagination)
+DB --> Dao : List<Offre> + total
+Dao --> Service : PageResult<Offre>
+Service -> Service : mapping DTO +\n raffinement distance (haversine)
+Service --> Bean : PageResult<OffreDTO>
+Bean --> UI : update("resultats")
+UI --> Utilisateur : grille de resultats tries
+@enduml
