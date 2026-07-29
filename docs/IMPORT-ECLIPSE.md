@@ -68,17 +68,60 @@ La datasource attendue est déjà déclarée pour TomEE dans
 
 ---
 
-## 6. Parcours à tester
+## 5 bis. Microservice de reconnaissance d'image (optionnel)
 
-- **Accueil** → non connecté : bouton **Se connecter**, carte *Vous êtes pro ?*.
-- **Créer mon espace** → connexion → nom + nature (produits/services).
-- **Mon espace** → onglets **Produits / Services** → *Ajouter* → catégorie
-  (listes imbriquées) → attributs auto-chargés → **Enregistrer**.
-- **Explorer** → recherche (lit la base : nécessite PostgreSQL + seed).
+La **recherche par photo** est assurée par un service séparé
+(`vision-service/`, MobileNetV2 / ONNX) — dissocié du WAR pour rester léger.
+Il n'est nécessaire **que** pour la recherche par photo ; tout le reste
+fonctionne sans lui.
 
-> Le parcours *Mon espace* fonctionne **sans base** (état en mémoire de
-> session) ; seule la page **Explorer** interroge la base. L'application a
-> toutefois besoin que la datasource `nexoraDS` existe pour **démarrer**
+```bash
+cd vision-service
+mvn -q package
+java -Xmx512m -jar target/nexora-vision.jar     # écoute sur le port 8090
+# test : curl -s --data-binary @photo.jpg http://localhost:8090/recognize
+```
+
+L'application le trouve par défaut sur `http://localhost:8090/recognize`
+(configurable via la variable d'environnement `NEXORA_VISION_URL`). S'il est
+absent, la recherche par photo affiche « Image non reconnue » et le reste de
+la recherche continue. Détails : `vision-service/README.md`.
+
+---
+
+## 6. Comptes de démonstration
+
+Chargés par `seed_demo.sql` :
+
+| Rôle | Identifiant | Mot de passe |
+|------|-------------|--------------|
+| **Administrateur** | `admin@nexora.sn` | `admin123` |
+
+Les comptes **client / professionnel** se créent depuis **Se connecter →
+Créer un compte** (l'inscription hache le mot de passe en BCrypt).
+
+---
+
+## 7. Parcours à tester
+
+- **Accueil / Explorer** → recherche réelle sur la base : mot-clé, **filtres**
+  (catégorie, prix min/max, tri, vérifiés/disponibles), **« Près de moi »**
+  (géolocalisation → tri par proximité), boutons **Itinéraire / Appeler /
+  Message**.
+- **Recherche par photo** → icône appareil photo dans la barre → une photo
+  (sac, chemise, robe, montre…) est reconnue et lance la recherche
+  *(nécessite le microservice §5 bis)*.
+- **Créer mon espace** → connexion → nom + **nature** (boutique / prestataire
+  / les deux). Puis **Mon espace** = back-office : vue d'ensemble, onglets
+  **Produits / Services**, ajout via catégories imbriquées + attributs (EAV),
+  **Modifier** une annonce en ligne, **Corriger** une annonce rejetée.
+- **Messagerie** → depuis *Explorer → Message* : conversation client ↔
+  boutique, **badge de messages non lus** (barre du haut + latérale) qui se
+  remet à zéro à la lecture, **notification** à la réception d'un message.
+- **Admin** (`admin@nexora.sn`) → **valider / rejeter (avec motif)** les
+  annonces, **certifier** les espaces.
+
+> L'application a besoin que la datasource `nexoraDS` existe pour **démarrer**
 > (les EJB injectent un `EntityManager`).
 
 ---
