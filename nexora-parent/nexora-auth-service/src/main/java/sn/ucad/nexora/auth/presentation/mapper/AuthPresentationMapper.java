@@ -4,9 +4,11 @@ import org.springframework.stereotype.Component;
 
 import sn.ucad.nexora.auth.application.command.LoginCommand;
 import sn.ucad.nexora.auth.application.command.RegisterCommand;
+import sn.ucad.nexora.auth.application.command.ResetPasswordCommand;
 import sn.ucad.nexora.auth.application.command.VerifyOtpCommand;
 import sn.ucad.nexora.auth.application.dto.request.LoginRequest;
 import sn.ucad.nexora.auth.application.dto.request.RegisterRequest;
+import sn.ucad.nexora.auth.application.dto.request.ResetPasswordRequest;
 import sn.ucad.nexora.auth.application.dto.request.VerifyOtpRequest;
 import sn.ucad.nexora.auth.application.dto.response.VerifyOtpResponse;
 import sn.ucad.nexora.auth.application.result.VerifyOtpResult;
@@ -70,6 +72,22 @@ public class AuthPresentationMapper {
         response.setMessage(result.getMessage());
 
         return response;
+    }
+
+    public ResetPasswordCommand toCommand(ResetPasswordRequest request) {
+
+        if (request == null) {
+            return null;
+        }
+
+        ResetPasswordCommand command = new ResetPasswordCommand();
+
+        command.setEmail(request.getEmail());
+        command.setOtp(request.getOtp());
+        command.setPassword(request.getPassword());
+        command.setConfirmPassword(request.getConfirmPassword());
+
+        return command;
     }
 
 }

@@ -1,9 +1,9 @@
 package sn.ucad.nexora.auth.application.usecase;
 
-import sn.ucad.nexora.auth.application.dto.request.ResetPasswordRequest;
+import sn.ucad.nexora.auth.application.command.ResetPasswordCommand;
 
 public interface ResetPasswordUseCase {
 
-    void resetPassword(ResetPasswordRequest request);
+    void resetPassword(ResetPasswordCommand command);
 
 }
