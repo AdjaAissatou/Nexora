@@ -1,6 +1,8 @@
 package sn.ucad.nexora.web.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import sn.ucad.nexora.web.config.GatewayConfig;
@@ -15,10 +17,12 @@ import sn.ucad.nexora.web.error.ApiErrors;
 @ApplicationScoped
 public class CatalogueApiClient {
 
-    private final RestClient client =
-            RestClient.builder().baseUrl(GatewayConfig.gatewayUrl() + "/catalogue-service").build();
+    private static final Logger LOG = LoggerFactory.getLogger(CatalogueApiClient.class);
+    private final String baseUrl = GatewayConfig.gatewayUrl() + "/catalogue-service";
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
 
     public OffrePageResponse rechercher(CritereRecherche c) {
+        LOG.info("GET {}/api/v1/offres/recherche ({})", baseUrl, c);
         try {
             return client
                     .get()
@@ -48,6 +52,7 @@ public class CatalogueApiClient {
     }
 
     public OffreDetailResponse obtenir(Long id) {
+        LOG.info("GET {}/api/v1/offres/{}", baseUrl, id);
         try {
             return client.get().uri("/api/v1/offres/{id}", id).retrieve().body(OffreDetailResponse.class);
         } catch (RestClientResponseException e) {

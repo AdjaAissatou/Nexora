@@ -2,6 +2,8 @@ package sn.ucad.nexora.web.error;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClientResponseException;
 
 /**
@@ -14,17 +16,32 @@ import org.springframework.web.client.RestClientResponseException;
 public final class ApiErrors {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger LOG = LoggerFactory.getLogger(ApiErrors.class);
 
     private ApiErrors() {}
 
     public static ApiException depuis(RestClientResponseException e) {
         int statut = e.getStatusCode().value();
         String message = extraireMessage(e.getResponseBodyAsString(), statut);
+        // Diagnostic : l'URL exacte appelée, le statut reçu et le corps de la réponse.
+        LOG.error(
+                "Appel API échoué [{}] {} -> {} {}\nCorps de la réponse : {}",
+                e.getStatusCode(),
+                e.getClass().getSimpleName(),
+                statut,
+                message,
+                tronquer(e.getResponseBodyAsString()));
         return new ApiException(message, statut, e);
     }
 
     public static ApiException reseau(Exception e) {
+        LOG.error("Impossible de joindre l'API Gateway : {}", e.toString(), e);
         return new ApiException("Impossible de joindre Nexora. Réessayez dans un instant.", 0, e);
+    }
+
+    private static String tronquer(String corps) {
+        if (corps == null) return "(vide)";
+        return corps.length() > 500 ? corps.substring(0, 500) + "…" : corps;
     }
 
     private static String extraireMessage(String corps, int statut) {

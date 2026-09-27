@@ -1,6 +1,8 @@
 package sn.ucad.nexora.web.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import sn.ucad.nexora.web.config.GatewayConfig;
@@ -17,9 +19,12 @@ import sn.ucad.nexora.web.error.ApiErrors;
 @ApplicationScoped
 public class AuthApiClient {
 
-    private final RestClient client = RestClient.builder().baseUrl(GatewayConfig.gatewayUrl() + "/auth-service").build();
+    private static final Logger LOG = LoggerFactory.getLogger(AuthApiClient.class);
+    private final String baseUrl = GatewayConfig.gatewayUrl() + "/auth-service";
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
 
     public AuthenticationResponse connecter(String email, String motDePasse) {
+        LOG.info("POST {}/api/v1/auth/login", baseUrl);
         try {
             return client
                     .post()
@@ -35,6 +40,7 @@ public class AuthApiClient {
     }
 
     public RegisterResult inscrire(RegisterRequest requete) {
+        LOG.info("POST {}/api/v1/auth/register", baseUrl);
         try {
             return client.post().uri("/api/v1/auth/register").body(requete).retrieve().body(RegisterResult.class);
         } catch (RestClientResponseException e) {
