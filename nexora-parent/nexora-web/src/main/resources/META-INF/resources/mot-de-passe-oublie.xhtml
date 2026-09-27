@@ -1,0 +1,44 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:define name="titre">Mot de passe oublié — Nexora</ui:define>
+<ui:define name="content">
+    <div class="nx-auth-wrap">
+        <div class="nx-auth-card">
+
+            <ui:fragment rendered="#{motDePasseOublieBean.envoye}">
+                <h1>Code envoyé</h1>
+                <p class="nx-sub">
+                    Si un compte existe avec l'adresse <strong>#{motDePasseOublieBean.email}</strong>,
+                    un code de réinitialisation vient de lui être envoyé par email.
+                </p>
+                <h:link outcome="/reinitialisation" value="Saisir le code →" styleClass="nx-button nx-button-primary nx-button-block">
+                    <f:param name="email" value="#{motDePasseOublieBean.email}" />
+                </h:link>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{!motDePasseOublieBean.envoye}">
+                <h1>Mot de passe oublié</h1>
+                <p class="nx-sub">Indiquez votre adresse email : nous vous envoyons un code pour réinitialiser votre mot de passe.</p>
+
+                <h:form id="oubli">
+                    <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" layout="table" />
+
+                    <div class="nx-field">
+                        <label for="oubli:email">Adresse email</label>
+                        <h:inputText id="email" value="#{motDePasseOublieBean.email}" styleClass="nx-input" required="true" />
+                    </div>
+
+                    <h:commandButton value="Recevoir un code" action="#{motDePasseOublieBean.envoyer}" styleClass="nx-button nx-button-primary nx-button-block" />
+                </h:form>
+            </ui:fragment>
+
+            <p class="nx-auth-footer">
+                <h:link outcome="/connexion" value="Retour à la connexion" />
+            </p>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>

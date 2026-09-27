@@ -1,0 +1,57 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:viewParam name="email" value="#{reinitialisationBean.email}" />
+</f:metadata>
+<ui:define name="titre">Réinitialiser le mot de passe — Nexora</ui:define>
+<ui:define name="content">
+    <div class="nx-auth-wrap">
+        <div class="nx-auth-card">
+
+            <ui:fragment rendered="#{reinitialisationBean.reinitialise}">
+                <h1>Mot de passe mis à jour ✓</h1>
+                <p class="nx-sub">Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter.</p>
+                <h:link outcome="/connexion" value="Se connecter →" styleClass="nx-button nx-button-primary nx-button-block" />
+            </ui:fragment>
+
+            <ui:fragment rendered="#{!reinitialisationBean.reinitialise}">
+                <h1>Nouveau mot de passe</h1>
+                <p class="nx-sub">Saisissez le code reçu par email et votre nouveau mot de passe.</p>
+
+                <h:form id="reinitialisation">
+                    <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" layout="table" />
+
+                    <div class="nx-field">
+                        <label for="reinitialisation:email">Adresse email</label>
+                        <h:inputText id="email" value="#{reinitialisationBean.email}" styleClass="nx-input" required="true" />
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="reinitialisation:otp">Code reçu par email</label>
+                        <h:inputText id="otp" value="#{reinitialisationBean.otp}" styleClass="nx-input" required="true" placeholder="123456" />
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="reinitialisation:motDePasse">Nouveau mot de passe</label>
+                        <h:inputSecret id="motDePasse" value="#{reinitialisationBean.motDePasse}" styleClass="nx-input" required="true" redisplay="true" />
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="reinitialisation:confirmation">Confirmer le mot de passe</label>
+                        <h:inputSecret id="confirmation" value="#{reinitialisationBean.confirmationMotDePasse}" styleClass="nx-input" required="true" redisplay="true" />
+                    </div>
+
+                    <h:commandButton value="Réinitialiser mon mot de passe" action="#{reinitialisationBean.reinitialiser}" styleClass="nx-button nx-button-primary nx-button-block" />
+                </h:form>
+            </ui:fragment>
+
+            <p class="nx-auth-footer">
+                <h:link outcome="/connexion" value="Retour à la connexion" />
+            </p>
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
