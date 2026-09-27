@@ -31,6 +31,8 @@
 
         <springdoc.version>2.8.9</springdoc.version>
 
+        <joinfaces.version>6.0.1</joinfaces.version>
+
         <maven.compiler.source>${java.version}</maven.compiler.source>
 
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -163,6 +165,7 @@
         <module>nexora-recherche-service</module>
         <module>nexora-administration-service</module>
         <module>nexora-config-server</module>
+        <module>nexora-web</module>
     </modules>
 
 </project>

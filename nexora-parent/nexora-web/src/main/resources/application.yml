@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: web
+
+  config:
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+
+server:
+  port: ${SERVER_PORT:8090}
+
+# URL publique unique de l'application : la Gateway. On ne connaît jamais les ports
+# internes des services depuis les pages — voir sn.ucad.nexora.web.config.ApiProperties.
+nexora:
+  api:
+    gateway-url: ${GATEWAY_URL:http://localhost:8080}
+
+# PrimeFaces sans thème payant : l'habillage vient entièrement de notre propre CSS
+# (resources/css/nexora-theme.css), sur la palette « Digital Premium Sénégalais ».
+primefaces:
+  theme: none
+  font-awesome: false
+
+faces:
+  project-stage: ${FACES_PROJECT_STAGE:Production}
+
+logging:
+  level:
+    sn.ucad.nexora.web: INFO

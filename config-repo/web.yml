@@ -1,0 +1,10 @@
+server:
+  port: 8090
+
+nexora:
+  api:
+    gateway-url: ${GATEWAY_URL:http://localhost:8080}
+
+logging:
+  level:
+    sn.ucad.nexora.web: INFO

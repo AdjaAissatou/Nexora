@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>sn.ucad.nexora</groupId>
+    <artifactId>nexora-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>nexora-web</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Nexora Web</name>
+  <description>Application web Nexora (JSF / PrimeFaces, Jakarta EE) — consomme l'API Gateway.</description>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- JoinFaces gère les versions cohérentes de PrimeFaces, MyFaces/Mojarra et CDI (Weld). -->
+      <dependency>
+        <groupId>org.joinfaces</groupId>
+        <artifactId>joinfaces-dependencies</artifactId>
+        <version>${joinfaces.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <!-- Web (fournit RestClient et le serveur Tomcat embarqué) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- JSF (Jakarta Faces) + PrimeFaces embarqués dans Spring Boot -->
+    <dependency>
+      <groupId>org.joinfaces</groupId>
+      <artifactId>primefaces-spring-boot-starter</artifactId>
+      <version>${joinfaces.version}</version>
+    </dependency>
+
+    <!-- CDI (Weld) : nos managed beans utilisent @Named / @ViewScoped, la norme Jakarta EE -->
+    <dependency>
+      <groupId>org.joinfaces</groupId>
+      <artifactId>cdi-spring-boot-starter</artifactId>
+      <version>${joinfaces.version}</version>
+    </dependency>
+
+    <!-- Config Server -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+
+    <!-- Eureka (annuaire des services consommés via la Gateway) -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+    </dependency>
+
+    <!-- Actuator -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <finalName>nexora-web</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

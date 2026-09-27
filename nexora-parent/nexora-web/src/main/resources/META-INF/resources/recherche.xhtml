@@ -1,0 +1,130 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui">
+<f:metadata>
+    <f:viewParam name="q" value="#{rechercheBean.q}" />
+    <f:viewParam name="typeEspace" value="#{rechercheBean.typeEspace}" />
+    <f:viewParam name="commune" value="#{rechercheBean.commune}" />
+    <f:viewAction action="#{rechercheBean.chargerDepuisParametres}" />
+</f:metadata>
+<ui:define name="titre">Rechercher — Nexora</ui:define>
+<ui:define name="content">
+
+    <div class="nx-container nx-section">
+        <div class="nx-search-layout">
+
+            <h:form id="filtres">
+                <p:panel styleClass="nx-filters" header="Filtrer">
+
+                    <div class="nx-field">
+                        <label for="filtres:q">Recherche</label>
+                        <p:inputText id="q" value="#{rechercheBean.q}" placeholder="Nom, quartier, service…" styleClass="nx-input" />
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="filtres:type">Catégorie</label>
+                        <p:selectOneMenu id="type" value="#{rechercheBean.typeEspace}" styleClass="nx-input">
+                            <f:selectItem itemLabel="Toutes les catégories" itemValue="#{null}" />
+                            <f:selectItems value="#{rechercheBean.categories}" var="t" itemLabel="#{t.nom}" itemValue="#{t.nom}" />
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="filtres:commune">Commune / ville</label>
+                        <p:inputText id="commune" value="#{rechercheBean.commune}" placeholder="Dakar, Thiès, Saly…" styleClass="nx-input" />
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="filtres:prixMax">Prix maximum (FCFA)</label>
+                        <p:inputText id="prixMax" value="#{rechercheBean.prixMax}" styleClass="nx-input" />
+                    </div>
+
+                    <div class="nx-field">
+                        <label>
+                            <p:selectBooleanCheckbox value="#{rechercheBean.verifieUniquement}" />
+                            Espaces vérifiés uniquement
+                        </label>
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="filtres:tri">Trier par</label>
+                        <p:selectOneMenu id="tri" value="#{rechercheBean.tri}" styleClass="nx-input">
+                            <f:selectItem itemLabel="Pertinence" itemValue="PERTINENCE" />
+                            <f:selectItem itemLabel="Prix croissant" itemValue="PRIX_ASC" />
+                            <f:selectItem itemLabel="Prix décroissant" itemValue="PRIX_DESC" />
+                            <f:selectItem itemLabel="Plus récents" itemValue="DATE_DESC" />
+                            <f:selectItem itemLabel="Mieux notés" itemValue="NOTE" />
+                        </p:selectOneMenu>
+                    </div>
+
+                    <p:commandButton value="Appliquer" action="#{rechercheBean.rechercher}"
+                                      update=":resultats" styleClass="nx-btn-block" />
+                    <p:commandButton value="Réinitialiser" action="#{rechercheBean.reinitialiser}"
+                                      update=":resultats :filtres" process="@this" styleClass="nx-btn-secondary nx-btn-block"
+                                      style="margin-top:8px;" />
+                </p:panel>
+            </h:form>
+
+            <h:panelGroup layout="block" id="resultats">
+                <div class="nx-results-header">
+                    <h2 style="font-size:20px; font-weight:800;">Résultats de recherche</h2>
+                    <span class="nx-results-count">#{rechercheBean.total} résultat(s)</span>
+                </div>
+
+                <p:messages showDetail="true" closable="true" />
+
+                <ui:fragment rendered="#{rechercheBean.vide}">
+                    <div class="nx-card nx-empty">
+                        <div class="nx-empty-icon">🔎</div>
+                        <p><strong>Aucun résultat pour cette recherche.</strong></p>
+                        <p>Essayez un autre mot-clé, une autre catégorie ou élargissez la zone géographique.</p>
+                    </div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{!rechercheBean.vide}">
+                    <div class="nx-offre-grid">
+                        <ui:repeat var="o" value="#{rechercheBean.contenu}">
+                            <h:link outcome="/offre" styleClass="nx-card nx-offre-card">
+                                <f:param name="id" value="#{o.id}" />
+                                <div class="nx-offre-media"><span>🏷️</span></div>
+                                <div class="nx-offre-body">
+                                    <span class="nx-offre-espace">
+                                        #{o.espaceNom}
+                                        <ui:fragment rendered="#{o.espaceVerifie}"><span class="nx-badge nx-badge-verifie">✓ Vérifié</span></ui:fragment>
+                                        <ui:fragment rendered="#{o.espaceCertifie}"><span class="nx-badge nx-badge-certifie">★ Certifié</span></ui:fragment>
+                                    </span>
+                                    <span class="nx-offre-titre">#{o.titre}</span>
+                                    <span class="nx-offre-prix">
+                                        <ui:fragment rendered="#{o.ancienPrix != null}">
+                                            <span class="nx-old"><h:outputText value="#{o.ancienPrix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText></span>
+                                        </ui:fragment>
+                                        <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                                    </span>
+                                    <span class="nx-offre-footer">
+                                        <span>📍 #{o.localisationCourte}</span>
+                                        <ui:fragment rendered="#{o.enPromotion}"><span class="nx-badge nx-badge-promo">Promo</span></ui:fragment>
+                                    </span>
+                                </div>
+                            </h:link>
+                        </ui:repeat>
+                    </div>
+
+                    <h:form id="pagination">
+                        <div class="nx-pagination">
+                            <p:commandButton value="← Précédent" action="#{rechercheBean.pagePrecedente}"
+                                             update=":resultats" disabled="#{!rechercheBean.pagePrecedenteDisponible}" styleClass="nx-btn-secondary" />
+                            <span>Page #{rechercheBean.pageAffichee}</span>
+                            <p:commandButton value="Suivant →" action="#{rechercheBean.pageSuivante}"
+                                             update=":resultats" disabled="#{!rechercheBean.pageSuivanteDisponible}" styleClass="nx-btn-secondary" />
+                        </div>
+                    </h:form>
+                </ui:fragment>
+            </h:panelGroup>
+        </div>
+    </div>
+
+</ui:define>
+</ui:composition>

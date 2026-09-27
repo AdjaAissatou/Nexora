@@ -1,0 +1,38 @@
+package sn.ucad.nexora.web.dto.catalogue;
+
+import java.math.BigDecimal;
+
+/** Miroir de {@code sn.ucad.nexora.catalogue.application.dto.response.OffreSummaryResponse}. */
+public record OffreSummaryResponse(
+        Long id,
+        String titre,
+        BigDecimal prix,
+        BigDecimal ancienPrix,
+        String imagePrincipale,
+        boolean disponible,
+        boolean negociable,
+        Long espaceId,
+        String espaceNom,
+        String espaceLogo,
+        boolean espaceCertifie,
+        boolean espaceVerifie,
+        BigDecimal espaceNoteMoyenne,
+        Integer espaceNombreAvis,
+        String typeEspace,
+        String categorie,
+        String commune,
+        String region,
+        BigDecimal latitude,
+        BigDecimal longitude,
+        String promotionNom,
+        String typeReduction,
+        BigDecimal valeurReduction) {
+
+    public boolean enPromotion() {
+        return promotionNom != null && !promotionNom.isBlank();
+    }
+
+    public String localisationCourte() {
+        return commune != null && !commune.isBlank() ? commune : (region != null ? region : "");
+    }
+}
