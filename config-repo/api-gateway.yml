@@ -1,17 +1,75 @@
 server:
   port: ${SERVER_PORT:8080}
 
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka/}
+
+# spring-cloud-starter-gateway-server-webmvc (la variante non réactive utilisée ici) ne fournit PAS
+# de découverte automatique de routes façon `discovery.locator` (cette fonctionnalité n'existe que
+# dans le module réactif classique) : chaque route doit être déclarée explicitement ci-dessous.
+# `uri: lb://<service>` s'appuie sur Eureka + Spring Cloud LoadBalancer (déjà sur le classpath via
+# le client Eureka) pour résoudre l'instance réelle ; `StripPrefix` retire le premier segment du
+# chemin avant de le transmettre au service (ex. /auth-service/api/v1/auth/login -> /api/v1/auth/login).
 spring:
   cloud:
     gateway:
       server:
         webmvc:
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
+          routes:
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - name: Path
+                  args:
+                    pattern: /auth-service/**
+              filters:
+                - name: StripPrefix
+                  args:
+                    parts: "1"
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka/}
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - name: Path
+                  args:
+                    pattern: /user-service/**
+              filters:
+                - name: StripPrefix
+                  args:
+                    parts: "1"
+
+            - id: espace-service
+              uri: lb://espace-service
+              predicates:
+                - name: Path
+                  args:
+                    pattern: /espace-service/**
+              filters:
+                - name: StripPrefix
+                  args:
+                    parts: "1"
+
+            - id: catalogue-service
+              uri: lb://catalogue-service
+              predicates:
+                - name: Path
+                  args:
+                    pattern: /catalogue-service/**
+              filters:
+                - name: StripPrefix
+                  args:
+                    parts: "1"
+
+            - id: recherche-service
+              uri: lb://recherche-service
+              predicates:
+                - name: Path
+                  args:
+                    pattern: /recherche-service/**
+              filters:
+                - name: StripPrefix
+                  args:
+                    parts: "1"
+

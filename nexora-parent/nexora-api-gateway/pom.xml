@@ -26,6 +26,14 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
+        <!-- Config Server : sans cette dépendance, "spring.config.import: optional:configserver:..."
+             ne fait rien du tout (le loader du schéma configserver: n'est pas enregistré), et la
+             Gateway ne récupère jamais config-repo/api-gateway.yml (ni ses routes, ni rien d'autre). -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
         <!-- Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
