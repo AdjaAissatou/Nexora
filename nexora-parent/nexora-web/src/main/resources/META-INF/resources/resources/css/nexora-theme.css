@@ -238,6 +238,23 @@ h1, h2, h3, p { margin: 0; }
     box-shadow: 0 12px 35px rgba(18, 60, 53, .15);
 }
 
+/*
+ * Système d'icônes SVG (remplace les emoji) : chaque icône hérite sa taille du
+ * font-size de son conteneur via `1em`, donc on peut la déposer dans n'importe
+ * quel wrapper `.nx-*-icon` déjà dimensionné en font-size sans CSS supplémentaire.
+ */
+.nx-icon {
+    width: 1em;
+    height: 1em;
+    display: block;
+    flex-shrink: 0;
+}
+.nx-inline-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .nx-search-icon {
     width: 46px;
     display: flex;
@@ -630,6 +647,7 @@ h1, h2, h3, p { margin: 0; }
     background: linear-gradient(135deg, var(--nx-primary-light), var(--nx-gold-soft));
     display: flex; align-items: center; justify-content: center;
     font-size: 34px;
+    color: var(--nx-primary);
 }
 .nx-offre-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
 .nx-offre-espace { font-size: 12px; font-weight: 700; color: var(--nx-primary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }

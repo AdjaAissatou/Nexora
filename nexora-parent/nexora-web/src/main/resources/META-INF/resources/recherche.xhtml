@@ -83,7 +83,11 @@
 
                 <ui:fragment rendered="#{rechercheBean.vide}">
                     <div class="nx-empty">
-                        <div class="nx-empty-icon">⌕</div>
+                        <div class="nx-empty-icon">
+                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>
+                            </svg>
+                        </div>
                         <p><strong>Aucun résultat pour cette recherche.</strong></p>
                         <p>Essayez un autre mot-clé, une autre catégorie ou élargissez la zone géographique.</p>
                     </div>
@@ -94,12 +98,26 @@
                         <ui:repeat var="o" value="#{rechercheBean.contenu}">
                             <h:link outcome="/offre" styleClass="nx-offre-card">
                                 <f:param name="id" value="#{o.id}" />
-                                <div class="nx-offre-media"><span>🏷️</span></div>
+                                <div class="nx-offre-media">
+                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 3h8l10 10-8 8L3 11V3z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+                                    </svg>
+                                </div>
                                 <div class="nx-offre-body">
                                     <span class="nx-offre-espace">
                                         #{o.espaceNom}
-                                        <ui:fragment rendered="#{o.espaceVerifie}"><span class="nx-badge nx-badge-verifie">✓ Vérifié</span></ui:fragment>
-                                        <ui:fragment rendered="#{o.espaceCertifie}"><span class="nx-badge nx-badge-certifie">★ Certifié</span></ui:fragment>
+                                        <ui:fragment rendered="#{o.espaceVerifie}">
+                                            <span class="nx-badge nx-badge-verifie">
+                                                <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                                                Vérifié
+                                            </span>
+                                        </ui:fragment>
+                                        <ui:fragment rendered="#{o.espaceCertifie}">
+                                            <span class="nx-badge nx-badge-certifie">
+                                                <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/></svg>
+                                                Certifié
+                                            </span>
+                                        </ui:fragment>
                                     </span>
                                     <span class="nx-offre-titre">#{o.titre}</span>
                                     <span class="nx-offre-prix">
@@ -109,7 +127,12 @@
                                         <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
                                     </span>
                                     <span class="nx-offre-footer">
-                                        <span>📍 #{o.localisationCourte}</span>
+                                        <span class="nx-inline-icon">
+                                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/>
+                                            </svg>
+                                            #{o.localisationCourte}
+                                        </span>
                                         <ui:fragment rendered="#{o.enPromotion}"><span class="nx-badge nx-badge-promo">Promo</span></ui:fragment>
                                     </span>
                                 </div>
