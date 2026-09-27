@@ -1,4 +1,4 @@
-INSERT INTO permissions (code, nom, description, module, actif, date_creation)
+INSERT INTO permissions (code, name, description, module, active, created_at)
 VALUES
 ('GERER_UTILISATEURS', 'Gérer les utilisateurs', 'Créer, modifier, supprimer et consulter les utilisateurs', 'SECURITY', TRUE, CURRENT_TIMESTAMP),
 ('GERER_ROLES', 'Gérer les rôles', 'Créer, modifier et affecter les rôles', 'SECURITY', TRUE, CURRENT_TIMESTAMP),
