@@ -145,6 +145,12 @@ h1, h2, h3, p { margin: 0; }
   pointer-events: none;
 }
 .nx-hero .nx-container { position: relative; z-index: 1; }
+.nx-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 .nx-hero-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   background: rgba(255,255,255,.12);
@@ -156,10 +162,11 @@ h1, h2, h3, p { margin: 0; }
   margin-bottom: 18px;
 }
 .nx-hero h1 {
-  font-size: 38px; font-weight: 800; max-width: 660px; line-height: 1.2;
+  font-size: 38px; font-weight: 800; max-width: 700px; line-height: 1.2;
   text-shadow: 0 2px 24px rgba(0,0,0,.18);
 }
-.nx-hero p.nx-lead { margin-top: 14px; font-size: 17px; color: #dcefec; max-width: 560px; }
+.nx-hero p.nx-lead { margin-top: 14px; font-size: 17px; color: #dcefec; max-width: 580px; }
+.nx-hero-search { margin-top: 30px; width: 100%; max-width: 640px; }
 
 /* ---------- Cartes ---------- */
 .nx-card {

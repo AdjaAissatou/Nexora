@@ -7,7 +7,7 @@
 <ui:define name="content">
 
     <section class="nx-hero">
-        <div class="nx-container">
+        <div class="nx-container nx-hero-content">
             <span class="nx-hero-eyebrow">🇸🇳 Écosystème numérique sénégalais</span>
             <h1>La plateforme qui connecte les espaces professionnels du Sénégal.</h1>
             <p class="nx-lead">
@@ -15,7 +15,7 @@
                 contactez les professionnels et établissements de votre quartier, au même endroit.
             </p>
 
-            <h:form style="margin-top:28px; max-width:640px;">
+            <h:form styleClass="nx-hero-search">
                 <div style="display:flex; gap:10px;">
                     <h:inputText id="rechercheRapide" value="#{rechercheRapideBean.q}"
                                  placeholder="Rechercher un restaurant, une pharmacie, un quartier…"
