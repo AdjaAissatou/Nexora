@@ -7,11 +7,15 @@
 <ui:define name="content">
     <div class="nx-auth-wrap">
         <div class="nx-auth-card" style="max-width:480px;">
-            <h1>Rejoindre Nexora</h1>
-            <p class="nx-sub">Créez votre compte pour rechercher, contacter et suivre vos espaces favoris.</p>
 
             <ui:fragment rendered="#{inscriptionBean.succes}">
-                <div class="nx-alert nx-alert-info">#{inscriptionBean.messageSucces}</div>
+                <h1 style="display:flex; align-items:center; gap:10px;">
+                    Compte créé
+                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px; color:var(--nx-primary);">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
+                </h1>
+                <p class="nx-sub">#{inscriptionBean.messageSucces}</p>
                 <ui:fragment rendered="#{inscriptionBean.verificationRequise}">
                     <h:link outcome="/verification" value="Vérifier mon compte →" styleClass="nx-button nx-button-primary nx-button-block">
                         <f:param name="email" value="#{inscriptionBean.email}" />
@@ -20,6 +24,11 @@
                 <ui:fragment rendered="#{!inscriptionBean.verificationRequise}">
                     <h:link outcome="/connexion" value="Se connecter →" styleClass="nx-button nx-button-primary nx-button-block" />
                 </ui:fragment>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{!inscriptionBean.succes}">
+                <h1>Rejoindre Nexora</h1>
+                <p class="nx-sub">Créez votre compte pour rechercher, contacter et suivre vos espaces favoris.</p>
             </ui:fragment>
 
             <h:form id="inscription" rendered="#{!inscriptionBean.succes}">
