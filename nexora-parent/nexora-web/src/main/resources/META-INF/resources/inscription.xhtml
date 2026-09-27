@@ -2,59 +2,58 @@
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                 xmlns:p="http://primefaces.org/ui">
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <ui:define name="titre">Créer un compte — Nexora</ui:define>
 <ui:define name="content">
     <div class="nx-auth-wrap">
-        <div class="nx-card nx-auth-card" style="max-width:480px;">
+        <div class="nx-auth-card" style="max-width:480px;">
             <h1>Rejoindre Nexora</h1>
             <p class="nx-sub">Créez votre compte pour rechercher, contacter et suivre vos espaces favoris.</p>
 
             <ui:fragment rendered="#{inscriptionBean.succes}">
-                <div class="ui-messages-info">#{inscriptionBean.messageSucces}</div>
-                <h:link outcome="/connexion" value="Se connecter →" styleClass="ui-button nx-btn-block" style="text-align:center; display:block;" />
+                <div class="nx-alert nx-alert-info">#{inscriptionBean.messageSucces}</div>
+                <h:link outcome="/connexion" value="Se connecter →" styleClass="nx-button nx-button-primary nx-button-block" />
             </ui:fragment>
 
             <h:form id="inscription" rendered="#{!inscriptionBean.succes}">
-                <p:messages showDetail="true" closable="true" />
+                <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" layout="table" />
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                     <div class="nx-field">
                         <label for="inscription:prenom">Prénom</label>
-                        <p:inputText id="prenom" value="#{inscriptionBean.prenom}" styleClass="nx-input" required="true" />
+                        <h:inputText id="prenom" value="#{inscriptionBean.prenom}" styleClass="nx-input" required="true" />
                     </div>
                     <div class="nx-field">
                         <label for="inscription:nom">Nom</label>
-                        <p:inputText id="nom" value="#{inscriptionBean.nom}" styleClass="nx-input" required="true" />
+                        <h:inputText id="nom" value="#{inscriptionBean.nom}" styleClass="nx-input" required="true" />
                     </div>
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:email">Adresse email</label>
-                    <p:inputText id="email" value="#{inscriptionBean.email}" styleClass="nx-input" required="true" />
+                    <h:inputText id="email" value="#{inscriptionBean.email}" styleClass="nx-input" required="true" />
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:telephone">Téléphone</label>
-                    <p:inputText id="telephone" value="#{inscriptionBean.telephone}" placeholder="77 123 45 67" styleClass="nx-input" />
+                    <h:inputText id="telephone" value="#{inscriptionBean.telephone}" placeholder="77 123 45 67" styleClass="nx-input" />
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:motDePasse">Mot de passe</label>
-                    <p:password id="motDePasse" value="#{inscriptionBean.motDePasse}" styleClass="nx-input" required="true" feedback="false" />
+                    <h:inputSecret id="motDePasse" value="#{inscriptionBean.motDePasse}" styleClass="nx-input" required="true" redisplay="true" />
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:confirmation">Confirmer le mot de passe</label>
-                    <p:password id="confirmation" value="#{inscriptionBean.confirmationMotDePasse}" styleClass="nx-input" required="true" feedback="false" />
+                    <h:inputSecret id="confirmation" value="#{inscriptionBean.confirmationMotDePasse}" styleClass="nx-input" required="true" redisplay="true" />
                 </div>
 
-                <p:commandButton value="Créer mon compte" action="#{inscriptionBean.inscrire}" styleClass="nx-btn-block" ajax="false" />
+                <h:commandButton value="Créer mon compte" action="#{inscriptionBean.inscrire}" styleClass="nx-button nx-button-primary nx-button-block" />
             </h:form>
 
-            <p style="margin-top:20px; font-size:14px; text-align:center; color:var(--nx-text-secondary);">
-                Déjà un compte ? <h:link outcome="/connexion" value="Se connecter" style="color:var(--nx-primary); font-weight:700;" />
+            <p class="nx-auth-footer">
+                Déjà un compte ? <h:link outcome="/connexion" value="Se connecter" />
             </p>
         </div>
     </div>

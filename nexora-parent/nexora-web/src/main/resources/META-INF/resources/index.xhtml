@@ -1,62 +1,353 @@
-<ui:composition template="/WEB-INF/templates/layout.xhtml"
-                 xmlns="http://www.w3.org/1999/xhtml"
-                 xmlns:h="http://xmlns.jcp.org/jsf/html"
-                 xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-<ui:define name="titre">Nexora — Découvrez les espaces professionnels du Sénégal</ui:define>
-<ui:define name="content">
+<ui:composition
+    template="/WEB-INF/templates/layout.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-    <section class="nx-hero">
-        <div class="nx-container nx-hero-content">
-            <span class="nx-hero-eyebrow">🇸🇳 Écosystème numérique sénégalais</span>
-            <h1>La plateforme qui connecte les espaces professionnels du Sénégal.</h1>
-            <p class="nx-lead">
-                Boutiques, restaurants, hôtels, cliniques, pharmacies, écoles… découvrez, consultez et
-                contactez les professionnels et établissements de votre quartier, au même endroit.
-            </p>
+    <ui:define name="titre">
+        Nexora — Découvrez les espaces professionnels du Sénégal
+    </ui:define>
 
-            <h:form styleClass="nx-hero-search">
-                <div style="display:flex; gap:10px;">
-                    <h:inputText id="rechercheRapide" value="#{rechercheRapideBean.q}"
-                                 placeholder="Rechercher un restaurant, une pharmacie, un quartier…"
-                                 style="flex:1;" />
-                    <h:commandButton value="Rechercher" action="#{rechercheRapideBean.rechercher}" />
-                </div>
-            </h:form>
-        </div>
-    </section>
+    <ui:define name="content">
 
-    <section class="nx-section">
-        <div class="nx-container">
-            <h2>Parcourir par catégorie</h2>
-            <div class="nx-category-grid">
-                <ui:repeat var="type" value="#{rechercheRapideBean.categories}">
-                    <h:link outcome="/recherche" styleClass="nx-category">
-                        <f:param name="typeEspace" value="#{type.nom}" />
-                        <span class="nx-category-icon" style="background:#{type.couleur}22;">
-                            #{type.emoji}
-                        </span>
-                        <span class="nx-category-label">#{type.nom}</span>
-                    </h:link>
-                </ui:repeat>
-            </div>
-        </div>
-    </section>
+        <!-- =========================
+             HERO
+        ========================== -->
+        <section class="nx-hero">
 
-    <section class="nx-section" style="padding-top:0;">
-        <div class="nx-container">
-            <div class="nx-card" style="padding:28px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
-                <div style="flex:1; min-width:240px;">
-                    <h2 style="margin-bottom:6px;">Un espace numérique pour chaque professionnel</h2>
-                    <p style="color:var(--nx-text-secondary);">
-                        Nom, slogan, description, contact, avis, note moyenne, badge « vérifié » ou « certifié » —
-                        chaque professionnel dispose d'une vitrine numérique complète sur Nexora.
+            <div class="nx-container nx-hero-inner">
+
+                <div class="nx-hero-copy">
+
+                    <span class="nx-eyebrow">
+                        <span class="nx-eyebrow-dot"></span>
+                        L'écosystème professionnel du Sénégal
+                    </span>
+
+                    <h1>
+                        Trouvez le bon
+                        <span>professionnel</span>,
+                        près de chez vous.
+                    </h1>
+
+                    <p class="nx-hero-description">
+                        Restaurants, boutiques, pharmacies, cliniques,
+                        hôtels, écoles, garages et bien plus encore.
+                        Découvrez les professionnels qui vous entourent
+                        sur une seule plateforme.
                     </p>
-                </div>
-                <h:link outcome="/inscription" styleClass="ui-button" value="Créer mon compte" />
-            </div>
-        </div>
-    </section>
 
-</ui:define>
+                    <!-- RECHERCHE -->
+                    <h:form styleClass="nx-search-form">
+
+                        <div class="nx-search-box">
+
+                            <div class="nx-search-icon">
+                                <span>⌕</span>
+                            </div>
+
+                            <h:inputText
+                                id="rechercheRapide"
+                                value="#{rechercheRapideBean.q}"
+                                placeholder="Que recherchez-vous ? Restaurant, pharmacie, garage..."
+                                styleClass="nx-search-input"/>
+
+                            <h:commandButton
+                                value="Rechercher"
+                                action="#{rechercheRapideBean.rechercher}"
+                                styleClass="nx-search-button"/>
+
+                        </div>
+
+                    </h:form>
+
+                    <div class="nx-popular">
+                        <span>Recherches populaires :</span>
+
+                        <h:link
+                            outcome="/recherche"
+                            value="Restaurants"
+                            styleClass="nx-popular-link">
+                            <f:param name="typeEspace" value="Restaurant"/>
+                        </h:link>
+
+                        <h:link
+                            outcome="/recherche"
+                            value="Pharmacies"
+                            styleClass="nx-popular-link">
+                            <f:param name="typeEspace" value="Pharmacie"/>
+                        </h:link>
+
+                        <h:link
+                            outcome="/recherche"
+                            value="Cliniques"
+                            styleClass="nx-popular-link">
+                            <f:param name="typeEspace" value="Clinique"/>
+                        </h:link>
+                    </div>
+
+                </div>
+
+                <!-- Décoration -->
+                <div class="nx-hero-visual">
+
+                    <div class="nx-hero-orbit nx-orbit-one"></div>
+                    <div class="nx-hero-orbit nx-orbit-two"></div>
+
+                    <div class="nx-hero-card">
+
+                        <div class="nx-mini-icon">
+                            <span>⌖</span>
+                        </div>
+
+                        <div>
+                            <strong>Des professionnels</strong>
+                            <small>près de vous</small>
+                        </div>
+
+                        <span class="nx-check">✓</span>
+
+                    </div>
+
+                    <div class="nx-floating-card nx-floating-top">
+                        <span class="nx-floating-icon">★</span>
+                        <div>
+                            <strong>Espaces vérifiés</strong>
+                            <small>Plus de confiance</small>
+                        </div>
+                    </div>
+
+                    <div class="nx-floating-card nx-floating-bottom">
+                        <span class="nx-floating-icon">⌖</span>
+                        <div>
+                            <strong>À proximité</strong>
+                            <small>Découvrez votre quartier</small>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             CATEGORIES
+        ========================== -->
+        <section class="nx-section nx-categories-section">
+
+            <div class="nx-container">
+
+                <div class="nx-section-heading">
+
+                    <div>
+                        <span class="nx-section-eyebrow">
+                            EXPLOREZ
+                        </span>
+
+                        <h2>
+                            Découvrez par catégorie
+                        </h2>
+
+                        <p>
+                            Trouvez rapidement le type d'espace professionnel
+                            dont vous avez besoin.
+                        </p>
+                    </div>
+
+                    <h:link
+                        outcome="/recherche"
+                        value="Voir tout →"
+                        styleClass="nx-see-all"/>
+
+                </div>
+
+
+                <div class="nx-category-grid">
+
+                    <ui:repeat
+                        var="type"
+                        value="#{rechercheRapideBean.categories}">
+
+                        <h:link
+                            outcome="/recherche"
+                            styleClass="nx-category-card">
+
+                            <f:param
+                                name="typeEspace"
+                                value="#{type.nom}"/>
+
+                            <div
+                                class="nx-category-icon"
+                                style="--category-color: #{type.couleur};">
+
+                                <span>
+                                    #{type.emoji}
+                                </span>
+
+                            </div>
+
+                            <div class="nx-category-content">
+
+                                <strong>
+                                    #{type.nom}
+                                </strong>
+
+                                <span>
+                                    Découvrir
+                                </span>
+
+                            </div>
+
+                            <span class="nx-category-arrow">
+                                →
+                            </span>
+
+                        </h:link>
+
+                    </ui:repeat>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             BLOC PROFESSIONNEL
+        ========================== -->
+        <section class="nx-section nx-professional-section">
+
+            <div class="nx-container">
+
+                <div class="nx-professional-card">
+
+                    <div class="nx-professional-pattern"></div>
+
+                    <div class="nx-professional-content">
+
+                        <span class="nx-gold-label">
+                            POUR LES PROFESSIONNELS
+                        </span>
+
+                        <h2>
+                            Donnez à votre activité
+                            la visibilité qu'elle mérite.
+                        </h2>
+
+                        <p>
+                            Créez votre espace professionnel sur Nexora
+                            et présentez votre activité, vos coordonnées,
+                            vos services, vos avis et vos informations
+                            essentielles à vos futurs clients.
+                        </p>
+
+                        <div class="nx-professional-actions">
+
+                            <h:link
+                                outcome="/inscription"
+                                value="Créer mon espace"
+                                styleClass="nx-button nx-button-gold"/>
+
+                            <h:link
+                                outcome="/recherche"
+                                value="Découvrir Nexora"
+                                styleClass="nx-button nx-button-outline"/>
+
+                        </div>
+
+                    </div>
+
+                    <div class="nx-professional-symbol">
+                        <div class="nx-symbol-circle">
+                            N
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             VALEURS
+        ========================== -->
+        <section class="nx-section nx-values-section">
+
+            <div class="nx-container">
+
+                <div class="nx-values-grid">
+
+                    <div class="nx-value">
+
+                        <div class="nx-value-icon">
+                            ⌖
+                        </div>
+
+                        <div>
+                            <h3>
+                                Proche de vous
+                            </h3>
+
+                            <p>
+                                Retrouvez les professionnels
+                                de votre quartier et de votre ville.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="nx-value">
+
+                        <div class="nx-value-icon">
+                            ✓
+                        </div>
+
+                        <div>
+                            <h3>
+                                Plus de confiance
+                            </h3>
+
+                            <p>
+                                Consultez les informations,
+                                avis et badges des espaces.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="nx-value">
+
+                        <div class="nx-value-icon">
+                            ◇
+                        </div>
+
+                        <div>
+                            <h3>
+                                Un seul endroit
+                            </h3>
+
+                            <p>
+                                Une plateforme pour découvrir
+                                différents types de professionnels.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </ui:define>
+
 </ui:composition>

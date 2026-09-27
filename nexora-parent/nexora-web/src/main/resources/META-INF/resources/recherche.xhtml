@@ -2,8 +2,7 @@
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                 xmlns:p="http://primefaces.org/ui">
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <f:metadata>
     <f:viewParam name="q" value="#{rechercheBean.q}" />
     <f:viewParam name="typeEspace" value="#{rechercheBean.typeEspace}" />
@@ -13,72 +12,78 @@
 <ui:define name="titre">Rechercher — Nexora</ui:define>
 <ui:define name="content">
 
-    <div class="nx-container nx-section">
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Explorez les espaces professionnels</h1>
+            <p>Filtrez par catégorie, localisation ou budget pour trouver le bon professionnel.</p>
+        </div>
+    </section>
+
+    <div class="nx-container">
         <div class="nx-search-layout">
 
             <h:form id="filtres">
-                <p:panel styleClass="nx-filters" header="Filtrer">
+                <div class="nx-filters-card">
+                    <h3>Filtrer</h3>
 
                     <div class="nx-field">
                         <label for="filtres:q">Recherche</label>
-                        <p:inputText id="q" value="#{rechercheBean.q}" placeholder="Nom, quartier, service…" styleClass="nx-input" />
+                        <h:inputText id="q" value="#{rechercheBean.q}" placeholder="Nom, quartier, service…" styleClass="nx-input" />
                     </div>
 
                     <div class="nx-field">
                         <label for="filtres:type">Catégorie</label>
-                        <p:selectOneMenu id="type" value="#{rechercheBean.typeEspace}" styleClass="nx-input">
+                        <h:selectOneMenu id="type" value="#{rechercheBean.typeEspace}" styleClass="nx-select">
                             <f:selectItem itemLabel="Toutes les catégories" itemValue="#{null}" />
                             <f:selectItems value="#{rechercheBean.categories}" var="t" itemLabel="#{t.nom}" itemValue="#{t.nom}" />
-                        </p:selectOneMenu>
+                        </h:selectOneMenu>
                     </div>
 
                     <div class="nx-field">
                         <label for="filtres:commune">Commune / ville</label>
-                        <p:inputText id="commune" value="#{rechercheBean.commune}" placeholder="Dakar, Thiès, Saly…" styleClass="nx-input" />
+                        <h:inputText id="commune" value="#{rechercheBean.commune}" placeholder="Dakar, Thiès, Saly…" styleClass="nx-input" />
                     </div>
 
                     <div class="nx-field">
                         <label for="filtres:prixMax">Prix maximum (FCFA)</label>
-                        <p:inputText id="prixMax" value="#{rechercheBean.prixMax}" styleClass="nx-input" />
+                        <h:inputText id="prixMax" value="#{rechercheBean.prixMax}" styleClass="nx-input" />
                     </div>
 
                     <div class="nx-field">
-                        <label>
-                            <p:selectBooleanCheckbox value="#{rechercheBean.verifieUniquement}" />
+                        <label class="nx-field-check">
+                            <h:selectBooleanCheckbox value="#{rechercheBean.verifieUniquement}" />
                             Espaces vérifiés uniquement
                         </label>
                     </div>
 
                     <div class="nx-field">
                         <label for="filtres:tri">Trier par</label>
-                        <p:selectOneMenu id="tri" value="#{rechercheBean.tri}" styleClass="nx-input">
+                        <h:selectOneMenu id="tri" value="#{rechercheBean.tri}" styleClass="nx-select">
                             <f:selectItem itemLabel="Pertinence" itemValue="PERTINENCE" />
                             <f:selectItem itemLabel="Prix croissant" itemValue="PRIX_ASC" />
                             <f:selectItem itemLabel="Prix décroissant" itemValue="PRIX_DESC" />
                             <f:selectItem itemLabel="Plus récents" itemValue="DATE_DESC" />
                             <f:selectItem itemLabel="Mieux notés" itemValue="NOTE" />
-                        </p:selectOneMenu>
+                        </h:selectOneMenu>
                     </div>
 
-                    <p:commandButton value="Appliquer" action="#{rechercheBean.rechercher}"
-                                      update=":resultats" styleClass="nx-btn-block" />
-                    <p:commandButton value="Réinitialiser" action="#{rechercheBean.reinitialiser}"
-                                      update=":resultats :filtres" process="@this" styleClass="nx-btn-secondary nx-btn-block"
-                                      style="margin-top:8px;" />
-                </p:panel>
+                    <h:commandButton value="Appliquer" action="#{rechercheBean.rechercher}" styleClass="nx-button nx-button-primary nx-button-block" />
+                    <h:commandButton value="Réinitialiser" action="#{rechercheBean.reinitialiser}" immediate="true"
+                                      styleClass="nx-button nx-button-outline-dark nx-button-block" style="margin-top:8px;" />
+                </div>
             </h:form>
 
-            <h:panelGroup layout="block" id="resultats">
+            <div>
                 <div class="nx-results-header">
-                    <h2 style="font-size:20px; font-weight:800;">Résultats de recherche</h2>
+                    <h2>Résultats de recherche</h2>
                     <span class="nx-results-count">#{rechercheBean.total} résultat(s)</span>
                 </div>
 
-                <p:messages showDetail="true" closable="true" />
+                <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
 
                 <ui:fragment rendered="#{rechercheBean.vide}">
-                    <div class="nx-card nx-empty">
-                        <div class="nx-empty-icon">🔎</div>
+                    <div class="nx-empty">
+                        <div class="nx-empty-icon">⌕</div>
                         <p><strong>Aucun résultat pour cette recherche.</strong></p>
                         <p>Essayez un autre mot-clé, une autre catégorie ou élargissez la zone géographique.</p>
                     </div>
@@ -87,7 +92,7 @@
                 <ui:fragment rendered="#{!rechercheBean.vide}">
                     <div class="nx-offre-grid">
                         <ui:repeat var="o" value="#{rechercheBean.contenu}">
-                            <h:link outcome="/offre" styleClass="nx-card nx-offre-card">
+                            <h:link outcome="/offre" styleClass="nx-offre-card">
                                 <f:param name="id" value="#{o.id}" />
                                 <div class="nx-offre-media"><span>🏷️</span></div>
                                 <div class="nx-offre-body">
@@ -114,15 +119,15 @@
 
                     <h:form id="pagination">
                         <div class="nx-pagination">
-                            <p:commandButton value="← Précédent" action="#{rechercheBean.pagePrecedente}"
-                                             update=":resultats" disabled="#{!rechercheBean.pagePrecedenteDisponible}" styleClass="nx-btn-secondary" />
+                            <h:commandButton value="← Précédent" action="#{rechercheBean.pagePrecedente}"
+                                             disabled="#{!rechercheBean.pagePrecedenteDisponible}" styleClass="nx-button nx-button-outline-dark" />
                             <span>Page #{rechercheBean.pageAffichee}</span>
-                            <p:commandButton value="Suivant →" action="#{rechercheBean.pageSuivante}"
-                                             update=":resultats" disabled="#{!rechercheBean.pageSuivanteDisponible}" styleClass="nx-btn-secondary" />
+                            <h:commandButton value="Suivant →" action="#{rechercheBean.pageSuivante}"
+                                             disabled="#{!rechercheBean.pageSuivanteDisponible}" styleClass="nx-button nx-button-outline-dark" />
                         </div>
                     </h:form>
                 </ui:fragment>
-            </h:panelGroup>
+            </div>
         </div>
     </div>
 

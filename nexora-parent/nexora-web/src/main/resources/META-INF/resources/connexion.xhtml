@@ -2,36 +2,35 @@
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                 xmlns:p="http://primefaces.org/ui">
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <ui:define name="titre">Connexion — Nexora</ui:define>
 <ui:define name="content">
     <div class="nx-auth-wrap">
-        <div class="nx-card nx-auth-card">
+        <div class="nx-auth-card">
             <h1>Content de vous revoir</h1>
             <p class="nx-sub">Connectez-vous pour accéder à votre compte Nexora.</p>
 
             <h:form id="connexion">
-                <p:messages showDetail="true" closable="true" />
+                <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" layout="table" />
 
                 <div class="nx-field">
                     <label for="connexion:email">Adresse email</label>
-                    <p:inputText id="email" value="#{connexionBean.email}" styleClass="nx-input" required="true"
+                    <h:inputText id="email" value="#{connexionBean.email}" styleClass="nx-input" required="true"
                                  requiredMessage="L'adresse email est obligatoire." />
                 </div>
 
                 <div class="nx-field">
                     <label for="connexion:motDePasse">Mot de passe</label>
-                    <p:password id="motDePasse" value="#{connexionBean.motDePasse}" styleClass="nx-input" required="true"
-                                requiredMessage="Le mot de passe est obligatoire." feedback="false" />
+                    <h:inputSecret id="motDePasse" value="#{connexionBean.motDePasse}" styleClass="nx-input" required="true"
+                                    requiredMessage="Le mot de passe est obligatoire." redisplay="true" />
                 </div>
 
-                <p:commandButton value="Se connecter" action="#{connexionBean.connecter}" styleClass="nx-btn-block" ajax="false" />
+                <h:commandButton value="Se connecter" action="#{connexionBean.connecter}" styleClass="nx-button nx-button-primary nx-button-block" />
             </h:form>
 
-            <p style="margin-top:20px; font-size:14px; text-align:center; color:var(--nx-text-secondary);">
+            <p class="nx-auth-footer">
                 Pas encore de compte ?
-                <h:link outcome="/inscription" value="Créer un compte" style="color:var(--nx-primary); font-weight:700;" />
+                <h:link outcome="/inscription" value="Créer un compte" />
             </p>
         </div>
     </div>

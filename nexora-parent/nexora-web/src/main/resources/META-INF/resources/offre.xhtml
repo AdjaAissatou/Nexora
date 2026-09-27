@@ -2,8 +2,7 @@
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                 xmlns:p="http://primefaces.org/ui">
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <f:metadata>
     <f:viewParam name="id" value="#{offreDetailBean.id}" />
     <f:viewAction action="#{offreDetailBean.charger}" />
@@ -11,37 +10,39 @@
 <ui:define name="titre">#{offreDetailBean.trouvee ? offreDetailBean.offre.titre : 'Offre'} — Nexora</ui:define>
 <ui:define name="content">
 
-    <div class="nx-container nx-section">
+    <div class="nx-container" style="padding-top:28px;">
 
         <ui:fragment rendered="#{!offreDetailBean.trouvee}">
-            <div class="nx-card nx-empty">
-                <div class="nx-empty-icon">🚫</div>
+            <div class="nx-empty" style="margin-bottom:80px;">
+                <div class="nx-empty-icon">⚠</div>
                 <p><strong>#{offreDetailBean.erreur != null ? offreDetailBean.erreur : 'Cette offre est introuvable.'}</strong></p>
-                <h:link outcome="/recherche" value="← Retour à la recherche" />
+                <h:link outcome="/recherche" value="← Retour à la recherche" styleClass="nx-back-link" />
             </div>
         </ui:fragment>
 
         <ui:fragment rendered="#{offreDetailBean.trouvee}">
-            <h:link outcome="/recherche" value="← Retour aux résultats" style="display:inline-block; margin-bottom:16px; font-weight:700; color:var(--nx-primary);" />
+            <h:link outcome="/recherche" value="← Retour aux résultats" styleClass="nx-back-link" />
 
-            <div style="display:grid; grid-template-columns: 1fr 320px; gap:24px; align-items:start;" class="nx-detail-layout">
+            <div class="nx-detail-layout">
 
-                <div class="nx-card" style="padding:28px;">
-                    <div class="nx-offre-espace" style="margin-bottom:10px;">
+                <div class="nx-detail-main">
+                    <div class="nx-offre-espace">
                         #{offreDetailBean.offre.typeEspace}
                         <ui:fragment rendered="#{offreDetailBean.offre.espaceVerifie}"><span class="nx-badge nx-badge-verifie">✓ Vérifié</span></ui:fragment>
                         <ui:fragment rendered="#{offreDetailBean.offre.espaceCertifie}"><span class="nx-badge nx-badge-certifie">★ Certifié</span></ui:fragment>
                     </div>
 
-                    <h1 style="font-size:26px; font-weight:800;">#{offreDetailBean.offre.titre}</h1>
+                    <h1>#{offreDetailBean.offre.titre}</h1>
 
-                    <p style="margin-top:14px; color:var(--nx-text-secondary); white-space:pre-line;">
+                    <p style="margin-top:16px; color:var(--nx-text-secondary); line-height:1.7; white-space:pre-line;">
                         #{offreDetailBean.offre.description}
                     </p>
 
-                    <div style="margin-top:20px; font-size:24px; font-weight:800;">
+                    <div class="nx-detail-price">
                         <ui:fragment rendered="#{offreDetailBean.offre.ancienPrix != null}">
-                            <span class="nx-old" style="font-size:16px;"><h:outputText value="#{offreDetailBean.offre.ancienPrix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText></span>
+                            <span class="nx-old" style="font-size:16px; color:var(--nx-text-light); text-decoration:line-through; font-weight:500;">
+                                <h:outputText value="#{offreDetailBean.offre.ancienPrix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                            </span>
                         </ui:fragment>
                         <h:outputText value="#{offreDetailBean.offre.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
                         <ui:fragment rendered="#{offreDetailBean.offre.negociable}">
@@ -52,41 +53,41 @@
                     <div style="margin-top:18px; display:flex; gap:8px; flex-wrap:wrap;">
                         <ui:fragment rendered="#{!empty offreDetailBean.offre.tags}">
                             <ui:repeat var="tag" value="#{offreDetailBean.offre.tags}">
-                                <span class="nx-badge" style="background:var(--nx-surface-muted); color:var(--nx-text-secondary);">#{tag}</span>
+                                <span class="nx-badge nx-badge-neutre">#{tag}</span>
                             </ui:repeat>
                         </ui:fragment>
                     </div>
 
                     <ui:fragment rendered="#{offreDetailBean.offre.localisation != null}">
-                        <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--nx-border);">
+                        <div style="margin-top:26px; padding-top:20px; border-top:1px solid var(--nx-border);">
                             <h3 style="font-size:15px; font-weight:800; margin-bottom:6px;">📍 Localisation</h3>
                             <p style="color:var(--nx-text-secondary);">#{offreDetailBean.offre.localisation.texte}</p>
                         </div>
                     </ui:fragment>
                 </div>
 
-                <div class="nx-card" style="padding:24px;">
-                    <h3 style="font-size:16px; font-weight:800;">#{offreDetailBean.offre.espaceNom}</h3>
+                <div class="nx-detail-side">
+                    <h3>#{offreDetailBean.offre.espaceNom}</h3>
                     <ui:fragment rendered="#{!empty offreDetailBean.offre.espaceSlogan}">
-                        <p style="color:var(--nx-text-secondary); font-size:14px; margin-top:4px;">#{offreDetailBean.offre.espaceSlogan}</p>
+                        <p style="color:var(--nx-text-secondary); font-size:14px; margin-top:6px;">#{offreDetailBean.offre.espaceSlogan}</p>
                     </ui:fragment>
 
-                    <div style="margin-top:14px; font-size:14px; color:var(--nx-text-secondary);">
+                    <div style="margin-top:16px; font-size:14px; color:var(--nx-text-secondary);">
                         ⭐ <h:outputText value="#{offreDetailBean.offre.espaceNoteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText>
                         (#{offreDetailBean.offre.espaceNombreAvis} avis)
                     </div>
 
-                    <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+                    <div style="margin-top:22px; display:flex; flex-direction:column; gap:10px;">
                         <ui:fragment rendered="#{!empty offreDetailBean.offre.espaceTelephone}">
-                            <h:outputLink value="#{format.lienTelephone(offreDetailBean.offre.espaceTelephone)}" styleClass="ui-button nx-btn-block" style="text-align:center;">
+                            <h:outputLink value="#{format.lienTelephone(offreDetailBean.offre.espaceTelephone)}" styleClass="nx-button nx-button-primary nx-button-block">
                                 📞 #{format.telephoneAffiche(offreDetailBean.offre.espaceTelephone)}
                             </h:outputLink>
-                            <h:outputLink value="#{format.lienWhatsApp(offreDetailBean.offre.espaceTelephone)}" styleClass="ui-button nx-btn-secondary nx-btn-block" style="text-align:center;" target="_blank">
+                            <h:outputLink value="#{format.lienWhatsApp(offreDetailBean.offre.espaceTelephone)}" styleClass="nx-button nx-button-outline-dark nx-button-block" target="_blank">
                                 💬 WhatsApp
                             </h:outputLink>
                         </ui:fragment>
                         <ui:fragment rendered="#{!empty offreDetailBean.offre.espaceSiteWeb}">
-                            <h:outputLink value="#{format.lienSiteWeb(offreDetailBean.offre.espaceSiteWeb)}" target="_blank" styleClass="nx-btn-secondary ui-button nx-btn-block" style="text-align:center;">
+                            <h:outputLink value="#{format.lienSiteWeb(offreDetailBean.offre.espaceSiteWeb)}" target="_blank" styleClass="nx-button nx-button-outline-dark nx-button-block">
                                 🌐 Site web
                             </h:outputLink>
                         </ui:fragment>
