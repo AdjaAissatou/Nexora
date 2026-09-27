@@ -98,4 +98,6 @@ POST   /api/v1/signalements
 - SpringDoc OpenAPI 2.8.9
 - Architecture hexagonale (ports & adaptateurs)
 
-### Groupe PowerFive — UCAD / DMI / Master 1 SIR
+### Auteure
+
+Adja Aïssatou Dione
