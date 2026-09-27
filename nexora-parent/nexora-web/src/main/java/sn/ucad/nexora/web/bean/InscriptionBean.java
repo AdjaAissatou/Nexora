@@ -28,6 +28,7 @@ public class InscriptionBean implements Serializable {
 
     private boolean succes;
     private String messageSucces;
+    private boolean verificationRequise;
 
     public String inscrire() {
         if (motDePasse != null && !motDePasse.equals(confirmationMotDePasse)) {
@@ -41,6 +42,7 @@ public class InscriptionBean implements Serializable {
             RegisterResult resultat = authApiClient.inscrire(
                     new RegisterRequest(prenom, nom, email, telephone, motDePasse, confirmationMotDePasse, null));
             succes = true;
+            verificationRequise = resultat.verificationRequired();
             messageSucces = resultat.message() != null && !resultat.message().isBlank()
                     ? resultat.message()
                     : "Compte créé. Vous pouvez maintenant vous connecter.";
@@ -58,6 +60,11 @@ public class InscriptionBean implements Serializable {
 
     public String getMessageSucces() {
         return messageSucces;
+    }
+
+    /** Vrai si le compte doit être vérifié par OTP avant de pouvoir se connecter. */
+    public boolean isVerificationRequise() {
+        return verificationRequise;
     }
 
     public String getPrenom() {

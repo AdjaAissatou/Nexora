@@ -12,7 +12,14 @@
 
             <ui:fragment rendered="#{inscriptionBean.succes}">
                 <div class="nx-alert nx-alert-info">#{inscriptionBean.messageSucces}</div>
-                <h:link outcome="/connexion" value="Se connecter →" styleClass="nx-button nx-button-primary nx-button-block" />
+                <ui:fragment rendered="#{inscriptionBean.verificationRequise}">
+                    <h:link outcome="/verification" value="Vérifier mon compte →" styleClass="nx-button nx-button-primary nx-button-block">
+                        <f:param name="email" value="#{inscriptionBean.email}" />
+                    </h:link>
+                </ui:fragment>
+                <ui:fragment rendered="#{!inscriptionBean.verificationRequise}">
+                    <h:link outcome="/connexion" value="Se connecter →" styleClass="nx-button nx-button-primary nx-button-block" />
+                </ui:fragment>
             </ui:fragment>
 
             <h:form id="inscription" rendered="#{!inscriptionBean.succes}">

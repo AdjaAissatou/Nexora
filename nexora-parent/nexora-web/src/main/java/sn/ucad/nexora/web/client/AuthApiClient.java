@@ -10,6 +10,8 @@ import sn.ucad.nexora.web.dto.auth.AuthenticationResponse;
 import sn.ucad.nexora.web.dto.auth.LoginRequest;
 import sn.ucad.nexora.web.dto.auth.RegisterRequest;
 import sn.ucad.nexora.web.dto.auth.RegisterResult;
+import sn.ucad.nexora.web.dto.auth.VerifyOtpRequest;
+import sn.ucad.nexora.web.dto.auth.VerifyOtpResponse;
 import sn.ucad.nexora.web.error.ApiErrors;
 
 /**
@@ -43,6 +45,22 @@ public class AuthApiClient {
         LOG.info("POST {}/api/v1/auth/register", baseUrl);
         try {
             return client.post().uri("/api/v1/auth/register").body(requete).retrieve().body(RegisterResult.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public VerifyOtpResponse verifierOtp(String email, String otp) {
+        LOG.info("POST {}/api/v1/auth/verify-otp", baseUrl);
+        try {
+            return client
+                    .post()
+                    .uri("/api/v1/auth/verify-otp")
+                    .body(new VerifyOtpRequest(email, otp))
+                    .retrieve()
+                    .body(VerifyOtpResponse.class);
         } catch (RestClientResponseException e) {
             throw ApiErrors.depuis(e);
         } catch (Exception e) {
