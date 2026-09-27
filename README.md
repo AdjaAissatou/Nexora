@@ -1,2 +1,101 @@
 # Nexora
-plateforme de recherche de service en temps réel
+
+Plateforme numérique sénégalaise qui met en relation les utilisateurs avec les professionnels, commerces, services et établissements, au sein d'un même écosystème.
+
+## Backend — Architecture microservices Spring Boot / Java 17
+
+### Services inclus
+
+| Service | Port | Rôle |
+|---------|------|------|
+| nexora-discovery-server | 8761 | Eureka — registre des services |
+| nexora-config-server | 8888 | Config centralisée (`config-repo/`) |
+| nexora-api-gateway | 8080 | Point d'entrée unique |
+| nexora-auth-service | 8081 | Authentification JWT |
+| nexora-user-service | 8082 | Gestion des profils utilisateurs |
+| nexora-espace-service | 8083 | Espaces professionnels |
+| nexora-catalogue-service | 8084 | Recherche d'offres + fiche détaillée |
+| nexora-recherche-service | 8085 | Favoris, historique, avis, signalements |
+| nexora-commerce-service | — | Panier, commandes, paiements (à venir) |
+| nexora-communication-service | — | Messagerie / conversations (à venir) |
+| nexora-administration-service | — | Back-office (à venir) |
+| nexora-common | — | Code partagé entre services |
+
+### Ordre de démarrage
+
+1. `nexora-discovery-server`
+2. `nexora-config-server`
+3. `nexora-api-gateway`
+4. `nexora-auth-service`
+5. `nexora-user-service`
+6. `nexora-espace-service`
+7. `nexora-catalogue-service`
+8. `nexora-recherche-service`
+
+### Variables d'environnement requises
+
+```
+DB_URL=jdbc:postgresql://localhost:5432/nexora
+DB_USERNAME=nexora_user
+DB_PASSWORD=nexora_pass
+JWT_SECRET=votre_secret_jwt_256bits_minimum
+```
+
+### Base de données
+
+Exécuter les scripts SQL dans cet ordre (voir `database/`) :
+
+```
+database/00_create_database.sql
+database/00_init/01_types.sql
+database/01_security/*.sql
+database/02_shared/*.sql
+database/03_professional/*.sql
+database/04_catalogue/*.sql
+database/05_search/*.sql
+database/09_seed/*.sql
+database/10_views/01_recherche_globale.sql
+```
+
+### Endpoints catalogue-service (port 8084)
+
+```
+GET  /api/v1/offres/recherche?q=...&commune=...&prixMax=...&tri=PRIX_ASC
+GET  /api/v1/offres/{id}
+```
+
+### Endpoints recherche-service (port 8085)
+
+```
+POST   /api/v1/historique/recherches
+GET    /api/v1/historique/recherches
+DELETE /api/v1/historique/recherches
+POST   /api/v1/historique/consultations
+DELETE /api/v1/historique/consultations
+
+GET    /api/v1/favoris
+POST   /api/v1/favoris
+DELETE /api/v1/favoris?offreId=X
+
+GET    /api/v1/recherches-sauvegardees
+POST   /api/v1/recherches-sauvegardees
+DELETE /api/v1/recherches-sauvegardees/{id}
+
+GET    /api/v1/avis/offre/{offreId}   (PUBLIC)
+GET    /api/v1/avis/espace/{espaceId} (PUBLIC)
+POST   /api/v1/avis
+DELETE /api/v1/avis/{id}
+
+POST   /api/v1/signalements
+```
+
+### Stack technique
+
+- Java 17 · Spring Boot 4.0.7 · Spring Cloud 2025.1.0
+- PostgreSQL · Spring Data JPA · Hibernate
+- Spring Security · JWT (jjwt 0.12.7)
+- Eureka · Spring Cloud Config · Spring Cloud Gateway
+- SpringDoc OpenAPI 2.8.9
+- Architecture hexagonale (ports & adaptateurs)
+
+### Groupe PowerFive — UCAD / DMI / Master 1 SIR

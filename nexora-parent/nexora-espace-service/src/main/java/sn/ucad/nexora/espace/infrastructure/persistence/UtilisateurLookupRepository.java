@@ -1,0 +1,3 @@
+package sn.ucad.nexora.espace.infrastructure.persistence;
+import java.util.Optional; import java.util.UUID; import org.springframework.data.jpa.repository.JpaRepository; import org.springframework.data.jpa.repository.Query; import org.springframework.data.repository.query.Param; import sn.ucad.nexora.espace.infrastructure.persistence.UtilisateurLookupEntity;
+public interface UtilisateurLookupRepository extends JpaRepository<UtilisateurLookupEntity,Long>{@Query("select u.id from UtilisateurLookupEntity u where u.accountId=:accountId") Optional<Long> findIdByAccountId(@Param("accountId") UUID accountId);}
