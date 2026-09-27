@@ -105,6 +105,13 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <!--
+                        Sans ce flag, tout @RequestParam/@PathVariable sans `name=` explicite échoue
+                        à l'exécution (pas à la compilation) avec "parameter name information not
+                        available via reflection" — cassé silencieusement sur tous les modules jusqu'à
+                        ce qu'on l'appelle vraiment (ex: GET /api/v1/offres/recherche du catalogue-service).
+                    -->
+                    <parameters>true</parameters>
                 	 <annotationProcessorPaths>
 			
 			            <path>

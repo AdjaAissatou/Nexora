@@ -14,6 +14,8 @@ CREATE TABLE adresse (
 
     commune VARCHAR(100),
 
+    arrondissement VARCHAR(100),
+
     quartier VARCHAR(100),
 
     adresse_complete TEXT,
