@@ -25,10 +25,16 @@ public class ConnexionBean implements Serializable {
     private String email;
     private String motDePasse;
 
+    /** Vue demandée avant la redirection vers la connexion, ex. par {@code SessionBean.exigerConnexion()}. */
+    private String redirect;
+
     public String connecter() {
         try {
             AuthenticationResponse reponse = authApiClient.connecter(email, motDePasse);
             session.connecter(reponse.accessToken(), reponse.refreshToken(), reponse.account());
+            if (redirect != null && !redirect.isBlank()) {
+                return redirect.replaceFirst("\\.xhtml$", "") + "?faces-redirect=true";
+            }
             return "index?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
@@ -51,5 +57,13 @@ public class ConnexionBean implements Serializable {
 
     public void setMotDePasse(String motDePasse) {
         this.motDePasse = motDePasse;
+    }
+
+    public String getRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
     }
 }
