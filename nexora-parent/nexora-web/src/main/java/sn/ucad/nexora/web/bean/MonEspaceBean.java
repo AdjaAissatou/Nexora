@@ -65,6 +65,10 @@ public class MonEspaceBean implements Serializable {
 
     private String espaceLogo;
     private String espaceCouverture;
+    private String espaceRegistreCommerce;
+    private String espaceNumeroNinea;
+    private String espaceNumeroRccm;
+    private String photosTexte;
 
     @PostConstruct
     public void charger() {
@@ -104,6 +108,10 @@ public class MonEspaceBean implements Serializable {
         adresseComplete = espace.adresseComplete();
         espaceLogo = espace.logo();
         espaceCouverture = espace.couverture();
+        espaceRegistreCommerce = espace.registreCommerce();
+        espaceNumeroNinea = espace.numeroNinea();
+        espaceNumeroRccm = espace.numeroRccm();
+        photosTexte = espace.photos() == null ? null : String.join("\n", espace.photos());
 
         regions = espaceApiClient.regions();
         idRegion = regions.stream().filter(r -> r.nom().equals(espace.region())).map(RegionResponse::id).findFirst().orElse(null);
@@ -167,7 +175,11 @@ public class MonEspaceBean implements Serializable {
                             quartier,
                             adresseComplete,
                             espaceLogo,
-                            espaceCouverture));
+                            espaceCouverture,
+                            espaceRegistreCommerce,
+                            espaceNumeroNinea,
+                            espaceNumeroRccm,
+                            urlsDepuisTexte(photosTexte)));
             remplirChampsEspace();
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Espace mis à jour.", null));
@@ -176,6 +188,11 @@ public class MonEspaceBean implements Serializable {
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));
         }
         return null;
+    }
+
+    private static List<String> urlsDepuisTexte(String texte) {
+        if (texte == null || texte.isBlank()) return List.of();
+        return texte.lines().map(String::trim).filter(l -> !l.isBlank()).toList();
     }
 
     /**
@@ -353,5 +370,37 @@ public class MonEspaceBean implements Serializable {
 
     public void setEspaceCouverture(String espaceCouverture) {
         this.espaceCouverture = espaceCouverture;
+    }
+
+    public String getEspaceRegistreCommerce() {
+        return espaceRegistreCommerce;
+    }
+
+    public void setEspaceRegistreCommerce(String espaceRegistreCommerce) {
+        this.espaceRegistreCommerce = espaceRegistreCommerce;
+    }
+
+    public String getEspaceNumeroNinea() {
+        return espaceNumeroNinea;
+    }
+
+    public void setEspaceNumeroNinea(String espaceNumeroNinea) {
+        this.espaceNumeroNinea = espaceNumeroNinea;
+    }
+
+    public String getEspaceNumeroRccm() {
+        return espaceNumeroRccm;
+    }
+
+    public void setEspaceNumeroRccm(String espaceNumeroRccm) {
+        this.espaceNumeroRccm = espaceNumeroRccm;
+    }
+
+    public String getPhotosTexte() {
+        return photosTexte;
+    }
+
+    public void setPhotosTexte(String photosTexte) {
+        this.photosTexte = photosTexte;
     }
 }

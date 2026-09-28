@@ -142,6 +142,28 @@
                                 </div>
                             </div>
 
+                            <div class="nx-field">
+                                <label for="espaceForm:photos">Photos du lieu <span style="font-weight:400; color:var(--nx-text-secondary);">(une URL d'image par ligne)</span></label>
+                                <h:inputTextarea id="photos" value="#{monEspaceBean.photosTexte}" placeholder="https://…/photo1.jpg&#10;https://…/photo2.jpg" styleClass="nx-input" rows="3" />
+                            </div>
+
+                            <h3 style="margin-top:20px;">Informations légales</h3>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 12px;">
+                                <div class="nx-field">
+                                    <label for="espaceForm:rc">Registre de commerce</label>
+                                    <h:inputText id="rc" value="#{monEspaceBean.espaceRegistreCommerce}" styleClass="nx-input" />
+                                </div>
+                                <div class="nx-field">
+                                    <label for="espaceForm:ninea">NINEA</label>
+                                    <h:inputText id="ninea" value="#{monEspaceBean.espaceNumeroNinea}" styleClass="nx-input" />
+                                </div>
+                                <div class="nx-field">
+                                    <label for="espaceForm:rccm">RCCM</label>
+                                    <h:inputText id="rccm" value="#{monEspaceBean.espaceNumeroRccm}" styleClass="nx-input" />
+                                </div>
+                            </div>
+
                             <h3 style="margin-top:20px;">Localisation</h3>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">

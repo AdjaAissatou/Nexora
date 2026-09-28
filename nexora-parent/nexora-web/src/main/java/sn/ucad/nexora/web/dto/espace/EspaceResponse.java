@@ -2,6 +2,7 @@ package sn.ucad.nexora.web.dto.espace;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /** Miroir de {@code sn.ucad.nexora.espace.application.dto.response.EspaceResponse}. */
 public record EspaceResponse(
@@ -33,4 +34,8 @@ public record EspaceResponse(
         String quartier,
         String adresseComplete,
         BigDecimal latitude,
-        BigDecimal longitude) {}
+        BigDecimal longitude,
+        String registreCommerce,
+        String numeroNinea,
+        String numeroRccm,
+        List<String> photos) {}

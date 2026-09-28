@@ -2,6 +2,7 @@ package sn.ucad.nexora.espace.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 public class UpdateEspaceRequest {
     @NotBlank private String nom;
@@ -19,6 +20,10 @@ public class UpdateEspaceRequest {
     private String adresseComplete;
     private String logo;
     private String couverture;
+    private String registreCommerce;
+    private String numeroNinea;
+    private String numeroRccm;
+    private List<String> photos;
 
     public String getNom() { return nom; }
     public void setNom(String v) { nom = v; }
@@ -50,4 +55,12 @@ public class UpdateEspaceRequest {
     public void setLogo(String v) { logo = v; }
     public String getCouverture() { return couverture; }
     public void setCouverture(String v) { couverture = v; }
+    public String getRegistreCommerce() { return registreCommerce; }
+    public void setRegistreCommerce(String v) { registreCommerce = v; }
+    public String getNumeroNinea() { return numeroNinea; }
+    public void setNumeroNinea(String v) { numeroNinea = v; }
+    public String getNumeroRccm() { return numeroRccm; }
+    public void setNumeroRccm(String v) { numeroRccm = v; }
+    public List<String> getPhotos() { return photos; }
+    public void setPhotos(List<String> v) { photos = v; }
 }

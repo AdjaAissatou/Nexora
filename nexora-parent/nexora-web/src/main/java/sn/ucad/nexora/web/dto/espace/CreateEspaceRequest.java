@@ -1,5 +1,7 @@
 package sn.ucad.nexora.web.dto.espace;
 
+import java.util.List;
+
 /** Miroir de {@code sn.ucad.nexora.espace.application.dto.request.CreateEspaceRequest}. */
 public record CreateEspaceRequest(
         Long typeEspaceId,
@@ -19,4 +21,5 @@ public record CreateEspaceRequest(
         String quartier,
         String adresseComplete,
         String logo,
-        String couverture) {}
+        String couverture,
+        List<String> photos) {}

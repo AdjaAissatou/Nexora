@@ -31,6 +31,7 @@
 \i 03_professional/03_adresse.sql
 \i 03_professional/04_horaire.sql
 \i 03_professional/05_certification.sql
+\i 03_professional/06_photo_espace.sql
 
 
 -------------------------------------------------------

@@ -1,5 +1,7 @@
 package sn.ucad.nexora.web.dto.espace;
 
+import java.util.List;
+
 /** Miroir de {@code sn.ucad.nexora.espace.application.dto.request.UpdateEspaceRequest}. */
 public record UpdateEspaceRequest(
         String nom,
@@ -16,4 +18,8 @@ public record UpdateEspaceRequest(
         String quartier,
         String adresseComplete,
         String logo,
-        String couverture) {}
+        String couverture,
+        String registreCommerce,
+        String numeroNinea,
+        String numeroRccm,
+        List<String> photos) {}

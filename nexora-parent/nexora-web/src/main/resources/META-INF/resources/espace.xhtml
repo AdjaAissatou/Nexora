@@ -91,6 +91,15 @@
                     <p style="color:var(--nx-text-secondary);">#{espaceDetailBean.espace.description}</p>
                 </ui:fragment>
 
+                <ui:fragment rendered="#{not empty espaceDetailBean.espace.photos}">
+                    <h3 style="margin-top:28px;">Photos du lieu</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px;">
+                        <ui:repeat var="p" value="#{espaceDetailBean.espace.photos}">
+                            <img src="#{p}" alt="Photo du lieu" style="width:100%; height:110px; object-fit:cover; border-radius:8px;" />
+                        </ui:repeat>
+                    </div>
+                </ui:fragment>
+
                 <ui:fragment rendered="#{espaceDetailBean.espace.latitude != null}">
                     <h3 style="margin-top:28px;">Localisation</h3>
                     <p style="color:var(--nx-text-secondary);">#{espaceDetailBean.espace.adresseComplete}</p>

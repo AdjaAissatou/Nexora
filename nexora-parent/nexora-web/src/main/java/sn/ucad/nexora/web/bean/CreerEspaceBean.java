@@ -54,6 +54,7 @@ public class CreerEspaceBean implements Serializable {
 
     private String logo;
     private String couverture;
+    private String photosTexte;
 
     @PostConstruct
     public void charger() {
@@ -111,13 +112,19 @@ public class CreerEspaceBean implements Serializable {
                             quartier,
                             adresseComplete,
                             logo,
-                            couverture));
+                            couverture,
+                            urlsDepuisTexte(photosTexte)));
             return "mon-espace?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Création impossible", e.getMessage()));
             return null;
         }
+    }
+
+    private static List<String> urlsDepuisTexte(String texte) {
+        if (texte == null || texte.isBlank()) return List.of();
+        return texte.lines().map(String::trim).filter(l -> !l.isBlank()).toList();
     }
 
     public List<TypeEspaceResponse> getTypes() {
@@ -278,5 +285,13 @@ public class CreerEspaceBean implements Serializable {
 
     public void setCouverture(String couverture) {
         this.couverture = couverture;
+    }
+
+    public String getPhotosTexte() {
+        return photosTexte;
+    }
+
+    public void setPhotosTexte(String photosTexte) {
+        this.photosTexte = photosTexte;
     }
 }
