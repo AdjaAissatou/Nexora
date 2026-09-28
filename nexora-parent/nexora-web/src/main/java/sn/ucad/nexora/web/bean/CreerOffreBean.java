@@ -61,6 +61,7 @@ public class CreerOffreBean implements Serializable {
 
     // Champs communs
     private String titre;
+    private String titreAutoSuggere;
     private String description;
     private BigDecimal prix;
     private boolean negociable;
@@ -102,6 +103,7 @@ public class CreerOffreBean implements Serializable {
         typesOffre = null;
         attributs = null;
         typeOffreId = null;
+        reinitialiserDetails();
         if (niveau1Id == null) return;
 
         CategorieResponse c = trouver(niveau1, niveau1Id);
@@ -118,6 +120,7 @@ public class CreerOffreBean implements Serializable {
         typesOffre = null;
         attributs = null;
         typeOffreId = null;
+        reinitialiserDetails();
         if (niveau2Id == null) return;
 
         CategorieResponse c = trouver(niveau2, niveau2Id);
@@ -132,8 +135,19 @@ public class CreerOffreBean implements Serializable {
         typesOffre = null;
         attributs = null;
         typeOffreId = null;
+        reinitialiserDetails();
         if (niveau3Id == null) return;
         chargerFeuille(niveau3Id);
+    }
+
+    /** true si l'utilisateur peut décrire librement ce qu'il propose (rien dans la liste ne convenait). */
+    public boolean isAutrePropose() {
+        if (typeOffreId == null || typesOffre == null) return false;
+        return typesOffre.stream()
+                .filter(t -> t.id().equals(typeOffreId))
+                .findFirst()
+                .map(t -> "Autre".equals(t.libelle()))
+                .orElse(false);
     }
 
     public void onTypeOffreChange() {
@@ -142,10 +156,35 @@ public class CreerOffreBean implements Serializable {
                 .filter(t -> t.id().equals(typeOffreId))
                 .findFirst()
                 .ifPresent(t -> {
-                    if (titre == null || titre.isBlank()) {
+                    // Ne remplace le titre que s'il est vide ou qu'il vient encore de la dernière
+                    // suggestion automatique — une saisie manuelle de l'utilisateur n'est jamais écrasée.
+                    boolean nonModifie = titre == null || titre.isBlank() || titre.equals(titreAutoSuggere);
+                    if ("Autre".equals(t.libelle())) {
+                        if (nonModifie) titre = null;
+                        titreAutoSuggere = null;
+                        return;
+                    }
+                    if (nonModifie) {
                         titre = t.libelle();
+                        titreAutoSuggere = t.libelle();
                     }
                 });
+    }
+
+    private void reinitialiserDetails() {
+        titre = null;
+        titreAutoSuggere = null;
+        description = null;
+        prix = null;
+        negociable = false;
+        marque = null;
+        modele = null;
+        quantiteStock = null;
+        garantie = null;
+        neuf = true;
+        dureeEstimee = null;
+        interventionDomicile = false;
+        reservation = true;
     }
 
     private void chargerFeuille(Long idCategorie) {
@@ -182,6 +221,7 @@ public class CreerOffreBean implements Serializable {
             List<AttributValeurRequest> valeurs = new ArrayList<>();
             if (attributs != null) {
                 for (AttributResponse a : attributs) {
+                    if ("Marque".equals(a.nom())) continue; // capturé par le champ dédié creerOffreBean.marque
                     switch (a.typeChamp()) {
                         case "LISTE" -> {
                             String v = valeursListe.get(a.id());
@@ -244,6 +284,22 @@ public class CreerOffreBean implements Serializable {
     public List<CategorieResponse> getNiveau3() { return niveau3; }
     public List<TypeOffreResponse> getTypesOffre() { return typesOffre; }
     public List<AttributResponse> getAttributs() { return attributs; }
+
+    /** Attributs à afficher dans "Caractéristiques" — Marque en est exclue, elle a son propre champ dans "Détails de l'offre". */
+    public List<AttributResponse> getAutresAttributs() {
+        if (attributs == null) return List.of();
+        return attributs.stream().filter(a -> !"Marque".equals(a.nom())).toList();
+    }
+
+    /** Marques suggérées pour la catégorie choisie (liste vide si aucune définie : le champ Marque reste alors libre). */
+    public List<String> getOptionsMarque() {
+        if (attributs == null) return List.of();
+        return attributs.stream()
+                .filter(a -> "Marque".equals(a.nom()))
+                .findFirst()
+                .map(a -> a.valeurs().stream().map(v -> v.valeur()).toList())
+                .orElse(List.of());
+    }
 
     public Long getNiveau1Id() { return niveau1Id; }
     public void setNiveau1Id(Long v) { niveau1Id = v; }

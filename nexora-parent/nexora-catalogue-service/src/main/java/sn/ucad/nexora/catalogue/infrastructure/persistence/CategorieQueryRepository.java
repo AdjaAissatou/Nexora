@@ -70,7 +70,7 @@ public class CategorieQueryRepository {
                 SELECT id_type_offre, libelle, description, CAST(principale AS TEXT)
                 FROM type_offre
                 WHERE id_categorie = :idCategorie AND actif = TRUE
-                ORDER BY libelle
+                ORDER BY (libelle = 'Autre'), libelle
                 """);
         q.setParameter("idCategorie", idCategorie);
         List<Object[]> rows = q.getResultList();

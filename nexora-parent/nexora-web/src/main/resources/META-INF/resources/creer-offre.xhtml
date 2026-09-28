@@ -88,16 +88,16 @@
                                     <f:ajax listener="#{creerOffreBean.onTypeOffreChange}" render="communBloc" />
                                 </h:selectOneMenu>
                                 <p style="color:var(--nx-text-secondary); font-size:.9em; margin-top:6px;">
-                                    Le titre est pré-rempli à partir de votre choix — vous pouvez le préciser (marque, modèle...).
+                                    Rien ne correspond ? Choisissez "Autre" en bas de la liste et décrivez librement dans le titre.
                                 </p>
                             </div>
                         </ui:fragment>
                     </h:panelGroup>
 
                     <h:panelGroup id="attributsBloc" layout="block">
-                        <ui:fragment rendered="#{not empty creerOffreBean.attributs}">
+                        <ui:fragment rendered="#{not empty creerOffreBean.autresAttributs}">
                             <h3 style="margin-top:20px;">Caractéristiques</h3>
-                            <ui:repeat value="#{creerOffreBean.attributs}" var="a">
+                            <ui:repeat value="#{creerOffreBean.autresAttributs}" var="a">
                                 <div class="nx-field">
                                     <label>#{a.nom}#{a.obligatoire ? ' *' : ''}</label>
 
@@ -125,7 +125,8 @@
                             <div class="nx-field">
                                 <label for="creerOffre:titre">Titre</label>
                                 <h:inputText id="titre" value="#{creerOffreBean.titre}" styleClass="nx-input" required="true"
-                                             requiredMessage="Le titre est obligatoire." />
+                                             requiredMessage="Le titre est obligatoire."
+                                             placeholder="#{creerOffreBean.autrePropose ? 'Décrivez précisément ce que vous proposez' : ''}" />
                             </div>
 
                             <div class="nx-field">
@@ -175,11 +176,17 @@
                                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
                                     <div class="nx-field">
                                         <label for="creerOffre:marque">Marque</label>
-                                        <h:inputText id="marque" value="#{creerOffreBean.marque}" styleClass="nx-input" />
+                                        <h:selectOneMenu id="marque" rendered="#{not empty creerOffreBean.optionsMarque}"
+                                                         value="#{creerOffreBean.marque}" styleClass="nx-select">
+                                            <f:selectItem itemLabel="Choisir une marque…" itemValue="" />
+                                            <f:selectItems value="#{creerOffreBean.optionsMarque}" var="m" itemLabel="#{m}" itemValue="#{m}" />
+                                        </h:selectOneMenu>
+                                        <h:inputText rendered="#{empty creerOffreBean.optionsMarque}"
+                                                     value="#{creerOffreBean.marque}" styleClass="nx-input" />
                                     </div>
                                     <div class="nx-field">
-                                        <label for="creerOffre:modele">Modèle</label>
-                                        <h:inputText id="modele" value="#{creerOffreBean.modele}" styleClass="nx-input" />
+                                        <label for="creerOffre:modele">Modèle <span style="font-weight:400; color:var(--nx-text-secondary);">(référence précise)</span></label>
+                                        <h:inputText id="modele" value="#{creerOffreBean.modele}" styleClass="nx-input" placeholder="ex. Pavilion 15-eg2001sn" />
                                     </div>
                                 </div>
                                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">

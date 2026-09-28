@@ -124,6 +124,8 @@
 \i 09_seed/08_sous_categories.sql
 \i 09_seed/09_sous_categories_informatique.sql
 \i 09_seed/10_sous_categories_reste.sql
+\i 09_seed/11_marques.sql
+\i 09_seed/12_type_offre_autre.sql
 
 -------------------------------------------------------
 -- VUES
