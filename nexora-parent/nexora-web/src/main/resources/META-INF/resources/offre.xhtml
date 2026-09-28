@@ -112,7 +112,9 @@
                 </div>
 
                 <div class="nx-detail-side">
-                    <h3>#{offreDetailBean.offre.espaceNom}</h3>
+                    <h:link outcome="/espace" value="#{offreDetailBean.offre.espaceNom}" style="font-weight:700; font-size:1.1em; color:var(--nx-text);">
+                        <f:param name="id" value="#{offreDetailBean.offre.espaceId}" />
+                    </h:link>
                     <ui:fragment rendered="#{!empty offreDetailBean.offre.espaceSlogan}">
                         <p style="color:var(--nx-text-secondary); font-size:14px; margin-top:6px;">#{offreDetailBean.offre.espaceSlogan}</p>
                     </ui:fragment>

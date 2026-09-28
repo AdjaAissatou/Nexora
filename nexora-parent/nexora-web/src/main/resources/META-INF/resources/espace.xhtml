@@ -1,0 +1,156 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:viewParam name="id" value="#{espaceDetailBean.id}" />
+    <f:viewAction action="#{espaceDetailBean.charger}" />
+</f:metadata>
+<ui:define name="titre">#{espaceDetailBean.trouve ? espaceDetailBean.espace.nom : 'Espace'} — Nexora</ui:define>
+<ui:define name="content">
+
+    <div class="nx-container" style="padding-top:28px; padding-bottom:80px;">
+
+        <ui:fragment rendered="#{!espaceDetailBean.trouve}">
+            <div class="nx-empty" style="margin-bottom:80px;">
+                <div class="nx-empty-icon">
+                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/>
+                    </svg>
+                </div>
+                <p><strong>#{espaceDetailBean.erreur != null ? espaceDetailBean.erreur : 'Cet espace est introuvable.'}</strong></p>
+                <h:link outcome="/recherche" value="← Retour à la recherche" styleClass="nx-back-link" />
+            </div>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{espaceDetailBean.trouve}">
+            <h:link outcome="/recherche" value="← Retour aux résultats" styleClass="nx-back-link" />
+
+            <ui:fragment rendered="#{!empty espaceDetailBean.espace.couverture}">
+                <div class="nx-detail-image" style="height:280px; margin-top:16px;">
+                    <img src="#{espaceDetailBean.espace.couverture}" alt="#{espaceDetailBean.espace.nom}" loading="lazy" />
+                </div>
+            </ui:fragment>
+
+            <div class="nx-card" style="margin-top:20px; padding:28px;">
+
+                <div style="display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap;">
+                    <ui:fragment rendered="#{!empty espaceDetailBean.espace.logo}">
+                        <img src="#{espaceDetailBean.espace.logo}" alt="Logo #{espaceDetailBean.espace.nom}"
+                             style="width:72px; height:72px; border-radius:16px; object-fit:cover; border:1px solid var(--nx-border);" />
+                    </ui:fragment>
+
+                    <div style="flex:1; min-width:240px;">
+                        <h1 style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0;">
+                            #{espaceDetailBean.espace.nom}
+                            <ui:fragment rendered="#{espaceDetailBean.espace.verifie}">
+                                <span class="nx-badge nx-badge-verifie">
+                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                                    Vérifié
+                                </span>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{espaceDetailBean.espace.certifie}">
+                                <span class="nx-badge nx-badge-certifie">
+                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/></svg>
+                                    Certifié
+                                </span>
+                            </ui:fragment>
+                        </h1>
+
+                        <p style="color:var(--nx-text-secondary); margin:6px 0 0;">#{espaceDetailBean.espace.slogan}</p>
+
+                        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:10px; color:var(--nx-text-secondary); font-size:.95em;">
+                            <span>
+                                <h:outputText value="#{espaceDetailBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText>
+                                ⭐ (#{espaceDetailBean.espace.nombreAvis} avis)
+                            </span>
+                            <ui:fragment rendered="#{!empty espaceDetailBean.espace.commune}">
+                                <span>📍 #{espaceDetailBean.espace.quartier} #{espaceDetailBean.espace.commune}</span>
+                            </ui:fragment>
+                            <span class="#{espaceDetailBean.espace.ouvert ? 'nx-badge-verifie' : 'nx-badge-certifie'}" style="padding:2px 10px; border-radius:999px;">
+                                #{espaceDetailBean.espace.ouvert ? 'Ouvert' : 'Fermé'}
+                            </span>
+                        </div>
+
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+                            <ui:fragment rendered="#{!empty espaceDetailBean.espace.telephone}">
+                                <h:outputLink value="tel:#{espaceDetailBean.espace.telephone}" styleClass="nx-button nx-button-primary">Appeler</h:outputLink>
+                                <h:outputLink value="https://wa.me/221#{espaceDetailBean.espace.telephone}" styleClass="nx-button nx-button-outline">WhatsApp</h:outputLink>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{espaceDetailBean.espace.latitude != null}">
+                                <h:outputLink value="#{format.lienItineraire(espaceDetailBean.espace.latitude, espaceDetailBean.espace.longitude)}"
+                                              target="_blank" styleClass="nx-button nx-button-outline">Itinéraire</h:outputLink>
+                            </ui:fragment>
+                        </div>
+                    </div>
+                </div>
+
+                <ui:fragment rendered="#{!empty espaceDetailBean.espace.description}">
+                    <h3 style="margin-top:28px;">À propos</h3>
+                    <p style="color:var(--nx-text-secondary);">#{espaceDetailBean.espace.description}</p>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{espaceDetailBean.espace.latitude != null}">
+                    <h3 style="margin-top:28px;">Localisation</h3>
+                    <p style="color:var(--nx-text-secondary);">#{espaceDetailBean.espace.adresseComplete}</p>
+                    <iframe class="nx-map-embed" loading="lazy"
+                            src="#{format.lienCarteEmbed(espaceDetailBean.espace.latitude, espaceDetailBean.espace.longitude)}">
+                    </iframe>
+                </ui:fragment>
+
+                <h3 style="margin-top:28px;">Produits &amp; services</h3>
+                <ui:fragment rendered="#{empty espaceDetailBean.offres}">
+                    <p style="color:var(--nx-text-secondary);">Aucune offre publiée pour le moment.</p>
+                </ui:fragment>
+                <div class="nx-offre-grid">
+                    <ui:repeat var="o" value="#{espaceDetailBean.offres}">
+                        <h:link outcome="/offre" styleClass="nx-offre-card">
+                            <f:param name="id" value="#{o.id}" />
+                            <div class="nx-offre-media">
+                                <ui:fragment rendered="#{!empty o.imagePrincipale}">
+                                    <img src="#{o.imagePrincipale}" alt="#{o.titre}" loading="lazy" />
+                                </ui:fragment>
+                                <ui:fragment rendered="#{empty o.imagePrincipale}">
+                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 3h8l10 10-8 8L3 11V3z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+                                    </svg>
+                                </ui:fragment>
+                            </div>
+                            <div class="nx-offre-body">
+                                <span class="nx-offre-titre">#{o.titre}</span>
+                                <span class="nx-offre-prix">
+                                    <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                                </span>
+                            </div>
+                        </h:link>
+                    </ui:repeat>
+                </div>
+
+                <h3 style="margin-top:28px;">Avis</h3>
+                <ui:fragment rendered="#{empty espaceDetailBean.avis}">
+                    <p style="color:var(--nx-text-secondary);">Aucun avis pour le moment.</p>
+                </ui:fragment>
+                <ui:repeat var="a" value="#{espaceDetailBean.avis}">
+                    <div class="nx-profile-row" style="align-items:flex-start; flex-direction:column; gap:4px;">
+                        <strong>#{a.note} ⭐</strong>
+                        <span style="color:var(--nx-text-secondary);">#{a.commentaire}</span>
+                    </div>
+                </ui:repeat>
+
+                <h3 style="margin-top:28px;">Informations</h3>
+                <div class="nx-profile-row"><span>Téléphone</span><span>#{espaceDetailBean.espace.telephone}</span></div>
+                <ui:fragment rendered="#{!empty espaceDetailBean.espace.email}">
+                    <div class="nx-profile-row"><span>Email</span><span>#{espaceDetailBean.espace.email}</span></div>
+                </ui:fragment>
+                <ui:fragment rendered="#{!empty espaceDetailBean.espace.siteWeb}">
+                    <div class="nx-profile-row"><span>Site web</span><span>#{espaceDetailBean.espace.siteWeb}</span></div>
+                </ui:fragment>
+
+            </div>
+        </ui:fragment>
+
+    </div>
+
+</ui:define>
+</ui:composition>

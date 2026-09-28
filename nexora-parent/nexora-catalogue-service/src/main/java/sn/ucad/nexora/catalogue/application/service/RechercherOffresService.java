@@ -30,6 +30,7 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         params.setTypeEspace(request.getTypeEspace());
         params.setCommune(request.getCommune());
         params.setRegion(request.getRegion());
+        params.setIdEspace(request.getIdEspace());
         params.setPrixMin(request.getPrixMin());
         params.setPrixMax(request.getPrixMax());
         params.setEstProduit(request.getEstProduit());

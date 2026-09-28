@@ -212,6 +212,11 @@ public class OffreRepositoryAdapter implements OffreRepository {
             paramMap.put("region", "%" + params.getRegion().trim() + "%");
         }
 
+        if (params.getIdEspace() != null) {
+            sql.append(" AND o.id_espace = :idEspace ");
+            paramMap.put("idEspace", params.getIdEspace());
+        }
+
         if (params.getPrixMin() != null) {
             sql.append(" AND o.prix >= :prixMin ");
             paramMap.put("prixMin", params.getPrixMin());

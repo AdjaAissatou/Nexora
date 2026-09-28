@@ -39,6 +39,7 @@ public class CatalogueApiClient {
                             .queryParamIfPresent("typeEspace", java.util.Optional.ofNullable(vide(c.typeEspace())))
                             .queryParamIfPresent("commune", java.util.Optional.ofNullable(vide(c.commune())))
                             .queryParamIfPresent("region", java.util.Optional.ofNullable(vide(c.region())))
+                            .queryParamIfPresent("idEspace", java.util.Optional.ofNullable(c.idEspace()))
                             .queryParamIfPresent("prixMin", java.util.Optional.ofNullable(c.prixMin()))
                             .queryParamIfPresent("prixMax", java.util.Optional.ofNullable(c.prixMax()))
                             .queryParamIfPresent("estProduit", java.util.Optional.ofNullable(c.estProduit()))

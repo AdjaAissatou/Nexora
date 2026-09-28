@@ -76,7 +76,12 @@
                             <span><h:outputText value="#{monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText> (#{monEspaceBean.espace.nombreAvis} avis)</span>
                         </div>
 
-                        <h:link outcome="/creer-offre" value="Ajouter une offre" styleClass="nx-button nx-button-primary" style="margin-top:12px;" />
+                        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+                            <h:link outcome="/creer-offre" value="Ajouter une offre" styleClass="nx-button nx-button-primary" />
+                            <h:link outcome="/espace" value="Voir ma fiche publique" styleClass="nx-button nx-button-outline">
+                                <f:param name="id" value="#{monEspaceBean.espace.id}" />
+                            </h:link>
+                        </div>
 
                         <h:form id="espaceForm" style="margin-top:18px;">
                             <h:messages for="espaceForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />

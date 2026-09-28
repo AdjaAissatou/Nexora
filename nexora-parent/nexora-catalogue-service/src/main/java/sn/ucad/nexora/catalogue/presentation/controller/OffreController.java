@@ -79,6 +79,9 @@ public class OffreController {
             @Parameter(description = "Filtrer par région")
             @RequestParam(required = false) String region,
 
+            @Parameter(description = "Filtrer par espace professionnel (fiche espace)")
+            @RequestParam(required = false) Long idEspace,
+
             @Parameter(description = "Prix minimum")
             @RequestParam(required = false) BigDecimal prixMin,
 
@@ -109,6 +112,7 @@ public class OffreController {
         request.setTypeEspace(typeEspace);
         request.setCommune(commune);
         request.setRegion(region);
+        request.setIdEspace(idEspace);
         request.setPrixMin(prixMin);
         request.setPrixMax(prixMax);
         request.setEstProduit(estProduit);

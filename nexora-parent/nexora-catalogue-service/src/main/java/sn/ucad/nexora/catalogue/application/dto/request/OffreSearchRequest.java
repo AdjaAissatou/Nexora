@@ -19,6 +19,7 @@ public class OffreSearchRequest {
     private String typeEspace;
     private String commune;
     private String region;
+    private Long idEspace;
     private BigDecimal prixMin;
     private BigDecimal prixMax;
 
@@ -46,6 +47,8 @@ public class OffreSearchRequest {
     public void setCommune(String commune) { this.commune = commune; }
     public String getRegion() { return region; }
     public void setRegion(String region) { this.region = region; }
+    public Long getIdEspace() { return idEspace; }
+    public void setIdEspace(Long idEspace) { this.idEspace = idEspace; }
     public BigDecimal getPrixMin() { return prixMin; }
     public void setPrixMin(BigDecimal prixMin) { this.prixMin = prixMin; }
     public BigDecimal getPrixMax() { return prixMax; }

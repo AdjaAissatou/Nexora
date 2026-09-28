@@ -1,0 +1,15 @@
+package sn.ucad.nexora.web.dto.recherche;
+
+import java.time.LocalDateTime;
+
+/** Miroir de {@code sn.ucad.nexora.recherche.application.dto.response.AvisResponse}. */
+public record AvisResponse(
+        Long id,
+        Long utilisateurId,
+        Long offreId,
+        Long espaceId,
+        int note,
+        String commentaire,
+        String reponseFournisseur,
+        LocalDateTime dateCreation,
+        LocalDateTime dateReponse) {}

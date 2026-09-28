@@ -83,7 +83,7 @@ public class RechercheBean implements Serializable {
         erreur = null;
         try {
             resultats = catalogueApiClient.rechercher(new CritereRecherche(
-                    q, null, typeEspace, commune, null, null, prixMax, null, null,
+                    q, null, typeEspace, commune, null, null, null, prixMax, null, null,
                     verifieUniquement ? Boolean.TRUE : null, tri, page, TAILLE_PAGE));
         } catch (ApiException e) {
             resultats = OffrePageResponse.vide();

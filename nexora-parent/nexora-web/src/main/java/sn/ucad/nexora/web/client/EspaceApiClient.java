@@ -55,6 +55,17 @@ public class EspaceApiClient {
         }
     }
 
+    public EspaceResponse obtenir(Long id) {
+        LOG.info("GET {}/api/v1/espaces/{}", baseUrl, id);
+        try {
+            return client.get().uri("/api/v1/espaces/{id}", id).retrieve().body(EspaceResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
     public EspaceResponse creer(String accessToken, CreateEspaceRequest requete) {
         LOG.info("POST {}/api/v1/espaces", baseUrl);
         try {
