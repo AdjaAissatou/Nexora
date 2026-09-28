@@ -52,6 +52,9 @@ public class CreerEspaceBean implements Serializable {
     private String quartier;
     private String adresseComplete;
 
+    private String logo;
+    private String couverture;
+
     @PostConstruct
     public void charger() {
         try {
@@ -106,7 +109,9 @@ public class CreerEspaceBean implements Serializable {
                             idDepartement,
                             idCommune,
                             quartier,
-                            adresseComplete));
+                            adresseComplete,
+                            logo,
+                            couverture));
             return "mon-espace?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
@@ -257,5 +262,21 @@ public class CreerEspaceBean implements Serializable {
 
     public void setAdresseComplete(String adresseComplete) {
         this.adresseComplete = adresseComplete;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+    public String getCouverture() {
+        return couverture;
+    }
+
+    public void setCouverture(String couverture) {
+        this.couverture = couverture;
     }
 }

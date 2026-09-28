@@ -17,6 +17,8 @@ public class UpdateEspaceRequest {
     @NotNull private Long idCommune;
     @NotBlank private String quartier;
     private String adresseComplete;
+    private String logo;
+    private String couverture;
 
     public String getNom() { return nom; }
     public void setNom(String v) { nom = v; }
@@ -44,4 +46,8 @@ public class UpdateEspaceRequest {
     public void setQuartier(String v) { quartier = v; }
     public String getAdresseComplete() { return adresseComplete; }
     public void setAdresseComplete(String v) { adresseComplete = v; }
+    public String getLogo() { return logo; }
+    public void setLogo(String v) { logo = v; }
+    public String getCouverture() { return couverture; }
+    public void setCouverture(String v) { couverture = v; }
 }

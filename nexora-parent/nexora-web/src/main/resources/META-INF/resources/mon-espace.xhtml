@@ -123,6 +123,25 @@
                                 </label>
                             </div>
 
+                            <h3 style="margin-top:20px;">Logo &amp; couverture</h3>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+                                <div class="nx-field">
+                                    <label for="espaceForm:logo">Logo <span style="font-weight:400; color:var(--nx-text-secondary);">(lien vers une image)</span></label>
+                                    <h:inputText id="logo" value="#{monEspaceBean.espaceLogo}" placeholder="https://…/logo.jpg" styleClass="nx-input" />
+                                    <ui:fragment rendered="#{not empty monEspaceBean.espaceLogo}">
+                                        <img src="#{monEspaceBean.espaceLogo}" alt="Aperçu du logo" style="margin-top:8px; width:64px; height:64px; object-fit:cover; border-radius:50%; border:1px solid var(--nx-border);" />
+                                    </ui:fragment>
+                                </div>
+                                <div class="nx-field">
+                                    <label for="espaceForm:couverture">Photo de couverture <span style="font-weight:400; color:var(--nx-text-secondary);">(lien vers une image)</span></label>
+                                    <h:inputText id="couverture" value="#{monEspaceBean.espaceCouverture}" placeholder="https://…/couverture.jpg" styleClass="nx-input" />
+                                    <ui:fragment rendered="#{not empty monEspaceBean.espaceCouverture}">
+                                        <img src="#{monEspaceBean.espaceCouverture}" alt="Aperçu de la couverture" style="margin-top:8px; width:100%; max-width:220px; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--nx-border);" />
+                                    </ui:fragment>
+                                </div>
+                            </div>
+
                             <h3 style="margin-top:20px;">Localisation</h3>
 
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">

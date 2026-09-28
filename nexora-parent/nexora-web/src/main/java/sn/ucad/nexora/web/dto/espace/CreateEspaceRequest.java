@@ -17,4 +17,6 @@ public record CreateEspaceRequest(
         Long idDepartement,
         Long idCommune,
         String quartier,
-        String adresseComplete) {}
+        String adresseComplete,
+        String logo,
+        String couverture) {}

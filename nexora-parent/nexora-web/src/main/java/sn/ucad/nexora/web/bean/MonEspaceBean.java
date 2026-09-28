@@ -63,6 +63,9 @@ public class MonEspaceBean implements Serializable {
     private String quartier;
     private String adresseComplete;
 
+    private String espaceLogo;
+    private String espaceCouverture;
+
     @PostConstruct
     public void charger() {
         try {
@@ -99,6 +102,8 @@ public class MonEspaceBean implements Serializable {
         espaceOuvert = espace.ouvert();
         quartier = espace.quartier();
         adresseComplete = espace.adresseComplete();
+        espaceLogo = espace.logo();
+        espaceCouverture = espace.couverture();
 
         regions = espaceApiClient.regions();
         idRegion = regions.stream().filter(r -> r.nom().equals(espace.region())).map(RegionResponse::id).findFirst().orElse(null);
@@ -160,7 +165,9 @@ public class MonEspaceBean implements Serializable {
                             idDepartement,
                             idCommune,
                             quartier,
-                            adresseComplete));
+                            adresseComplete,
+                            espaceLogo,
+                            espaceCouverture));
             remplirChampsEspace();
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Espace mis à jour.", null));
@@ -330,5 +337,21 @@ public class MonEspaceBean implements Serializable {
 
     public void setAdresseComplete(String adresseComplete) {
         this.adresseComplete = adresseComplete;
+    }
+
+    public String getEspaceLogo() {
+        return espaceLogo;
+    }
+
+    public void setEspaceLogo(String espaceLogo) {
+        this.espaceLogo = espaceLogo;
+    }
+
+    public String getEspaceCouverture() {
+        return espaceCouverture;
+    }
+
+    public void setEspaceCouverture(String espaceCouverture) {
+        this.espaceCouverture = espaceCouverture;
     }
 }

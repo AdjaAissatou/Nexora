@@ -14,4 +14,6 @@ public record UpdateEspaceRequest(
         Long idDepartement,
         Long idCommune,
         String quartier,
-        String adresseComplete) {}
+        String adresseComplete,
+        String logo,
+        String couverture) {}

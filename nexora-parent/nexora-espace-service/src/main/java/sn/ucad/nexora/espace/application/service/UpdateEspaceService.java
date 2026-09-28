@@ -56,6 +56,8 @@ public class UpdateEspaceService implements UpdateEspaceUseCase {
         espace.setTelephoneSecondaire(request.getTelephoneSecondaire());
         espace.setEmail(request.getEmail());
         espace.setSiteWeb(request.getSiteWeb());
+        espace.setLogo(request.getLogo());
+        espace.setCouverture(request.getCouverture());
         if (request.getOuvert() != null) {
             espace.setOuvert(request.getOuvert());
         }
