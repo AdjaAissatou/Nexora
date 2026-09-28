@@ -3,6 +3,8 @@ package sn.ucad.nexora.web.util;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Locale;
 
 /** Petites fonctions de formatage exposées à l'EL des pages ({@code #{format.xxx}}). */
 @Named("format")
@@ -49,5 +51,23 @@ public class FormatBean implements Serializable {
 
     public int getAnneeCourante() {
         return java.time.Year.now().getValue();
+    }
+
+    /** Lien "obtenir l'itinéraire" vers Google Maps — aucune clé d'API requise, s'ouvre dans l'appli Maps du visiteur. */
+    public String lienItineraire(BigDecimal latitude, BigDecimal longitude) {
+        if (latitude == null || longitude == null) return "";
+        return String.format(Locale.ROOT, "https://www.google.com/maps/dir/?api=1&destination=%s,%s", latitude, longitude);
+    }
+
+    /** Carte embarquée OpenStreetMap (gratuite, sans clé d'API) centrée sur le point avec un repère. */
+    public String lienCarteEmbed(BigDecimal latitude, BigDecimal longitude) {
+        if (latitude == null || longitude == null) return "";
+        double lat = latitude.doubleValue();
+        double lon = longitude.doubleValue();
+        double delta = 0.01;
+        return String.format(
+                Locale.ROOT,
+                "https://www.openstreetmap.org/export/embed.html?bbox=%s,%s,%s,%s&layer=mapnik&marker=%s,%s",
+                lon - delta, lat - delta, lon + delta, lat + delta, lat, lon);
     }
 }

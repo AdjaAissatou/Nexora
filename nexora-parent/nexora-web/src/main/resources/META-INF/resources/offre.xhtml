@@ -30,6 +30,12 @@
             <div class="nx-detail-layout">
 
                 <div class="nx-detail-main">
+                    <ui:fragment rendered="#{!empty offreDetailBean.offre.imagePrincipale}">
+                        <div class="nx-detail-image">
+                            <img src="#{offreDetailBean.offre.imagePrincipale}" alt="#{offreDetailBean.offre.titre}" loading="lazy" />
+                        </div>
+                    </ui:fragment>
+
                     <div class="nx-offre-espace">
                         #{offreDetailBean.offre.typeEspace}
                         <ui:fragment rendered="#{offreDetailBean.offre.espaceVerifie}">
@@ -80,7 +86,27 @@
                                 </svg>
                                 Localisation
                             </h3>
-                            <p style="color:var(--nx-text-secondary);">#{offreDetailBean.offre.localisation.texte}</p>
+                            <p style="color:var(--nx-text-secondary);">
+                                <ui:fragment rendered="#{!empty offreDetailBean.offre.localisation.adresseComplete}">
+                                    #{offreDetailBean.offre.localisation.adresseComplete} —
+                                </ui:fragment>
+                                #{offreDetailBean.offre.localisation.texte}
+                            </p>
+
+                            <ui:fragment rendered="#{offreDetailBean.offre.localisation.latitude != null and offreDetailBean.offre.localisation.longitude != null}">
+                                <div class="nx-map-embed">
+                                    <iframe
+                                        src="#{format.lienCarteEmbed(offreDetailBean.offre.localisation.latitude, offreDetailBean.offre.localisation.longitude)}"
+                                        loading="lazy" title="Carte de localisation" />
+                                </div>
+                                <h:outputLink value="#{format.lienItineraire(offreDetailBean.offre.localisation.latitude, offreDetailBean.offre.localisation.longitude)}"
+                                              target="_blank" styleClass="nx-button nx-button-outline-dark nx-button-block" style="margin-top:12px;">
+                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;">
+                                        <path d="M3 11l18-8-8 18-2-8-8-2z"/>
+                                    </svg>
+                                    Obtenir l'itinéraire
+                                </h:outputLink>
+                            </ui:fragment>
                         </div>
                     </ui:fragment>
                 </div>
