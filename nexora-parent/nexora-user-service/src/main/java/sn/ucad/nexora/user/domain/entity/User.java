@@ -5,7 +5,8 @@ import java.util.UUID;
 
 public class User {
 
-    private UUID id;
+    /** Identifiant technique dans la table {@code utilisateurs} (id_utilisateur). */
+    private Long id;
 
     /**
      * Identifiant du compte géré par auth-service.
@@ -15,6 +16,8 @@ public class User {
     private String firstName;
 
     private String lastName;
+
+    private String email;
 
     private String phone;
 
@@ -26,10 +29,11 @@ public class User {
     }
 
     public User(
-            UUID id,
+            Long id,
             UUID accountId,
             String firstName,
             String lastName,
+            String email,
             String phone,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
@@ -38,16 +42,17 @@ public class User {
         this.accountId = accountId;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
         this.phone = phone;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -73,6 +78,14 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPhone() {

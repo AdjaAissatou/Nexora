@@ -33,6 +33,12 @@ public class CreateUserService implements CreateUserUseCase {
             );
         }
 
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Email obligatoire"
+            );
+        }
+
         // Empêcher la création de plusieurs profils
         // pour le même compte
         if (userRepository
@@ -57,6 +63,10 @@ public class CreateUserService implements CreateUserUseCase {
 
         user.setLastName(
                 request.getLastName()
+        );
+
+        user.setEmail(
+                request.getEmail()
         );
 
         user.setPhone(

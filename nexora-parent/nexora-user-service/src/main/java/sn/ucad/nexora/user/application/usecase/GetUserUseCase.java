@@ -6,7 +6,7 @@ import sn.ucad.nexora.user.domain.entity.User;
 
 public interface GetUserUseCase {
 
-    User getById(UUID id);
+    User getById(Long id);
 
     User getByAccountId(UUID accountId);
 }

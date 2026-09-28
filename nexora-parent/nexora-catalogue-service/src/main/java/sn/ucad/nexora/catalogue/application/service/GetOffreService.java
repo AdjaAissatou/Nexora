@@ -65,6 +65,7 @@ public class GetOffreService implements GetOffreUseCase {
         r.setEspaceTelephone(o.getEspaceTelephone());
         r.setEspaceCertifie(o.isEspaceCertifie());
         r.setEspaceVerifie(o.isEspaceVerifie());
+        r.setEspaceOuvert(o.isEspaceOuvert());
         r.setEspaceNoteMoyenne(o.getEspaceNoteMoyenne());
         r.setEspaceNombreAvis(o.getEspaceNombreAvis());
         r.setTypeEspace(o.getTypeEspace());

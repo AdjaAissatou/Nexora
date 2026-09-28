@@ -40,6 +40,7 @@ public class Offre {
     private String espaceTelephone;
     private boolean espaceCertifie;
     private boolean espaceVerifie;
+    private boolean espaceOuvert;
     private BigDecimal espaceNoteMoyenne;
     private Integer espaceNombreAvis;
     private String typeEspace;
@@ -147,6 +148,9 @@ public class Offre {
 
     public boolean isEspaceVerifie() { return espaceVerifie; }
     public void setEspaceVerifie(boolean espaceVerifie) { this.espaceVerifie = espaceVerifie; }
+
+    public boolean isEspaceOuvert() { return espaceOuvert; }
+    public void setEspaceOuvert(boolean espaceOuvert) { this.espaceOuvert = espaceOuvert; }
 
     public BigDecimal getEspaceNoteMoyenne() { return espaceNoteMoyenne; }
     public void setEspaceNoteMoyenne(BigDecimal espaceNoteMoyenne) { this.espaceNoteMoyenne = espaceNoteMoyenne; }

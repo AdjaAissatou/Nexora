@@ -18,7 +18,7 @@ public class GetUserService implements GetUserUseCase {
     }
 
     @Override
-    public User getById(UUID id) {
+    public User getById(Long id) {
 
         return userRepository.findById(id)
                 .orElseThrow(() ->

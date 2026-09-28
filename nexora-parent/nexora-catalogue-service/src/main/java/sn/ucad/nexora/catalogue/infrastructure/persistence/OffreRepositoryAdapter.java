@@ -311,7 +311,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
         // r[25] = email, r[26] = site_web
         o.setEspaceCertifie(toBool(r[27]));
         o.setEspaceVerifie(toBool(r[28]));
-        // r[29] = ouvert
+        o.setEspaceOuvert(toBool(r[29]));
         o.setEspaceNoteMoyenne(toBD(r[30]));
         o.setEspaceNombreAvis(toInt(r[31]));
 
@@ -372,11 +372,11 @@ public class OffreRepositoryAdapter implements OffreRepository {
 
     private List<String> loadImages(Long offreId) {
         @SuppressWarnings("unchecked")
-        List<Object[]> rows = em.createNativeQuery(
+        List<Object> rows = em.createNativeQuery(
                 "SELECT url FROM image WHERE id_offre = :id ORDER BY ordre_affichage ASC")
                 .setParameter("id", offreId)
                 .getResultList();
-        return rows.stream().map(r -> str(r[0])).filter(Objects::nonNull).toList();
+        return rows.stream().map(this::str).filter(Objects::nonNull).toList();
     }
 
     private String loadImagePrincipale(Long offreId) {

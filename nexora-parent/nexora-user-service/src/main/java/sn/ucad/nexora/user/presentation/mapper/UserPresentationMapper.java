@@ -20,6 +20,7 @@ public class UserPresentationMapper {
         response.setAccountId(user.getAccountId());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
         response.setPhone(user.getPhone());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());

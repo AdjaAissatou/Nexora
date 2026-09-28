@@ -10,6 +10,8 @@ public class CreateUserRequest {
 
     private String lastName;
 
+    private String email;
+
     private String phone;
 
     public CreateUserRequest() {
@@ -45,5 +47,13 @@ public class CreateUserRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

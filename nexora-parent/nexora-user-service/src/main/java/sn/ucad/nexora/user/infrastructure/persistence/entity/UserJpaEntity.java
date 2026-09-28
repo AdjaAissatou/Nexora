@@ -5,45 +5,50 @@ import java.util.UUID;
 
 import jakarta.persistence.*;
 
+/**
+ * Mappe la vraie table {@code utilisateurs} du schéma métier (celle dont dépendent
+ * espace_professionnel, avis, commande, favori, wallet...), et non une table à part : c'était le bug
+ * précédent (une table {@code users} créée par Hibernate, jamais reliée au reste du schéma, qui
+ * faisait échouer toute lecture côté espace-service avec "Profil utilisateur introuvable").
+ *
+ * Seuls les champs utiles à user-service aujourd'hui sont mappés ; les colonnes restantes (pseudo,
+ * photo_profil, biographie, sexe, langue, statut...) gardent leurs valeurs par défaut en base et ne
+ * sont pas touchées par Hibernate tant qu'elles ne sont pas mappées ici.
+ */
 @Entity
-@Table(
-    name = "users",
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uk_users_account_id", columnNames = "account_id")
-    }
-)
+@Table(name = "utilisateurs")
 public class UserJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_utilisateur")
+    private Long id;
 
-    @Column(name = "account_id", nullable = false, unique = true)
+    @Column(name = "account_id", unique = true)
     private UUID accountId;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @Column(nullable = false)
+    private String prenom;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    @Column(nullable = false)
+    private String nom;
 
-    @Column(name = "phone")
-    private String phone;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private String telephone;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "date_creation")
+    private LocalDateTime dateCreation;
 
-    public UserJpaEntity() {
-    }
+    @Column(name = "date_modification")
+    private LocalDateTime dateModification;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -55,43 +60,53 @@ public class UserJpaEntity {
         this.accountId = accountId;
     }
 
+    /** Prénom (colonne {@code prenom}) — l'entité expose firstName/lastName pour rester lisible côté Java. */
     public String getFirstName() {
-        return firstName;
+        return prenom;
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        this.prenom = firstName;
     }
 
+    /** Nom de famille (colonne {@code nom}). */
     public String getLastName() {
-        return lastName;
+        return nom;
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.nom = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPhone() {
-        return phone;
+        return telephone;
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.telephone = phone;
     }
 
     public LocalDateTime getCreatedAt() {
-        return createdAt;
+        return dateCreation;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+        this.dateCreation = createdAt;
     }
 
     public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+        return dateModification;
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+        this.dateModification = updatedAt;
     }
 }

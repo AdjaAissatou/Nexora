@@ -19,7 +19,7 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<User> findById(Long id) {
         return repository.findById(id)
                 .map(this::toDomain);
     }
@@ -41,7 +41,7 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         repository.deleteById(id);
     }
 
@@ -53,6 +53,7 @@ public class UserRepositoryAdapter implements UserRepository {
         user.setAccountId(entity.getAccountId());
         user.setFirstName(entity.getFirstName());
         user.setLastName(entity.getLastName());
+        user.setEmail(entity.getEmail());
         user.setPhone(entity.getPhone());
         user.setCreatedAt(entity.getCreatedAt());
         user.setUpdatedAt(entity.getUpdatedAt());
@@ -68,6 +69,7 @@ public class UserRepositoryAdapter implements UserRepository {
         entity.setAccountId(user.getAccountId());
         entity.setFirstName(user.getFirstName());
         entity.setLastName(user.getLastName());
+        entity.setEmail(user.getEmail());
         entity.setPhone(user.getPhone());
         entity.setCreatedAt(user.getCreatedAt());
         entity.setUpdatedAt(user.getUpdatedAt());

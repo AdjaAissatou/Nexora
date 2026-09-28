@@ -5,13 +5,15 @@ import java.util.UUID;
 
 public class UserResponse {
 
-    private UUID id;
+    private Long id;
 
     private UUID accountId;
 
     private String firstName;
 
     private String lastName;
+
+    private String email;
 
     private String phone;
 
@@ -22,11 +24,11 @@ public class UserResponse {
     public UserResponse() {
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -60,6 +62,14 @@ public class UserResponse {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public LocalDateTime getCreatedAt() {
