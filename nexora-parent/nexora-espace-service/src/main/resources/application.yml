@@ -1,5 +1,5 @@
 spring:
-application:
-  name: espace-service
-config:
-  import: configserver:http://localhost:8888
+  application:
+    name: espace-service
+  config:
+    import: "optional:configserver:http://localhost:8888"

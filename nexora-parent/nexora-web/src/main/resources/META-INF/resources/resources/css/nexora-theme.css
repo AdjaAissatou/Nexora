@@ -761,6 +761,36 @@ h1, h2, h3, p { margin: 0; }
 
 
 /* =========================================================
+   MON ESPACE / CRÉER MON ESPACE
+========================================================= */
+
+.nx-espace-layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; padding: 28px 0 80px; }
+
+.nx-card {
+    background: var(--nx-surface);
+    border: 1px solid var(--nx-border);
+    border-radius: var(--nx-radius-lg);
+    box-shadow: var(--nx-shadow);
+    padding: 26px;
+}
+.nx-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+
+.nx-profile-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--nx-border); font-size: 14px; }
+.nx-profile-row:last-child { border-bottom: none; }
+.nx-profile-row span:first-child { color: var(--nx-text-light); }
+.nx-profile-row span:last-child { font-weight: 600; text-align: right; }
+
+.nx-card-empty { text-align: center; padding: 50px 24px; }
+.nx-card-empty .nx-icon { width: 40px; height: 40px; color: var(--nx-primary); margin: 0 auto 16px; }
+.nx-card-empty h3 { margin-bottom: 8px; }
+.nx-card-empty p { color: var(--nx-text-secondary); margin-bottom: 22px; }
+
+textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
+
+.nx-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+
+
+/* =========================================================
    FOOTER
 ========================================================= */
 

@@ -1,0 +1,86 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}" />
+</f:metadata>
+<ui:define name="titre">Mon espace — Nexora</ui:define>
+<ui:define name="content">
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Mon espace</h1>
+            <p>Gérez votre profil et votre espace professionnel Nexora.</p>
+        </div>
+    </section>
+
+    <div class="nx-container">
+
+        <ui:fragment rendered="#{!empty monEspaceBean.erreur}">
+            <div class="nx-alert nx-alert-error" style="margin-top:20px;">#{monEspaceBean.erreur}</div>
+        </ui:fragment>
+
+        <div class="nx-espace-layout">
+
+            <div class="nx-card">
+                <h3>Mon profil</h3>
+                <div class="nx-profile-row"><span>Nom</span><span>#{sessionBean.nomComplet}</span></div>
+                <div class="nx-profile-row"><span>Email</span><span>#{sessionBean.compte.email}</span></div>
+                <div class="nx-profile-row"><span>Téléphone</span><span>#{format.telephoneAffiche(monEspaceBean.profil.phone)}</span></div>
+            </div>
+
+            <div>
+
+                <ui:fragment rendered="#{monEspaceBean.aEspace}">
+                    <div class="nx-card">
+                        <h3 style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            #{monEspaceBean.espace.nom}
+                            <ui:fragment rendered="#{monEspaceBean.espace.verifie}">
+                                <span class="nx-badge nx-badge-verifie">
+                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                                    Vérifié
+                                </span>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{monEspaceBean.espace.certifie}">
+                                <span class="nx-badge nx-badge-certifie">
+                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/></svg>
+                                    Certifié
+                                </span>
+                            </ui:fragment>
+                        </h3>
+
+                        <ui:fragment rendered="#{!empty monEspaceBean.espace.slogan}">
+                            <p style="color:var(--nx-text-secondary); margin-bottom:16px;">#{monEspaceBean.espace.slogan}</p>
+                        </ui:fragment>
+
+                        <div class="nx-profile-row"><span>Téléphone</span><span>#{format.telephoneAffiche(monEspaceBean.espace.telephone)}</span></div>
+                        <div class="nx-profile-row"><span>Email</span><span>#{monEspaceBean.espace.email}</span></div>
+                        <div class="nx-profile-row">
+                            <span>Note moyenne</span>
+                            <span><h:outputText value="#{monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText> (#{monEspaceBean.espace.nombreAvis} avis)</span>
+                        </div>
+                        <div class="nx-profile-row"><span>Statut</span><span>#{monEspaceBean.espace.ouvert ? 'Ouvert' : 'Fermé'}</span></div>
+                    </div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{!monEspaceBean.aEspace}">
+                    <div class="nx-card nx-card-empty">
+                        <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/><path d="M10 21v-4h4v4"/>
+                        </svg>
+                        <h3>Vous n'avez pas encore d'espace professionnel</h3>
+                        <p>Créez votre espace pour présenter votre activité, vos coordonnées et vos services aux visiteurs de Nexora.</p>
+                        <h:link outcome="/creer-espace" value="Créer mon espace" styleClass="nx-button nx-button-primary" />
+                    </div>
+                </ui:fragment>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</ui:define>
+</ui:composition>

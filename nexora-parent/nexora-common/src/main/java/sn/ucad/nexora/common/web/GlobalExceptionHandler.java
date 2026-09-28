@@ -1,8 +1,9 @@
-package sn.ucad.nexora.auth.presentation.controller;
+package sn.ucad.nexora.common.web;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,12 +15,20 @@ import sn.ucad.nexora.common.exception.UnauthorizedException;
 import sn.ucad.nexora.common.exception.ValidationException;
 
 /**
- * Sans cette classe, chaque {@link BusinessException}/{@link ResourceNotFoundException} levée par
- * register/login/verify-otp/forgot-password/reset-password (compte non vérifié, OTP expiré, email
- * déjà utilisé...) n'était interceptée par personne : la requête finissait en exception non gérée
- * remontant jusqu'au conteneur, et le client ne recevait qu'un statut générique à corps vide — le
- * vrai message métier ("Votre compte n'est pas encore vérifié.", etc.) n'atteignait jamais l'appelant.
+ * Gestionnaire d'erreurs partagé par tous les microservices Nexora (auto-configuré via
+ * {@code META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports}).
+ *
+ * Avant cette classe, chaque service dupliquait le même {@code @RestControllerAdvice}, et certains
+ * (auth-service, user-service, espace-service) n'en avaient tout simplement aucun : une
+ * {@link BusinessException}/{@link ResourceNotFoundException}/{@link IllegalArgumentException} levée
+ * dans le code métier finissait alors en exception non gérée, et l'appelant ne recevait qu'un statut
+ * générique à corps vide au lieu du vrai message.
+ *
+ * Couvre aussi {@link IllegalArgumentException} (avec l'heuristique déjà utilisée par
+ * catalogue-service/recherche-service : "introuvable" dans le message → 404, sinon 400), car
+ * plusieurs services l'utilisent directement plutôt que la hiérarchie d'exceptions de ce module.
  */
+@AutoConfiguration
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -36,6 +45,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({BusinessException.class, ValidationException.class})
     public ResponseEntity<Map<String, Object>> handleBusiness(RuntimeException ex) {
         return corps(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        HttpStatus status = ex.getMessage() != null && ex.getMessage().contains("introuvable")
+                ? HttpStatus.NOT_FOUND
+                : HttpStatus.BAD_REQUEST;
+        return corps(status, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

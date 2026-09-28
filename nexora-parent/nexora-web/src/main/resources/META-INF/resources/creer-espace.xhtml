@@ -1,0 +1,94 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}" />
+</f:metadata>
+<ui:define name="titre">Créer mon espace — Nexora</ui:define>
+<ui:define name="content">
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Créer mon espace professionnel</h1>
+            <p>Présentez votre activité aux visiteurs de Nexora.</p>
+        </div>
+    </section>
+
+    <div class="nx-container" style="padding:28px 0 80px;">
+        <div class="nx-card" style="max-width:640px; margin:0 auto;">
+
+            <h:form id="creerEspace">
+                <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" layout="table" />
+
+                <div class="nx-field">
+                    <label for="creerEspace:type">Catégorie</label>
+                    <h:selectOneMenu id="type" value="#{creerEspaceBean.typeEspaceId}" styleClass="nx-select" required="true"
+                                     requiredMessage="Choisissez une catégorie.">
+                        <f:selectItem itemLabel="Choisir une catégorie…" itemValue="#{null}" />
+                        <f:selectItems value="#{creerEspaceBean.types}" var="t" itemLabel="#{t.nom}" itemValue="#{t.id}" />
+                        <f:converter converterId="jakarta.faces.Long" />
+                    </h:selectOneMenu>
+                </div>
+
+                <div class="nx-field">
+                    <label for="creerEspace:nom">Nom de l'espace</label>
+                    <h:inputText id="nom" value="#{creerEspaceBean.nom}" styleClass="nx-input" required="true"
+                                 requiredMessage="Le nom est obligatoire." />
+                </div>
+
+                <div class="nx-field">
+                    <label for="creerEspace:slogan">Slogan</label>
+                    <h:inputText id="slogan" value="#{creerEspaceBean.slogan}" styleClass="nx-input" />
+                </div>
+
+                <div class="nx-field">
+                    <label for="creerEspace:description">Description</label>
+                    <h:inputTextarea id="description" value="#{creerEspaceBean.description}" styleClass="nx-input" />
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+                    <div class="nx-field">
+                        <label for="creerEspace:telephone">Téléphone</label>
+                        <h:inputText id="telephone" value="#{creerEspaceBean.telephone}" placeholder="77 123 45 67" styleClass="nx-input" />
+                    </div>
+                    <div class="nx-field">
+                        <label for="creerEspace:telephoneSecondaire">Téléphone secondaire</label>
+                        <h:inputText id="telephoneSecondaire" value="#{creerEspaceBean.telephoneSecondaire}" styleClass="nx-input" />
+                    </div>
+                </div>
+
+                <div class="nx-field">
+                    <label for="creerEspace:email">Adresse email</label>
+                    <h:inputText id="email" value="#{creerEspaceBean.email}" styleClass="nx-input" />
+                </div>
+
+                <div class="nx-field">
+                    <label for="creerEspace:siteWeb">Site web</label>
+                    <h:inputText id="siteWeb" value="#{creerEspaceBean.siteWeb}" placeholder="www.monsite.sn" styleClass="nx-input" />
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 12px;">
+                    <div class="nx-field">
+                        <label for="creerEspace:rc">Registre de commerce</label>
+                        <h:inputText id="rc" value="#{creerEspaceBean.registreCommerce}" styleClass="nx-input" />
+                    </div>
+                    <div class="nx-field">
+                        <label for="creerEspace:ninea">NINEA</label>
+                        <h:inputText id="ninea" value="#{creerEspaceBean.numeroNinea}" styleClass="nx-input" />
+                    </div>
+                    <div class="nx-field">
+                        <label for="creerEspace:rccm">RCCM</label>
+                        <h:inputText id="rccm" value="#{creerEspaceBean.numeroRccm}" styleClass="nx-input" />
+                    </div>
+                </div>
+
+                <h:commandButton value="Créer mon espace" action="#{creerEspaceBean.creer}" styleClass="nx-button nx-button-primary nx-button-block" />
+            </h:form>
+
+        </div>
+    </div>
+
+</ui:define>
+</ui:composition>
