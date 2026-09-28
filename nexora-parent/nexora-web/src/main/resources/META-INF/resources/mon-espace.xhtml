@@ -33,7 +33,7 @@
 
             <div>
 
-                <ui:fragment rendered="#{monEspaceBean.aEspace}">
+                <ui:fragment rendered="#{monEspaceBean.possedeEspace}">
                     <div class="nx-card">
                         <h3 style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                             #{monEspaceBean.espace.nom}
@@ -65,7 +65,7 @@
                     </div>
                 </ui:fragment>
 
-                <ui:fragment rendered="#{!monEspaceBean.aEspace}">
+                <ui:fragment rendered="#{!monEspaceBean.possedeEspace}">
                     <div class="nx-card nx-card-empty">
                         <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/><path d="M10 21v-4h4v4"/>

@@ -49,7 +49,12 @@ public class MonEspaceBean implements Serializable {
         }
     }
 
-    public boolean isAEspace() {
+    /**
+     * Nommé sans "is + deux majuscules" à dessein : {@code isAEspace()} exposerait la propriété EL
+     * "AEspace" (majuscule conservée) et non "aEspace", par la règle de décapitalisation de
+     * {@link java.beans.Introspector} — {@code #{monEspaceBean.aEspace}} échouerait silencieusement.
+     */
+    public boolean isPossedeEspace() {
         return espace != null;
     }
 
