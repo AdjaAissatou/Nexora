@@ -10,6 +10,8 @@ CREATE TABLE type_offre (
 
     description TEXT,
 
+    principale type_offre_principale NOT NULL DEFAULT 'PRODUIT',
+
     actif BOOLEAN DEFAULT TRUE,
 
     CONSTRAINT fk_typeoffre_categorie

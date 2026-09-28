@@ -4,6 +4,8 @@ CREATE TABLE categorie (
 
     id_categorie BIGSERIAL PRIMARY KEY,
 
+    id_categorie_parent BIGINT,
+
     nom VARCHAR(120) NOT NULL UNIQUE,
 
     description TEXT,
@@ -18,6 +20,11 @@ CREATE TABLE categorie (
 
     actif BOOLEAN DEFAULT TRUE,
 
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_categorie_parent
+        FOREIGN KEY(id_categorie_parent)
+        REFERENCES categorie(id_categorie)
+        ON DELETE CASCADE
 
 );
