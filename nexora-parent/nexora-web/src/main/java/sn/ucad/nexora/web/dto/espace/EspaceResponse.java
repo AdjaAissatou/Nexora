@@ -14,6 +14,7 @@ public record EspaceResponse(
         String telephone,
         String email,
         boolean ouvert,
+        String statut,
         boolean certifie,
         boolean verifie,
         BigDecimal noteMoyenne,

@@ -34,6 +34,11 @@ CREATE TABLE espace_professionnel (
 
     ouvert BOOLEAN DEFAULT TRUE,
 
+    -- Statut de cycle de vie administratif (distinct de "ouvert", qui reflète une
+    -- fermeture volontaire/horaire décidée par le professionnel). Par défaut ACTIF
+    -- tant qu'aucune modération n'est en place : voir statut_espace dans 01_types.sql.
+    statut statut_espace NOT NULL DEFAULT 'ACTIF',
+
     certifie BOOLEAN DEFAULT FALSE,
 
     verifie BOOLEAN DEFAULT FALSE,

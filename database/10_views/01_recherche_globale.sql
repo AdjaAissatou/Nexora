@@ -83,4 +83,5 @@ ON d.id_offre = o.id_offre
 AND d.est_disponible = TRUE
 
 WHERE o.statut = 'PUBLIE'
-AND ep.ouvert = TRUE;
+AND ep.ouvert = TRUE
+AND ep.statut = 'ACTIF';

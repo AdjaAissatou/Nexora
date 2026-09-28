@@ -20,6 +20,7 @@ public class EspaceProfessionnel {
     private String numeroNinea;
     private String numeroRccm;
     private boolean ouvert;
+    private String statut;
     private boolean certifie;
     private boolean verifie;
     private BigDecimal noteMoyenne;
@@ -46,6 +47,7 @@ public class EspaceProfessionnel {
     public String getNumeroNinea(){return numeroNinea;} public void setNumeroNinea(String v){numeroNinea=v;}
     public String getNumeroRccm(){return numeroRccm;} public void setNumeroRccm(String v){numeroRccm=v;}
     public boolean isOuvert(){return ouvert;} public void setOuvert(boolean v){ouvert=v;}
+    public String getStatut(){return statut;} public void setStatut(String v){statut=v;}
     public boolean isCertifie(){return certifie;} public void setCertifie(boolean v){certifie=v;}
     public boolean isVerifie(){return verifie;} public void setVerifie(boolean v){verifie=v;}
     public BigDecimal getNoteMoyenne(){return noteMoyenne;} public void setNoteMoyenne(BigDecimal v){noteMoyenne=v;}

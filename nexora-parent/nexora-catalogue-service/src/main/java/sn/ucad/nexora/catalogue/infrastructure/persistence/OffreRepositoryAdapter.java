@@ -173,6 +173,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
             LEFT JOIN image img ON img.id_offre = o.id_offre AND img.principale = TRUE
             WHERE CAST(o.statut AS TEXT) = 'PUBLIE'
               AND ep.ouvert = TRUE
+              AND CAST(ep.statut AS TEXT) = 'ACTIF'
             """);
 
         Map<String, Object> paramMap = new LinkedHashMap<>();
