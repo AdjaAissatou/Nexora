@@ -3,6 +3,7 @@ package sn.ucad.nexora.espace.infrastructure.persistence.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 @Entity
 @Table(name="espace_professionnel")
@@ -17,7 +18,7 @@ public class EspaceJpaEntity {
  @Column(name="registre_commerce") private String registreCommerce;
  @Column(name="numero_ninea") private String numeroNinea; @Column(name="numero_rccm") private String numeroRccm;
  private Boolean ouvert=true;
- @Column(name="statut",columnDefinition="statut_espace") private String statut="ACTIF";
+ @Column(name="statut",columnDefinition="statut_espace") @ColumnTransformer(write="?::statut_espace") private String statut="ACTIF";
  private Boolean certifie=false; private Boolean verifie=false;
  @Column(name="note_moyenne") private BigDecimal noteMoyenne=BigDecimal.ZERO;
  @Column(name="nombre_avis") private Integer nombreAvis=0; @Column(name="nombre_vues") private Long nombreVues=0L; @Column(name="nombre_favoris") private Long nombreFavoris=0L;
