@@ -131,6 +131,9 @@
 \i 09_seed/11_marques.sql
 \i 09_seed/12_type_offre_autre.sql
 \i 09_seed/13_geo_senegal.sql
+\i 09_seed/14_taxonomie_domaines.sql
+\i 09_seed/15_type_offre_domaines.sql
+\i 09_seed/12_type_offre_autre.sql
 
 -------------------------------------------------------
 -- VUES

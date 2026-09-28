@@ -18,7 +18,7 @@ FROM categorie, (VALUES
     ('Boissons', 'Jus, boissons chaudes et fraîches', 'cup-soda', 4)
 ) AS v(nom, description, icone, ordre)
 WHERE categorie.nom = 'Restauration'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'PRODUIT', TRUE
@@ -72,7 +72,7 @@ FROM categorie, (VALUES
     ('Bien-être', 'Massage et épilation', 'flower', 3)
 ) AS v(nom, description, icone, ordre)
 WHERE categorie.nom = 'Beauté'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'SERVICE', TRUE
@@ -115,7 +115,7 @@ FROM categorie, (VALUES
     ('Location de véhicule', 'Location avec ou sans chauffeur', 'car-front', 3)
 ) AS v(nom, description, icone, ordre)
 WHERE categorie.nom = 'Transport'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'SERVICE', TRUE
@@ -153,7 +153,7 @@ FROM categorie, (VALUES
     ('Vente immobilière', 'Biens à vendre', 'home', 2)
 ) AS v(nom, description, icone, ordre)
 WHERE categorie.nom = 'Immobilier'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'PRODUIT', TRUE
@@ -187,7 +187,7 @@ FROM categorie, (VALUES
     ('Formations', 'Formations professionnelles et en ligne', 'graduation-cap', 2)
 ) AS v(nom, description, icone, ordre)
 WHERE categorie.nom = 'Éducation'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'SERVICE', TRUE
@@ -221,7 +221,7 @@ FROM categorie, (VALUES
     ('Services numériques', 'Web, design, community management', 'monitor', 3)
 ) AS v(nom, description, icone, ordre)
 WHERE categorie.nom = 'Services'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'SERVICE', TRUE
@@ -259,7 +259,7 @@ WHERE c.nom = 'Services numériques' AND NOT EXISTS (SELECT 1 FROM type_offre t 
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Hébergement', 'Chambres et logements meublés', 'bed', '#0ea5e9', 1, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE categorie.nom = 'Hôtellerie'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'PRODUIT', TRUE
@@ -278,7 +278,7 @@ WHERE c.nom = 'Hébergement' AND NOT EXISTS (SELECT 1 FROM type_offre t WHERE t.
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Démarches administratives', 'Documents officiels et démarches', 'file-text', '#334155', 1, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE categorie.nom = 'Administration'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'SERVICE', TRUE

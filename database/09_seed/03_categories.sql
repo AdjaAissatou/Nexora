@@ -12,4 +12,4 @@ VALUES
 ('Automobile', 'Véhicules, garages et pièces auto', 'car-side', '#ea580c', NULL, 10, TRUE, CURRENT_TIMESTAMP),
 ('Hôtellerie', 'Hôtels, chambres et hébergement', 'bed', '#0ea5e9', NULL, 11, TRUE, CURRENT_TIMESTAMP),
 ('Administration', 'Services et établissements administratifs', 'building', '#475569', NULL, 12, TRUE, CURRENT_TIMESTAMP)
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;

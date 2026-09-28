@@ -13,32 +13,32 @@
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Mécanique automobile', 'Entretien et réparation de véhicules', 'wrench', '#ea580c', 1, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Automobile'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Mode', 'Vêtements, chaussures et accessoires', 'shirt', '#16a34a', 1, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Commerce'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Vêtements', 'Robes, boubous, pantalons, chemises...', 'shirt', '#16a34a', 1, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Mode'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Chaussures', 'Sandales, baskets, escarpins...', 'footprints', '#16a34a', 2, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Mode'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Accessoires de mode', 'Sacs, bijoux, ceintures...', 'gem', '#16a34a', 3, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Mode'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Soins dentaires', 'Consultations et prestations dentaires', 'stethoscope', '#dc2626', 1, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Santé'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 -------------------------------------------------------
 -- TYPES D'OFFRE GRANULAIRES (les prestations/produits concrets d'un métier)

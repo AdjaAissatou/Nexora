@@ -6,7 +6,7 @@ CREATE TABLE categorie (
 
     id_categorie_parent BIGINT,
 
-    nom VARCHAR(120) NOT NULL UNIQUE,
+    nom VARCHAR(120) NOT NULL,
 
     description TEXT,
 
@@ -28,3 +28,7 @@ CREATE TABLE categorie (
         ON DELETE CASCADE
 
 );
+
+-- Unicité par branche, pas globale : deux domaines différents peuvent chacun avoir
+-- une sous-catégorie "Services administratifs" ou "Conseil" sans entrer en conflit.
+CREATE UNIQUE INDEX uq_categorie_parent_nom ON categorie ((COALESCE(id_categorie_parent, 0)), nom);

@@ -7,12 +7,12 @@
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Ordinateurs', 'Ordinateurs portables et de bureau', 'laptop', '#2563eb', 1, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Informatique'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO categorie (id_categorie_parent, nom, description, icone, couleur, ordre_affichage, actif, date_creation)
 SELECT id_categorie, 'Périphériques informatiques', 'Imprimantes, souris, claviers, écrans, stockage', 'mouse', '#2563eb', 2, TRUE, CURRENT_TIMESTAMP
 FROM categorie WHERE nom = 'Informatique'
-ON CONFLICT (nom) DO NOTHING;
+ON CONFLICT ((COALESCE(id_categorie_parent, 0)), nom) DO NOTHING;
 
 INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
 SELECT c.id_categorie, v.libelle, v.description, 'PRODUIT', TRUE
