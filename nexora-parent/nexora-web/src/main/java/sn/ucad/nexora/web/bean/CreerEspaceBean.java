@@ -46,6 +46,10 @@ public class CreerEspaceBean implements Serializable {
         } catch (ApiException e) {
             types = List.of();
         }
+        if (session.getCompte() != null) {
+            telephone = session.getCompte().phone();
+            email = session.getCompte().email();
+        }
     }
 
     public String creer() {
