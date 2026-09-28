@@ -85,8 +85,11 @@
                                     <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
                                     <f:selectItems value="#{creerOffreBean.typesOffre}" var="t" itemLabel="#{t.libelle}" itemValue="#{t.id}" />
                                     <f:converter converterId="jakarta.faces.Long" />
-                                    <f:ajax render="communBloc" />
+                                    <f:ajax listener="#{creerOffreBean.onTypeOffreChange}" render="communBloc" />
                                 </h:selectOneMenu>
+                                <p style="color:var(--nx-text-secondary); font-size:.9em; margin-top:6px;">
+                                    Le titre est pré-rempli à partir de votre choix — vous pouvez le préciser (marque, modèle...).
+                                </p>
                             </div>
                         </ui:fragment>
                     </h:panelGroup>

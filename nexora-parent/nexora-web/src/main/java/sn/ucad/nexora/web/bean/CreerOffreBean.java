@@ -136,6 +136,18 @@ public class CreerOffreBean implements Serializable {
         chargerFeuille(niveau3Id);
     }
 
+    public void onTypeOffreChange() {
+        if (typeOffreId == null || typesOffre == null) return;
+        typesOffre.stream()
+                .filter(t -> t.id().equals(typeOffreId))
+                .findFirst()
+                .ifPresent(t -> {
+                    if (titre == null || titre.isBlank()) {
+                        titre = t.libelle();
+                    }
+                });
+    }
+
     private void chargerFeuille(Long idCategorie) {
         typesOffre = catalogueApiClient.typesOffre(idCategorie);
         attributs = catalogueApiClient.attributs(idCategorie);

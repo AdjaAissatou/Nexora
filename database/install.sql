@@ -122,6 +122,7 @@
 \i 09_seed/05_types_offres.sql
 \i 09_seed/06_admin.sql
 \i 09_seed/08_sous_categories.sql
+\i 09_seed/09_sous_categories_informatique.sql
 
 -------------------------------------------------------
 -- VUES
