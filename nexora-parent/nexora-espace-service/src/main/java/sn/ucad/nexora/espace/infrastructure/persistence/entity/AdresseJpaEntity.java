@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 @Table(name = "adresse")
 public class AdresseJpaEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_adresse")
     private Long id;
 
@@ -15,6 +16,7 @@ public class AdresseJpaEntity {
 
     private String pays;
     private String region;
+    private String departement;
     private String commune;
     private String quartier;
 
@@ -33,6 +35,8 @@ public class AdresseJpaEntity {
     public void setPays(String pays) { this.pays = pays; }
     public String getRegion() { return region; }
     public void setRegion(String region) { this.region = region; }
+    public String getDepartement() { return departement; }
+    public void setDepartement(String departement) { this.departement = departement; }
     public String getCommune() { return commune; }
     public void setCommune(String commune) { this.commune = commune; }
     public String getQuartier() { return quartier; }

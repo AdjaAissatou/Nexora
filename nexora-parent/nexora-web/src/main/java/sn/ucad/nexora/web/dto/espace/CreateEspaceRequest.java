@@ -12,4 +12,9 @@ public record CreateEspaceRequest(
         String siteWeb,
         String registreCommerce,
         String numeroNinea,
-        String numeroRccm) {}
+        String numeroRccm,
+        Long idRegion,
+        Long idDepartement,
+        Long idCommune,
+        String quartier,
+        String adresseComplete) {}

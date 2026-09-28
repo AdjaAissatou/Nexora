@@ -84,6 +84,56 @@
                     </div>
                 </div>
 
+                <h3 style="margin-top:20px;">Localisation</h3>
+                <p style="color:var(--nx-text-secondary); font-size:.9em; margin-top:-8px;">
+                    Essentielle pour que les visiteurs vous trouvent près de chez eux.
+                </p>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+                    <div class="nx-field">
+                        <label for="creerEspace:region">Région</label>
+                        <h:selectOneMenu id="region" value="#{creerEspaceBean.idRegion}" styleClass="nx-select" required="true"
+                                         requiredMessage="Choisissez une région.">
+                            <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
+                            <f:selectItems value="#{creerEspaceBean.regions}" var="r" itemLabel="#{r.nom}" itemValue="#{r.id}" />
+                            <f:converter converterId="jakarta.faces.Long" />
+                            <f:ajax listener="#{creerEspaceBean.onRegionChange}" render="departementBloc communeBloc" />
+                        </h:selectOneMenu>
+                    </div>
+                    <h:panelGroup id="departementBloc" layout="block" styleClass="nx-field">
+                        <label for="creerEspace:departement">Département</label>
+                        <h:selectOneMenu id="departement" value="#{creerEspaceBean.idDepartement}" styleClass="nx-select"
+                                         required="true" requiredMessage="Choisissez un département." disabled="#{empty creerEspaceBean.departements}">
+                            <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
+                            <f:selectItems value="#{creerEspaceBean.departements}" var="d" itemLabel="#{d.nom}" itemValue="#{d.id}" />
+                            <f:converter converterId="jakarta.faces.Long" />
+                            <f:ajax listener="#{creerEspaceBean.onDepartementChange}" render="communeBloc" />
+                        </h:selectOneMenu>
+                    </h:panelGroup>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+                    <h:panelGroup id="communeBloc" layout="block" styleClass="nx-field">
+                        <label for="creerEspace:commune">Commune</label>
+                        <h:selectOneMenu id="commune" value="#{creerEspaceBean.idCommune}" styleClass="nx-select"
+                                         required="true" requiredMessage="Choisissez une commune." disabled="#{empty creerEspaceBean.communes}">
+                            <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
+                            <f:selectItems value="#{creerEspaceBean.communes}" var="c" itemLabel="#{c.nom}" itemValue="#{c.id}" />
+                            <f:converter converterId="jakarta.faces.Long" />
+                        </h:selectOneMenu>
+                    </h:panelGroup>
+                    <div class="nx-field">
+                        <label for="creerEspace:quartier">Quartier</label>
+                        <h:inputText id="quartier" value="#{creerEspaceBean.quartier}" placeholder="ex. Sacré-Cœur 3" styleClass="nx-input"
+                                     required="true" requiredMessage="Le quartier est obligatoire." />
+                    </div>
+                </div>
+
+                <div class="nx-field">
+                    <label for="creerEspace:adresseComplete">Adresse complète <span style="font-weight:400; color:var(--nx-text-secondary);">(repère, numéro de porte…)</span></label>
+                    <h:inputText id="adresseComplete" value="#{creerEspaceBean.adresseComplete}" placeholder="ex. Villa n°12, en face de la pharmacie" styleClass="nx-input" />
+                </div>
+
                 <h:commandButton value="Créer mon espace" action="#{creerEspaceBean.creer}" styleClass="nx-button nx-button-primary nx-button-block" />
             </h:form>
 

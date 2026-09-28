@@ -28,6 +28,7 @@ public record EspaceResponse(
         LocalDateTime dateCreation,
         String pays,
         String region,
+        String departement,
         String commune,
         String quartier,
         String adresseComplete,

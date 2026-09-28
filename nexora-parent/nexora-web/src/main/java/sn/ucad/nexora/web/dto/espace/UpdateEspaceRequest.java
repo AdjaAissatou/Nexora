@@ -9,4 +9,9 @@ public record UpdateEspaceRequest(
         String telephoneSecondaire,
         String email,
         String siteWeb,
-        Boolean ouvert) {}
+        Boolean ouvert,
+        Long idRegion,
+        Long idDepartement,
+        Long idCommune,
+        String quartier,
+        String adresseComplete) {}

@@ -43,6 +43,9 @@
 \i 02_shared/04_moyen_contact.sql
 \i 02_shared/05_horaire_exception.sql
 \i 02_shared/06_jour_ferie.sql
+\i 02_shared/07_region.sql
+\i 02_shared/08_departement.sql
+\i 02_shared/09_commune.sql
 
 -------------------------------------------------------
 -- CATALOGUE
@@ -126,6 +129,7 @@
 \i 09_seed/10_sous_categories_reste.sql
 \i 09_seed/11_marques.sql
 \i 09_seed/12_type_offre_autre.sql
+\i 09_seed/13_geo_senegal.sql
 
 -------------------------------------------------------
 -- VUES

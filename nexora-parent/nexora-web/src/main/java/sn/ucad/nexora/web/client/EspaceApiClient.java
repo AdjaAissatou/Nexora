@@ -7,8 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import sn.ucad.nexora.web.config.GatewayConfig;
+import sn.ucad.nexora.web.dto.espace.CommuneResponse;
 import sn.ucad.nexora.web.dto.espace.CreateEspaceRequest;
+import sn.ucad.nexora.web.dto.espace.DepartementResponse;
 import sn.ucad.nexora.web.dto.espace.EspaceResponse;
+import sn.ucad.nexora.web.dto.espace.RegionResponse;
 import sn.ucad.nexora.web.dto.espace.TypeEspaceResponse;
 import sn.ucad.nexora.web.dto.espace.UpdateEspaceRequest;
 import sn.ucad.nexora.web.error.ApiErrors;
@@ -93,6 +96,42 @@ public class EspaceApiClient {
                     .body(requete)
                     .retrieve()
                     .body(EspaceResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public List<RegionResponse> regions() {
+        LOG.info("GET {}/api/v1/geo/regions", baseUrl);
+        try {
+            return client.get().uri("/api/v1/geo/regions").retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<RegionResponse>>() {});
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public List<DepartementResponse> departements(Long idRegion) {
+        LOG.info("GET {}/api/v1/geo/regions/{}/departements", baseUrl, idRegion);
+        try {
+            return client.get().uri("/api/v1/geo/regions/{id}/departements", idRegion).retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<DepartementResponse>>() {});
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public List<CommuneResponse> communes(Long idDepartement) {
+        LOG.info("GET {}/api/v1/geo/departements/{}/communes", baseUrl, idDepartement);
+        try {
+            return client.get().uri("/api/v1/geo/departements/{id}/communes", idDepartement).retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<CommuneResponse>>() {});
         } catch (RestClientResponseException e) {
             throw ApiErrors.depuis(e);
         } catch (Exception e) {

@@ -8,17 +8,25 @@ import sn.ucad.nexora.espace.application.dto.request.UpdateEspaceRequest;
 import sn.ucad.nexora.espace.application.usecase.UpdateEspaceUseCase;
 import sn.ucad.nexora.espace.domain.entity.EspaceProfessionnel;
 import sn.ucad.nexora.espace.domain.repository.EspaceRepository;
+import sn.ucad.nexora.espace.infrastructure.persistence.AdresseLookupRepository;
+import sn.ucad.nexora.espace.infrastructure.persistence.GeoQueryRepository;
 import sn.ucad.nexora.espace.infrastructure.persistence.UtilisateurLookupRepository;
+import sn.ucad.nexora.espace.infrastructure.persistence.entity.AdresseJpaEntity;
 
 @Service
 public class UpdateEspaceService implements UpdateEspaceUseCase {
 
     private final EspaceRepository espaceRepository;
     private final UtilisateurLookupRepository utilisateurRepository;
+    private final GeoQueryRepository geoRepository;
+    private final AdresseLookupRepository adresseRepository;
 
-    public UpdateEspaceService(EspaceRepository espaceRepository, UtilisateurLookupRepository utilisateurRepository) {
+    public UpdateEspaceService(EspaceRepository espaceRepository, UtilisateurLookupRepository utilisateurRepository,
+                                GeoQueryRepository geoRepository, AdresseLookupRepository adresseRepository) {
         this.espaceRepository = espaceRepository;
         this.utilisateurRepository = utilisateurRepository;
+        this.geoRepository = geoRepository;
+        this.adresseRepository = adresseRepository;
     }
 
     @Override
@@ -38,6 +46,9 @@ public class UpdateEspaceService implements UpdateEspaceUseCase {
             throw new UnauthorizedException("Vous n'êtes pas autorisé à modifier cet espace");
         }
 
+        GeoQueryRepository.GeoNoms noms = geoRepository.verifierEtResoudre(
+                request.getIdRegion(), request.getIdDepartement(), request.getIdCommune());
+
         espace.setNom(request.getNom().trim());
         espace.setSlogan(request.getSlogan());
         espace.setDescription(request.getDescription());
@@ -50,6 +61,19 @@ public class UpdateEspaceService implements UpdateEspaceUseCase {
         }
         espace.setDateModification(LocalDateTime.now());
 
-        return espaceRepository.save(espace);
+        EspaceProfessionnel saved = espaceRepository.save(espace);
+
+        AdresseJpaEntity adresse = adresseRepository.findPrincipaleByEspaceId(espaceId).orElseGet(AdresseJpaEntity::new);
+        adresse.setEspaceId(espaceId);
+        adresse.setPays("Sénégal");
+        adresse.setRegion(noms.region());
+        adresse.setDepartement(noms.departement());
+        adresse.setCommune(noms.commune());
+        adresse.setQuartier(request.getQuartier().trim());
+        adresse.setAdresseComplete(request.getAdresseComplete());
+        adresse.setPrincipale(true);
+        adresseRepository.save(adresse);
+
+        return saved;
     }
 }

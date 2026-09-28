@@ -10,7 +10,10 @@ import java.io.Serializable;
 import java.util.List;
 import sn.ucad.nexora.web.client.EspaceApiClient;
 import sn.ucad.nexora.web.client.UserApiClient;
+import sn.ucad.nexora.web.dto.espace.CommuneResponse;
+import sn.ucad.nexora.web.dto.espace.DepartementResponse;
 import sn.ucad.nexora.web.dto.espace.EspaceResponse;
+import sn.ucad.nexora.web.dto.espace.RegionResponse;
 import sn.ucad.nexora.web.dto.espace.UpdateEspaceRequest;
 import sn.ucad.nexora.web.dto.user.UpdateUserRequest;
 import sn.ucad.nexora.web.dto.user.UserResponse;
@@ -50,6 +53,16 @@ public class MonEspaceBean implements Serializable {
     private String espaceSiteWeb;
     private boolean espaceOuvert;
 
+    // Localisation — toujours choisie en cascade, jamais saisie librement pour région/département/commune.
+    private List<RegionResponse> regions;
+    private Long idRegion;
+    private List<DepartementResponse> departements;
+    private Long idDepartement;
+    private List<CommuneResponse> communes;
+    private Long idCommune;
+    private String quartier;
+    private String adresseComplete;
+
     @PostConstruct
     public void charger() {
         try {
@@ -63,7 +76,9 @@ public class MonEspaceBean implements Serializable {
         }
         try {
             List<EspaceResponse> mesEspaces = espaceApiClient.mesEspaces(session.getAccessToken());
-            espace = mesEspaces.isEmpty() ? null : mesEspaces.get(0);
+            // mesEspaces() ne renvoie pas l'adresse (uniquement GET /{id}) : on recharge le détail
+            // complet du premier espace du compte pour disposer de la localisation actuelle.
+            espace = mesEspaces.isEmpty() ? null : espaceApiClient.obtenir(mesEspaces.get(0).id());
             remplirChampsEspace();
         } catch (ApiException e) {
             // Pas encore de profil utilisateur exploitable côté espace-service : pas une erreur bloquante,
@@ -78,8 +93,41 @@ public class MonEspaceBean implements Serializable {
         espaceSlogan = espace.slogan();
         espaceDescription = espace.description();
         espaceTelephone = espace.telephone();
+        espaceTelephoneSecondaire = espace.telephoneSecondaire();
         espaceEmail = espace.email();
+        espaceSiteWeb = espace.siteWeb();
         espaceOuvert = espace.ouvert();
+        quartier = espace.quartier();
+        adresseComplete = espace.adresseComplete();
+
+        regions = espaceApiClient.regions();
+        idRegion = regions.stream().filter(r -> r.nom().equals(espace.region())).map(RegionResponse::id).findFirst().orElse(null);
+        if (idRegion != null) {
+            departements = espaceApiClient.departements(idRegion);
+            idDepartement = departements.stream().filter(d -> d.nom().equals(espace.departement()))
+                    .map(DepartementResponse::id).findFirst().orElse(null);
+        }
+        if (idDepartement != null) {
+            communes = espaceApiClient.communes(idDepartement);
+            idCommune = communes.stream().filter(c -> c.nom().equals(espace.commune()))
+                    .map(CommuneResponse::id).findFirst().orElse(null);
+        }
+    }
+
+    public void onRegionChange() {
+        departements = null;
+        idDepartement = null;
+        communes = null;
+        idCommune = null;
+        if (idRegion == null) return;
+        departements = espaceApiClient.departements(idRegion);
+    }
+
+    public void onDepartementChange() {
+        communes = null;
+        idCommune = null;
+        if (idDepartement == null) return;
+        communes = espaceApiClient.communes(idDepartement);
     }
 
     public String enregistrerProfil() {
@@ -107,7 +155,12 @@ public class MonEspaceBean implements Serializable {
                             espaceTelephoneSecondaire,
                             espaceEmail,
                             espaceSiteWeb,
-                            espaceOuvert));
+                            espaceOuvert,
+                            idRegion,
+                            idDepartement,
+                            idCommune,
+                            quartier,
+                            adresseComplete));
             remplirChampsEspace();
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Espace mis à jour.", null));
@@ -225,5 +278,57 @@ public class MonEspaceBean implements Serializable {
 
     public void setEspaceOuvert(boolean espaceOuvert) {
         this.espaceOuvert = espaceOuvert;
+    }
+
+    public List<RegionResponse> getRegions() {
+        return regions;
+    }
+
+    public Long getIdRegion() {
+        return idRegion;
+    }
+
+    public void setIdRegion(Long idRegion) {
+        this.idRegion = idRegion;
+    }
+
+    public List<DepartementResponse> getDepartements() {
+        return departements;
+    }
+
+    public Long getIdDepartement() {
+        return idDepartement;
+    }
+
+    public void setIdDepartement(Long idDepartement) {
+        this.idDepartement = idDepartement;
+    }
+
+    public List<CommuneResponse> getCommunes() {
+        return communes;
+    }
+
+    public Long getIdCommune() {
+        return idCommune;
+    }
+
+    public void setIdCommune(Long idCommune) {
+        this.idCommune = idCommune;
+    }
+
+    public String getQuartier() {
+        return quartier;
+    }
+
+    public void setQuartier(String quartier) {
+        this.quartier = quartier;
+    }
+
+    public String getAdresseComplete() {
+        return adresseComplete;
+    }
+
+    public void setAdresseComplete(String adresseComplete) {
+        this.adresseComplete = adresseComplete;
     }
 }

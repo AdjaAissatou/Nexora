@@ -1,6 +1,7 @@
 package sn.ucad.nexora.espace.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class UpdateEspaceRequest {
     @NotBlank private String nom;
@@ -11,6 +12,11 @@ public class UpdateEspaceRequest {
     private String email;
     private String siteWeb;
     private Boolean ouvert;
+    @NotNull private Long idRegion;
+    @NotNull private Long idDepartement;
+    @NotNull private Long idCommune;
+    @NotBlank private String quartier;
+    private String adresseComplete;
 
     public String getNom() { return nom; }
     public void setNom(String v) { nom = v; }
@@ -28,4 +34,14 @@ public class UpdateEspaceRequest {
     public void setSiteWeb(String v) { siteWeb = v; }
     public Boolean getOuvert() { return ouvert; }
     public void setOuvert(Boolean v) { ouvert = v; }
+    public Long getIdRegion() { return idRegion; }
+    public void setIdRegion(Long v) { idRegion = v; }
+    public Long getIdDepartement() { return idDepartement; }
+    public void setIdDepartement(Long v) { idDepartement = v; }
+    public Long getIdCommune() { return idCommune; }
+    public void setIdCommune(Long v) { idCommune = v; }
+    public String getQuartier() { return quartier; }
+    public void setQuartier(String v) { quartier = v; }
+    public String getAdresseComplete() { return adresseComplete; }
+    public void setAdresseComplete(String v) { adresseComplete = v; }
 }

@@ -9,7 +9,10 @@ import jakarta.inject.Named;
 import java.io.Serializable;
 import java.util.List;
 import sn.ucad.nexora.web.client.EspaceApiClient;
+import sn.ucad.nexora.web.dto.espace.CommuneResponse;
 import sn.ucad.nexora.web.dto.espace.CreateEspaceRequest;
+import sn.ucad.nexora.web.dto.espace.DepartementResponse;
+import sn.ucad.nexora.web.dto.espace.RegionResponse;
 import sn.ucad.nexora.web.dto.espace.TypeEspaceResponse;
 import sn.ucad.nexora.web.error.ApiException;
 import sn.ucad.nexora.web.session.SessionBean;
@@ -39,6 +42,16 @@ public class CreerEspaceBean implements Serializable {
     private String numeroNinea;
     private String numeroRccm;
 
+    // Localisation — toujours choisie en cascade, jamais saisie librement pour région/département/commune.
+    private List<RegionResponse> regions;
+    private Long idRegion;
+    private List<DepartementResponse> departements;
+    private Long idDepartement;
+    private List<CommuneResponse> communes;
+    private Long idCommune;
+    private String quartier;
+    private String adresseComplete;
+
     @PostConstruct
     public void charger() {
         try {
@@ -46,10 +59,31 @@ public class CreerEspaceBean implements Serializable {
         } catch (ApiException e) {
             types = List.of();
         }
+        try {
+            regions = espaceApiClient.regions();
+        } catch (ApiException e) {
+            regions = List.of();
+        }
         if (session.getCompte() != null) {
             telephone = session.getCompte().phone();
             email = session.getCompte().email();
         }
+    }
+
+    public void onRegionChange() {
+        departements = null;
+        idDepartement = null;
+        communes = null;
+        idCommune = null;
+        if (idRegion == null) return;
+        departements = espaceApiClient.departements(idRegion);
+    }
+
+    public void onDepartementChange() {
+        communes = null;
+        idCommune = null;
+        if (idDepartement == null) return;
+        communes = espaceApiClient.communes(idDepartement);
     }
 
     public String creer() {
@@ -67,7 +101,12 @@ public class CreerEspaceBean implements Serializable {
                             siteWeb,
                             registreCommerce,
                             numeroNinea,
-                            numeroRccm));
+                            numeroRccm,
+                            idRegion,
+                            idDepartement,
+                            idCommune,
+                            quartier,
+                            adresseComplete));
             return "mon-espace?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
@@ -166,5 +205,57 @@ public class CreerEspaceBean implements Serializable {
 
     public void setNumeroRccm(String numeroRccm) {
         this.numeroRccm = numeroRccm;
+    }
+
+    public List<RegionResponse> getRegions() {
+        return regions;
+    }
+
+    public Long getIdRegion() {
+        return idRegion;
+    }
+
+    public void setIdRegion(Long idRegion) {
+        this.idRegion = idRegion;
+    }
+
+    public List<DepartementResponse> getDepartements() {
+        return departements;
+    }
+
+    public Long getIdDepartement() {
+        return idDepartement;
+    }
+
+    public void setIdDepartement(Long idDepartement) {
+        this.idDepartement = idDepartement;
+    }
+
+    public List<CommuneResponse> getCommunes() {
+        return communes;
+    }
+
+    public Long getIdCommune() {
+        return idCommune;
+    }
+
+    public void setIdCommune(Long idCommune) {
+        this.idCommune = idCommune;
+    }
+
+    public String getQuartier() {
+        return quartier;
+    }
+
+    public void setQuartier(String quartier) {
+        this.quartier = quartier;
+    }
+
+    public String getAdresseComplete() {
+        return adresseComplete;
+    }
+
+    public void setAdresseComplete(String adresseComplete) {
+        this.adresseComplete = adresseComplete;
     }
 }

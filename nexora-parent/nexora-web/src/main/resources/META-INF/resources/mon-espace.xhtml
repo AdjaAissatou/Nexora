@@ -123,6 +123,53 @@
                                 </label>
                             </div>
 
+                            <h3 style="margin-top:20px;">Localisation</h3>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+                                <div class="nx-field">
+                                    <label for="espaceForm:region">Région</label>
+                                    <h:selectOneMenu id="region" value="#{monEspaceBean.idRegion}" styleClass="nx-select" required="true"
+                                                     requiredMessage="Choisissez une région.">
+                                        <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
+                                        <f:selectItems value="#{monEspaceBean.regions}" var="r" itemLabel="#{r.nom}" itemValue="#{r.id}" />
+                                        <f:converter converterId="jakarta.faces.Long" />
+                                        <f:ajax listener="#{monEspaceBean.onRegionChange}" render="departementBloc communeBloc" />
+                                    </h:selectOneMenu>
+                                </div>
+                                <h:panelGroup id="departementBloc" layout="block" styleClass="nx-field">
+                                    <label for="espaceForm:departement">Département</label>
+                                    <h:selectOneMenu id="departement" value="#{monEspaceBean.idDepartement}" styleClass="nx-select"
+                                                     required="true" requiredMessage="Choisissez un département." disabled="#{empty monEspaceBean.departements}">
+                                        <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
+                                        <f:selectItems value="#{monEspaceBean.departements}" var="d" itemLabel="#{d.nom}" itemValue="#{d.id}" />
+                                        <f:converter converterId="jakarta.faces.Long" />
+                                        <f:ajax listener="#{monEspaceBean.onDepartementChange}" render="communeBloc" />
+                                    </h:selectOneMenu>
+                                </h:panelGroup>
+                            </div>
+
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+                                <h:panelGroup id="communeBloc" layout="block" styleClass="nx-field">
+                                    <label for="espaceForm:commune">Commune</label>
+                                    <h:selectOneMenu id="commune" value="#{monEspaceBean.idCommune}" styleClass="nx-select"
+                                                     required="true" requiredMessage="Choisissez une commune." disabled="#{empty monEspaceBean.communes}">
+                                        <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
+                                        <f:selectItems value="#{monEspaceBean.communes}" var="c" itemLabel="#{c.nom}" itemValue="#{c.id}" />
+                                        <f:converter converterId="jakarta.faces.Long" />
+                                    </h:selectOneMenu>
+                                </h:panelGroup>
+                                <div class="nx-field">
+                                    <label for="espaceForm:quartier">Quartier</label>
+                                    <h:inputText id="quartier" value="#{monEspaceBean.quartier}" placeholder="ex. Sacré-Cœur 3" styleClass="nx-input"
+                                                 required="true" requiredMessage="Le quartier est obligatoire." />
+                                </div>
+                            </div>
+
+                            <div class="nx-field">
+                                <label for="espaceForm:adresseComplete">Adresse complète <span style="font-weight:400; color:var(--nx-text-secondary);">(repère, numéro de porte…)</span></label>
+                                <h:inputText id="adresseComplete" value="#{monEspaceBean.adresseComplete}" placeholder="ex. Villa n°12, en face de la pharmacie" styleClass="nx-input" />
+                            </div>
+
                             <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerEspace}" styleClass="nx-button nx-button-primary nx-button-block" />
                         </h:form>
                     </div>
