@@ -1,13 +1,19 @@
 package sn.ucad.nexora.web.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import sn.ucad.nexora.web.config.GatewayConfig;
+import sn.ucad.nexora.web.dto.catalogue.AttributResponse;
+import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
+import sn.ucad.nexora.web.dto.catalogue.CreateOffreRequest;
+import sn.ucad.nexora.web.dto.catalogue.CreateOffreResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffreDetailResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffrePageResponse;
+import sn.ucad.nexora.web.dto.catalogue.TypeOffreResponse;
 import sn.ucad.nexora.web.error.ApiErrors;
 
 /**
@@ -64,5 +70,68 @@ public class CatalogueApiClient {
 
     private static String vide(String s) {
         return s == null || s.isBlank() ? null : s.trim();
+    }
+
+    public List<CategorieResponse> categoriesRacines() {
+        LOG.info("GET {}/api/v1/categories", baseUrl);
+        try {
+            return client.get().uri("/api/v1/categories").retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<CategorieResponse>>() {});
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public List<CategorieResponse> sousCategories(Long idCategorie) {
+        LOG.info("GET {}/api/v1/categories/{}/sous-categories", baseUrl, idCategorie);
+        try {
+            return client.get().uri("/api/v1/categories/{id}/sous-categories", idCategorie).retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<CategorieResponse>>() {});
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public List<TypeOffreResponse> typesOffre(Long idCategorie) {
+        LOG.info("GET {}/api/v1/categories/{}/types-offre", baseUrl, idCategorie);
+        try {
+            return client.get().uri("/api/v1/categories/{id}/types-offre", idCategorie).retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<TypeOffreResponse>>() {});
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public List<AttributResponse> attributs(Long idCategorie) {
+        LOG.info("GET {}/api/v1/categories/{}/attributs", baseUrl, idCategorie);
+        try {
+            return client.get().uri("/api/v1/categories/{id}/attributs", idCategorie).retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<AttributResponse>>() {});
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public CreateOffreResponse creerOffre(String accessToken, CreateOffreRequest requete) {
+        LOG.info("POST {}/api/v1/offres", baseUrl);
+        try {
+            return client.post().uri("/api/v1/offres")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .body(requete)
+                    .retrieve()
+                    .body(CreateOffreResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
     }
 }

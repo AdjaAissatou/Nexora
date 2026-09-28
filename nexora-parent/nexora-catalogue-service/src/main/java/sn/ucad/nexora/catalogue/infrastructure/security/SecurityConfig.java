@@ -27,6 +27,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/offres/recherche",
                                 "/api/v1/offres/{id:\\d+}",
+                                "/api/v1/categories/**",
                                 "/actuator/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"

@@ -4,14 +4,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sn.ucad.nexora.catalogue.application.dto.request.CreateOffreRequest;
 import sn.ucad.nexora.catalogue.application.dto.request.OffreSearchRequest;
+import sn.ucad.nexora.catalogue.application.dto.response.CreateOffreResponse;
 import sn.ucad.nexora.catalogue.application.dto.response.OffreDetailResponse;
 import sn.ucad.nexora.catalogue.application.dto.response.OffrePageResponse;
+import sn.ucad.nexora.catalogue.application.usecase.CreateOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.GetOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.RechercherOffresUseCase;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * Controller REST du catalogue NEXORA.
@@ -26,11 +31,27 @@ public class OffreController {
 
     private final RechercherOffresUseCase rechercherOffres;
     private final GetOffreUseCase getOffre;
+    private final CreateOffreUseCase createOffre;
 
     public OffreController(RechercherOffresUseCase rechercherOffres,
-                           GetOffreUseCase getOffre) {
+                           GetOffreUseCase getOffre,
+                           CreateOffreUseCase createOffre) {
         this.rechercherOffres = rechercherOffres;
         this.getOffre = getOffre;
+        this.createOffre = createOffre;
+    }
+
+    /**
+     * Publie une nouvelle offre (produit ou service) pour l'espace professionnel du compte connecté.
+     */
+    @PostMapping
+    @Operation(summary = "Créer une offre",
+               description = "Publie un produit ou un service pour l'espace du compte connecté")
+    public ResponseEntity<CreateOffreResponse> creer(
+            @AuthenticationPrincipal UUID accountId,
+            @RequestBody CreateOffreRequest request) {
+
+        return ResponseEntity.status(201).body(createOffre.creer(accountId, request));
     }
 
     /**

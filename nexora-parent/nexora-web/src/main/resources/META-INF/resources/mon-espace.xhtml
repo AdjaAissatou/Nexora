@@ -76,6 +76,8 @@
                             <span><h:outputText value="#{monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText> (#{monEspaceBean.espace.nombreAvis} avis)</span>
                         </div>
 
+                        <h:link outcome="/creer-offre" value="Ajouter une offre" styleClass="nx-button nx-button-primary" style="margin-top:12px;" />
+
                         <h:form id="espaceForm" style="margin-top:18px;">
                             <h:messages for="espaceForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
 
