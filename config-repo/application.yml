@@ -6,7 +6,15 @@ management:
 
 eureka:
   instance:
-    prefer-ip-address: true
+    # `prefer-ip-address: true` faisait enregistrer chaque service sous l'IP retournée par
+    # InetUtils au moment du démarrage — instable en développement local (Wi-Fi qui va et vient,
+    # VPN, plusieurs interfaces réseau...) : un service pouvait s'enregistrer sous 127.0.0.1,
+    # sous l'IP du réseau local (ex. 192.168.1.28) ou sous "localhost" selon l'état de la machine
+    # à cet instant précis, rendant le routage de la Gateway aléatoire d'un redémarrage à l'autre
+    # (Connection refused vers une IP qui a changé). En local, tout tourne sur la même machine :
+    # on fige donc explicitement le nom d'hôte à "localhost", toujours résolvable et stable.
+    prefer-ip-address: false
+    hostname: localhost
 
 logging:
   level:
