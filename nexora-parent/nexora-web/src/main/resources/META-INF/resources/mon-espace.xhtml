@@ -26,9 +26,29 @@
 
             <div class="nx-card">
                 <h3>Mon profil</h3>
-                <div class="nx-profile-row"><span>Nom</span><span>#{sessionBean.nomComplet}</span></div>
-                <div class="nx-profile-row"><span>Email</span><span>#{sessionBean.compte.email}</span></div>
-                <div class="nx-profile-row"><span>Téléphone</span><span>#{format.telephoneAffiche(monEspaceBean.profil.phone)}</span></div>
+
+                <h:form id="profilForm">
+                    <h:messages for="profilForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                    <div class="nx-field">
+                        <label for="profilForm:prenom">Prénom</label>
+                        <h:inputText id="prenom" value="#{monEspaceBean.prenom}" styleClass="nx-input" required="true" />
+                    </div>
+                    <div class="nx-field">
+                        <label for="profilForm:nom">Nom</label>
+                        <h:inputText id="nom" value="#{monEspaceBean.nom}" styleClass="nx-input" required="true" />
+                    </div>
+                    <div class="nx-field">
+                        <label for="profilForm:email">Email</label>
+                        <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
+                    </div>
+                    <div class="nx-field">
+                        <label for="profilForm:telephone">Téléphone</label>
+                        <h:inputText id="telephone" value="#{monEspaceBean.telephone}" styleClass="nx-input" />
+                    </div>
+
+                    <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerProfil}" styleClass="nx-button nx-button-primary nx-button-block" />
+                </h:form>
             </div>
 
             <div>
@@ -51,17 +71,53 @@
                             </ui:fragment>
                         </h3>
 
-                        <ui:fragment rendered="#{!empty monEspaceBean.espace.slogan}">
-                            <p style="color:var(--nx-text-secondary); margin-bottom:16px;">#{monEspaceBean.espace.slogan}</p>
-                        </ui:fragment>
-
-                        <div class="nx-profile-row"><span>Téléphone</span><span>#{format.telephoneAffiche(monEspaceBean.espace.telephone)}</span></div>
-                        <div class="nx-profile-row"><span>Email</span><span>#{monEspaceBean.espace.email}</span></div>
                         <div class="nx-profile-row">
                             <span>Note moyenne</span>
                             <span><h:outputText value="#{monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText> (#{monEspaceBean.espace.nombreAvis} avis)</span>
                         </div>
-                        <div class="nx-profile-row"><span>Statut</span><span>#{monEspaceBean.espace.ouvert ? 'Ouvert' : 'Fermé'}</span></div>
+
+                        <h:form id="espaceForm" style="margin-top:18px;">
+                            <h:messages for="espaceForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                            <div class="nx-field">
+                                <label for="espaceForm:nom">Nom de l'espace</label>
+                                <h:inputText id="nom" value="#{monEspaceBean.espaceNom}" styleClass="nx-input" required="true" />
+                            </div>
+                            <div class="nx-field">
+                                <label for="espaceForm:slogan">Slogan</label>
+                                <h:inputText id="slogan" value="#{monEspaceBean.espaceSlogan}" styleClass="nx-input" />
+                            </div>
+                            <div class="nx-field">
+                                <label for="espaceForm:description">Description</label>
+                                <h:inputTextarea id="description" value="#{monEspaceBean.espaceDescription}" styleClass="nx-input" />
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
+                                <div class="nx-field">
+                                    <label for="espaceForm:telephone">Téléphone</label>
+                                    <h:inputText id="telephone" value="#{monEspaceBean.espaceTelephone}" styleClass="nx-input" />
+                                </div>
+                                <div class="nx-field">
+                                    <label for="espaceForm:telephoneSecondaire">Téléphone secondaire</label>
+                                    <h:inputText id="telephoneSecondaire" value="#{monEspaceBean.espaceTelephoneSecondaire}" styleClass="nx-input" />
+                                </div>
+                            </div>
+                            <div class="nx-field">
+                                <label for="espaceForm:email">Email</label>
+                                <h:inputText id="email" value="#{monEspaceBean.espaceEmail}" styleClass="nx-input" />
+                            </div>
+                            <div class="nx-field">
+                                <label for="espaceForm:siteWeb">Site web</label>
+                                <h:inputText id="siteWeb" value="#{monEspaceBean.espaceSiteWeb}" placeholder="www.monsite.sn" styleClass="nx-input" />
+                            </div>
+                            <div class="nx-field">
+                                <label class="nx-field-check">
+                                    <h:selectBooleanCheckbox id="ouvert" value="#{monEspaceBean.espaceOuvert}" />
+                                    Espace ouvert (visible comme actif par les visiteurs)
+                                </label>
+                            </div>
+
+                            <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerEspace}" styleClass="nx-button nx-button-primary nx-button-block" />
+                        </h:form>
                     </div>
                 </ui:fragment>
 

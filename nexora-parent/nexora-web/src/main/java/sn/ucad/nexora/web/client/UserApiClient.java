@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import sn.ucad.nexora.web.config.GatewayConfig;
+import sn.ucad.nexora.web.dto.user.UpdateUserRequest;
 import sn.ucad.nexora.web.dto.user.UserResponse;
 import sn.ucad.nexora.web.error.ApiErrors;
 
@@ -28,6 +29,23 @@ public class UserApiClient {
                     .get()
                     .uri("/api/v1/users/{accountId}", accountId)
                     .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(UserResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public UserResponse mettreAJour(String accessToken, UpdateUserRequest requete) {
+        LOG.info("PUT {}/api/v1/users/me", baseUrl);
+        try {
+            return client
+                    .put()
+                    .uri("/api/v1/users/me")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .body(requete)
                     .retrieve()
                     .body(UserResponse.class);
         } catch (RestClientResponseException e) {

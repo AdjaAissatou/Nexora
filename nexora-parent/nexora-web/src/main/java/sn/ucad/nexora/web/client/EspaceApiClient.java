@@ -10,6 +10,7 @@ import sn.ucad.nexora.web.config.GatewayConfig;
 import sn.ucad.nexora.web.dto.espace.CreateEspaceRequest;
 import sn.ucad.nexora.web.dto.espace.EspaceResponse;
 import sn.ucad.nexora.web.dto.espace.TypeEspaceResponse;
+import sn.ucad.nexora.web.dto.espace.UpdateEspaceRequest;
 import sn.ucad.nexora.web.error.ApiErrors;
 
 /**
@@ -60,6 +61,23 @@ public class EspaceApiClient {
             return client
                     .post()
                     .uri("/api/v1/espaces")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .body(requete)
+                    .retrieve()
+                    .body(EspaceResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public EspaceResponse mettreAJour(String accessToken, Long id, UpdateEspaceRequest requete) {
+        LOG.info("PUT {}/api/v1/espaces/{}", baseUrl, id);
+        try {
+            return client
+                    .put()
+                    .uri("/api/v1/espaces/{id}", id)
                     .header("Authorization", "Bearer " + accessToken)
                     .body(requete)
                     .retrieve()
