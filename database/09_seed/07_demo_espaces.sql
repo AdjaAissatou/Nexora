@@ -60,11 +60,6 @@ JOIN (VALUES
 ) AS s(titre, stock) ON s.titre = o.titre
 WHERE NOT EXISTS (SELECT 1 FROM produit WHERE id_offre = o.id_offre);
 
-INSERT INTO image (id_offre, url, principale, ordre_affichage, texte_alternatif)
-SELECT o.id_offre, 'https://picsum.photos/seed/' || replace(lower(o.titre), ' ', '-') || '/640/480', TRUE, 0, o.titre
-FROM offre o
-JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'Auchan Discount Sénégal'
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE id_offre = o.id_offre);
 
 
 -- ----------------------------------------------------------------------------
@@ -117,11 +112,6 @@ JOIN (VALUES
 ) AS s(titre, duree) ON s.titre = o.titre
 WHERE NOT EXISTS (SELECT 1 FROM service WHERE id_offre = o.id_offre);
 
-INSERT INTO image (id_offre, url, principale, ordre_affichage, texte_alternatif)
-SELECT o.id_offre, 'https://picsum.photos/seed/' || replace(lower(o.titre), ' ', '-') || '/640/480', TRUE, 0, o.titre
-FROM offre o
-JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'Atelier Diagne Bois'
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE id_offre = o.id_offre);
 
 
 -- ----------------------------------------------------------------------------
@@ -172,11 +162,6 @@ JOIN (VALUES
 ) AS s(titre, duree, delai, urgence) ON s.titre = o.titre
 WHERE NOT EXISTS (SELECT 1 FROM service WHERE id_offre = o.id_offre);
 
-INSERT INTO image (id_offre, url, principale, ordre_affichage, texte_alternatif)
-SELECT o.id_offre, 'https://picsum.photos/seed/' || replace(lower(o.titre), ' ', '-') || '/640/480', TRUE, 0, o.titre
-FROM offre o
-JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'SOS Plomberie Dakar'
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE id_offre = o.id_offre);
 
 
 -- ----------------------------------------------------------------------------
@@ -227,11 +212,6 @@ JOIN (VALUES
 ) AS s(titre, duree, delai, urgence) ON s.titre = o.titre
 WHERE NOT EXISTS (SELECT 1 FROM service WHERE id_offre = o.id_offre);
 
-INSERT INTO image (id_offre, url, principale, ordre_affichage, texte_alternatif)
-SELECT o.id_offre, 'https://picsum.photos/seed/' || replace(lower(o.titre), ' ', '-') || '/640/480', TRUE, 0, o.titre
-FROM offre o
-JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'Plomberie Ndiaye & Fils'
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE id_offre = o.id_offre);
 
 
 -- ----------------------------------------------------------------------------
@@ -279,11 +259,6 @@ FROM offre o
 JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'Baye Transport'
 WHERE NOT EXISTS (SELECT 1 FROM service WHERE id_offre = o.id_offre);
 
-INSERT INTO image (id_offre, url, principale, ordre_affichage, texte_alternatif)
-SELECT o.id_offre, 'https://picsum.photos/seed/' || replace(lower(o.titre), ' ', '-') || '/640/480', TRUE, 0, o.titre
-FROM offre o
-JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'Baye Transport'
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE id_offre = o.id_offre);
 
 
 -- ----------------------------------------------------------------------------
@@ -340,11 +315,6 @@ JOIN (VALUES
 ) AS s(titre, stock) ON s.titre = o.titre
 WHERE NOT EXISTS (SELECT 1 FROM produit WHERE id_offre = o.id_offre);
 
-INSERT INTO image (id_offre, url, principale, ordre_affichage, texte_alternatif)
-SELECT o.id_offre, 'https://picsum.photos/seed/' || replace(lower(o.titre), ' ', '-') || '/640/480', TRUE, 0, o.titre
-FROM offre o
-JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'Boutique Sarah Mode'
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE id_offre = o.id_offre);
 
 
 -- ----------------------------------------------------------------------------
@@ -405,10 +375,49 @@ JOIN (VALUES
 ) AS d(titre, marque, modele, reference, stock, poids, garantie) ON d.titre = o.titre
 WHERE NOT EXISTS (SELECT 1 FROM produit WHERE id_offre = o.id_offre);
 
+-- ----------------------------------------------------------------------------
+-- Images : une photo réellement représentative par produit/service (pas de
+-- placeholder aléatoire) — sources Unsplash et Wikimedia Commons, vérifiées
+-- visuellement une à une avant intégration ici.
+-- ----------------------------------------------------------------------------
+
 INSERT INTO image (id_offre, url, principale, ordre_affichage, texte_alternatif)
-SELECT o.id_offre, 'https://picsum.photos/seed/' || replace(lower(o.titre), ' ', '-') || '/640/480', TRUE, 0, o.titre
+SELECT o.id_offre, m.url, TRUE, 0, o.titre
 FROM offre o
-JOIN espace_professionnel ep ON ep.id_espace = o.id_espace AND ep.nom = 'TechnoPlus Informatique'
+JOIN (VALUES
+    ('Riz parfumé Auchan 5kg', 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=640&h=480&fit=crop&q=75'),
+    ('Huile végétale Auchan 1L', 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=640&h=480&fit=crop&q=75'),
+    ('Lait en poudre Auchan 900g', 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=640&h=480&fit=crop&q=75'),
+    ('Sucre en poudre 1kg', 'https://commons.wikimedia.org/wiki/Special:FilePath/W%C3%BCrfelzucker%20--%202018%20--%203564.jpg?width=640'),
+    ('Pack eau minérale 1,5L x6', 'https://images.unsplash.com/photo-1523362628745-0c100150b504?w=640&h=480&fit=crop&q=75'),
+
+    ('Fabrication de meubles sur mesure', 'https://images.unsplash.com/photo-1601058268499-e52658b8bb88?w=640&h=480&fit=crop&q=75'),
+    ('Pose de portes et fenêtres en bois', 'https://images.unsplash.com/photo-1509644851169-2acc08aa25b5?w=640&h=480&fit=crop&q=75'),
+    ('Rénovation de mobilier ancien', 'https://images.unsplash.com/photo-1581539250439-c96689b516dd?w=640&h=480&fit=crop&q=75'),
+
+    ('Dépannage plomberie urgence', 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=640&h=480&fit=crop&q=75'),
+    ('Installation sanitaire complète', 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=640&h=480&fit=crop&q=75'),
+    ('Débouchage canalisation', 'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=640&h=480&fit=crop&q=75'),
+    ('Installation chauffe-eau', 'https://commons.wikimedia.org/wiki/Special:FilePath/Rheem%20home%20gas%20water%20heater%20tank%20-%20newly%20installed.jpg?width=640'),
+
+    ('Course VTC en ville (Dakar)', 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=640&h=480&fit=crop&q=75'),
+    ('Location chauffeur à la journée', 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=640&h=480&fit=crop&q=75'),
+    ('Livraison colis express', 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=640&h=480&fit=crop&q=75'),
+
+    ('Robe wax élégante', 'https://images.unsplash.com/photo-1596783074918-c84cb06531ca?w=640&h=480&fit=crop&q=75'),
+    ('Chemise homme coton', 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=640&h=480&fit=crop&q=75'),
+    ('Pantalon jean slim', 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=640&h=480&fit=crop&q=75'),
+    ('Ensemble boubou traditionnel', 'https://commons.wikimedia.org/wiki/Special:FilePath/Boubou%20traditionnel%20du%20S%C3%A9n%C3%A9gal.jpg?width=640'),
+    ('Chaussures cuir homme', 'https://commons.wikimedia.org/wiki/Special:FilePath/Mens%20brown%20derby%20leather%20shoes.jpg?width=640'),
+
+    ('Ordinateur portable HP Pavilion 15', 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=640&h=480&fit=crop&q=75'),
+    ('PC de bureau Dell OptiPlex 3090', 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=640&h=480&fit=crop&q=75'),
+    ('Imprimante Canon Pixma G2010', 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=640&h=480&fit=crop&q=75'),
+    ('Souris sans fil Logitech M185', 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=640&h=480&fit=crop&q=75'),
+    ('Clavier mécanique gaming Redragon K552', 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=640&h=480&fit=crop&q=75'),
+    ('Disque dur externe Seagate 1To', 'https://commons.wikimedia.org/wiki/Special:FilePath/35-Desktop-Hard-Drive.jpg?width=640'),
+    ('Écran LED 24 pouces Samsung S24F350', 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=640&h=480&fit=crop&q=75')
+) AS m(titre, url) ON m.titre = o.titre
 WHERE NOT EXISTS (SELECT 1 FROM image WHERE id_offre = o.id_offre);
 
 -- Promotion active sur l'ordinateur portable HP (en cours, visible sur la recherche)
