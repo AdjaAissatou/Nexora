@@ -35,6 +35,7 @@ public class MonEspaceBean implements Serializable {
     private SessionBean session;
 
     private UserResponse profil;
+    private List<EspaceResponse> mesEspaces;
     private EspaceResponse espace;
     private String erreur;
 
@@ -82,15 +83,31 @@ public class MonEspaceBean implements Serializable {
             return;
         }
         try {
-            List<EspaceResponse> mesEspaces = espaceApiClient.mesEspaces(session.getAccessToken());
-            // mesEspaces() ne renvoie pas l'adresse (uniquement GET /{id}) : on recharge le détail
-            // complet du premier espace du compte pour disposer de la localisation actuelle.
-            espace = mesEspaces.isEmpty() ? null : espaceApiClient.obtenir(mesEspaces.get(0).id());
+            mesEspaces = espaceApiClient.mesEspaces(session.getAccessToken());
+            // Un compte peut posséder plusieurs espaces ; celui à éditer est choisi via ?id=,
+            // sinon le premier par défaut. mesEspaces() ne renvoie pas l'adresse (uniquement
+            // GET /{id}) : on recharge le détail complet de l'espace sélectionné.
+            Long idSelectionne = idDepuisParametre();
+            EspaceResponse selectionne = mesEspaces.stream()
+                    .filter(e -> e.id().equals(idSelectionne))
+                    .findFirst()
+                    .orElse(mesEspaces.isEmpty() ? null : mesEspaces.get(0));
+            espace = selectionne == null ? null : espaceApiClient.obtenir(selectionne.id());
             remplirChampsEspace();
         } catch (ApiException e) {
             // Pas encore de profil utilisateur exploitable côté espace-service : pas une erreur bloquante,
             // l'utilisateur voit simplement la proposition de créer son espace.
+            mesEspaces = List.of();
             espace = null;
+        }
+    }
+
+    private Long idDepuisParametre() {
+        String brut = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("id");
+        try {
+            return brut == null ? null : Long.valueOf(brut);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 
@@ -181,6 +198,7 @@ public class MonEspaceBean implements Serializable {
                             espaceNumeroRccm,
                             urlsDepuisTexte(photosTexte)));
             remplirChampsEspace();
+            mesEspaces = mesEspaces.stream().map(e -> e.id().equals(espace.id()) ? espace : e).toList();
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Espace mis à jour.", null));
         } catch (ApiException e) {
@@ -206,6 +224,14 @@ public class MonEspaceBean implements Serializable {
 
     public UserResponse getProfil() {
         return profil;
+    }
+
+    public List<EspaceResponse> getMesEspaces() {
+        return mesEspaces;
+    }
+
+    public boolean isPlusieursEspaces() {
+        return mesEspaces != null && mesEspaces.size() > 1;
     }
 
     public EspaceResponse getEspace() {

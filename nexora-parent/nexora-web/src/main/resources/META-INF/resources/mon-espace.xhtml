@@ -53,6 +53,22 @@
 
             <div>
 
+                <ui:fragment rendered="#{monEspaceBean.plusieursEspaces}">
+                    <div class="nx-card" style="margin-bottom:18px;">
+                        <h3>Mes espaces</h3>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+                            <ui:repeat var="e" value="#{monEspaceBean.mesEspaces}">
+                                <h:link outcome="/mon-espace"
+                                        value="#{e.nom}"
+                                        styleClass="#{e.id == monEspaceBean.espace.id ? 'nx-button nx-button-primary' : 'nx-button nx-button-outline'}">
+                                    <f:param name="id" value="#{e.id}" />
+                                </h:link>
+                            </ui:repeat>
+                            <h:link outcome="/creer-espace" value="+ Nouvel espace" styleClass="nx-button nx-button-outline" />
+                        </div>
+                    </div>
+                </ui:fragment>
+
                 <ui:fragment rendered="#{monEspaceBean.possedeEspace}">
                     <div class="nx-card">
                         <h3 style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -81,6 +97,7 @@
                             <h:link outcome="/espace" value="Voir ma fiche publique" styleClass="nx-button nx-button-outline">
                                 <f:param name="id" value="#{monEspaceBean.espace.id}" />
                             </h:link>
+                            <h:link outcome="/creer-espace" value="+ Créer un autre espace" styleClass="nx-button nx-button-outline" rendered="#{!monEspaceBean.plusieursEspaces}" />
                         </div>
 
                         <h:form id="espaceForm" style="margin-top:18px;">
