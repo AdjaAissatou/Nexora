@@ -93,6 +93,25 @@
 
                 <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
 
+                <ui:fragment rendered="#{!empty rechercheBean.lieuxPublics}">
+                    <div class="nx-card" style="margin-bottom:20px;">
+                        <h3 style="margin-top:0;">Lieux publics</h3>
+                        <div class="nx-lieu-public-liste">
+                            <ui:repeat var="l" value="#{rechercheBean.lieuxPublics}">
+                                <div class="nx-lieu-public-item">
+                                    <div>
+                                        <span class="nx-lieu-public-nom">#{l.nom}</span>
+                                        <span class="nx-badge nx-badge-neutre">#{l.typeLieu}</span>
+                                        <span class="nx-lieu-public-commune">#{l.commune}#{!empty l.region ? ', ' : ''}#{l.region}</span>
+                                    </div>
+                                    <h:outputLink value="#{format.lienItineraire(l.latitude, l.longitude)}"
+                                                  target="_blank" styleClass="nx-button nx-button-outline-dark">Itinéraire</h:outputLink>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </div>
+                </ui:fragment>
+
                 <ui:fragment rendered="#{rechercheBean.vide}">
                     <div class="nx-empty">
                         <div class="nx-empty-icon">

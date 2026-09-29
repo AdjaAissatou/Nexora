@@ -47,6 +47,7 @@
 \i 02_shared/07_region.sql
 \i 02_shared/08_departement.sql
 \i 02_shared/09_commune.sql
+\i 02_shared/10_lieu_public.sql
 
 -------------------------------------------------------
 -- CATALOGUE
@@ -138,6 +139,7 @@
 \i 09_seed/16_type_offre_attributs_tags.sql
 \i 09_seed/12_type_offre_autre.sql
 \i 09_seed/17_categorie_type_espace.sql
+\i 09_seed/18_lieux_publics.sql
 
 -------------------------------------------------------
 -- VUES

@@ -29,7 +29,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/offres/recherche",
                                 "/api/v1/offres/{id:\\d+}",
-                                "/api/v1/categories/**"
+                                "/api/v1/categories/**",
+                                "/api/v1/lieux-publics/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/actuator/**",

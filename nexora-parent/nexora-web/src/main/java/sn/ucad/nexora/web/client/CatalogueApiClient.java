@@ -11,6 +11,7 @@ import sn.ucad.nexora.web.dto.catalogue.AttributResponse;
 import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
 import sn.ucad.nexora.web.dto.catalogue.CreateOffreRequest;
 import sn.ucad.nexora.web.dto.catalogue.CreateOffreResponse;
+import sn.ucad.nexora.web.dto.catalogue.LieuPublicResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffreDetailResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffreEditionResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffrePageResponse;
@@ -183,6 +184,24 @@ public class CatalogueApiClient {
                     .header("Authorization", "Bearer " + accessToken)
                     .retrieve()
                     .toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public List<LieuPublicResponse> rechercherLieuxPublics(String q, String commune, int limite) {
+        LOG.info("Requête GET {}/api/v1/lieux-publics/recherche (q={}, commune={})", baseUrl, q, commune);
+        try {
+            return client.get()
+                    .uri(uriBuilder -> uriBuilder.path("/api/v1/lieux-publics/recherche")
+                            .queryParamIfPresent("q", java.util.Optional.ofNullable(vide(q)))
+                            .queryParamIfPresent("commune", java.util.Optional.ofNullable(vide(commune)))
+                            .queryParam("limite", limite)
+                            .build())
+                    .retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<LieuPublicResponse>>() {});
         } catch (RestClientResponseException e) {
             throw ApiErrors.depuis(e);
         } catch (Exception e) {

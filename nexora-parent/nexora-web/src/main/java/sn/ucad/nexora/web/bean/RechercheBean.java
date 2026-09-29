@@ -12,6 +12,7 @@ import java.util.List;
 import sn.ucad.nexora.web.client.CatalogueApiClient;
 import sn.ucad.nexora.web.client.CritereRecherche;
 import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
+import sn.ucad.nexora.web.dto.catalogue.LieuPublicResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffrePageResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffreSummaryResponse;
 import sn.ucad.nexora.web.error.ApiException;
@@ -44,6 +45,7 @@ public class RechercheBean implements Serializable {
     private boolean recherchee;
     private String erreur;
     private List<CategorieResponse> categoriesRacines;
+    private List<LieuPublicResponse> lieuxPublics = List.of();
 
     @PostConstruct
     public void charger() {
@@ -107,6 +109,23 @@ public class RechercheBean implements Serializable {
         } finally {
             recherchee = true;
         }
+        chargerLieuxPublics();
+    }
+
+    private void chargerLieuxPublics() {
+        if (q == null || q.isBlank()) {
+            lieuxPublics = List.of();
+            return;
+        }
+        try {
+            lieuxPublics = catalogueApiClient.rechercherLieuxPublics(q, commune, 10);
+        } catch (ApiException e) {
+            lieuxPublics = List.of();
+        }
+    }
+
+    public List<LieuPublicResponse> getLieuxPublics() {
+        return lieuxPublics;
     }
 
     public List<OffreSummaryResponse> getContenu() {
