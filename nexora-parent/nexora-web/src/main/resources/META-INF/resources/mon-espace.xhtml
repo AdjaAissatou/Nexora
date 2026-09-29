@@ -16,7 +16,7 @@
     <section class="nx-page-header">
         <div class="nx-container">
             <h1>Mon espace</h1>
-            <p>Gérez votre profil et votre espace professionnel Nexora.</p>
+            <p>Gérez votre activité professionnelle sur Nexora.</p>
         </div>
     </section>
 
@@ -83,8 +83,11 @@
                             <f:param name="idEspace" value="#{monEspaceBean.espace.id}" />
                         </h:link>
                         <button type="button" class="nx-espace-nav-item" data-tab="infos" onclick="nexoraAfficherOnglet('infos', this)">Gérer les informations de l'espace</button>
-                        <button type="button" class="nx-espace-nav-item" data-tab="profil" onclick="nexoraAfficherOnglet('profil', this)">Gérer le profil</button>
                         <h:link outcome="/creer-espace" styleClass="nx-espace-nav-item" value="+ Créer un autre espace" rendered="#{!monEspaceBean.plusieursEspaces}" />
+
+                        <div class="nx-espace-nav-separateur"></div>
+
+                        <h:link outcome="/mon-compte" styleClass="nx-espace-nav-item" value="Mon compte (profil, favoris...)" />
 
                         <div class="nx-espace-nav-separateur"></div>
 
@@ -345,79 +348,20 @@
                     </div>
                 </div>
 
-                <div class="nx-tab-pane" id="tab-profil">
-                    <div class="nx-card">
-                        <h3>Mon profil</h3>
-
-                        <h:form id="profilForm">
-                            <h:messages for="profilForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
-
-                            <div class="nx-field">
-                                <label for="profilForm:prenom">Prénom</label>
-                                <h:inputText id="prenom" value="#{monEspaceBean.prenom}" styleClass="nx-input" required="true" />
-                            </div>
-                            <div class="nx-field">
-                                <label for="profilForm:nom">Nom</label>
-                                <h:inputText id="nom" value="#{monEspaceBean.nom}" styleClass="nx-input" required="true" />
-                            </div>
-                            <div class="nx-field">
-                                <label for="profilForm:email">Email</label>
-                                <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
-                            </div>
-                            <div class="nx-field">
-                                <label for="profilForm:telephone">Téléphone</label>
-                                <h:inputText id="telephone" value="#{monEspaceBean.telephone}" styleClass="nx-input" />
-                            </div>
-
-                            <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerProfil}" styleClass="nx-button nx-button-primary nx-button-block" />
-                        </h:form>
-                    </div>
-                </div>
-
             </div>
         </div>
         </ui:fragment>
 
-        <!-- ===================== Sans espace : profil seul + invitation à en créer un ===================== -->
+        <!-- ===================== Sans espace : invitation à en créer un ===================== -->
         <ui:fragment rendered="#{!monEspaceBean.possedeEspace}">
-            <div class="nx-espace-layout">
-
-                <div class="nx-card">
-                    <h3>Mon profil</h3>
-
-                    <h:form id="profilFormSansEspace">
-                        <h:messages for="profilFormSansEspace" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
-
-                        <div class="nx-field">
-                            <label for="profilFormSansEspace:prenom">Prénom</label>
-                            <h:inputText id="prenom" value="#{monEspaceBean.prenom}" styleClass="nx-input" required="true" />
-                        </div>
-                        <div class="nx-field">
-                            <label for="profilFormSansEspace:nom">Nom</label>
-                            <h:inputText id="nom" value="#{monEspaceBean.nom}" styleClass="nx-input" required="true" />
-                        </div>
-                        <div class="nx-field">
-                            <label for="profilFormSansEspace:email">Email</label>
-                            <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
-                        </div>
-                        <div class="nx-field">
-                            <label for="profilFormSansEspace:telephone">Téléphone</label>
-                            <h:inputText id="telephone" value="#{monEspaceBean.telephone}" styleClass="nx-input" />
-                        </div>
-
-                        <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerProfil}" styleClass="nx-button nx-button-primary nx-button-block" />
-                    </h:form>
-                </div>
-
-                <div class="nx-card nx-card-empty">
-                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/><path d="M10 21v-4h4v4"/>
-                    </svg>
-                    <h3>Vous n'avez pas encore d'espace professionnel</h3>
-                    <p>Créez votre espace pour présenter votre activité, vos coordonnées et vos services aux visiteurs de Nexora.</p>
-                    <h:link outcome="/creer-espace" value="Créer mon espace" styleClass="nx-button nx-button-primary" />
-                </div>
-
+            <div class="nx-card nx-card-empty" style="max-width:640px; margin:28px auto 80px;">
+                <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/><path d="M10 21v-4h4v4"/>
+                </svg>
+                <h3>Vous n'avez pas encore d'espace professionnel</h3>
+                <p>Créez votre espace pour présenter votre activité, vos coordonnées et vos services aux visiteurs de Nexora.</p>
+                <h:link outcome="/creer-espace" value="Créer mon espace" styleClass="nx-button nx-button-primary" />
+                <p style="margin-top:16px; font-size:13px;"><h:link outcome="/mon-compte" value="Gérer mon profil et mes favoris" /></p>
             </div>
         </ui:fragment>
 

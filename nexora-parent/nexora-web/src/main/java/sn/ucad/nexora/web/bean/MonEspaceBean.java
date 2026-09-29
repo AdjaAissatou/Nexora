@@ -22,13 +22,11 @@ import sn.ucad.nexora.web.dto.espace.EspaceResponse;
 import sn.ucad.nexora.web.dto.espace.RegionResponse;
 import sn.ucad.nexora.web.dto.espace.TypeEspaceResponse;
 import sn.ucad.nexora.web.dto.espace.UpdateEspaceRequest;
-import sn.ucad.nexora.web.dto.user.UpdateUserRequest;
-import sn.ucad.nexora.web.dto.user.UserResponse;
 import sn.ucad.nexora.web.error.ApiException;
 import sn.ucad.nexora.web.session.SessionBean;
 import sn.ucad.nexora.web.util.VocabulaireOffres;
 
-/** Backing bean de {@code mon-espace.xhtml} — profil du compte connecté et son espace professionnel. */
+/** Backing bean de {@code mon-espace.xhtml} — gestion de l'espace (ou des espaces) professionnel du compte connecté. */
 @Named
 @ViewScoped
 public class MonEspaceBean implements Serializable {
@@ -45,17 +43,11 @@ public class MonEspaceBean implements Serializable {
     @Inject
     private SessionBean session;
 
-    private UserResponse profil;
     private List<EspaceResponse> mesEspaces;
     private EspaceResponse espace;
     private List<OffreSummaryResponse> mesOffres;
     private String erreur;
     private VocabulaireOffres.Vocabulaire vocabulaireOffres = VocabulaireOffres.pour(null);
-
-    // Champs modifiables du profil
-    private String prenom;
-    private String nom;
-    private String telephone;
 
     // Champs modifiables de l'espace
     private String espaceNom;
@@ -89,10 +81,9 @@ public class MonEspaceBean implements Serializable {
     @PostConstruct
     public void charger() {
         try {
-            profil = userApiClient.obtenir(session.getAccessToken(), session.getCompte().id());
-            prenom = profil.firstName();
-            nom = profil.lastName();
-            telephone = profil.phone();
+            // Simple garde-fou : s'assurer que le profil existe côté user-service avant de
+            // continuer. L'édition du profil elle-même vit désormais dans MonCompteBean.
+            userApiClient.obtenir(session.getAccessToken(), session.getCompte().id());
         } catch (ApiException e) {
             erreur = e.getMessage();
             return;
@@ -192,18 +183,6 @@ public class MonEspaceBean implements Serializable {
         communes = espaceApiClient.communes(idDepartement);
     }
 
-    public String enregistrerProfil() {
-        try {
-            profil = userApiClient.mettreAJour(session.getAccessToken(), new UpdateUserRequest(prenom, nom, telephone));
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Profil mis à jour.", null));
-        } catch (ApiException e) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));
-        }
-        return null;
-    }
-
     public String enregistrerEspace() {
         try {
             espace = espaceApiClient.mettreAJour(
@@ -287,10 +266,6 @@ public class MonEspaceBean implements Serializable {
         return espace != null;
     }
 
-    public UserResponse getProfil() {
-        return profil;
-    }
-
     public List<EspaceResponse> getMesEspaces() {
         return mesEspaces;
     }
@@ -325,30 +300,6 @@ public class MonEspaceBean implements Serializable {
 
     public String getErreur() {
         return erreur;
-    }
-
-    public String getPrenom() {
-        return prenom;
-    }
-
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
-
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
     }
 
     public String getEspaceNom() {
