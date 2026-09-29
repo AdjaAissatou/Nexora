@@ -109,9 +109,12 @@ public class CreerOffreBean implements Serializable {
         CategorieResponse c = trouver(niveau1, niveau1Id);
         if (c != null && c.aDesEnfants()) {
             niveau2 = catalogueApiClient.sousCategories(niveau1Id);
-        } else {
-            chargerFeuille(niveau1Id);
         }
+        // Une catégorie peut avoir à la fois des sous-catégories à explorer et ses
+        // propres types d'offre directement sélectionnables (ex: "Téléphones et
+        // tablettes" a une sous-catégorie "Accessoires" mais propose aussi des
+        // téléphones directement) — on charge donc toujours les deux.
+        chargerFeuille(niveau1Id);
     }
 
     public void onNiveau2Change() {
@@ -126,9 +129,8 @@ public class CreerOffreBean implements Serializable {
         CategorieResponse c = trouver(niveau2, niveau2Id);
         if (c != null && c.aDesEnfants()) {
             niveau3 = catalogueApiClient.sousCategories(niveau2Id);
-        } else {
-            chargerFeuille(niveau2Id);
         }
+        chargerFeuille(niveau2Id);
     }
 
     public void onNiveau3Change() {
