@@ -523,6 +523,9 @@ h1, h2, h3, p { margin: 0; }
 .nx-button-outline-dark { border: 1px solid var(--nx-primary) !important; color: var(--nx-primary) !important; background: transparent !important; }
 .nx-button-outline-dark:hover { background: var(--nx-primary-light) !important; }
 
+.nx-button-danger { border: 1px solid var(--nx-error) !important; color: var(--nx-error) !important; background: transparent !important; }
+.nx-button-danger:hover { background: var(--nx-error-soft) !important; }
+
 .nx-button-block { width: 100%; }
 
 

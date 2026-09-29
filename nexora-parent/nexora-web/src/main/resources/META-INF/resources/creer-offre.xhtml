@@ -6,12 +6,12 @@
 <f:metadata>
     <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}" />
 </f:metadata>
-<ui:define name="titre">Ajouter une offre — Nexora</ui:define>
+<ui:define name="titre">#{creerOffreBean.modeEdition ? 'Modifier cette offre' : 'Ajouter une offre'} — Nexora</ui:define>
 <ui:define name="content">
 
     <section class="nx-page-header">
         <div class="nx-container">
-            <h1>Ajouter une offre</h1>
+            <h1>#{creerOffreBean.modeEdition ? 'Modifier cette offre' : 'Ajouter une offre'}</h1>
             <p>Choisissez une catégorie précise : le formulaire s'adapte automatiquement, sans saisie inutile.</p>
         </div>
     </section>
@@ -205,7 +205,7 @@
                                 </div>
                             </ui:fragment>
 
-                            <h:commandButton value="Publier l'offre" action="#{creerOffreBean.publier}"
+                            <h:commandButton value="#{creerOffreBean.modeEdition ? 'Enregistrer les modifications' : 'Publier cette offre'}" action="#{creerOffreBean.publier}"
                                              styleClass="nx-button nx-button-primary nx-button-block" />
                         </ui:fragment>
                     </h:panelGroup>

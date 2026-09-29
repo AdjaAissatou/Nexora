@@ -67,6 +67,7 @@
 \i 04_catalogue/13_ressource.sql
 \i 04_catalogue/14_disponibilite.sql
 \i 04_catalogue/15_categorie_type_espace.sql
+\i 04_catalogue/16_offre_espace_cascade.sql
 
 -------------------------------------------------------
 -- RECHERCHE

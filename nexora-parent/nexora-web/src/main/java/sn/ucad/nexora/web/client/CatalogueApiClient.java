@@ -12,8 +12,10 @@ import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
 import sn.ucad.nexora.web.dto.catalogue.CreateOffreRequest;
 import sn.ucad.nexora.web.dto.catalogue.CreateOffreResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffreDetailResponse;
+import sn.ucad.nexora.web.dto.catalogue.OffreEditionResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffrePageResponse;
 import sn.ucad.nexora.web.dto.catalogue.TypeOffreResponse;
+import sn.ucad.nexora.web.dto.catalogue.UpdateOffreRequest;
 import sn.ucad.nexora.web.error.ApiErrors;
 
 /**
@@ -133,6 +135,35 @@ public class CatalogueApiClient {
         LOG.info("Requête POST {}/api/v1/offres", baseUrl);
         try {
             return client.post().uri("/api/v1/offres")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .body(requete)
+                    .retrieve()
+                    .body(CreateOffreResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public OffreEditionResponse obtenirEdition(String accessToken, Long idOffre) {
+        LOG.info("Requête GET {}/api/v1/offres/{}/edition", baseUrl, idOffre);
+        try {
+            return client.get().uri("/api/v1/offres/{id}/edition", idOffre)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .body(OffreEditionResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    public CreateOffreResponse modifierOffre(String accessToken, Long idOffre, UpdateOffreRequest requete) {
+        LOG.info("Requête PUT {}/api/v1/offres/{}", baseUrl, idOffre);
+        try {
+            return client.put().uri("/api/v1/offres/{id}", idOffre)
                     .header("Authorization", "Bearer " + accessToken)
                     .body(requete)
                     .retrieve()

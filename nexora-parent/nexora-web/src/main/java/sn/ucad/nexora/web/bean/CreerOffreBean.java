@@ -18,7 +18,9 @@ import sn.ucad.nexora.web.dto.catalogue.AttributResponse;
 import sn.ucad.nexora.web.dto.catalogue.AttributValeurRequest;
 import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
 import sn.ucad.nexora.web.dto.catalogue.CreateOffreRequest;
+import sn.ucad.nexora.web.dto.catalogue.OffreEditionResponse;
 import sn.ucad.nexora.web.dto.catalogue.TypeOffreResponse;
+import sn.ucad.nexora.web.dto.catalogue.UpdateOffreRequest;
 import sn.ucad.nexora.web.dto.espace.EspaceResponse;
 import sn.ucad.nexora.web.error.ApiException;
 import sn.ucad.nexora.web.session.SessionBean;
@@ -42,6 +44,7 @@ public class CreerOffreBean implements Serializable {
     private SessionBean session;
 
     private EspaceResponse espace;
+    private Long idOffreEdition;
     private String erreur;
 
     private List<CategorieResponse> niveau1;
@@ -83,13 +86,81 @@ public class CreerOffreBean implements Serializable {
     public void charger() {
         try {
             List<EspaceResponse> mesEspaces = espaceApiClient.mesEspaces(session.getAccessToken());
-            espace = mesEspaces.isEmpty() ? null : mesEspaces.get(0);
+            // "Ajouter une offre" depuis la fiche d'un espace précis transmet idEspace ; sans quoi
+            // (ou si l'id ne correspond à aucun espace possédé), on retombe sur le premier.
+            Long idEspaceParam = idParametre("idEspace");
+            espace = mesEspaces.stream()
+                    .filter(e -> e.id().equals(idEspaceParam))
+                    .findFirst()
+                    .orElse(mesEspaces.isEmpty() ? null : mesEspaces.get(0));
         } catch (ApiException e) {
             erreur = e.getMessage();
             return;
         }
         try {
             niveau1 = catalogueApiClient.categoriesRacines(espace == null ? null : espace.typeEspaceId());
+        } catch (ApiException e) {
+            erreur = e.getMessage();
+            return;
+        }
+
+        Long idOffreParam = idParametre("offreId");
+        if (idOffreParam != null) {
+            chargerPourEdition(idOffreParam);
+        }
+    }
+
+    private Long idParametre(String nom) {
+        String brut = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get(nom);
+        try {
+            return brut == null ? null : Long.valueOf(brut);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private void chargerPourEdition(Long idOffre) {
+        try {
+            OffreEditionResponse r = catalogueApiClient.obtenirEdition(session.getAccessToken(), idOffre);
+            idOffreEdition = r.id();
+
+            niveau1Id = r.niveau1Id();
+            if (niveau1Id != null) {
+                CategorieResponse c = trouver(niveau1, niveau1Id);
+                if (c != null && c.aDesEnfants()) niveau2 = catalogueApiClient.sousCategories(niveau1Id);
+            }
+            niveau2Id = r.niveau2Id();
+            if (niveau2Id != null) {
+                CategorieResponse c = trouver(niveau2, niveau2Id);
+                if (c != null && c.aDesEnfants()) niveau3 = catalogueApiClient.sousCategories(niveau2Id);
+            }
+            niveau3Id = r.niveau3Id();
+
+            chargerFeuille(r.idCategorie());
+            typeOffreId = r.idTypeOffre();
+
+            titre = r.titre();
+            titreAutoSuggere = null;
+            description = r.description();
+            prix = r.prix();
+            negociable = r.negociable();
+            marque = r.marque();
+            modele = r.modele();
+            reference = r.reference();
+            quantiteStock = r.quantiteStock();
+            garantie = r.garantie();
+            neuf = r.neuf() == null || r.neuf();
+            dureeEstimee = r.dureeEstimee();
+            interventionDomicile = r.interventionDomicile() != null && r.interventionDomicile();
+            reservation = r.reservation() == null || r.reservation();
+
+            if (r.attributs() != null) {
+                for (AttributValeurRequest a : r.attributs()) {
+                    if (a.idValeur() != null) valeursListe.put(a.idAttribut(), String.valueOf(a.idValeur()));
+                    else if (a.valeurNombre() != null) valeursNombre.put(a.idAttribut(), a.valeurNombre());
+                    else if (a.valeurTexte() != null) valeursTexte.put(a.idAttribut(), a.valeurTexte());
+                }
+            }
         } catch (ApiException e) {
             erreur = e.getMessage();
         }
@@ -247,39 +318,64 @@ public class CreerOffreBean implements Serializable {
                 }
             }
 
-            CreateOffreRequest requete = new CreateOffreRequest(
-                    espace.id(),
-                    typeOffreId,
-                    getCategorieFeuilleId(),
-                    titre,
-                    description,
-                    prix,
-                    negociable,
-                    true,
-                    marque,
-                    modele,
-                    reference,
-                    quantiteStock,
-                    garantie,
-                    neuf,
-                    dureeEstimee,
-                    interventionDomicile,
-                    reservation,
-                    valeurs);
-
-            catalogueApiClient.creerOffre(session.getAccessToken(), requete);
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Offre publiée.", null));
+            if (idOffreEdition != null) {
+                UpdateOffreRequest requete = new UpdateOffreRequest(
+                        typeOffreId,
+                        getCategorieFeuilleId(),
+                        titre,
+                        description,
+                        prix,
+                        negociable,
+                        true,
+                        marque,
+                        modele,
+                        reference,
+                        quantiteStock,
+                        garantie,
+                        neuf,
+                        dureeEstimee,
+                        interventionDomicile,
+                        reservation,
+                        valeurs);
+                catalogueApiClient.modifierOffre(session.getAccessToken(), idOffreEdition, requete);
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Offre mise à jour.", null));
+            } else {
+                CreateOffreRequest requete = new CreateOffreRequest(
+                        espace.id(),
+                        typeOffreId,
+                        getCategorieFeuilleId(),
+                        titre,
+                        description,
+                        prix,
+                        negociable,
+                        true,
+                        marque,
+                        modele,
+                        reference,
+                        quantiteStock,
+                        garantie,
+                        neuf,
+                        dureeEstimee,
+                        interventionDomicile,
+                        reservation,
+                        valeurs);
+                catalogueApiClient.creerOffre(session.getAccessToken(), requete);
+                FacesContext.getCurrentInstance()
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Offre publiée.", null));
+            }
             return "mon-espace?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Publication impossible", e.getMessage()));
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            idOffreEdition != null ? "Mise à jour impossible" : "Publication impossible", e.getMessage()));
             return null;
         }
     }
 
     public EspaceResponse getEspace() { return espace; }
     public String getErreur() { return erreur; }
+    public boolean isModeEdition() { return idOffreEdition != null; }
 
     public List<CategorieResponse> getNiveau1() { return niveau1; }
     public List<CategorieResponse> getNiveau2() { return niveau2; }

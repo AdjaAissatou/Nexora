@@ -8,8 +8,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.util.List;
+import sn.ucad.nexora.web.client.CatalogueApiClient;
+import sn.ucad.nexora.web.client.CritereRecherche;
 import sn.ucad.nexora.web.client.EspaceApiClient;
 import sn.ucad.nexora.web.client.UserApiClient;
+import sn.ucad.nexora.web.dto.catalogue.OffreSummaryResponse;
 import sn.ucad.nexora.web.dto.espace.CommuneResponse;
 import sn.ucad.nexora.web.dto.espace.DepartementResponse;
 import sn.ucad.nexora.web.dto.espace.EspaceResponse;
@@ -32,11 +35,15 @@ public class MonEspaceBean implements Serializable {
     private transient EspaceApiClient espaceApiClient;
 
     @Inject
+    private transient CatalogueApiClient catalogueApiClient;
+
+    @Inject
     private SessionBean session;
 
     private UserResponse profil;
     private List<EspaceResponse> mesEspaces;
     private EspaceResponse espace;
+    private List<OffreSummaryResponse> mesOffres;
     private String erreur;
 
     // Champs modifiables du profil
@@ -94,6 +101,8 @@ public class MonEspaceBean implements Serializable {
                     .orElse(mesEspaces.isEmpty() ? null : mesEspaces.get(0));
             espace = selectionne == null ? null : espaceApiClient.obtenir(selectionne.id());
             remplirChampsEspace();
+            mesOffres = espace == null ? List.of()
+                    : catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
         } catch (ApiException e) {
             // Pas encore de profil utilisateur exploitable côté espace-service : pas une erreur bloquante,
             // l'utilisateur voit simplement la proposition de créer son espace.
@@ -208,6 +217,17 @@ public class MonEspaceBean implements Serializable {
         return null;
     }
 
+    public String supprimerEspace() {
+        try {
+            espaceApiClient.supprimer(session.getAccessToken(), espace.id());
+            return "mon-espace?faces-redirect=true";
+        } catch (ApiException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
+            return null;
+        }
+    }
+
     private static List<String> urlsDepuisTexte(String texte) {
         if (texte == null || texte.isBlank()) return List.of();
         return texte.lines().map(String::trim).filter(l -> !l.isBlank()).toList();
@@ -232,6 +252,10 @@ public class MonEspaceBean implements Serializable {
 
     public boolean isPlusieursEspaces() {
         return mesEspaces != null && mesEspaces.size() > 1;
+    }
+
+    public List<OffreSummaryResponse> getMesOffres() {
+        return mesOffres;
     }
 
     public EspaceResponse getEspace() {

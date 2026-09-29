@@ -103,6 +103,20 @@ public class EspaceApiClient {
         }
     }
 
+    public void supprimer(String accessToken, Long id) {
+        LOG.info("Requête DELETE {}/api/v1/espaces/{}", baseUrl, id);
+        try {
+            client.delete().uri("/api/v1/espaces/{id}", id)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
     public List<RegionResponse> regions() {
         LOG.info("Requête GET {}/api/v1/geo/regions", baseUrl);
         try {

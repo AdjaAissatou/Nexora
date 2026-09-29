@@ -8,12 +8,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sn.ucad.nexora.catalogue.application.dto.request.CreateOffreRequest;
 import sn.ucad.nexora.catalogue.application.dto.request.OffreSearchRequest;
+import sn.ucad.nexora.catalogue.application.dto.request.UpdateOffreRequest;
 import sn.ucad.nexora.catalogue.application.dto.response.CreateOffreResponse;
 import sn.ucad.nexora.catalogue.application.dto.response.OffreDetailResponse;
+import sn.ucad.nexora.catalogue.application.dto.response.OffreEditionResponse;
 import sn.ucad.nexora.catalogue.application.dto.response.OffrePageResponse;
 import sn.ucad.nexora.catalogue.application.usecase.CreateOffreUseCase;
+import sn.ucad.nexora.catalogue.application.usecase.GetOffreEditionUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.GetOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.RechercherOffresUseCase;
+import sn.ucad.nexora.catalogue.application.usecase.UpdateOffreUseCase;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -32,13 +36,19 @@ public class OffreController {
     private final RechercherOffresUseCase rechercherOffres;
     private final GetOffreUseCase getOffre;
     private final CreateOffreUseCase createOffre;
+    private final UpdateOffreUseCase updateOffre;
+    private final GetOffreEditionUseCase getOffreEdition;
 
     public OffreController(RechercherOffresUseCase rechercherOffres,
                            GetOffreUseCase getOffre,
-                           CreateOffreUseCase createOffre) {
+                           CreateOffreUseCase createOffre,
+                           UpdateOffreUseCase updateOffre,
+                           GetOffreEditionUseCase getOffreEdition) {
         this.rechercherOffres = rechercherOffres;
         this.getOffre = getOffre;
         this.createOffre = createOffre;
+        this.updateOffre = updateOffre;
+        this.getOffreEdition = getOffreEdition;
     }
 
     /**
@@ -52,6 +62,30 @@ public class OffreController {
             @RequestBody CreateOffreRequest request) {
 
         return ResponseEntity.status(201).body(createOffre.creer(accountId, request));
+    }
+
+    /**
+     * Charge une offre pour édition (chaîne de catégories + attributs déjà saisis) —
+     * réservé au propriétaire de l'espace, contrairement à GET /{id} qui est public.
+     */
+    @GetMapping("/{id}/edition")
+    @Operation(summary = "Charger une offre pour édition")
+    public ResponseEntity<OffreEditionResponse> obtenirEdition(
+            @AuthenticationPrincipal UUID accountId,
+            @PathVariable Long id) {
+        return ResponseEntity.ok(getOffreEdition.obtenir(accountId, id));
+    }
+
+    /**
+     * Modifie une offre existante pour l'espace professionnel du compte connecté.
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "Modifier une offre")
+    public ResponseEntity<CreateOffreResponse> modifier(
+            @AuthenticationPrincipal UUID accountId,
+            @PathVariable Long id,
+            @RequestBody UpdateOffreRequest request) {
+        return ResponseEntity.ok(updateOffre.modifier(accountId, id, request));
     }
 
     /**

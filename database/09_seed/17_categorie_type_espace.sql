@@ -6,6 +6,8 @@
 INSERT INTO categorie_type_espace (id_categorie, id_type_espace, principal)
 SELECT c.id_categorie, t.id_type_espace, TRUE FROM categorie c, type_espace t WHERE c.nom = 'Commerce' AND c.id_categorie_parent IS NULL AND t.nom = 'Boutique'
 UNION ALL
+SELECT c.id_categorie, t.id_type_espace, TRUE FROM categorie c, type_espace t WHERE c.nom = 'Informatique' AND c.id_categorie_parent IS NULL AND t.nom = 'Boutique'
+UNION ALL
 SELECT c.id_categorie, t.id_type_espace, TRUE FROM categorie c, type_espace t WHERE c.nom = 'Mode et textile' AND c.id_categorie_parent IS NULL AND t.nom = 'Boutique'
 UNION ALL
 SELECT c.id_categorie, t.id_type_espace, TRUE FROM categorie c, type_espace t WHERE c.nom = 'Électronique et électroménager' AND c.id_categorie_parent IS NULL AND t.nom = 'Boutique'
@@ -25,6 +27,8 @@ UNION ALL
 SELECT c.id_categorie, t.id_type_espace, FALSE FROM categorie c, type_espace t WHERE c.nom = 'Bâtiment et construction' AND c.id_categorie_parent IS NULL AND t.nom = 'Boutique'
 UNION ALL
 SELECT c.id_categorie, t.id_type_espace, TRUE FROM categorie c, type_espace t WHERE c.nom = 'Services' AND c.id_categorie_parent IS NULL AND t.nom = 'Service'
+UNION ALL
+SELECT c.id_categorie, t.id_type_espace, FALSE FROM categorie c, type_espace t WHERE c.nom = 'Informatique' AND c.id_categorie_parent IS NULL AND t.nom = 'Service'
 UNION ALL
 SELECT c.id_categorie, t.id_type_espace, TRUE FROM categorie c, type_espace t WHERE c.nom = 'Conseil et services aux entreprises' AND c.id_categorie_parent IS NULL AND t.nom = 'Service'
 UNION ALL
@@ -103,6 +107,8 @@ UNION ALL
 SELECT c.id_categorie, t.id_type_espace, FALSE FROM categorie c, type_espace t WHERE c.nom = 'Transport' AND c.id_categorie_parent IS NULL AND t.nom = 'Agence'
 UNION ALL
 SELECT c.id_categorie, t.id_type_espace, TRUE FROM categorie c, type_espace t WHERE c.nom = 'Artisanat et réparation' AND c.id_categorie_parent IS NULL AND t.nom = 'Atelier'
+UNION ALL
+SELECT c.id_categorie, t.id_type_espace, FALSE FROM categorie c, type_espace t WHERE c.nom = 'Informatique' AND c.id_categorie_parent IS NULL AND t.nom = 'Atelier'
 UNION ALL
 SELECT c.id_categorie, t.id_type_espace, FALSE FROM categorie c, type_espace t WHERE c.nom = 'Mode et textile' AND c.id_categorie_parent IS NULL AND t.nom = 'Atelier'
 UNION ALL

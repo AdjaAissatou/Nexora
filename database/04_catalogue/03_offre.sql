@@ -46,7 +46,8 @@ CREATE TABLE offre (
 
     CONSTRAINT fk_offre_espace
         FOREIGN KEY(id_espace)
-        REFERENCES espace_professionnel(id_espace),
+        REFERENCES espace_professionnel(id_espace)
+        ON DELETE CASCADE,
 
     CONSTRAINT fk_offre_type
         FOREIGN KEY(id_type_offre)

@@ -8,4 +8,5 @@ public interface EspaceRepository {
     EspaceProfessionnel save(EspaceProfessionnel espace);
     Optional<EspaceProfessionnel> findById(Long id);
     List<EspaceProfessionnel> findByUtilisateurId(Long utilisateurId);
+    void deleteById(Long id);
 }

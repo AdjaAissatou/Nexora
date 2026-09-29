@@ -93,12 +93,37 @@
                         </div>
 
                         <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
-                            <h:link outcome="/creer-offre" value="Ajouter une offre" styleClass="nx-button nx-button-primary" />
+                            <h:link outcome="/creer-offre" value="Ajouter une offre" styleClass="nx-button nx-button-primary">
+                                <f:param name="idEspace" value="#{monEspaceBean.espace.id}" />
+                            </h:link>
                             <h:link outcome="/espace" value="Voir ma fiche publique" styleClass="nx-button nx-button-outline">
                                 <f:param name="id" value="#{monEspaceBean.espace.id}" />
                             </h:link>
                             <h:link outcome="/creer-espace" value="+ Créer un autre espace" styleClass="nx-button nx-button-outline" rendered="#{!monEspaceBean.plusieursEspaces}" />
                         </div>
+
+                        <h3 style="margin-top:20px;">Mes offres</h3>
+                        <ui:fragment rendered="#{empty monEspaceBean.mesOffres}">
+                            <p style="color:var(--nx-text-secondary);">Aucune offre publiée pour le moment.</p>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{not empty monEspaceBean.mesOffres}">
+                            <div class="nx-offre-liste">
+                                <ui:repeat var="o" value="#{monEspaceBean.mesOffres}">
+                                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid var(--nx-border);">
+                                        <div>
+                                            <strong>#{o.titre}</strong>
+                                            <div style="color:var(--nx-text-secondary); font-size:.9em;">
+                                                <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol="FCFA " maxFractionDigits="0" /></h:outputText>
+                                                <ui:fragment rendered="#{!o.disponible}"> — indisponible</ui:fragment>
+                                            </div>
+                                        </div>
+                                        <h:link outcome="/creer-offre" value="Modifier" styleClass="nx-button nx-button-outline">
+                                            <f:param name="offreId" value="#{o.id}" />
+                                        </h:link>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+                        </ui:fragment>
 
                         <h:form id="espaceForm" style="margin-top:18px;">
                             <h:messages for="espaceForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
@@ -229,6 +254,12 @@
                             </div>
 
                             <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerEspace}" styleClass="nx-button nx-button-primary nx-button-block" />
+                        </h:form>
+
+                        <h:form id="supprimerForm" style="margin-top:12px;">
+                            <h:commandButton value="Supprimer cet espace" action="#{monEspaceBean.supprimerEspace}"
+                                             styleClass="nx-button nx-button-danger nx-button-block"
+                                             onclick="return confirm('Supprimer définitivement « ' + document.getElementById('espaceForm:nom').value + ' » et toutes ses offres ? Cette action est irréversible.');" />
                         </h:form>
                     </div>
                 </ui:fragment>
