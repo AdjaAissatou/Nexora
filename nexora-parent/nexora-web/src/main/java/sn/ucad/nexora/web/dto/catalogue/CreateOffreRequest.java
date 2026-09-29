@@ -22,4 +22,5 @@ public record CreateOffreRequest(
         Integer dureeEstimee,
         Boolean interventionDomicile,
         Boolean reservation,
-        List<AttributValeurRequest> attributs) {}
+        List<AttributValeurRequest> attributs,
+        List<String> images) {}

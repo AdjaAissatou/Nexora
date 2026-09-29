@@ -26,6 +26,7 @@ public class UpdateOffreRequest {
     private Boolean reservation;
 
     private List<AttributValeurRequest> attributs;
+    private List<String> images;
 
     public Long getIdTypeOffre() { return idTypeOffre; }
     public void setIdTypeOffre(Long idTypeOffre) { this.idTypeOffre = idTypeOffre; }
@@ -61,4 +62,6 @@ public class UpdateOffreRequest {
     public void setReservation(Boolean reservation) { this.reservation = reservation; }
     public List<AttributValeurRequest> getAttributs() { return attributs; }
     public void setAttributs(List<AttributValeurRequest> attributs) { this.attributs = attributs; }
+    public List<String> getImages() { return images; }
+    public void setImages(List<String> images) { this.images = images; }
 }

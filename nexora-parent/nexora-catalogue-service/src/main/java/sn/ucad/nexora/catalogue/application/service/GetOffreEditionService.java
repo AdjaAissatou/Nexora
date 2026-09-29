@@ -75,6 +75,7 @@ public class GetOffreEditionService implements GetOffreEditionUseCase {
         remplirChaineCategories(r);
         remplirProduitOuService(r);
         r.setAttributs(chargerAttributs(idOffre));
+        r.setImages(chargerImages(idOffre));
 
         return r;
     }
@@ -149,6 +150,14 @@ public class GetOffreEditionService implements GetOffreEditionUseCase {
             a.setIdValeur(toLong(row[4]));
             return a;
         }).toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> chargerImages(Long idOffre) {
+        Query q = em.createNativeQuery(
+                "SELECT url FROM image WHERE id_offre = :id ORDER BY ordre_affichage");
+        q.setParameter("id", idOffre);
+        return q.getResultList();
     }
 
     private Long toLong(Object v) {

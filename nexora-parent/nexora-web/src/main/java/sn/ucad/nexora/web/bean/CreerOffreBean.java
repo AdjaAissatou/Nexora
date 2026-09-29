@@ -6,14 +6,17 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.primefaces.event.FileUploadEvent;
 import sn.ucad.nexora.web.client.CatalogueApiClient;
 import sn.ucad.nexora.web.client.EspaceApiClient;
+import sn.ucad.nexora.web.config.ImageUploadService;
 import sn.ucad.nexora.web.dto.catalogue.AttributResponse;
 import sn.ucad.nexora.web.dto.catalogue.AttributValeurRequest;
 import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
@@ -81,6 +84,8 @@ public class CreerOffreBean implements Serializable {
     private Integer dureeEstimee;
     private boolean interventionDomicile;
     private boolean reservation = true;
+
+    private String photosTexte;
 
     @PostConstruct
     public void charger() {
@@ -161,6 +166,7 @@ public class CreerOffreBean implements Serializable {
                     else if (a.valeurTexte() != null) valeursTexte.put(a.idAttribut(), a.valeurTexte());
                 }
             }
+            photosTexte = r.images() == null ? null : String.join("\n", r.images());
         } catch (ApiException e) {
             erreur = e.getMessage();
         }
@@ -318,6 +324,10 @@ public class CreerOffreBean implements Serializable {
                 }
             }
 
+            List<String> images = photosTexte == null || photosTexte.isBlank()
+                    ? List.of()
+                    : photosTexte.lines().map(String::trim).filter(l -> !l.isBlank()).toList();
+
             if (idOffreEdition != null) {
                 UpdateOffreRequest requete = new UpdateOffreRequest(
                         typeOffreId,
@@ -336,7 +346,8 @@ public class CreerOffreBean implements Serializable {
                         dureeEstimee,
                         interventionDomicile,
                         reservation,
-                        valeurs);
+                        valeurs,
+                        images);
                 catalogueApiClient.modifierOffre(session.getAccessToken(), idOffreEdition, requete);
                 FacesContext.getCurrentInstance()
                         .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Offre mise à jour.", null));
@@ -359,7 +370,8 @@ public class CreerOffreBean implements Serializable {
                         dureeEstimee,
                         interventionDomicile,
                         reservation,
-                        valeurs);
+                        valeurs,
+                        images);
                 catalogueApiClient.creerOffre(session.getAccessToken(), requete);
                 FacesContext.getCurrentInstance()
                         .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Offre publiée.", null));
@@ -440,4 +452,17 @@ public class CreerOffreBean implements Serializable {
     public void setInterventionDomicile(boolean v) { interventionDomicile = v; }
     public boolean isReservation() { return reservation; }
     public void setReservation(boolean v) { reservation = v; }
+
+    public String getPhotosTexte() { return photosTexte; }
+    public void setPhotosTexte(String v) { photosTexte = v; }
+
+    public void uploaderPhoto(FileUploadEvent event) {
+        try {
+            String url = ImageUploadService.enregistrer(event.getFile().getInputStream(), event.getFile().getFileName());
+            photosTexte = (photosTexte == null || photosTexte.isBlank()) ? url : photosTexte + "\n" + url;
+        } catch (IOException | IllegalArgumentException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
+        }
+    }
 }

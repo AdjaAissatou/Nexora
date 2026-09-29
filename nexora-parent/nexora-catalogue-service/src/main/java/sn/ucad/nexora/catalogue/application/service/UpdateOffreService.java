@@ -75,6 +75,10 @@ public class UpdateOffreService implements UpdateOffreUseCase {
         supprimerAttributs.setParameter("id", idOffre).executeUpdate();
         insererAttributs(idOffre, r.getAttributs());
 
+        Query supprimerImages = em.createNativeQuery("DELETE FROM image WHERE id_offre = :id");
+        supprimerImages.setParameter("id", idOffre).executeUpdate();
+        insererImages(idOffre, r.getImages());
+
         return new CreateOffreResponse(idOffre, r.getTitre());
     }
 
@@ -170,6 +174,24 @@ public class UpdateOffreService implements UpdateOffreUseCase {
             q.setParameter("valeurDate", a.getValeurDate());
             q.setParameter("idValeur", a.getIdValeur());
             q.executeUpdate();
+        }
+    }
+
+    private void insererImages(Long idOffre, List<String> images) {
+        if (images == null) return;
+        int ordre = 0;
+        for (String url : images) {
+            if (url == null || url.isBlank()) continue;
+            Query q = em.createNativeQuery("""
+                    INSERT INTO image (id_offre, url, principale, ordre_affichage)
+                    VALUES (:idOffre, :url, :principale, :ordre)
+                    """);
+            q.setParameter("idOffre", idOffre);
+            q.setParameter("url", url.trim());
+            q.setParameter("principale", ordre == 0);
+            q.setParameter("ordre", ordre);
+            q.executeUpdate();
+            ordre++;
         }
     }
 }

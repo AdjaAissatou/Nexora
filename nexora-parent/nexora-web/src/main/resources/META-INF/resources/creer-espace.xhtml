@@ -2,12 +2,15 @@
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui">
 <f:metadata>
     <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}" />
 </f:metadata>
 <ui:define name="titre">Créer mon espace — Nexora</ui:define>
 <ui:define name="content">
+
+    <h:outputScript library="js" name="geolocation.js" target="head" />
 
     <section class="nx-page-header">
         <div class="nx-container">
@@ -71,18 +74,30 @@
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
                     <div class="nx-field">
-                        <label for="creerEspace:logo">Logo <span style="font-weight:400; color:var(--nx-text-secondary);">(lien vers une image)</span></label>
+                        <label for="creerEspace:logo">Logo <span style="font-weight:400; color:var(--nx-text-secondary);">(lien ou import direct)</span></label>
                         <h:inputText id="logo" value="#{creerEspaceBean.logo}" placeholder="https://…/logo.jpg" styleClass="nx-input" />
-                        <ui:fragment rendered="#{not empty creerEspaceBean.logo}">
-                            <img src="#{creerEspaceBean.logo}" alt="Aperçu du logo" style="margin-top:8px; width:64px; height:64px; object-fit:cover; border-radius:50%; border:1px solid var(--nx-border);" />
-                        </ui:fragment>
+                        <p:fileUpload mode="advanced" auto="true" dragDrop="false" multiple="false"
+                                      accept="image/*"
+                                      listener="#{creerEspaceBean.uploaderLogo}" update="logoApercu logo"
+                                      label="…ou importer un fichier" invalidFileMessage="Format d'image non supporté." />
+                        <h:panelGroup id="logoApercu">
+                            <ui:fragment rendered="#{not empty creerEspaceBean.logo}">
+                                <img src="#{creerEspaceBean.logo}" alt="Aperçu du logo" style="margin-top:8px; width:64px; height:64px; object-fit:cover; border-radius:50%; border:1px solid var(--nx-border);" />
+                            </ui:fragment>
+                        </h:panelGroup>
                     </div>
                     <div class="nx-field">
-                        <label for="creerEspace:couverture">Photo de couverture <span style="font-weight:400; color:var(--nx-text-secondary);">(lien vers une image)</span></label>
+                        <label for="creerEspace:couverture">Photo de couverture <span style="font-weight:400; color:var(--nx-text-secondary);">(lien ou import direct)</span></label>
                         <h:inputText id="couverture" value="#{creerEspaceBean.couverture}" placeholder="https://…/couverture.jpg" styleClass="nx-input" />
-                        <ui:fragment rendered="#{not empty creerEspaceBean.couverture}">
-                            <img src="#{creerEspaceBean.couverture}" alt="Aperçu de la couverture" style="margin-top:8px; width:100%; max-width:220px; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--nx-border);" />
-                        </ui:fragment>
+                        <p:fileUpload mode="advanced" auto="true" dragDrop="false" multiple="false"
+                                      accept="image/*"
+                                      listener="#{creerEspaceBean.uploaderCouverture}" update="couvertureApercu couverture"
+                                      label="…ou importer un fichier" invalidFileMessage="Format d'image non supporté." />
+                        <h:panelGroup id="couvertureApercu">
+                            <ui:fragment rendered="#{not empty creerEspaceBean.couverture}">
+                                <img src="#{creerEspaceBean.couverture}" alt="Aperçu de la couverture" style="margin-top:8px; width:100%; max-width:220px; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--nx-border);" />
+                            </ui:fragment>
+                        </h:panelGroup>
                     </div>
                 </div>
 
@@ -102,14 +117,21 @@
                 </div>
 
                 <div class="nx-field">
-                    <label for="creerEspace:photos">Photos du lieu <span style="font-weight:400; color:var(--nx-text-secondary);">(une URL d'image par ligne)</span></label>
+                    <label for="creerEspace:photos">Photos du lieu <span style="font-weight:400; color:var(--nx-text-secondary);">(une URL par ligne, ou importez directement ci-dessous)</span></label>
                     <h:inputTextarea id="photos" value="#{creerEspaceBean.photosTexte}" placeholder="https://…/photo1.jpg&#10;https://…/photo2.jpg" styleClass="nx-input" rows="3" />
+                    <p:fileUpload mode="advanced" auto="true" dragDrop="false" multiple="true"
+                                  accept="image/*"
+                                  listener="#{creerEspaceBean.uploaderPhoto}" update="photos"
+                                  label="Ajouter des photos" invalidFileMessage="Format d'image non supporté." />
                 </div>
 
                 <h3 style="margin-top:20px;">Localisation</h3>
                 <p style="color:var(--nx-text-secondary); font-size:.9em; margin-top:-8px;">
                     Essentielle pour que les visiteurs vous trouvent près de chez eux.
                 </p>
+                <h:commandButton value="Utiliser ma position actuelle" type="button"
+                                  styleClass="nx-button nx-button-outline-dark" style="margin:6px 0 14px;"
+                                  onclick="nexoraUtiliserPositionActuelle(); return false;" />
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
                     <div class="nx-field">

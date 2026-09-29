@@ -6,12 +6,15 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import org.primefaces.event.FileUploadEvent;
 import sn.ucad.nexora.web.client.CatalogueApiClient;
 import sn.ucad.nexora.web.client.CritereRecherche;
 import sn.ucad.nexora.web.client.EspaceApiClient;
 import sn.ucad.nexora.web.client.UserApiClient;
+import sn.ucad.nexora.web.config.ImageUploadService;
 import sn.ucad.nexora.web.dto.catalogue.OffreSummaryResponse;
 import sn.ucad.nexora.web.dto.espace.CommuneResponse;
 import sn.ucad.nexora.web.dto.espace.DepartementResponse;
@@ -452,5 +455,29 @@ public class MonEspaceBean implements Serializable {
 
     public void setPhotosTexte(String photosTexte) {
         this.photosTexte = photosTexte;
+    }
+
+    public void uploaderLogo(FileUploadEvent event) {
+        espaceLogo = enregistrerUpload(event);
+    }
+
+    public void uploaderCouverture(FileUploadEvent event) {
+        espaceCouverture = enregistrerUpload(event);
+    }
+
+    public void uploaderPhoto(FileUploadEvent event) {
+        String url = enregistrerUpload(event);
+        if (url == null) return;
+        photosTexte = (photosTexte == null || photosTexte.isBlank()) ? url : photosTexte + "\n" + url;
+    }
+
+    private String enregistrerUpload(FileUploadEvent event) {
+        try {
+            return ImageUploadService.enregistrer(event.getFile().getInputStream(), event.getFile().getFileName());
+        } catch (IOException | IllegalArgumentException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
+            return null;
+        }
     }
 }

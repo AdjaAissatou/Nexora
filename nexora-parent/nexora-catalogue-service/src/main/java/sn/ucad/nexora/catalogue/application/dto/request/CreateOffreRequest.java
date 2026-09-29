@@ -29,6 +29,7 @@ public class CreateOffreRequest {
     private Boolean reservation;
 
     private List<AttributValeurRequest> attributs;
+    private List<String> images;
 
     public Long getIdEspace() { return idEspace; }
     public void setIdEspace(Long idEspace) { this.idEspace = idEspace; }
@@ -66,4 +67,6 @@ public class CreateOffreRequest {
     public void setReservation(Boolean reservation) { this.reservation = reservation; }
     public List<AttributValeurRequest> getAttributs() { return attributs; }
     public void setAttributs(List<AttributValeurRequest> attributs) { this.attributs = attributs; }
+    public List<String> getImages() { return images; }
+    public void setImages(List<String> images) { this.images = images; }
 }

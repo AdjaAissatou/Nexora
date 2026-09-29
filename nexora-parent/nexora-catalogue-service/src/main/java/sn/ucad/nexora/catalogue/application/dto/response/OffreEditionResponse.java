@@ -31,6 +31,7 @@ public class OffreEditionResponse {
     private Boolean interventionDomicile;
     private Boolean reservation;
     private List<AttributValeurResponse> attributs;
+    private List<String> images;
 
     public Long getId() { return id; }
     public void setId(Long v) { id = v; }
@@ -76,4 +77,6 @@ public class OffreEditionResponse {
     public void setReservation(Boolean v) { reservation = v; }
     public List<AttributValeurResponse> getAttributs() { return attributs; }
     public void setAttributs(List<AttributValeurResponse> v) { attributs = v; }
+    public List<String> getImages() { return images; }
+    public void setImages(List<String> v) { images = v; }
 }
