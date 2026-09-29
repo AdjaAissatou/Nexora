@@ -122,16 +122,26 @@ plus structurant à cadrer avant de coder quoi que ce soit dessus.
 | Journal d'activité | 🚧 |
 | Paramètres Nexora | 🚧 |
 
-## 4. Navigation par acteur
+## 4. ✅ Navigation par acteur
 
-- **Visiteur** : Accueil · Explorer · Connexion · Inscription.
+- **Visiteur** : Accueil · Explorer · Connexion · Créer un compte.
 - **Client** (sans espace) : Accueil · Explorer · Mon compte · Déconnexion.
 - **Professionnel** (au moins un espace) : Accueil · Explorer · Mon compte · **Mon
-  espace** · Déconnexion. *(Aujourd'hui la barre affiche seulement « Mon espace » —
-  il faudra distinguer « Mon compte » = profil/favoris/commandes du côté client, de
-  « Mon espace » = gestion professionnelle, dès que Mon compte existera.)*
+  espace** · Déconnexion.
 - **Admin** : navigation séparée, jamais mélangée à la navigation publique
-  (`/admin/...`, layout dédié, pas le header Nexora grand public).
+  (`/admin/...`, layout dédié, pas le header Nexora grand public) — pas encore construite.
+
+En place : `SessionBean.isFournisseur()` lit les rôles renvoyés par auth-service à la
+connexion ; `SessionBean.rafraichir()` recharge jeton et rôles après la création ou la
+suppression d'un espace, sans reconnexion. Le rôle FOURNISSEUR est retiré à la
+suppression du dernier espace ; `database/09_seed/20_synchro_role_fournisseur.sql`
+resynchronise les comptes existants.
+
+**Problème connu, vérifié :** le jeton d'accès expire au bout de 15 minutes
+(`jwt.access-token-expiration-minutes`) et le web ne le rafraîchit pas à l'expiration.
+Passé ce délai, les services répondent 403 alors que le menu affiche toujours le
+compte connecté. Correctif simple maintenant que `/refresh` fonctionne : rafraîchir
+dans `SessionBean.getAccessToken()` quand le jeton approche de son expiration.
 
 ## 5. ✅ `mon-espace.xhtml` et le profil personnel sont maintenant séparés
 
@@ -179,8 +189,10 @@ précédent :
    (`RechercheApiClient`) ; ajout de l'endpoint manquant
    `GET /api/v1/historique/consultations`. Reste côté client : avis laissés
    (`AvisController` en écriture), demandes, réservations, commandes (point 6).
-4. **Navigation adaptative** : afficher "Mon espace" dans le header seulement si le
-   compte a le rôle `FOURNISSEUR`.
+4. ✅ **Navigation adaptative** : « Mon espace » réservé au rôle `FOURNISSEUR` (§4).
+   Au passage, `/api/v1/auth/refresh` réparé (table `revoked_tokens` manquante,
+   `database/01_security/09_revoked_tokens.sql`). Reste : le rafraîchissement à
+   l'expiration du jeton (§4, problème connu).
 5. **Back-office admin** : le plus gros chantier, à cadrer précisément (pages,
    permissions, layout séparé) avant de commencer à coder — probablement sa propre
    session de conception dédiée plutôt qu'un ajout au fil de l'eau.
