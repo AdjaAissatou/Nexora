@@ -78,6 +78,52 @@
 
         </div>
 
+        <div class="nx-card" style="margin-top:20px;">
+            <h3 style="margin-top:0;">Mes favoris</h3>
+            <ui:fragment rendered="#{empty monCompteBean.favoris}">
+                <p style="color:var(--nx-text-secondary);">Aucun favori pour le moment. Le cœur ♡ sur une fiche offre ou espace l'ajoute ici.</p>
+            </ui:fragment>
+            <ui:fragment rendered="#{not empty monCompteBean.favoris}">
+                <div class="nx-lieu-public-liste">
+                    <ui:repeat var="el" value="#{monCompteBean.favoris}">
+                        <div class="nx-lieu-public-item">
+                            <a href="#{el.href}" class="nx-lieu-public-nom">#{el.titre}</a>
+                            <span class="nx-lieu-public-commune">#{el.sousTitre}</span>
+                            <h:form>
+                                <h:commandButton value="Retirer" styleClass="nx-button nx-button-outline-dark"
+                                                 action="#{monCompteBean.retirerFavori(el.offreId, el.espaceId)}" />
+                            </h:form>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </ui:fragment>
+        </div>
+
+        <div class="nx-card" style="margin-top:20px;">
+            <div class="nx-section-header">
+                <h3 style="margin:0;">Mon historique</h3>
+                <ui:fragment rendered="#{not empty monCompteBean.historique}">
+                    <h:form>
+                        <h:commandButton value="Effacer l'historique" styleClass="nx-button nx-button-outline-dark"
+                                         action="#{monCompteBean.effacerHistorique}" />
+                    </h:form>
+                </ui:fragment>
+            </div>
+            <ui:fragment rendered="#{empty monCompteBean.historique}">
+                <p style="color:var(--nx-text-secondary);">Aucune consultation récente.</p>
+            </ui:fragment>
+            <ui:fragment rendered="#{not empty monCompteBean.historique}">
+                <div class="nx-lieu-public-liste">
+                    <ui:repeat var="el" value="#{monCompteBean.historique}">
+                        <div class="nx-lieu-public-item">
+                            <a href="#{el.href}" class="nx-lieu-public-nom">#{el.titre}</a>
+                            <span class="nx-lieu-public-commune">#{el.sousTitre}</span>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </ui:fragment>
+        </div>
+
     </div>
 
 </ui:define>

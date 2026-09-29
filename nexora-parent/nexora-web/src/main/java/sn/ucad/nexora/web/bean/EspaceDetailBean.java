@@ -10,10 +10,12 @@ import sn.ucad.nexora.web.client.AvisApiClient;
 import sn.ucad.nexora.web.client.CatalogueApiClient;
 import sn.ucad.nexora.web.client.CritereRecherche;
 import sn.ucad.nexora.web.client.EspaceApiClient;
+import sn.ucad.nexora.web.client.RechercheApiClient;
 import sn.ucad.nexora.web.dto.catalogue.OffreSummaryResponse;
 import sn.ucad.nexora.web.dto.espace.EspaceResponse;
 import sn.ucad.nexora.web.dto.recherche.AvisResponse;
 import sn.ucad.nexora.web.error.ApiException;
+import sn.ucad.nexora.web.session.SessionBean;
 
 /** Backing bean de {@code espace.xhtml} — fiche publique d'un espace professionnel. */
 @Named
@@ -29,12 +31,19 @@ public class EspaceDetailBean implements Serializable {
     @Inject
     private transient AvisApiClient avisApiClient;
 
+    @Inject
+    private transient RechercheApiClient rechercheApiClient;
+
+    @Inject
+    private SessionBean session;
+
     private Long id;
     private EspaceResponse espace;
     private List<OffreSummaryResponse> offres;
     private List<AvisResponse> avis;
     private String erreur;
     private boolean trouve;
+    private boolean favori;
 
     public void charger() {
         if (id == null) return;
@@ -57,8 +66,32 @@ public class EspaceDetailBean implements Serializable {
         } catch (ApiException e) {
             avis = List.of();
         }
+        if (session.isConnecte()) {
+            rechercheApiClient.enregistrerConsultation(session.getAccessToken(), null, id);
+            try {
+                favori = rechercheApiClient.listerFavoris(session.getAccessToken()).stream()
+                        .anyMatch(f -> id.equals(f.espaceId()));
+            } catch (ApiException e) {
+                favori = false;
+            }
+        }
     }
 
+    public void basculerFavori() {
+        if (!session.isConnecte() || espace == null) return;
+        try {
+            if (favori) {
+                rechercheApiClient.supprimerFavori(session.getAccessToken(), null, id);
+            } else {
+                rechercheApiClient.ajouterFavori(session.getAccessToken(), null, id);
+            }
+            favori = !favori;
+        } catch (ApiException e) {
+            // Silencieux : un aller-retour favori raté n'empêche pas de consulter la fiche.
+        }
+    }
+
+    public boolean isFavori() { return favori; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public EspaceResponse getEspace() { return espace; }

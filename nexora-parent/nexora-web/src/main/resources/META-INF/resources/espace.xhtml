@@ -82,6 +82,13 @@
                                 <h:outputLink value="#{format.lienItineraire(espaceDetailBean.espace.latitude, espaceDetailBean.espace.longitude)}"
                                               target="_blank" styleClass="nx-button nx-button-outline">Itinéraire</h:outputLink>
                             </ui:fragment>
+                            <ui:fragment rendered="#{sessionBean.connecte}">
+                                <h:form>
+                                    <h:commandButton value="#{espaceDetailBean.favori ? '♥ Favori' : '♡ Favori'}"
+                                                     action="#{espaceDetailBean.basculerFavori}"
+                                                     styleClass="nx-button #{espaceDetailBean.favori ? 'nx-button-primary' : 'nx-button-outline'}" />
+                                </h:form>
+                            </ui:fragment>
                         </div>
                     </div>
                 </div>

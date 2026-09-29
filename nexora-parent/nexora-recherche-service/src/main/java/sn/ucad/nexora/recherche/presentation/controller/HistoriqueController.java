@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sn.ucad.nexora.recherche.application.dto.request.EnregistrerConsultationRequest;
 import sn.ucad.nexora.recherche.application.dto.request.EnregistrerRechercheRequest;
+import sn.ucad.nexora.recherche.application.dto.response.HistoriqueConsultationResponse;
 import sn.ucad.nexora.recherche.application.dto.response.HistoriqueRechercheResponse;
 import sn.ucad.nexora.recherche.application.dto.response.MessageResponse;
 import sn.ucad.nexora.recherche.application.usecase.ConsultationUseCase;
@@ -23,6 +24,7 @@ import java.util.List;
  * DELETE /api/v1/historique/recherches          — Effacer mon historique de recherche
  *
  * POST   /api/v1/historique/consultations       — Enregistrer une consultation
+ * GET    /api/v1/historique/consultations       — Lister mes consultations récentes
  * DELETE /api/v1/historique/consultations       — Effacer mon historique de consultation
  */
 @RestController
@@ -84,6 +86,14 @@ public class HistoriqueController {
         Long utilisateurId = PrincipalHelper.resolveUtilisateurId(auth, lookupRepository);
         consultationUseCase.enregistrer(utilisateurId, request);
         return ResponseEntity.status(201).build();
+    }
+
+    @GetMapping("/consultations")
+    @Operation(summary = "Mes consultations récentes",
+               description = "Retourne les dernières offres/espaces consultés par l'utilisateur connecté, du plus récent au plus ancien")
+    public ResponseEntity<List<HistoriqueConsultationResponse>> listerConsultations(Authentication auth) {
+        Long utilisateurId = PrincipalHelper.resolveUtilisateurId(auth, lookupRepository);
+        return ResponseEntity.ok(consultationUseCase.lister(utilisateurId));
     }
 
     @DeleteMapping("/consultations")

@@ -23,7 +23,7 @@ public class HistoriqueConsultationRepositoryAdapter implements HistoriqueConsul
 
     @Override
     public List<HistoriqueConsultation> findByUtilisateurId(Long utilisateurId) {
-        return jpa.findByUtilisateurIdOrderByDateConsultationDesc(utilisateurId)
+        return jpa.findTop100ByUtilisateurIdOrderByDateConsultationDesc(utilisateurId)
                 .stream().map(this::toDomain).toList();
     }
 

@@ -52,7 +52,17 @@
                         </ui:fragment>
                     </div>
 
-                    <h1>#{offreDetailBean.offre.titre}</h1>
+                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+                        <h1 style="margin:0;">#{offreDetailBean.offre.titre}</h1>
+                        <ui:fragment rendered="#{sessionBean.connecte}">
+                            <h:form>
+                                <h:commandButton value="#{offreDetailBean.favori ? '♥ Favori' : '♡ Favori'}"
+                                                 action="#{offreDetailBean.basculerFavori}"
+                                                 styleClass="nx-button #{offreDetailBean.favori ? 'nx-button-primary' : 'nx-button-outline'}"
+                                                 style="white-space:nowrap;" />
+                            </h:form>
+                        </ui:fragment>
+                    </div>
 
                     <p style="margin-top:16px; color:var(--nx-text-secondary); line-height:1.7; white-space:pre-line;">
                         #{offreDetailBean.offre.description}

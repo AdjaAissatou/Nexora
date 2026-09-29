@@ -12,7 +12,10 @@ import java.util.List;
 public interface HistoriqueConsultationJpaRepository
         extends JpaRepository<HistoriqueConsultationJpaEntity, Long> {
 
-    List<HistoriqueConsultationJpaEntity> findByUtilisateurIdOrderByDateConsultationDesc(Long utilisateurId);
+    // Bornée : l'historique n'a pas de suppression automatique, une consultation ajoute
+    // toujours une nouvelle ligne (même offre revisitée = nouvelle ligne) — Top100 évite
+    // de renvoyer un historique illimité à l'affichage.
+    List<HistoriqueConsultationJpaEntity> findTop100ByUtilisateurIdOrderByDateConsultationDesc(Long utilisateurId);
 
     @Modifying @Transactional
     @Query("DELETE FROM HistoriqueConsultationJpaEntity c WHERE c.utilisateurId = :uid")
