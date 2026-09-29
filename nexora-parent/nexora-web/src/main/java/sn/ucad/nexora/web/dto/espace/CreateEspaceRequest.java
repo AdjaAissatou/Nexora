@@ -1,5 +1,6 @@
 package sn.ucad.nexora.web.dto.espace;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /** Miroir de {@code sn.ucad.nexora.espace.application.dto.request.CreateEspaceRequest}. */
@@ -20,6 +21,8 @@ public record CreateEspaceRequest(
         Long idCommune,
         String quartier,
         String adresseComplete,
+        BigDecimal latitude,
+        BigDecimal longitude,
         String logo,
         String couverture,
         List<String> photos) {}

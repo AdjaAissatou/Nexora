@@ -2,6 +2,7 @@ package sn.ucad.nexora.espace.application.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class UpdateEspaceRequest {
@@ -18,6 +19,8 @@ public class UpdateEspaceRequest {
     @NotNull private Long idCommune;
     @NotBlank private String quartier;
     private String adresseComplete;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
     private String logo;
     private String couverture;
     private String registreCommerce;
@@ -51,6 +54,10 @@ public class UpdateEspaceRequest {
     public void setQuartier(String v) { quartier = v; }
     public String getAdresseComplete() { return adresseComplete; }
     public void setAdresseComplete(String v) { adresseComplete = v; }
+    public BigDecimal getLatitude() { return latitude; }
+    public void setLatitude(BigDecimal v) { latitude = v; }
+    public BigDecimal getLongitude() { return longitude; }
+    public void setLongitude(BigDecimal v) { longitude = v; }
     public String getLogo() { return logo; }
     public void setLogo(String v) { logo = v; }
     public String getCouverture() { return couverture; }

@@ -177,6 +177,8 @@
                     <label for="creerEspace:adresseComplete">Adresse complète <span style="font-weight:400; color:var(--nx-text-secondary);">(repère, numéro de porte…)</span></label>
                     <h:inputText id="adresseComplete" value="#{creerEspaceBean.adresseComplete}" placeholder="ex. Villa n°12, en face de la pharmacie" styleClass="nx-input" />
                 </div>
+                <h:inputHidden id="latitude" value="#{creerEspaceBean.latitude}" />
+                <h:inputHidden id="longitude" value="#{creerEspaceBean.longitude}" />
 
                 <h:commandButton value="Créer mon espace" action="#{creerEspaceBean.creer}" styleClass="nx-button nx-button-primary nx-button-block" />
             </h:form>

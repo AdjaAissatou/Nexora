@@ -834,8 +834,8 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 .nx-tab-pane.active { display: block; }
 
 /* Cartes d'offres avec actions (mon-espace) : variante non cliquable de .nx-offre-card */
-.nx-offre-card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--nx-border); }
-.nx-offre-card-actions .nx-button { flex: 1; padding: 8px 10px; font-size: 13px; text-align: center; }
+.nx-offre-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--nx-border); }
+.nx-offre-card-actions .nx-button { flex: 1 1 calc(50% - 4px); padding: 8px 10px; font-size: 13px; text-align: center; white-space: nowrap; }
 
 
 /* =========================================================

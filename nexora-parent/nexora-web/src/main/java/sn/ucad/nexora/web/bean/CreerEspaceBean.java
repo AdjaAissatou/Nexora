@@ -54,6 +54,8 @@ public class CreerEspaceBean implements Serializable {
     private Long idCommune;
     private String quartier;
     private String adresseComplete;
+    private java.math.BigDecimal latitude;
+    private java.math.BigDecimal longitude;
 
     private String logo;
     private String couverture;
@@ -114,6 +116,8 @@ public class CreerEspaceBean implements Serializable {
                             idCommune,
                             quartier,
                             adresseComplete,
+                            latitude,
+                            longitude,
                             logo,
                             couverture,
                             urlsDepuisTexte(photosTexte)));
@@ -272,6 +276,22 @@ public class CreerEspaceBean implements Serializable {
 
     public void setAdresseComplete(String adresseComplete) {
         this.adresseComplete = adresseComplete;
+    }
+
+    public java.math.BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(java.math.BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public java.math.BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(java.math.BigDecimal longitude) {
+        this.longitude = longitude;
     }
 
     public String getLogo() {

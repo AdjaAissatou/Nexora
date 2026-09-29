@@ -18,6 +18,7 @@ import sn.ucad.nexora.catalogue.application.usecase.DeleteOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.GetOffreEditionUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.GetOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.RechercherOffresUseCase;
+import sn.ucad.nexora.catalogue.application.usecase.ToggleDisponibiliteOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.UpdateOffreUseCase;
 
 import java.math.BigDecimal;
@@ -40,19 +41,22 @@ public class OffreController {
     private final UpdateOffreUseCase updateOffre;
     private final GetOffreEditionUseCase getOffreEdition;
     private final DeleteOffreUseCase deleteOffre;
+    private final ToggleDisponibiliteOffreUseCase toggleDisponibiliteOffre;
 
     public OffreController(RechercherOffresUseCase rechercherOffres,
                            GetOffreUseCase getOffre,
                            CreateOffreUseCase createOffre,
                            UpdateOffreUseCase updateOffre,
                            GetOffreEditionUseCase getOffreEdition,
-                           DeleteOffreUseCase deleteOffre) {
+                           DeleteOffreUseCase deleteOffre,
+                           ToggleDisponibiliteOffreUseCase toggleDisponibiliteOffre) {
         this.rechercherOffres = rechercherOffres;
         this.getOffre = getOffre;
         this.createOffre = createOffre;
         this.updateOffre = updateOffre;
         this.getOffreEdition = getOffreEdition;
         this.deleteOffre = deleteOffre;
+        this.toggleDisponibiliteOffre = toggleDisponibiliteOffre;
     }
 
     /**
@@ -89,6 +93,19 @@ public class OffreController {
             @AuthenticationPrincipal UUID accountId,
             @PathVariable Long id) {
         deleteOffre.supprimer(accountId, id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Bascule rapide disponible/épuisé, sans repasser par le formulaire d'édition complet.
+     */
+    @PatchMapping("/{id}/disponibilite")
+    @Operation(summary = "Marquer une offre disponible ou épuisée")
+    public ResponseEntity<Void> basculerDisponibilite(
+            @AuthenticationPrincipal UUID accountId,
+            @PathVariable Long id,
+            @RequestParam boolean disponible) {
+        toggleDisponibiliteOffre.basculer(accountId, id, disponible);
         return ResponseEntity.noContent().build();
     }
 

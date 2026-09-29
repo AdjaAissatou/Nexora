@@ -84,6 +84,8 @@ public class UpdateEspaceService implements UpdateEspaceUseCase {
         adresse.setCommune(noms.commune());
         adresse.setQuartier(request.getQuartier().trim());
         adresse.setAdresseComplete(request.getAdresseComplete());
+        adresse.setLatitude(request.getLatitude());
+        adresse.setLongitude(request.getLongitude());
         adresse.setPrincipale(true);
         adresseRepository.save(adresse);
 

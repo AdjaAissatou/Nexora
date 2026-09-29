@@ -128,6 +128,11 @@
                                                     <f:param name="offreId" value="#{o.id}" />
                                                 </h:link>
                                                 <h:form>
+                                                    <h:commandButton value="#{o.disponible ? 'Marquer épuisé' : 'Remettre en stock'}"
+                                                                     action="#{monEspaceBean.basculerDisponibiliteOffre(o.id, !o.disponible)}"
+                                                                     styleClass="nx-button nx-button-outline-dark" />
+                                                </h:form>
+                                                <h:form>
                                                     <h:commandButton value="Supprimer" action="#{monEspaceBean.supprimerOffre(o.id)}"
                                                                      styleClass="nx-button nx-button-danger"
                                                                      onclick="return confirm('Supprimer définitivement cette offre ? Cette action est irréversible.');" />
@@ -291,6 +296,8 @@
                                 <label for="espaceForm:adresseComplete">Adresse complète <span style="font-weight:400; color:var(--nx-text-secondary);">(repère, numéro de porte…)</span></label>
                                 <h:inputText id="adresseComplete" value="#{monEspaceBean.adresseComplete}" placeholder="ex. Villa n°12, en face de la pharmacie" styleClass="nx-input" />
                             </div>
+                            <h:inputHidden id="latitude" value="#{monEspaceBean.latitude}" />
+                            <h:inputHidden id="longitude" value="#{monEspaceBean.longitude}" />
 
                             <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerEspace}" styleClass="nx-button nx-button-primary nx-button-block" />
                         </h:form>

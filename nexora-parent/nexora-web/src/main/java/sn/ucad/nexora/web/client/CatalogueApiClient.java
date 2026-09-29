@@ -189,4 +189,22 @@ public class CatalogueApiClient {
             throw ApiErrors.reseau(e);
         }
     }
+
+    public void basculerDisponibiliteOffre(String accessToken, Long idOffre, boolean disponible) {
+        LOG.info("Requête PATCH {}/api/v1/offres/{}/disponibilite ({})", baseUrl, idOffre, disponible);
+        try {
+            client.patch()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/api/v1/offres/{id}/disponibilite")
+                            .queryParam("disponible", disponible)
+                            .build(idOffre))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
 }

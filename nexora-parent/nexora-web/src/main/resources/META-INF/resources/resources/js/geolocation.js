@@ -20,11 +20,15 @@ function nexoraUtiliserPositionActuelle() {
                 var adresse = donnees.address || {};
                 var quartierInput = document.querySelector('input[id$=":quartier"]');
                 var adresseInput = document.querySelector('input[id$=":adresseComplete"]');
+                var latitudeInput = document.querySelector('input[id$=":latitude"]');
+                var longitudeInput = document.querySelector('input[id$=":longitude"]');
                 var regionSelect = document.querySelector('select[id$=":region"]');
 
                 var quartier = adresse.suburb || adresse.neighbourhood || adresse.quarter || adresse.city_district;
                 if (quartierInput && quartier) quartierInput.value = quartier;
                 if (adresseInput && donnees.display_name) adresseInput.value = donnees.display_name;
+                if (latitudeInput) latitudeInput.value = lat;
+                if (longitudeInput) longitudeInput.value = lon;
 
                 if (regionSelect && adresse.state) {
                     var nomRegion = adresse.state.toLowerCase();

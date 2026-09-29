@@ -73,6 +73,8 @@ public class MonEspaceBean implements Serializable {
     private Long idCommune;
     private String quartier;
     private String adresseComplete;
+    private java.math.BigDecimal latitude;
+    private java.math.BigDecimal longitude;
 
     private String espaceLogo;
     private String espaceCouverture;
@@ -135,6 +137,8 @@ public class MonEspaceBean implements Serializable {
         espaceOuvert = espace.ouvert();
         quartier = espace.quartier();
         adresseComplete = espace.adresseComplete();
+        latitude = espace.latitude();
+        longitude = espace.longitude();
         espaceLogo = espace.logo();
         espaceCouverture = espace.couverture();
         espaceRegistreCommerce = espace.registreCommerce();
@@ -203,6 +207,8 @@ public class MonEspaceBean implements Serializable {
                             idCommune,
                             quartier,
                             adresseComplete,
+                            latitude,
+                            longitude,
                             espaceLogo,
                             espaceCouverture,
                             espaceRegistreCommerce,
@@ -238,6 +244,16 @@ public class MonEspaceBean implements Serializable {
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
+        }
+    }
+
+    public void basculerDisponibiliteOffre(Long idOffre, boolean disponible) {
+        try {
+            catalogueApiClient.basculerDisponibiliteOffre(session.getAccessToken(), idOffre, disponible);
+            mesOffres = catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
+        } catch (ApiException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));
         }
     }
 
@@ -417,6 +433,22 @@ public class MonEspaceBean implements Serializable {
 
     public void setAdresseComplete(String adresseComplete) {
         this.adresseComplete = adresseComplete;
+    }
+
+    public java.math.BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(java.math.BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public java.math.BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(java.math.BigDecimal longitude) {
+        this.longitude = longitude;
     }
 
     public String getEspaceLogo() {
