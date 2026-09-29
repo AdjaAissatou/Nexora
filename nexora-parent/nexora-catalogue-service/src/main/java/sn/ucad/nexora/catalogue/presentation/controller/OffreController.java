@@ -14,6 +14,7 @@ import sn.ucad.nexora.catalogue.application.dto.response.OffreDetailResponse;
 import sn.ucad.nexora.catalogue.application.dto.response.OffreEditionResponse;
 import sn.ucad.nexora.catalogue.application.dto.response.OffrePageResponse;
 import sn.ucad.nexora.catalogue.application.usecase.CreateOffreUseCase;
+import sn.ucad.nexora.catalogue.application.usecase.DeleteOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.GetOffreEditionUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.GetOffreUseCase;
 import sn.ucad.nexora.catalogue.application.usecase.RechercherOffresUseCase;
@@ -38,17 +39,20 @@ public class OffreController {
     private final CreateOffreUseCase createOffre;
     private final UpdateOffreUseCase updateOffre;
     private final GetOffreEditionUseCase getOffreEdition;
+    private final DeleteOffreUseCase deleteOffre;
 
     public OffreController(RechercherOffresUseCase rechercherOffres,
                            GetOffreUseCase getOffre,
                            CreateOffreUseCase createOffre,
                            UpdateOffreUseCase updateOffre,
-                           GetOffreEditionUseCase getOffreEdition) {
+                           GetOffreEditionUseCase getOffreEdition,
+                           DeleteOffreUseCase deleteOffre) {
         this.rechercherOffres = rechercherOffres;
         this.getOffre = getOffre;
         this.createOffre = createOffre;
         this.updateOffre = updateOffre;
         this.getOffreEdition = getOffreEdition;
+        this.deleteOffre = deleteOffre;
     }
 
     /**
@@ -74,6 +78,18 @@ public class OffreController {
             @AuthenticationPrincipal UUID accountId,
             @PathVariable Long id) {
         return ResponseEntity.ok(getOffreEdition.obtenir(accountId, id));
+    }
+
+    /**
+     * Supprime définitivement une offre du propriétaire de l'espace connecté.
+     */
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Supprimer une offre")
+    public ResponseEntity<Void> supprimer(
+            @AuthenticationPrincipal UUID accountId,
+            @PathVariable Long id) {
+        deleteOffre.supprimer(accountId, id);
+        return ResponseEntity.noContent().build();
     }
 
     /**

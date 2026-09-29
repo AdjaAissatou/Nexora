@@ -811,6 +811,32 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 
 .nx-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 
+/* Navigation verticale "Mon espace" */
+.nx-espace-nav { display: flex; flex-direction: column; gap: 3px; }
+.nx-espace-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px;
+    border-radius: var(--nx-radius-md);
+    color: var(--nx-text);
+    text-decoration: none;
+    font-weight: 600; font-size: 14px;
+    cursor: pointer; border: none; background: transparent;
+    width: 100%; text-align: left;
+    font-family: inherit;
+}
+.nx-espace-nav-item:hover { background: var(--nx-bg); }
+.nx-espace-nav-item.active { background: var(--nx-primary-light); color: var(--nx-primary); }
+.nx-espace-nav-item.danger { color: var(--nx-error); }
+.nx-espace-nav-item.danger:hover { background: var(--nx-error-soft); }
+.nx-espace-nav-separateur { border-top: 1px solid var(--nx-border); margin: 8px 0; }
+
+.nx-tab-pane { display: none; }
+.nx-tab-pane.active { display: block; }
+
+/* Cartes d'offres avec actions (mon-espace) : variante non cliquable de .nx-offre-card */
+.nx-offre-card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--nx-border); }
+.nx-offre-card-actions .nx-button { flex: 1; padding: 8px 10px; font-size: 13px; text-align: center; }
+
 
 /* =========================================================
    FOOTER

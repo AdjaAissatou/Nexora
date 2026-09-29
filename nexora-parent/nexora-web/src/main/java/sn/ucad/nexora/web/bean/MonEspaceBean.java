@@ -231,6 +231,16 @@ public class MonEspaceBean implements Serializable {
         }
     }
 
+    public void supprimerOffre(Long idOffre) {
+        try {
+            catalogueApiClient.supprimerOffre(session.getAccessToken(), idOffre);
+            mesOffres = catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
+        } catch (ApiException e) {
+            FacesContext.getCurrentInstance()
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
+        }
+    }
+
     private static List<String> urlsDepuisTexte(String texte) {
         if (texte == null || texte.isBlank()) return List.of();
         return texte.lines().map(String::trim).filter(l -> !l.isBlank()).toList();

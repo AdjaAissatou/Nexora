@@ -11,6 +11,7 @@
 <ui:define name="content">
 
     <h:outputScript library="js" name="geolocation.js" target="head" />
+    <h:outputScript library="js" name="mon-espace.js" target="head" />
 
     <section class="nx-page-header">
         <div class="nx-container">
@@ -25,41 +26,15 @@
             <div class="nx-alert nx-alert-error" style="margin-top:20px;">#{monEspaceBean.erreur}</div>
         </ui:fragment>
 
+        <!-- ===================== Avec espace : navigation verticale + onglets ===================== -->
+        <ui:fragment rendered="#{monEspaceBean.possedeEspace}">
         <div class="nx-espace-layout">
 
-            <div class="nx-card">
-                <h3>Mon profil</h3>
-
-                <h:form id="profilForm">
-                    <h:messages for="profilForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
-
-                    <div class="nx-field">
-                        <label for="profilForm:prenom">Prénom</label>
-                        <h:inputText id="prenom" value="#{monEspaceBean.prenom}" styleClass="nx-input" required="true" />
-                    </div>
-                    <div class="nx-field">
-                        <label for="profilForm:nom">Nom</label>
-                        <h:inputText id="nom" value="#{monEspaceBean.nom}" styleClass="nx-input" required="true" />
-                    </div>
-                    <div class="nx-field">
-                        <label for="profilForm:email">Email</label>
-                        <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
-                    </div>
-                    <div class="nx-field">
-                        <label for="profilForm:telephone">Téléphone</label>
-                        <h:inputText id="telephone" value="#{monEspaceBean.telephone}" styleClass="nx-input" />
-                    </div>
-
-                    <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerProfil}" styleClass="nx-button nx-button-primary nx-button-block" />
-                </h:form>
-            </div>
-
             <div>
-
                 <ui:fragment rendered="#{monEspaceBean.plusieursEspaces}">
-                    <div class="nx-card" style="margin-bottom:18px;">
-                        <h3>Mes espaces</h3>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+                    <div class="nx-card" style="margin-bottom:14px; padding:18px;">
+                        <h3 style="font-size:14px; margin-bottom:10px;">Mes espaces</h3>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
                             <ui:repeat var="e" value="#{monEspaceBean.mesEspaces}">
                                 <h:link outcome="/mon-espace"
                                         value="#{e.nom}"
@@ -72,63 +47,105 @@
                     </div>
                 </ui:fragment>
 
-                <ui:fragment rendered="#{monEspaceBean.possedeEspace}">
+                <div class="nx-card" style="padding:18px;">
+                    <h3 style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:16px;">
+                        #{monEspaceBean.espace.nom}
+                        <ui:fragment rendered="#{monEspaceBean.espace.verifie}">
+                            <span class="nx-badge nx-badge-verifie">
+                                <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                                Vérifié
+                            </span>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{monEspaceBean.espace.certifie}">
+                            <span class="nx-badge nx-badge-certifie">
+                                <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/></svg>
+                                Certifié
+                            </span>
+                        </ui:fragment>
+                    </h3>
+
+                    <div class="nx-profile-row">
+                        <span>Note moyenne</span>
+                        <span><h:outputText value="#{monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText> (#{monEspaceBean.espace.nombreAvis} avis)</span>
+                    </div>
+
+                    <nav class="nx-espace-nav" style="margin-top:16px;">
+                        <button type="button" class="nx-espace-nav-item active" data-tab="offres" onclick="nexoraAfficherOnglet('offres', this)">Gérer les offres</button>
+                        <h:link outcome="/creer-offre" styleClass="nx-espace-nav-item" value="Ajouter une offre">
+                            <f:param name="idEspace" value="#{monEspaceBean.espace.id}" />
+                        </h:link>
+                        <button type="button" class="nx-espace-nav-item" data-tab="infos" onclick="nexoraAfficherOnglet('infos', this)">Gérer les informations de l'espace</button>
+                        <button type="button" class="nx-espace-nav-item" data-tab="profil" onclick="nexoraAfficherOnglet('profil', this)">Gérer le profil</button>
+                        <h:link outcome="/espace" styleClass="nx-espace-nav-item" value="Voir ma fiche publique">
+                            <f:param name="id" value="#{monEspaceBean.espace.id}" />
+                        </h:link>
+                        <h:link outcome="/creer-espace" styleClass="nx-espace-nav-item" value="+ Créer un autre espace" rendered="#{!monEspaceBean.plusieursEspaces}" />
+
+                        <div class="nx-espace-nav-separateur"></div>
+
+                        <h:form id="supprimerForm">
+                            <h:commandButton value="Supprimer l'espace" action="#{monEspaceBean.supprimerEspace}"
+                                             styleClass="nx-espace-nav-item danger"
+                                             onclick="return confirm('Supprimer définitivement « ' + document.getElementById('espaceForm:nom').value + ' » et toutes ses offres ? Cette action est irréversible.');" />
+                        </h:form>
+                    </nav>
+                </div>
+            </div>
+
+            <div>
+
+                <div class="nx-tab-pane active" id="tab-offres">
                     <div class="nx-card">
-                        <h3 style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                            #{monEspaceBean.espace.nom}
-                            <ui:fragment rendered="#{monEspaceBean.espace.verifie}">
-                                <span class="nx-badge nx-badge-verifie">
-                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
-                                    Vérifié
-                                </span>
-                            </ui:fragment>
-                            <ui:fragment rendered="#{monEspaceBean.espace.certifie}">
-                                <span class="nx-badge nx-badge-certifie">
-                                    <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/></svg>
-                                    Certifié
-                                </span>
-                            </ui:fragment>
-                        </h3>
+                        <h3>Mes offres</h3>
 
-                        <div class="nx-profile-row">
-                            <span>Note moyenne</span>
-                            <span><h:outputText value="#{monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText> (#{monEspaceBean.espace.nombreAvis} avis)</span>
-                        </div>
-
-                        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
-                            <h:link outcome="/creer-offre" value="Ajouter une offre" styleClass="nx-button nx-button-primary">
-                                <f:param name="idEspace" value="#{monEspaceBean.espace.id}" />
-                            </h:link>
-                            <h:link outcome="/espace" value="Voir ma fiche publique" styleClass="nx-button nx-button-outline">
-                                <f:param name="id" value="#{monEspaceBean.espace.id}" />
-                            </h:link>
-                            <h:link outcome="/creer-espace" value="+ Créer un autre espace" styleClass="nx-button nx-button-outline" rendered="#{!monEspaceBean.plusieursEspaces}" />
-                        </div>
-
-                        <h3 style="margin-top:20px;">Mes offres</h3>
                         <ui:fragment rendered="#{empty monEspaceBean.mesOffres}">
                             <p style="color:var(--nx-text-secondary);">Aucune offre publiée pour le moment.</p>
                         </ui:fragment>
                         <ui:fragment rendered="#{not empty monEspaceBean.mesOffres}">
-                            <div class="nx-offre-liste">
+                            <div class="nx-offre-grid">
                                 <ui:repeat var="o" value="#{monEspaceBean.mesOffres}">
-                                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid var(--nx-border);">
-                                        <div>
-                                            <strong>#{o.titre}</strong>
-                                            <div style="color:var(--nx-text-secondary); font-size:.9em;">
-                                                <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol="FCFA " maxFractionDigits="0" /></h:outputText>
-                                                <ui:fragment rendered="#{!o.disponible}"> — indisponible</ui:fragment>
+                                    <div class="nx-offre-card">
+                                        <div class="nx-offre-media">
+                                            <ui:fragment rendered="#{!empty o.imagePrincipale}">
+                                                <img src="#{o.imagePrincipale}" alt="#{o.titre}" loading="lazy" />
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{empty o.imagePrincipale}">
+                                                <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M3 3h8l10 10-8 8L3 11V3z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+                                                </svg>
+                                            </ui:fragment>
+                                        </div>
+                                        <div class="nx-offre-body">
+                                            <span class="nx-offre-titre">#{o.titre}</span>
+                                            <span class="nx-offre-prix">
+                                                <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                                            </span>
+                                            <ui:fragment rendered="#{!o.disponible}">
+                                                <span class="nx-badge nx-badge-neutre" style="align-self:flex-start;">Indisponible</span>
+                                            </ui:fragment>
+                                            <div class="nx-offre-card-actions">
+                                                <h:link outcome="/creer-offre" value="Modifier" styleClass="nx-button nx-button-outline">
+                                                    <f:param name="offreId" value="#{o.id}" />
+                                                </h:link>
+                                                <h:form>
+                                                    <h:commandButton value="Supprimer" action="#{monEspaceBean.supprimerOffre(o.id)}"
+                                                                     styleClass="nx-button nx-button-danger"
+                                                                     onclick="return confirm('Supprimer définitivement cette offre ? Cette action est irréversible.');" />
+                                                </h:form>
                                             </div>
                                         </div>
-                                        <h:link outcome="/creer-offre" value="Modifier" styleClass="nx-button nx-button-outline">
-                                            <f:param name="offreId" value="#{o.id}" />
-                                        </h:link>
                                     </div>
                                 </ui:repeat>
                             </div>
                         </ui:fragment>
+                    </div>
+                </div>
 
-                        <h:form id="espaceForm" style="margin-top:18px;">
+                <div class="nx-tab-pane" id="tab-infos">
+                    <div class="nx-card">
+                        <h3>Informations de l'espace</h3>
+
+                        <h:form id="espaceForm">
                             <h:messages for="espaceForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
 
                             <div class="nx-field">
@@ -277,29 +294,84 @@
 
                             <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerEspace}" styleClass="nx-button nx-button-primary nx-button-block" />
                         </h:form>
+                    </div>
+                </div>
 
-                        <h:form id="supprimerForm" style="margin-top:12px;">
-                            <h:commandButton value="Supprimer cet espace" action="#{monEspaceBean.supprimerEspace}"
-                                             styleClass="nx-button nx-button-danger nx-button-block"
-                                             onclick="return confirm('Supprimer définitivement « ' + document.getElementById('espaceForm:nom').value + ' » et toutes ses offres ? Cette action est irréversible.');" />
+                <div class="nx-tab-pane" id="tab-profil">
+                    <div class="nx-card">
+                        <h3>Mon profil</h3>
+
+                        <h:form id="profilForm">
+                            <h:messages for="profilForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                            <div class="nx-field">
+                                <label for="profilForm:prenom">Prénom</label>
+                                <h:inputText id="prenom" value="#{monEspaceBean.prenom}" styleClass="nx-input" required="true" />
+                            </div>
+                            <div class="nx-field">
+                                <label for="profilForm:nom">Nom</label>
+                                <h:inputText id="nom" value="#{monEspaceBean.nom}" styleClass="nx-input" required="true" />
+                            </div>
+                            <div class="nx-field">
+                                <label for="profilForm:email">Email</label>
+                                <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
+                            </div>
+                            <div class="nx-field">
+                                <label for="profilForm:telephone">Téléphone</label>
+                                <h:inputText id="telephone" value="#{monEspaceBean.telephone}" styleClass="nx-input" />
+                            </div>
+
+                            <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerProfil}" styleClass="nx-button nx-button-primary nx-button-block" />
                         </h:form>
                     </div>
-                </ui:fragment>
-
-                <ui:fragment rendered="#{!monEspaceBean.possedeEspace}">
-                    <div class="nx-card nx-card-empty">
-                        <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/><path d="M10 21v-4h4v4"/>
-                        </svg>
-                        <h3>Vous n'avez pas encore d'espace professionnel</h3>
-                        <p>Créez votre espace pour présenter votre activité, vos coordonnées et vos services aux visiteurs de Nexora.</p>
-                        <h:link outcome="/creer-espace" value="Créer mon espace" styleClass="nx-button nx-button-primary" />
-                    </div>
-                </ui:fragment>
+                </div>
 
             </div>
-
         </div>
+        </ui:fragment>
+
+        <!-- ===================== Sans espace : profil seul + invitation à en créer un ===================== -->
+        <ui:fragment rendered="#{!monEspaceBean.possedeEspace}">
+            <div class="nx-espace-layout">
+
+                <div class="nx-card">
+                    <h3>Mon profil</h3>
+
+                    <h:form id="profilFormSansEspace">
+                        <h:messages for="profilFormSansEspace" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                        <div class="nx-field">
+                            <label for="profilFormSansEspace:prenom">Prénom</label>
+                            <h:inputText id="prenom" value="#{monEspaceBean.prenom}" styleClass="nx-input" required="true" />
+                        </div>
+                        <div class="nx-field">
+                            <label for="profilFormSansEspace:nom">Nom</label>
+                            <h:inputText id="nom" value="#{monEspaceBean.nom}" styleClass="nx-input" required="true" />
+                        </div>
+                        <div class="nx-field">
+                            <label for="profilFormSansEspace:email">Email</label>
+                            <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
+                        </div>
+                        <div class="nx-field">
+                            <label for="profilFormSansEspace:telephone">Téléphone</label>
+                            <h:inputText id="telephone" value="#{monEspaceBean.telephone}" styleClass="nx-input" />
+                        </div>
+
+                        <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerProfil}" styleClass="nx-button nx-button-primary nx-button-block" />
+                    </h:form>
+                </div>
+
+                <div class="nx-card nx-card-empty">
+                    <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/><path d="M10 21v-4h4v4"/>
+                    </svg>
+                    <h3>Vous n'avez pas encore d'espace professionnel</h3>
+                    <p>Créez votre espace pour présenter votre activité, vos coordonnées et vos services aux visiteurs de Nexora.</p>
+                    <h:link outcome="/creer-espace" value="Créer mon espace" styleClass="nx-button nx-button-primary" />
+                </div>
+
+            </div>
+        </ui:fragment>
 
     </div>
 

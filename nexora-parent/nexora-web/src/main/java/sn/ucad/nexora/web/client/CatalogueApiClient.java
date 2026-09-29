@@ -175,4 +175,18 @@ public class CatalogueApiClient {
             throw ApiErrors.reseau(e);
         }
     }
+
+    public void supprimerOffre(String accessToken, Long idOffre) {
+        LOG.info("Requête DELETE {}/api/v1/offres/{}", baseUrl, idOffre);
+        try {
+            client.delete().uri("/api/v1/offres/{id}", idOffre)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
 }
