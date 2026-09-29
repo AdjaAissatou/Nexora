@@ -8,7 +8,12 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import sn.ucad.nexora.web.client.CatalogueApiClient;
 import sn.ucad.nexora.web.client.CritereRecherche;
 import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
@@ -113,12 +118,12 @@ public class RechercheBean implements Serializable {
     }
 
     private void chargerLieuxPublics() {
-        if (q == null || q.isBlank()) {
+        if ((q == null || q.isBlank()) && (commune == null || commune.isBlank())) {
             lieuxPublics = List.of();
             return;
         }
         try {
-            lieuxPublics = catalogueApiClient.rechercherLieuxPublics(q, commune, 10);
+            lieuxPublics = catalogueApiClient.rechercherLieuxPublics(q, commune, 20);
         } catch (ApiException e) {
             lieuxPublics = List.of();
         }
@@ -126,6 +131,47 @@ public class RechercheBean implements Serializable {
 
     public List<LieuPublicResponse> getLieuxPublics() {
         return lieuxPublics;
+    }
+
+    private static final ObjectMapper JSON = new ObjectMapper();
+
+    /** Points géolocalisés (offres + lieux publics) pour la carte de recherche. */
+    private List<Map<String, Object>> pointsCarte() {
+        List<Map<String, Object>> points = new ArrayList<>();
+        for (OffreSummaryResponse o : getContenu()) {
+            if (o.latitude() == null || o.longitude() == null) continue;
+            Map<String, Object> p = new LinkedHashMap<>();
+            p.put("lat", o.latitude());
+            p.put("lng", o.longitude());
+            p.put("nom", o.titre());
+            p.put("categorie", "OFFRE");
+            p.put("href", "/offre.xhtml?id=" + o.id());
+            points.add(p);
+        }
+        for (LieuPublicResponse l : lieuxPublics) {
+            if (l.latitude() == null || l.longitude() == null) continue;
+            Map<String, Object> p = new LinkedHashMap<>();
+            p.put("lat", l.latitude());
+            p.put("lng", l.longitude());
+            p.put("nom", l.nom());
+            p.put("categorie", l.typeLieu());
+            p.put("href", String.format(Locale.ROOT,
+                    "https://www.google.com/maps/dir/?api=1&destination=%s,%s", l.latitude(), l.longitude()));
+            points.add(p);
+        }
+        return points;
+    }
+
+    public String getPointsCarteJson() {
+        try {
+            return JSON.writeValueAsString(pointsCarte());
+        } catch (Exception e) {
+            return "[]";
+        }
+    }
+
+    public boolean isCarteVisible() {
+        return !pointsCarte().isEmpty();
     }
 
     public List<OffreSummaryResponse> getContenu() {

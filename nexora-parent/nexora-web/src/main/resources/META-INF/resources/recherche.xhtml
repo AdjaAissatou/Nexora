@@ -13,7 +13,12 @@
     <f:viewAction action="#{rechercheBean.chargerDepuisParametres}" />
 </f:metadata>
 <ui:define name="titre">Rechercher — Nexora</ui:define>
+<ui:define name="head-extra">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</ui:define>
 <ui:define name="content">
+    <h:outputScript library="js" name="search-map.js" target="head" />
 
     <section class="nx-page-header">
         <div class="nx-container">
@@ -92,6 +97,20 @@
                 </div>
 
                 <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                <ui:fragment rendered="#{rechercheBean.carteVisible}">
+                    <div class="nx-card" style="margin-bottom:20px; padding:0; overflow:hidden;">
+                        <div id="nx-search-map" class="nx-search-map"></div>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var points = #{rechercheBean.pointsCarteJson};
+                            if (window.nexoraInitSearchMap) {
+                                window.nexoraInitSearchMap('nx-search-map', points);
+                            }
+                        });
+                    </script>
+                </ui:fragment>
 
                 <ui:fragment rendered="#{!empty rechercheBean.lieuxPublics}">
                     <div class="nx-card" style="margin-bottom:20px;">

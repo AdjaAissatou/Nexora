@@ -140,6 +140,7 @@
 \i 09_seed/12_type_offre_autre.sql
 \i 09_seed/17_categorie_type_espace.sql
 \i 09_seed/18_lieux_publics.sql
+\i 09_seed/19_lieux_publics_extension.sql
 
 -------------------------------------------------------
 -- VUES

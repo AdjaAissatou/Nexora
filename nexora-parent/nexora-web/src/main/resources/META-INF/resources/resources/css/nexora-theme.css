@@ -837,6 +837,9 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 .nx-offre-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--nx-border); }
 .nx-offre-card-actions .nx-button { flex: 1 1 calc(50% - 4px); padding: 8px 10px; font-size: 13px; text-align: center; white-space: nowrap; }
 
+/* Carte de recherche (Leaflet) : offres + lieux publics géolocalisés */
+.nx-search-map { width: 100%; height: 420px; }
+
 /* Lieux publics (recherche) : repères géographiques distincts des offres */
 .nx-lieu-public-liste { display: flex; flex-direction: column; gap: 10px; }
 .nx-lieu-public-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--nx-border); flex-wrap: wrap; }
