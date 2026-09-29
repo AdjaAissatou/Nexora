@@ -1,5 +1,6 @@
 package sn.ucad.nexora.web.bean;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import sn.ucad.nexora.web.client.CatalogueApiClient;
 import sn.ucad.nexora.web.client.CritereRecherche;
+import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffrePageResponse;
 import sn.ucad.nexora.web.dto.catalogue.OffreSummaryResponse;
 import sn.ucad.nexora.web.error.ApiException;
@@ -29,6 +31,7 @@ public class RechercheBean implements Serializable {
     // Filtres liés au formulaire
     private String q;
     private String typeEspace;
+    private Long idCategorie;
     private String commune;
     private BigDecimal prixMax;
     private boolean verifieUniquement;
@@ -40,6 +43,16 @@ public class RechercheBean implements Serializable {
     private OffrePageResponse resultats = OffrePageResponse.vide();
     private boolean recherchee;
     private String erreur;
+    private List<CategorieResponse> categoriesRacines;
+
+    @PostConstruct
+    public void charger() {
+        try {
+            categoriesRacines = catalogueApiClient.categoriesRacines();
+        } catch (ApiException e) {
+            categoriesRacines = List.of();
+        }
+    }
 
     public void chargerDepuisParametres() {
         rechercher();
@@ -72,6 +85,7 @@ public class RechercheBean implements Serializable {
     public void reinitialiser() {
         q = null;
         typeEspace = null;
+        idCategorie = null;
         commune = null;
         prixMax = null;
         verifieUniquement = false;
@@ -83,7 +97,7 @@ public class RechercheBean implements Serializable {
         erreur = null;
         try {
             resultats = catalogueApiClient.rechercher(new CritereRecherche(
-                    q, null, typeEspace, commune, null, null, null, prixMax, null, null,
+                    q, null, idCategorie, typeEspace, commune, null, null, null, prixMax, null, null,
                     verifieUniquement ? Boolean.TRUE : null, tri, page, TAILLE_PAGE));
         } catch (ApiException e) {
             resultats = OffrePageResponse.vide();
@@ -121,6 +135,18 @@ public class RechercheBean implements Serializable {
 
     public List<TypeEspaceVue> getCategories() {
         return TypeEspaceVue.TOUS;
+    }
+
+    public List<CategorieResponse> getCategoriesRacines() {
+        return categoriesRacines;
+    }
+
+    public Long getIdCategorie() {
+        return idCategorie;
+    }
+
+    public void setIdCategorie(Long idCategorie) {
+        this.idCategorie = idCategorie;
     }
 
     public String getErreur() {

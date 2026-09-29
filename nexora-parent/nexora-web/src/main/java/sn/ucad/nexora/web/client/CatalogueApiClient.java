@@ -38,6 +38,7 @@ public class CatalogueApiClient {
                             .path("/api/v1/offres/recherche")
                             .queryParamIfPresent("q", java.util.Optional.ofNullable(vide(c.q())))
                             .queryParamIfPresent("categorie", java.util.Optional.ofNullable(vide(c.categorie())))
+                            .queryParamIfPresent("idCategorie", java.util.Optional.ofNullable(c.idCategorie()))
                             .queryParamIfPresent("typeEspace", java.util.Optional.ofNullable(vide(c.typeEspace())))
                             .queryParamIfPresent("commune", java.util.Optional.ofNullable(vide(c.commune())))
                             .queryParamIfPresent("region", java.util.Optional.ofNullable(vide(c.region())))

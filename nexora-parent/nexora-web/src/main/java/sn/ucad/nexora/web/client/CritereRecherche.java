@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public record CritereRecherche(
         String q,
         String categorie,
+        Long idCategorie,
         String typeEspace,
         String commune,
         String region,
@@ -23,10 +24,10 @@ public record CritereRecherche(
         int taille) {
 
     public static CritereRecherche vide() {
-        return new CritereRecherche(null, null, null, null, null, null, null, null, null, null, null, "PERTINENCE", 0, 12);
+        return new CritereRecherche(null, null, null, null, null, null, null, null, null, null, null, null, "PERTINENCE", 0, 12);
     }
 
     public static CritereRecherche parEspace(Long idEspace) {
-        return new CritereRecherche(null, null, null, null, null, idEspace, null, null, null, null, null, "DATE_DESC", 0, 50);
+        return new CritereRecherche(null, null, null, null, null, null, idEspace, null, null, null, null, null, "DATE_DESC", 0, 50);
     }
 }

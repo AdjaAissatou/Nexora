@@ -33,3 +33,8 @@ spring:
 nexora:
   mail:
     from: ${MAIL_FROM:${MAIL_USERNAME}}
+
+management:
+  health:
+    mail:
+      enabled: false

@@ -101,8 +101,11 @@ public class OffreController {
             @Parameter(description = "Texte libre (titre, description, catégorie, commune)")
             @RequestParam(required = false) String q,
 
-            @Parameter(description = "Filtrer par catégorie")
+            @Parameter(description = "Filtrer par catégorie (texte libre, correspondance partielle)")
             @RequestParam(required = false) String categorie,
+
+            @Parameter(description = "Filtrer par catégorie et ses sous-catégories (id de la hiérarchie)")
+            @RequestParam(required = false) Long idCategorie,
 
             @Parameter(description = "Filtrer par type d'espace (ex: Boutique, Restaurant)")
             @RequestParam(required = false) String typeEspace,
@@ -143,6 +146,7 @@ public class OffreController {
         OffreSearchRequest request = new OffreSearchRequest();
         request.setQ(q);
         request.setCategorie(categorie);
+        request.setIdCategorie(idCategorie);
         request.setTypeEspace(typeEspace);
         request.setCommune(commune);
         request.setRegion(region);

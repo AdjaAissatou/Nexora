@@ -197,6 +197,21 @@ public class OffreRepositoryAdapter implements OffreRepository {
             paramMap.put("cat", "%" + params.getCategorie().trim() + "%");
         }
 
+        if (params.getIdCategorie() != null) {
+            sql.append("""
+                AND o.id_categorie IN (
+                    WITH RECURSIVE descendants AS (
+                        SELECT id_categorie FROM categorie WHERE id_categorie = :idCategorie
+                        UNION ALL
+                        SELECT c2.id_categorie FROM categorie c2
+                        JOIN descendants d ON c2.id_categorie_parent = d.id_categorie
+                    )
+                    SELECT id_categorie FROM descendants
+                )
+                """);
+            paramMap.put("idCategorie", params.getIdCategorie());
+        }
+
         if (params.getTypeEspace() != null && !params.getTypeEspace().isBlank()) {
             sql.append(" AND te.nom ILIKE :te ");
             paramMap.put("te", "%" + params.getTypeEspace().trim() + "%");

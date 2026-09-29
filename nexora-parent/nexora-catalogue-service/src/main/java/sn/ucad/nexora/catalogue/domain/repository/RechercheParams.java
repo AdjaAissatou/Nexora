@@ -13,6 +13,7 @@ public class RechercheParams {
 
     /** Filtres */
     private String categorie;
+    private Long idCategorie;
     private String typeEspace;
     private String commune;
     private String region;
@@ -46,6 +47,8 @@ public class RechercheParams {
     public void setQ(String q) { this.q = q; }
     public String getCategorie() { return categorie; }
     public void setCategorie(String categorie) { this.categorie = categorie; }
+    public Long getIdCategorie() { return idCategorie; }
+    public void setIdCategorie(Long idCategorie) { this.idCategorie = idCategorie; }
     public String getTypeEspace() { return typeEspace; }
     public void setTypeEspace(String typeEspace) { this.typeEspace = typeEspace; }
     public String getCommune() { return commune; }

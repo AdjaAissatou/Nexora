@@ -6,6 +6,9 @@
 <f:metadata>
     <f:viewParam name="q" value="#{rechercheBean.q}" />
     <f:viewParam name="typeEspace" value="#{rechercheBean.typeEspace}" />
+    <f:viewParam name="idCategorie" value="#{rechercheBean.idCategorie}">
+        <f:converter converterId="jakarta.faces.Long" />
+    </f:viewParam>
     <f:viewParam name="commune" value="#{rechercheBean.commune}" />
     <f:viewAction action="#{rechercheBean.chargerDepuisParametres}" />
 </f:metadata>
@@ -32,9 +35,18 @@
                     </div>
 
                     <div class="nx-field">
-                        <label for="filtres:type">Catégorie</label>
-                        <h:selectOneMenu id="type" value="#{rechercheBean.typeEspace}" styleClass="nx-select">
+                        <label for="filtres:categorie">Catégorie</label>
+                        <h:selectOneMenu id="categorie" value="#{rechercheBean.idCategorie}" styleClass="nx-select">
                             <f:selectItem itemLabel="Toutes les catégories" itemValue="#{null}" />
+                            <f:selectItems value="#{rechercheBean.categoriesRacines}" var="c" itemLabel="#{c.nom}" itemValue="#{c.id}" />
+                            <f:converter converterId="jakarta.faces.Long" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="filtres:type">Type d'espace</label>
+                        <h:selectOneMenu id="type" value="#{rechercheBean.typeEspace}" styleClass="nx-select">
+                            <f:selectItem itemLabel="Tous les types" itemValue="#{null}" />
                             <f:selectItems value="#{rechercheBean.categories}" var="t" itemLabel="#{t.nom}" itemValue="#{t.nom}" />
                         </h:selectOneMenu>
                     </div>
@@ -68,7 +80,7 @@
                     </div>
 
                     <h:commandButton value="Appliquer" action="#{rechercheBean.rechercher}" styleClass="nx-button nx-button-primary nx-button-block" />
-                    <h:commandButton value="Réinitialiser" action="#{rechercheBean.reinitialiser}" immediate="true"
+                    <h:commandButton value="Réinitialiser" action="#{rechercheBean.reinitialiser}"
                                       styleClass="nx-button nx-button-outline-dark nx-button-block" style="margin-top:8px;" />
                 </div>
             </h:form>

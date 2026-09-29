@@ -27,6 +27,7 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         RechercheParams params = new RechercheParams();
         params.setQ(request.getQ());
         params.setCategorie(request.getCategorie());
+        params.setIdCategorie(request.getIdCategorie());
         params.setTypeEspace(request.getTypeEspace());
         params.setCommune(request.getCommune());
         params.setRegion(request.getRegion());
