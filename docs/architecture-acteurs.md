@@ -137,11 +137,15 @@ suppression d'un espace, sans reconnexion. Le rôle FOURNISSEUR est retiré à l
 suppression du dernier espace ; `database/09_seed/20_synchro_role_fournisseur.sql`
 resynchronise les comptes existants.
 
-**Problème connu, vérifié :** le jeton d'accès expire au bout de 15 minutes
-(`jwt.access-token-expiration-minutes`) et le web ne le rafraîchit pas à l'expiration.
-Passé ce délai, les services répondent 403 alors que le menu affiche toujours le
-compte connecté. Correctif simple maintenant que `/refresh` fonctionne : rafraîchir
-dans `SessionBean.getAccessToken()` quand le jeton approche de son expiration.
+**✅ Expiration du jeton — corrigé.** Le jeton d'accès expire au bout de 15 minutes
+(`jwt.access-token-expiration-minutes`). Avant le correctif, le web ne le renouvelait
+jamais : passé ce délai, les services répondaient 403 alors que le menu affichait
+toujours le compte connecté. Désormais `SessionBean` lit la date d'expiration du jeton
+(claim `exp`) et, dans `isConnecte()` et `getAccessToken()`, le renouvelle via
+`/api/v1/auth/refresh` quand il reste moins d'une minute. Si le jeton a expiré sans
+pouvoir être renouvelé (refresh token de 7 jours expiré ou révoqué, auth-service
+injoignable), la session web est fermée : les pages protégées renvoient vers la
+connexion et le menu repasse en mode visiteur.
 
 ## 5. ✅ `mon-espace.xhtml` et le profil personnel sont maintenant séparés
 
@@ -191,8 +195,8 @@ précédent :
    (`AvisController` en écriture), demandes, réservations, commandes (point 6).
 4. ✅ **Navigation adaptative** : « Mon espace » réservé au rôle `FOURNISSEUR` (§4).
    Au passage, `/api/v1/auth/refresh` réparé (table `revoked_tokens` manquante,
-   `database/01_security/09_revoked_tokens.sql`). Reste : le rafraîchissement à
-   l'expiration du jeton (§4, problème connu).
+   `database/01_security/09_revoked_tokens.sql`), puis renouvellement automatique du
+   jeton d'accès avant son expiration (§4).
 5. **Back-office admin** : le plus gros chantier, à cadrer précisément (pages,
    permissions, layout séparé) avant de commencer à coder — probablement sa propre
    session de conception dédiée plutôt qu'un ajout au fil de l'eau.
@@ -201,5 +205,5 @@ précédent :
    branchés au web du tout — chantier à part entière une fois 1-4 posés.
 
 ---
-*Dernière mise à jour : session du 29/09/2026, après la refonte de `mon-espace.xhtml`
-en tableau de bord (vue d'ensemble, vocabulaire dynamique par type d'espace).*
+*Dernière mise à jour : session du 29/09/2026, après les chantiers 1 à 4 et le
+renouvellement automatique du jeton d'accès.*
