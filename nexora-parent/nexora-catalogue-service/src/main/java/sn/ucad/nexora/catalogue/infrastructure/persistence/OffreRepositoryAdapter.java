@@ -262,15 +262,18 @@ public class OffreRepositoryAdapter implements OffreRepository {
             }
         }
 
-        // Tri
-        sql.append(buildOrderBy(params.getTri()));
+        // Tie-breaker fixe pour DISTINCT ON (id_offre obligatoire en tête d'ORDER BY ici) :
+        // le tri réellement demandé par l'utilisateur est appliqué dans la requête englobante,
+        // car un ORDER BY secondaire à cet endroit serait ignoré (DISTINCT ON impose id_offre en clé primaire de tri).
+        sql.append(" ORDER BY o.id_offre ");
 
-        // Pagination
-        sql.append(" LIMIT :taille OFFSET :offset ");
+        String requeteFinale = "SELECT * FROM (" + sql + ") base " + buildOrderBy(params.getTri())
+                + " LIMIT :taille OFFSET :offset ";
+
         paramMap.put("taille", params.getTaille());
         paramMap.put("offset", params.getPage() * params.getTaille());
 
-        Query q = em.createNativeQuery(sql.toString());
+        Query q = em.createNativeQuery(requeteFinale);
         paramMap.forEach(q::setParameter);
 
         @SuppressWarnings("unchecked")
@@ -292,11 +295,11 @@ public class OffreRepositoryAdapter implements OffreRepository {
 
     private String buildOrderBy(String tri) {
         return switch (tri == null ? "PERTINENCE" : tri.toUpperCase()) {
-            case "PRIX_ASC"   -> " ORDER BY o.id_offre, o.prix ASC NULLS LAST ";
-            case "PRIX_DESC"  -> " ORDER BY o.id_offre, o.prix DESC NULLS LAST ";
-            case "DATE_DESC"  -> " ORDER BY o.id_offre, o.date_publication DESC NULLS LAST ";
-            case "NOTE"       -> " ORDER BY o.id_offre, ep.note_moyenne DESC NULLS LAST ";
-            default           -> " ORDER BY o.id_offre, o.score_pertinence DESC, o.vue_count DESC ";
+            case "PRIX_ASC"   -> " ORDER BY prix ASC NULLS LAST ";
+            case "PRIX_DESC"  -> " ORDER BY prix DESC NULLS LAST ";
+            case "DATE_DESC"  -> " ORDER BY date_publication DESC NULLS LAST ";
+            case "NOTE"       -> " ORDER BY espace_note DESC NULLS LAST ";
+            default           -> " ORDER BY score_pertinence DESC, vue_count DESC ";
         };
     }
 
