@@ -20,11 +20,13 @@ import sn.ucad.nexora.web.dto.espace.CommuneResponse;
 import sn.ucad.nexora.web.dto.espace.DepartementResponse;
 import sn.ucad.nexora.web.dto.espace.EspaceResponse;
 import sn.ucad.nexora.web.dto.espace.RegionResponse;
+import sn.ucad.nexora.web.dto.espace.TypeEspaceResponse;
 import sn.ucad.nexora.web.dto.espace.UpdateEspaceRequest;
 import sn.ucad.nexora.web.dto.user.UpdateUserRequest;
 import sn.ucad.nexora.web.dto.user.UserResponse;
 import sn.ucad.nexora.web.error.ApiException;
 import sn.ucad.nexora.web.session.SessionBean;
+import sn.ucad.nexora.web.util.VocabulaireOffres;
 
 /** Backing bean de {@code mon-espace.xhtml} — profil du compte connecté et son espace professionnel. */
 @Named
@@ -48,6 +50,7 @@ public class MonEspaceBean implements Serializable {
     private EspaceResponse espace;
     private List<OffreSummaryResponse> mesOffres;
     private String erreur;
+    private VocabulaireOffres.Vocabulaire vocabulaireOffres = VocabulaireOffres.pour(null);
 
     // Champs modifiables du profil
     private String prenom;
@@ -106,6 +109,7 @@ public class MonEspaceBean implements Serializable {
                     .orElse(mesEspaces.isEmpty() ? null : mesEspaces.get(0));
             espace = selectionne == null ? null : espaceApiClient.obtenir(selectionne.id());
             remplirChampsEspace();
+            vocabulaireOffres = VocabulaireOffres.pour(nomTypeEspaceDe(espace));
             mesOffres = espace == null ? List.of()
                     : catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
         } catch (ApiException e) {
@@ -113,6 +117,18 @@ public class MonEspaceBean implements Serializable {
             // l'utilisateur voit simplement la proposition de créer son espace.
             mesEspaces = List.of();
             espace = null;
+        }
+    }
+
+    private String nomTypeEspaceDe(EspaceResponse e) {
+        if (e == null || e.typeEspaceId() == null) return null;
+        try {
+            return espaceApiClient.listerTypes().stream()
+                    .filter(t -> t.id().equals(e.typeEspaceId()))
+                    .map(TypeEspaceResponse::nom)
+                    .findFirst().orElse(null);
+        } catch (ApiException ex) {
+            return null;
         }
     }
 
@@ -285,6 +301,22 @@ public class MonEspaceBean implements Serializable {
 
     public List<OffreSummaryResponse> getMesOffres() {
         return mesOffres;
+    }
+
+    public String getLibelleSectionOffres() {
+        return vocabulaireOffres.section();
+    }
+
+    public String getLibelleAjouterOffre() {
+        return vocabulaireOffres.ajouter();
+    }
+
+    public String getLibelleOffresPluriel() {
+        return vocabulaireOffres.pluriel();
+    }
+
+    public int getNombreOffresDisponibles() {
+        return mesOffres == null ? 0 : (int) mesOffres.stream().filter(OffreSummaryResponse::disponible).count();
     }
 
     public EspaceResponse getEspace() {

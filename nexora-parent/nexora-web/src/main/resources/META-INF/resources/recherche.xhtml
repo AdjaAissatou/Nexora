@@ -177,9 +177,9 @@
                                     <span class="nx-offre-titre">#{o.titre}</span>
                                     <span class="nx-offre-prix">
                                         <ui:fragment rendered="#{o.ancienPrix != null}">
-                                            <span class="nx-old"><h:outputText value="#{o.ancienPrix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText></span>
+                                            <span class="nx-old">#{format.prix(o.ancienPrix)}</span>
                                         </ui:fragment>
-                                        <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                                        #{format.prix(o.prix)}
                                     </span>
                                     <span class="nx-offre-footer">
                                         <span class="nx-inline-icon">

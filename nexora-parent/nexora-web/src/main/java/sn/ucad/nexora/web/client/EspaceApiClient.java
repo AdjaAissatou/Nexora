@@ -103,6 +103,14 @@ public class EspaceApiClient {
         }
     }
 
+    public void enregistrerVue(Long id) {
+        try {
+            client.post().uri("/api/v1/espaces/{id}/vue", id).retrieve().toBodilessEntity();
+        } catch (Exception e) {
+            LOG.warn("Échec de l'enregistrement de la vue pour l'espace {} : {}", id, e.getMessage());
+        }
+    }
+
     public void supprimer(String accessToken, Long id) {
         LOG.info("Requête DELETE {}/api/v1/espaces/{}", baseUrl, id);
         try {

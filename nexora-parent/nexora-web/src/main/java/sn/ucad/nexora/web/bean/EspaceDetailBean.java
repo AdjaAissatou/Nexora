@@ -41,6 +41,7 @@ public class EspaceDetailBean implements Serializable {
         try {
             espace = espaceApiClient.obtenir(id);
             trouve = true;
+            espaceApiClient.enregistrerVue(id);
         } catch (ApiException e) {
             erreur = e.getMessage();
             trouve = false;

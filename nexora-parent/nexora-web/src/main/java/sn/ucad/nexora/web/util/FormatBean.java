@@ -4,6 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 /** Petites fonctions de formatage exposées à l'EL des pages ({@code #{format.xxx}}). */
@@ -47,6 +49,19 @@ public class FormatBean implements Serializable {
     public String lienSiteWeb(String site) {
         if (site == null) return "";
         return site.matches("(?i)^https?://.*") ? site : "https://" + site;
+    }
+
+    private static final DecimalFormat PRIX_FORMAT;
+    static {
+        DecimalFormatSymbols symboles = new DecimalFormatSymbols(Locale.FRANCE);
+        symboles.setGroupingSeparator(' ');
+        PRIX_FORMAT = new DecimalFormat("#,##0", symboles);
+    }
+
+    /** `95000.00` → `95 000 FCFA` — pas de décimales, espace fine comme séparateur de milliers. */
+    public String prix(BigDecimal montant) {
+        if (montant == null) return "";
+        return PRIX_FORMAT.format(montant) + " FCFA";
     }
 
     public int getAnneeCourante() {

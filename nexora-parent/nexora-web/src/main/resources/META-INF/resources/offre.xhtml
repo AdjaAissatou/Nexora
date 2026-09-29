@@ -61,10 +61,10 @@
                     <div class="nx-detail-price">
                         <ui:fragment rendered="#{offreDetailBean.offre.ancienPrix != null}">
                             <span class="nx-old" style="font-size:16px; color:var(--nx-text-light); text-decoration:line-through; font-weight:500;">
-                                <h:outputText value="#{offreDetailBean.offre.ancienPrix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                                #{format.prix(offreDetailBean.offre.ancienPrix)}
                             </span>
                         </ui:fragment>
-                        <h:outputText value="#{offreDetailBean.offre.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                        #{format.prix(offreDetailBean.offre.prix)}
                         <ui:fragment rendered="#{offreDetailBean.offre.negociable}">
                             <span style="font-size:13px; font-weight:600; color:var(--nx-text-secondary);"> (négociable)</span>
                         </ui:fragment>

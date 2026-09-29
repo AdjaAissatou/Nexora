@@ -129,7 +129,7 @@
                             <div class="nx-offre-body">
                                 <span class="nx-offre-titre">#{o.titre}</span>
                                 <span class="nx-offre-prix">
-                                    <h:outputText value="#{o.prix}"><f:convertNumber type="currency" currencySymbol=" FCFA" groupingUsed="true" /></h:outputText>
+                                    #{format.prix(o.prix)}
                                 </span>
                             </div>
                         </h:link>

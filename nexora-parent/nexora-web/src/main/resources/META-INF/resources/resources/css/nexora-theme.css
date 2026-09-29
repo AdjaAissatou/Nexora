@@ -652,13 +652,16 @@ h1, h2, h3, p { margin: 0; }
     font-size: 34px;
     color: var(--nx-primary);
     overflow: hidden;
+    position: relative;
 }
 .nx-offre-media img { width: 100%; height: 100%; object-fit: cover; }
+.nx-offre-media-badge { position: absolute; top: 10px; right: 10px; font-size: 11px; }
 .nx-offre-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
 .nx-offre-espace { font-size: 12px; font-weight: 700; color: var(--nx-primary); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .nx-offre-titre { font-size: 15px; font-weight: 700; }
 .nx-offre-prix { font-weight: 800; font-size: 17px; }
 .nx-offre-prix .nx-old { color: var(--nx-text-light); text-decoration: line-through; font-weight: 500; font-size: 13px; margin-right: 6px; }
+.nx-offre-souscategorie { font-size: 13px; color: var(--nx-text-light); }
 .nx-offre-footer {
     display: flex; align-items: center; justify-content: space-between;
     margin-top: auto; padding-top: 10px;
@@ -811,7 +814,21 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 
 .nx-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 
+/* Vue d'ensemble (Mon espace) : tuiles de statistiques */
+.nx-apercu-card { margin-bottom: 20px; }
+.nx-apercu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.nx-apercu-stat { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 14px 8px; border-radius: var(--nx-radius-md); background: var(--nx-bg); }
+.nx-apercu-stat .nx-icon { width: 20px; height: 20px; color: var(--nx-primary); }
+.nx-apercu-valeur { font-size: 20px; font-weight: 800; }
+.nx-apercu-label { font-size: 12px; color: var(--nx-text-light); }
+@media (max-width: 640px) { .nx-apercu-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* En-tête de section avec bouton d'action ("Mes offres" + Ajouter) */
+.nx-section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.nx-section-header h3 { margin: 0; }
+
 /* Navigation verticale "Mon espace" */
+.nx-espace-nav-titre { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--nx-text-light); padding: 10px 14px 2px; }
 .nx-espace-nav { display: flex; flex-direction: column; gap: 3px; }
 .nx-espace-nav-item {
     display: flex; align-items: center; gap: 10px;
