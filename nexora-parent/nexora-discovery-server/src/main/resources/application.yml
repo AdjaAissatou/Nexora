@@ -9,6 +9,13 @@ eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+  server:
+    # Environnement de dev local, un seul nœud Eureka : le mode d'auto-préservation (pensé pour
+    # distinguer une vraie panne réseau d'un pic de non-renouvellements sur un cluster) n'a pas de
+    # sens ici et retardait l'éviction des instances mortes après un redémarrage de service,
+    # laissant Eureka renvoyer une ancienne adresse injoignable en plus de la bonne.
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
 
 management:
   endpoints:
