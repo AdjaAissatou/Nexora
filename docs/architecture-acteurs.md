@@ -77,9 +77,8 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Page | Route proposée | État |
 |---|---|---|
 | Mon profil (infos personnelles) | `/mon-compte` | ✅ séparé de la gestion pro (voir §5) |
-| Tableau de bord client complet (au-delà du profil) | `/mon-compte` | 🚧 |
-| Mes favoris | `/mon-compte/favoris` | 🚧 (table `favori` existe, jamais écrite par le web) |
-| Mon historique de consultation | `/mon-compte/historique` | 🚧 (table `historique_consultation` existe, jamais écrite par le web) |
+| Mes favoris | `/mon-compte` (section) | ✅ bouton ♡/♥ sur les fiches offre et espace, liste + retrait dans Mon compte |
+| Mon historique de consultation | `/mon-compte` (section) | ✅ enregistré à l'ouverture d'une fiche offre/espace, dédoublonné, effaçable |
 | Mes demandes / messages | `/mon-compte/messages` | 🚧 (tables `conversation`/`message` existent, service `nexora-communication-service` non branché au web) |
 | Mes réservations | `/mon-compte/reservations` | 🚧 (table `reservation` existe) |
 | Mes commandes | `/mon-compte/commandes` | 🚧 (tables `commande`/`sous_commande` existent) |
@@ -141,8 +140,9 @@ téléphone) ; `MonEspaceBean` (page `/mon-espace`) ne garde que la gestion
 professionnelle (offres, infos de l'espace, suppression de l'espace). Les deux
 pages se renvoient l'une vers l'autre (lien "Mon compte" dans la nav verticale de
 Mon espace ; carte "Gérer mon espace" / invitation à en créer un dans Mon compte).
-`/mon-compte` reste minimal pour l'instant — favoris/historique/commandes etc.
-restent à construire (§3, ligne "Tableau de bord client complet").
+`/mon-compte` porte aussi les favoris et l'historique de consultation ; demandes,
+réservations, commandes, messages, avis laissés et notifications restent à
+construire (§3).
 
 ## 6. Permissions — mapping rôle → permission (déjà seedées, jamais appliquées)
 
@@ -175,10 +175,10 @@ précédent :
 1. ✅ **Rôle `FOURNISSEUR` auto-attribué** à la création d'un espace.
 2. ✅ **`mon-espace.xhtml` séparé** : profil personnel sorti vers `/mon-compte`
    (§5).
-3. **`/mon-compte` (Client) — compléter** : le profil existe, il reste favoris et
-   historique. Les tables existent déjà, il "suffit" de brancher web ↔
-   recherche-service qui a déjà les contrôleurs (`FavoriController`,
-   `HistoriqueController`, `AvisController`) jamais appelés par le web.
+3. ✅ **`/mon-compte` : favoris et historique** branchés sur recherche-service
+   (`RechercheApiClient`) ; ajout de l'endpoint manquant
+   `GET /api/v1/historique/consultations`. Reste côté client : avis laissés
+   (`AvisController` en écriture), demandes, réservations, commandes (point 6).
 4. **Navigation adaptative** : afficher "Mon espace" dans le header seulement si le
    compte a le rôle `FOURNISSEUR`.
 5. **Back-office admin** : le plus gros chantier, à cadrer précisément (pages,
