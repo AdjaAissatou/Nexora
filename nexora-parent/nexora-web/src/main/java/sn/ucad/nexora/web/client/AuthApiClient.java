@@ -10,6 +10,7 @@ import sn.ucad.nexora.web.dto.auth.AuthenticationResponse;
 import sn.ucad.nexora.web.dto.auth.ForgotPasswordRequest;
 import sn.ucad.nexora.web.dto.auth.LoginRequest;
 import sn.ucad.nexora.web.dto.auth.OtpResponse;
+import sn.ucad.nexora.web.dto.auth.RefreshTokenRequest;
 import sn.ucad.nexora.web.dto.auth.RegisterRequest;
 import sn.ucad.nexora.web.dto.auth.RegisterResult;
 import sn.ucad.nexora.web.dto.auth.ResetPasswordRequest;
@@ -35,6 +36,23 @@ public class AuthApiClient {
                     .post()
                     .uri("/api/v1/auth/login")
                     .body(new LoginRequest(email, motDePasse))
+                    .retrieve()
+                    .body(AuthenticationResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    /** Nouveau jeton d'accès, régénéré par auth-service à partir des rôles actuels du compte en base. */
+    public AuthenticationResponse rafraichir(String refreshToken) {
+        LOG.info("Requête POST {}/api/v1/auth/refresh", baseUrl);
+        try {
+            return client
+                    .post()
+                    .uri("/api/v1/auth/refresh")
+                    .body(new RefreshTokenRequest(refreshToken))
                     .retrieve()
                     .body(AuthenticationResponse.class);
         } catch (RestClientResponseException e) {

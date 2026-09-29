@@ -79,9 +79,11 @@
                                 value="Mon compte"
                                 styleClass="nx-nav-link" />
 
+                        <!-- Réservé aux comptes FOURNISSEUR (au moins un espace) : docs/architecture-acteurs.md §4 -->
                         <h:link outcome="/mon-espace"
                                 value="Mon espace"
-                                styleClass="nx-nav-link" />
+                                styleClass="nx-nav-link"
+                                rendered="#{sessionBean.fournisseur}" />
 
                         <span class="nx-user-greeting">
                             Bonjour, #{sessionBean.prenom}

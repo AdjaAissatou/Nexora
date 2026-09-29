@@ -224,7 +224,10 @@ public class MonEspaceBean implements Serializable {
     public String supprimerEspace() {
         try {
             espaceApiClient.supprimer(session.getAccessToken(), espace.id());
-            return "mon-espace?faces-redirect=true";
+            // Supprimer son dernier espace retire le rôle FOURNISSEUR : on recharge les rôles,
+            // et on renvoie vers Mon compte puisque « Mon espace » disparaît de la navigation.
+            session.rafraichir();
+            return session.isFournisseur() ? "mon-espace?faces-redirect=true" : "mon-compte?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));

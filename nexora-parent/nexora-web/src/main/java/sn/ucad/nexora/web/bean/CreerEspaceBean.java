@@ -121,6 +121,9 @@ public class CreerEspaceBean implements Serializable {
                             logo,
                             couverture,
                             urlsDepuisTexte(photosTexte)));
+            // Le compte vient peut-être de devenir FOURNISSEUR : on recharge ses rôles
+            // pour que « Mon espace » apparaisse tout de suite dans la navigation.
+            session.rafraichir();
             return "mon-espace?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()

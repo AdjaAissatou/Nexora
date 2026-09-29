@@ -123,6 +123,9 @@ public class RefreshTokenService implements RefreshTokenUseCase {
         accountResponse.setLastName(account.getLastName());
         accountResponse.setEmail(account.getEmail());
         accountResponse.setPhone(account.getPhone());
+        accountResponse.setRoles(account.getRoles().stream()
+                .map(role -> role.getCode())
+                .collect(java.util.stream.Collectors.toSet()));
 
         response.setAccount(accountResponse);
 

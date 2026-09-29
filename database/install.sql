@@ -21,6 +21,7 @@
 \i 01_security/07_account_roles.sql
 \i 01_security/04_utilisateurs.sql
 \i 01_security/08_otp_codes.sql
+\i 01_security/09_revoked_tokens.sql
 
 -------------------------------------------------------
 -- PROFESSIONNEL
@@ -141,6 +142,7 @@
 \i 09_seed/17_categorie_type_espace.sql
 \i 09_seed/18_lieux_publics.sql
 \i 09_seed/19_lieux_publics_extension.sql
+\i 09_seed/20_synchro_role_fournisseur.sql
 
 -------------------------------------------------------
 -- VUES

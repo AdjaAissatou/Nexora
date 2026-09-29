@@ -1,10 +1,14 @@
 package sn.ucad.nexora.auth.application.dto.response;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class AccountResponse {
 
     private UUID id;
+
+    /** Codes des rôles du compte (UTILISATEUR, FOURNISSEUR, ADMIN...) — utilisés par le web pour adapter la navigation. */
+    private Set<String> roles;
 
     private String firstName;
 
@@ -52,6 +56,14 @@ public class AccountResponse {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<String> roles) {
+		this.roles = roles;
 	}
 
     // getters & setters

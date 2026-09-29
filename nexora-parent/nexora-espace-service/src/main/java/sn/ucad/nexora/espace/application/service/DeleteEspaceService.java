@@ -6,6 +6,7 @@ import sn.ucad.nexora.common.exception.UnauthorizedException;
 import sn.ucad.nexora.espace.application.usecase.DeleteEspaceUseCase;
 import sn.ucad.nexora.espace.domain.entity.EspaceProfessionnel;
 import sn.ucad.nexora.espace.domain.repository.EspaceRepository;
+import sn.ucad.nexora.espace.infrastructure.persistence.RoleAssignmentRepository;
 import sn.ucad.nexora.espace.infrastructure.persistence.UtilisateurLookupRepository;
 
 @Service
@@ -13,10 +14,13 @@ public class DeleteEspaceService implements DeleteEspaceUseCase {
 
     private final EspaceRepository espaceRepository;
     private final UtilisateurLookupRepository utilisateurRepository;
+    private final RoleAssignmentRepository roleRepository;
 
-    public DeleteEspaceService(EspaceRepository espaceRepository, UtilisateurLookupRepository utilisateurRepository) {
+    public DeleteEspaceService(EspaceRepository espaceRepository, UtilisateurLookupRepository utilisateurRepository,
+                               RoleAssignmentRepository roleRepository) {
         this.espaceRepository = espaceRepository;
         this.utilisateurRepository = utilisateurRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -36,5 +40,6 @@ public class DeleteEspaceService implements DeleteEspaceUseCase {
         }
 
         espaceRepository.deleteById(espaceId);
+        roleRepository.retirerFournisseurSiPlusAucunEspace(accountId);
     }
 }
