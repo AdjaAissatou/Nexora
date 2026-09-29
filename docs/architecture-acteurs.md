@@ -31,12 +31,14 @@ rôles du compte. De même, aucun endpoint n'utilise encore `hasRole(...)` — t
 `permitAll()` ou `authenticated()` (n'importe quel compte connecté), jamais
 role-spécifique.
 
-**Chantier concret qui en découle** (backend, avant de dessiner des pages qui en
-dépendent) : quand `CreateEspaceService.create(...)` réussit, attribuer le rôle
-`FOURNISSEUR` au compte s'il ne l'a pas déjà. Décision à prendre : appel inter-service
-espace-service → auth-service, ou écriture directe (les deux services partagent
-aujourd'hui la même base physique `nexora_marketplace`, donc techniquement possible
-mais à valider comme convention avant de généraliser ce genre de raccourci).
+**✅ Fait** : `CreateEspaceService.create(...)` attribue désormais le rôle
+`FOURNISSEUR` au compte s'il ne l'a pas déjà (`RoleAssignmentRepository`, écriture
+directe en SQL natif — les deux services partagent la même base physique
+`nexora_marketplace`, même convention que `UtilisateurLookupRepository`/
+`GeoQueryRepository`). Point à garder en tête : le JWT embarque les rôles à la
+connexion, donc un compte qui vient de créer son premier espace ne verra
+`FOURNISSEUR` dans ses autorités Spring Security qu'à sa prochaine connexion —
+pertinent pour le chantier "navigation adaptative selon les rôles" (§7, point 4).
 
 ## 2. Les 4 acteurs
 
@@ -74,8 +76,8 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 
 | Page | Route proposée | État |
 |---|---|---|
-| Mon profil (infos personnelles) | `/mon-espace` (partagé avec profil pro actuellement) | ✅ mais **à séparer** — voir §5 |
-| Tableau de bord client | `/mon-compte` | 🚧 |
+| Mon profil (infos personnelles) | `/mon-compte` | ✅ séparé de la gestion pro (voir §5) |
+| Tableau de bord client complet (au-delà du profil) | `/mon-compte` | 🚧 |
 | Mes favoris | `/mon-compte/favoris` | 🚧 (table `favori` existe, jamais écrite par le web) |
 | Mon historique de consultation | `/mon-compte/historique` | 🚧 (table `historique_consultation` existe, jamais écrite par le web) |
 | Mes demandes / messages | `/mon-compte/messages` | 🚧 (tables `conversation`/`message` existent, service `nexora-communication-service` non branché au web) |
@@ -132,17 +134,15 @@ plus structurant à cadrer avant de coder quoi que ce soit dessus.
 - **Admin** : navigation séparée, jamais mélangée à la navigation publique
   (`/admin/...`, layout dédié, pas le header Nexora grand public).
 
-## 5. Point d'attention immédiat : `mon-espace.xhtml` mélange encore Client et Pro
+## 5. ✅ `mon-espace.xhtml` et le profil personnel sont maintenant séparés
 
-`MonEspaceBean` gère aujourd'hui à la fois le **profil personnel** (prénom, nom,
-téléphone — onglet "Gérer le profil") et la **gestion professionnelle** (offres,
-infos de l'espace). Tant que "Mon compte" (client) n'existe pas, c'est un compromis
-raisonnable. Mais dès qu'on construit "Mon compte", il faudra :
-1. Déplacer l'onglet "Gérer le profil" vers `/mon-compte`.
-2. `mon-espace.xhtml` ne garde que ce qui est propre à la gestion d'un espace
-   (offres, infos de l'espace, suppression de l'espace).
-3. Un lien croisé dans les deux sens (« Gérer mon espace » depuis Mon compte,
-   « Mon compte » depuis Mon espace).
+`MonCompteBean` (page `/mon-compte`) porte le profil personnel (prénom, nom,
+téléphone) ; `MonEspaceBean` (page `/mon-espace`) ne garde que la gestion
+professionnelle (offres, infos de l'espace, suppression de l'espace). Les deux
+pages se renvoient l'une vers l'autre (lien "Mon compte" dans la nav verticale de
+Mon espace ; carte "Gérer mon espace" / invitation à en créer un dans Mon compte).
+`/mon-compte` reste minimal pour l'instant — favoris/historique/commandes etc.
+restent à construire (§3, ligne "Tableau de bord client complet").
 
 ## 6. Permissions — mapping rôle → permission (déjà seedées, jamais appliquées)
 
@@ -172,12 +172,11 @@ compte"*.
 Vu l'état réel du code, dans l'ordre où chaque chantier dépend logiquement du
 précédent :
 
-1. **Rôle `FOURNISSEUR` auto-attribué** à la création d'un espace (petit, débloque
-   toute distinction Client/Pro fiable dans la navigation et les permissions).
-2. **Séparer `mon-espace.xhtml`** : sortir le profil personnel vers un futur
-   `/mon-compte`, ne garder que la gestion pro dans `/mon-espace` (§5).
-3. **`/mon-compte` (Client)** : tableau de bord client minimal — profil (déplacé),
-   favoris, historique. Les tables existent déjà, il "suffit" de brancher web ↔
+1. ✅ **Rôle `FOURNISSEUR` auto-attribué** à la création d'un espace.
+2. ✅ **`mon-espace.xhtml` séparé** : profil personnel sorti vers `/mon-compte`
+   (§5).
+3. **`/mon-compte` (Client) — compléter** : le profil existe, il reste favoris et
+   historique. Les tables existent déjà, il "suffit" de brancher web ↔
    recherche-service qui a déjà les contrôleurs (`FavoriController`,
    `HistoriqueController`, `AvisController`) jamais appelés par le web.
 4. **Navigation adaptative** : afficher "Mon espace" dans le header seulement si le
