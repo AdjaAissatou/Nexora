@@ -89,7 +89,7 @@ public class CreerOffreBean implements Serializable {
             return;
         }
         try {
-            niveau1 = catalogueApiClient.categoriesRacines();
+            niveau1 = catalogueApiClient.categoriesRacines(espace == null ? null : espace.typeEspaceId());
         } catch (ApiException e) {
             erreur = e.getMessage();
         }

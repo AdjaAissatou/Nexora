@@ -22,7 +22,7 @@ public class AvisApiClient {
     private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
 
     public List<AvisResponse> parEspace(Long espaceId) {
-        LOG.info("GET {}/api/v1/avis/espace/{}", baseUrl, espaceId);
+        LOG.info("Requête GET {}/api/v1/avis/espace/{}", baseUrl, espaceId);
         try {
             return client.get().uri("/api/v1/avis/espace/{id}", espaceId).retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<AvisResponse>>() {});

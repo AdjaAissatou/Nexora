@@ -24,6 +24,15 @@ public class CatalogueMetaService implements CatalogueMetaUseCase {
     }
 
     @Override
+    public List<CategorieResponse> categoriesRacines(Long idTypeEspace) {
+        if (idTypeEspace == null) return repository.racines();
+        // Si aucun domaine n'est rattaché à ce type d'espace (nouveau type d'espace pas
+        // encore mappé), mieux vaut tout montrer que de bloquer le professionnel.
+        List<CategorieResponse> filtrees = repository.racinesParTypeEspace(idTypeEspace);
+        return filtrees.isEmpty() ? repository.racines() : filtrees;
+    }
+
+    @Override
     public List<CategorieResponse> sousCategories(Long idCategorie) {
         return repository.enfants(idCategorie);
     }

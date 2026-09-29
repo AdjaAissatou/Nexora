@@ -28,7 +28,7 @@ public class EspaceApiClient {
     private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
 
     public List<TypeEspaceResponse> listerTypes() {
-        LOG.info("GET {}/api/v1/types-espaces", baseUrl);
+        LOG.info("Requête GET {}/api/v1/types-espaces", baseUrl);
         try {
             return client
                     .get()
@@ -43,7 +43,7 @@ public class EspaceApiClient {
     }
 
     public List<EspaceResponse> mesEspaces(String accessToken) {
-        LOG.info("GET {}/api/v1/espaces/me", baseUrl);
+        LOG.info("Requête GET {}/api/v1/espaces/me", baseUrl);
         try {
             return client
                     .get()
@@ -59,7 +59,7 @@ public class EspaceApiClient {
     }
 
     public EspaceResponse obtenir(Long id) {
-        LOG.info("GET {}/api/v1/espaces/{}", baseUrl, id);
+        LOG.info("Requête GET {}/api/v1/espaces/{}", baseUrl, id);
         try {
             return client.get().uri("/api/v1/espaces/{id}", id).retrieve().body(EspaceResponse.class);
         } catch (RestClientResponseException e) {
@@ -70,7 +70,7 @@ public class EspaceApiClient {
     }
 
     public EspaceResponse creer(String accessToken, CreateEspaceRequest requete) {
-        LOG.info("POST {}/api/v1/espaces", baseUrl);
+        LOG.info("Requête POST {}/api/v1/espaces", baseUrl);
         try {
             return client
                     .post()
@@ -87,7 +87,7 @@ public class EspaceApiClient {
     }
 
     public EspaceResponse mettreAJour(String accessToken, Long id, UpdateEspaceRequest requete) {
-        LOG.info("PUT {}/api/v1/espaces/{}", baseUrl, id);
+        LOG.info("Requête PUT {}/api/v1/espaces/{}", baseUrl, id);
         try {
             return client
                     .put()
@@ -104,7 +104,7 @@ public class EspaceApiClient {
     }
 
     public List<RegionResponse> regions() {
-        LOG.info("GET {}/api/v1/geo/regions", baseUrl);
+        LOG.info("Requête GET {}/api/v1/geo/regions", baseUrl);
         try {
             return client.get().uri("/api/v1/geo/regions").retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<RegionResponse>>() {});
@@ -116,7 +116,7 @@ public class EspaceApiClient {
     }
 
     public List<DepartementResponse> departements(Long idRegion) {
-        LOG.info("GET {}/api/v1/geo/regions/{}/departements", baseUrl, idRegion);
+        LOG.info("Requête GET {}/api/v1/geo/regions/{}/departements", baseUrl, idRegion);
         try {
             return client.get().uri("/api/v1/geo/regions/{id}/departements", idRegion).retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<DepartementResponse>>() {});
@@ -128,7 +128,7 @@ public class EspaceApiClient {
     }
 
     public List<CommuneResponse> communes(Long idDepartement) {
-        LOG.info("GET {}/api/v1/geo/departements/{}/communes", baseUrl, idDepartement);
+        LOG.info("Requête GET {}/api/v1/geo/departements/{}/communes", baseUrl, idDepartement);
         try {
             return client.get().uri("/api/v1/geo/departements/{id}/communes", idDepartement).retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<CommuneResponse>>() {});

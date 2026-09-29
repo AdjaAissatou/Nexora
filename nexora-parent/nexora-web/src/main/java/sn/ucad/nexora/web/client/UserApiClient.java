@@ -23,7 +23,7 @@ public class UserApiClient {
     private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
 
     public UserResponse obtenir(String accessToken, UUID accountId) {
-        LOG.info("GET {}/api/v1/users/{}", baseUrl, accountId);
+        LOG.info("Requête GET {}/api/v1/users/{}", baseUrl, accountId);
         try {
             return client
                     .get()
@@ -39,7 +39,7 @@ public class UserApiClient {
     }
 
     public UserResponse mettreAJour(String accessToken, UpdateUserRequest requete) {
-        LOG.info("PUT {}/api/v1/users/me", baseUrl);
+        LOG.info("Requête PUT {}/api/v1/users/me", baseUrl);
         try {
             return client
                     .put()

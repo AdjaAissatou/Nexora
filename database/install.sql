@@ -66,6 +66,7 @@
 \i 04_catalogue/12_offre_tag.sql
 \i 04_catalogue/13_ressource.sql
 \i 04_catalogue/14_disponibilite.sql
+\i 04_catalogue/15_categorie_type_espace.sql
 
 -------------------------------------------------------
 -- RECHERCHE
@@ -135,6 +136,7 @@
 \i 09_seed/15_type_offre_domaines.sql
 \i 09_seed/16_type_offre_attributs_tags.sql
 \i 09_seed/12_type_offre_autre.sql
+\i 09_seed/17_categorie_type_espace.sql
 
 -------------------------------------------------------
 -- VUES

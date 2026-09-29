@@ -29,7 +29,7 @@ public class AuthApiClient {
     private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
 
     public AuthenticationResponse connecter(String email, String motDePasse) {
-        LOG.info("POST {}/api/v1/auth/login", baseUrl);
+        LOG.info("Requête POST {}/api/v1/auth/login", baseUrl);
         try {
             return client
                     .post()
@@ -45,7 +45,7 @@ public class AuthApiClient {
     }
 
     public RegisterResult inscrire(RegisterRequest requete) {
-        LOG.info("POST {}/api/v1/auth/register", baseUrl);
+        LOG.info("Requête POST {}/api/v1/auth/register", baseUrl);
         try {
             return client.post().uri("/api/v1/auth/register").body(requete).retrieve().body(RegisterResult.class);
         } catch (RestClientResponseException e) {
@@ -56,7 +56,7 @@ public class AuthApiClient {
     }
 
     public VerifyOtpResponse verifierOtp(String email, String otp) {
-        LOG.info("POST {}/api/v1/auth/verify-otp", baseUrl);
+        LOG.info("Requête POST {}/api/v1/auth/verify-otp", baseUrl);
         try {
             return client
                     .post()
@@ -72,7 +72,7 @@ public class AuthApiClient {
     }
 
     public OtpResponse motDePasseOublie(String email) {
-        LOG.info("POST {}/api/v1/auth/forgot-password", baseUrl);
+        LOG.info("Requête POST {}/api/v1/auth/forgot-password", baseUrl);
         try {
             return client
                     .post()
@@ -88,7 +88,7 @@ public class AuthApiClient {
     }
 
     public OtpResponse reinitialiserMotDePasse(String email, String otp, String motDePasse, String confirmation) {
-        LOG.info("POST {}/api/v1/auth/reset-password", baseUrl);
+        LOG.info("Requête POST {}/api/v1/auth/reset-password", baseUrl);
         try {
             return client
                     .post()

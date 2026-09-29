@@ -27,9 +27,10 @@ public class CategorieController {
     }
 
     @GetMapping
-    @Operation(summary = "Catégories racines")
-    public ResponseEntity<List<CategorieResponse>> racines() {
-        return ResponseEntity.ok(meta.categoriesRacines());
+    @Operation(summary = "Catégories racines, filtrées par type d'espace si fourni")
+    public ResponseEntity<List<CategorieResponse>> racines(
+            @RequestParam(name = "typeEspace", required = false) Long idTypeEspace) {
+        return ResponseEntity.ok(meta.categoriesRacines(idTypeEspace));
     }
 
     @GetMapping("/{id}/sous-categories")

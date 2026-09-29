@@ -28,7 +28,7 @@ public class CatalogueApiClient {
     private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
 
     public OffrePageResponse rechercher(CritereRecherche c) {
-        LOG.info("GET {}/api/v1/offres/recherche ({})", baseUrl, c);
+        LOG.info("Requête GET {}/api/v1/offres/recherche ({})", baseUrl, c);
         try {
             return client
                     .get()
@@ -59,7 +59,7 @@ public class CatalogueApiClient {
     }
 
     public OffreDetailResponse obtenir(Long id) {
-        LOG.info("GET {}/api/v1/offres/{}", baseUrl, id);
+        LOG.info("Requête GET {}/api/v1/offres/{}", baseUrl, id);
         try {
             return client.get().uri("/api/v1/offres/{id}", id).retrieve().body(OffreDetailResponse.class);
         } catch (RestClientResponseException e) {
@@ -74,9 +74,17 @@ public class CatalogueApiClient {
     }
 
     public List<CategorieResponse> categoriesRacines() {
-        LOG.info("GET {}/api/v1/categories", baseUrl);
+        return categoriesRacines(null);
+    }
+
+    public List<CategorieResponse> categoriesRacines(Long idTypeEspace) {
+        LOG.info("Requête GET {}/api/v1/categories (typeEspace={})", baseUrl, idTypeEspace);
         try {
-            return client.get().uri("/api/v1/categories").retrieve()
+            return client.get()
+                    .uri(uriBuilder -> uriBuilder.path("/api/v1/categories")
+                            .queryParamIfPresent("typeEspace", java.util.Optional.ofNullable(idTypeEspace))
+                            .build())
+                    .retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<CategorieResponse>>() {});
         } catch (RestClientResponseException e) {
             throw ApiErrors.depuis(e);
@@ -86,7 +94,7 @@ public class CatalogueApiClient {
     }
 
     public List<CategorieResponse> sousCategories(Long idCategorie) {
-        LOG.info("GET {}/api/v1/categories/{}/sous-categories", baseUrl, idCategorie);
+        LOG.info("Requête GET {}/api/v1/categories/{}/sous-categories", baseUrl, idCategorie);
         try {
             return client.get().uri("/api/v1/categories/{id}/sous-categories", idCategorie).retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<CategorieResponse>>() {});
@@ -98,7 +106,7 @@ public class CatalogueApiClient {
     }
 
     public List<TypeOffreResponse> typesOffre(Long idCategorie) {
-        LOG.info("GET {}/api/v1/categories/{}/types-offre", baseUrl, idCategorie);
+        LOG.info("Requête GET {}/api/v1/categories/{}/types-offre", baseUrl, idCategorie);
         try {
             return client.get().uri("/api/v1/categories/{id}/types-offre", idCategorie).retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<TypeOffreResponse>>() {});
@@ -110,7 +118,7 @@ public class CatalogueApiClient {
     }
 
     public List<AttributResponse> attributs(Long idCategorie) {
-        LOG.info("GET {}/api/v1/categories/{}/attributs", baseUrl, idCategorie);
+        LOG.info("Requête GET {}/api/v1/categories/{}/attributs", baseUrl, idCategorie);
         try {
             return client.get().uri("/api/v1/categories/{id}/attributs", idCategorie).retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<List<AttributResponse>>() {});
@@ -122,7 +130,7 @@ public class CatalogueApiClient {
     }
 
     public CreateOffreResponse creerOffre(String accessToken, CreateOffreRequest requete) {
-        LOG.info("POST {}/api/v1/offres", baseUrl);
+        LOG.info("Requête POST {}/api/v1/offres", baseUrl);
         try {
             return client.post().uri("/api/v1/offres")
                     .header("Authorization", "Bearer " + accessToken)

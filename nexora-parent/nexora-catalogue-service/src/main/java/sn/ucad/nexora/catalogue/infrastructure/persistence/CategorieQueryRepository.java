@@ -28,6 +28,20 @@ public class CategorieQueryRepository {
         return categories("WHERE c.id_categorie_parent IS NULL AND c.actif = TRUE ORDER BY c.ordre_affichage, c.nom");
     }
 
+    @SuppressWarnings("unchecked")
+    public List<CategorieResponse> racinesParTypeEspace(Long idTypeEspace) {
+        Query q = em.createNativeQuery("""
+                SELECT c.id_categorie, c.id_categorie_parent, c.nom, c.description, c.icone, c.couleur,
+                       EXISTS(SELECT 1 FROM categorie e WHERE e.id_categorie_parent = c.id_categorie AND e.actif = TRUE)
+                FROM categorie c
+                JOIN categorie_type_espace cte ON cte.id_categorie = c.id_categorie
+                WHERE c.id_categorie_parent IS NULL AND c.actif = TRUE AND cte.id_type_espace = :idTypeEspace
+                ORDER BY (NOT cte.principal), c.ordre_affichage, c.nom
+                """);
+        q.setParameter("idTypeEspace", idTypeEspace);
+        return mapCategories(q.getResultList());
+    }
+
     public List<CategorieResponse> enfants(Long idParent) {
         Query q = em.createNativeQuery("""
                 SELECT c.id_categorie, c.id_categorie_parent, c.nom, c.description, c.icone, c.couleur,
