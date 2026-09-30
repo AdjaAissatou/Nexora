@@ -2,7 +2,8 @@
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 <f:metadata>
     <f:viewParam name="id" value="#{espaceDetailBean.id}" />
     <f:viewAction action="#{espaceDetailBean.charger}" />
@@ -143,16 +144,60 @@
                     </ui:repeat>
                 </div>
 
-                <h3 style="margin-top:28px;">Avis</h3>
+                <h3 style="margin-top:28px;" id="avis">Avis</h3>
                 <ui:fragment rendered="#{empty espaceDetailBean.avis}">
                     <p style="color:var(--nx-text-secondary);">Aucun avis pour le moment.</p>
                 </ui:fragment>
-                <ui:repeat var="a" value="#{espaceDetailBean.avis}">
-                    <div class="nx-profile-row" style="align-items:flex-start; flex-direction:column; gap:4px;">
-                        <strong>#{a.note} ⭐</strong>
-                        <span style="color:var(--nx-text-secondary);">#{a.commentaire}</span>
-                    </div>
-                </ui:repeat>
+                <div class="nx-avis-liste">
+                    <ui:repeat var="a" value="#{espaceDetailBean.avis}">
+                        <div class="nx-avis">
+                            <div class="nx-avis-tete">
+                                <span class="nx-avis-etoiles" aria-label="#{a.note} sur 5">#{format.etoiles(a.note)}</span>
+                                <strong>#{a.auteur}</strong>
+                                <span class="nx-avis-date">#{format.date(a.dateCreation)}</span>
+                                <ui:fragment rendered="#{!espaceDetailBean.estMonAvis(a)}">
+                                    <h:link outcome="/signaler" value="Signaler" styleClass="nx-avis-signaler">
+                                        <f:param name="avis" value="#{a.id}" />
+                                    </h:link>
+                                </ui:fragment>
+                            </div>
+                            <ui:fragment rendered="#{not empty a.commentaire}"><p>#{a.commentaire}</p></ui:fragment>
+                        </div>
+                    </ui:repeat>
+                </div>
+
+                <!-- Donner son avis (docs/architecture-acteurs.md §9.10) -->
+                <ui:fragment rendered="#{espaceDetailBean.peutDonnerAvis}">
+                    <h:form id="avisForm" styleClass="nx-avis-form">
+                        <h4>Votre avis sur #{espaceDetailBean.espace.nom}</h4>
+                        <h:messages for="avisForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                        <h:selectOneRadio id="note" value="#{espaceDetailBean.nouvelleNote}" styleClass="nx-avis-choix" layout="lineDirection">
+                            <f:selectItem itemValue="5" itemLabel="★★★★★ Excellent" />
+                            <f:selectItem itemValue="4" itemLabel="★★★★ Très bien" />
+                            <f:selectItem itemValue="3" itemLabel="★★★ Correct" />
+                            <f:selectItem itemValue="2" itemLabel="★★ Décevant" />
+                            <f:selectItem itemValue="1" itemLabel="★ À éviter" />
+                        </h:selectOneRadio>
+                        <h:inputTextarea id="commentaire" value="#{espaceDetailBean.nouveauCommentaire}" styleClass="nx-input" rows="3"
+                                         a:placeholder="Racontez votre expérience (facultatif)" a:maxlength="1000" />
+                        <h:commandButton id="publier" value="Publier mon avis" action="#{espaceDetailBean.publierAvis}"
+                                         styleClass="nx-button nx-button-primary" />
+                    </h:form>
+                </ui:fragment>
+                <ui:fragment rendered="#{espaceDetailBean.dejaNote}">
+                    <h:messages for="avisForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                    <ui:fragment rendered="#{espaceDetailBean.monAvis.masque()}">
+                        <div class="nx-alert nx-alert-warn" style="margin-top:14px;">
+                            Votre avis sur cet espace a été masqué par la modération de Nexora :
+                            #{empty espaceDetailBean.monAvis.motifModeration() ? 'motif non précisé' : espaceDetailBean.monAvis.motifModeration()}.
+                            Il n'est plus visible et ne compte plus dans la note.
+                        </div>
+                    </ui:fragment>
+                </ui:fragment>
+                <ui:fragment rendered="#{!sessionBean.connecte}">
+                    <p style="margin-top:12px;"><h:link outcome="/connexion" value="Connectez-vous pour donner votre avis">
+                        <f:param name="redirect" value="/espace.xhtml?id=#{espaceDetailBean.espace.id}" /></h:link></p>
+                </ui:fragment>
 
                 <h3 style="margin-top:28px;">Informations</h3>
                 <div class="nx-profile-row"><span>Téléphone</span><span>#{espaceDetailBean.espace.telephone}</span></div>
@@ -161,6 +206,13 @@
                 </ui:fragment>
                 <ui:fragment rendered="#{!empty espaceDetailBean.espace.siteWeb}">
                     <div class="nx-profile-row"><span>Site web</span><span>#{espaceDetailBean.espace.siteWeb}</span></div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{!espaceDetailBean.proprietaire}">
+                    <p class="nx-signaler-ligne">
+                        Une information fausse, une arnaque ?&#160;
+                        <h:link outcome="/signaler" value="Signaler cet espace"><f:param name="espace" value="#{espaceDetailBean.espace.id}" /></h:link>
+                    </p>
                 </ui:fragment>
 
             </div>

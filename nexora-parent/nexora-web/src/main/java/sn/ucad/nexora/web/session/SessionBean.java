@@ -155,7 +155,10 @@ public class SessionBean implements Serializable {
         }
         FacesContext contexte = FacesContext.getCurrentInstance();
         ExternalContext externe = contexte.getExternalContext();
-        String vue = URLEncoder.encode(contexte.getViewRoot().getViewId(), StandardCharsets.UTF_8);
+        // La page demandée avec ses paramètres (ex. /signaler.xhtml?espace=4), pour y revenir après connexion.
+        String requete = ((jakarta.servlet.http.HttpServletRequest) externe.getRequest()).getQueryString();
+        String vue = URLEncoder.encode(contexte.getViewRoot().getViewId()
+                + (requete == null || requete.isBlank() ? "" : "?" + requete), StandardCharsets.UTF_8);
         try {
             externe.redirect(externe.getRequestContextPath() + "/connexion.xhtml?redirect=" + vue);
         } catch (IOException e) {

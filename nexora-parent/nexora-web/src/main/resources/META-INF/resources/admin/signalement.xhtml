@@ -1,0 +1,99 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerSignalements}" />
+</f:metadata>
+<ui:param name="section" value="signalements" />
+<ui:define name="titre">Signalement</ui:define>
+<ui:define name="titre-page">#{empty ficheSignalementBean.detail ? 'Signalement' : 'Signalement n° '.concat(ficheSignalementBean.detail.signalement.id)}</ui:define>
+<ui:define name="content">
+
+    <p style="margin-top:0;"><h:link outcome="/admin/signalements" value="← File des signalements" /></p>
+
+    <ui:fragment rendered="#{not empty ficheSignalementBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{ficheSignalementBean.erreur}</div>
+    </ui:fragment>
+
+    <ui:fragment rendered="#{not empty ficheSignalementBean.detail}">
+    <ui:param name="s" value="#{ficheSignalementBean.detail.signalement}" />
+    <ui:param name="av" value="#{ficheSignalementBean.detail.avis}" />
+
+    <h:form id="ficheForm">
+    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+    <div class="nx-verif-grille">
+        <div>
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Ce qui est signalé
+                    <span class="nx-badge #{libAdmin.classeSignalement(s.statut)}">#{libAdmin.statutSignalement(s.statut)}</span></h3>
+                <dl class="nx-verif-infos">
+                    <dt>Élément</dt><dd>#{libAdmin.typeSignalement(s.type)} : <strong>#{s.cibleLibelle}</strong></dd>
+                    <dt>État actuel</dt>
+                    <dd><span class="nx-badge #{s.cibleStatut eq 'MASQUE' ? 'nx-badge-alerte' : libAdmin.classeStatut(s.cibleStatut)}">#{s.type eq 'AVIS' ? (s.cibleStatut eq 'MASQUE' ? 'Masqué' : 'Visible') : (s.type eq 'OFFRE' ? libAdmin.statutOffre(s.cibleStatut) : libAdmin.statutEspace(s.cibleStatut))}</span></dd>
+                    <dt>Motif</dt><dd>#{libAdmin.motifSignalement(s.motif)}</dd>
+                    <dt>Précisions</dt><dd style="white-space:pre-line;">#{empty s.description ? '—' : s.description}</dd>
+                    <dt>Envoyé par</dt><dd>#{s.signaleurNom}, le #{format.dateHeure(s.dateCreation)}</dd>
+                    <dt>Signalements</dt><dd>#{s.signalementsSurLaCible} sur cet élément</dd>
+                </dl>
+                <ui:fragment rendered="#{not empty s.espaceId and acces.modererEspaces}">
+                    <p style="margin:14px 0 0;">
+                        <h:link outcome="/admin/espace" value="Ouvrir la fiche de modération de l'espace →"><f:param name="id" value="#{s.espaceId}" /></h:link>
+                        <br /><span style="font-size:13px; color:var(--nx-text-secondary);">Pour suspendre l'espace ou l'une de ses offres, avec un motif.</span>
+                    </p>
+                </ui:fragment>
+            </div>
+
+            <ui:fragment rendered="#{not empty av}">
+                <div class="nx-card">
+                    <h3 style="margin-top:0;">L'avis</h3>
+                    <p style="margin:0 0 6px;"><span class="nx-avis-etoiles">#{format.etoiles(av.note)}</span>
+                        <strong>#{av.auteurNom}</strong> · #{format.dateHeure(av.dateCreation)}</p>
+                    <p style="margin:0; white-space:pre-line;">#{empty av.commentaire ? '(sans commentaire)' : av.commentaire}</p>
+                    <ui:fragment rendered="#{av.masque}">
+                        <div class="nx-alert nx-alert-warn" style="margin:12px 0 0;">Masqué le #{format.dateHeure(av.dateModeration)} : #{av.motifModeration}</div>
+                    </ui:fragment>
+                </div>
+            </ui:fragment>
+        </div>
+
+        <div>
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Décision</h3>
+                <ui:fragment rendered="#{!s.ouvert()}">
+                    <p>Clos par #{s.traitePar} le #{format.dateHeure(s.dateTraitement)} :</p>
+                    <p style="white-space:pre-line; color:var(--nx-text-secondary);">#{s.commentaire}</p>
+                </ui:fragment>
+                <ui:fragment rendered="#{s.ouvert()}">
+                    <ui:fragment rendered="#{s.statut eq 'EN_ATTENTE'}">
+                        <h:commandButton id="prendre" value="Prendre en charge" action="#{ficheSignalementBean.prendre}" styleClass="nx-button nx-button-outline nx-button-block" style="margin-bottom:14px;" />
+                    </ui:fragment>
+                    <ui:fragment rendered="#{s.statut eq 'EN_COURS'}">
+                        <p style="font-size:13px; color:var(--nx-text-secondary); margin-top:0;">Pris en charge par #{s.traitePar}.</p>
+                    </ui:fragment>
+                    <div class="nx-field">
+                        <label for="ficheForm:commentaire">Commentaire (obligatoire) : écrit dans le journal</label>
+                        <h:inputTextarea id="commentaire" value="#{ficheSignalementBean.commentaire}" styleClass="nx-input" rows="3" />
+                    </div>
+                    <ui:fragment rendered="#{not empty av and !av.masque and acces.modererAvis}">
+                        <h:commandButton id="masquer" value="Masquer l'avis" action="#{ficheSignalementBean.masquerAvis}" styleClass="nx-button nx-button-danger nx-button-block"
+                                         style="margin-bottom:10px;" onclick="return confirm('Masquer cet avis avec ce commentaire comme motif ?');" />
+                    </ui:fragment>
+                    <h:commandButton id="traiter" value="Clore : traité" action="#{ficheSignalementBean.traiter}" styleClass="nx-button nx-button-primary nx-button-block" style="margin-bottom:10px;" />
+                    <h:commandButton id="rejeter" value="Clore : rejeté" action="#{ficheSignalementBean.rejeter}" styleClass="nx-button nx-button-outline nx-button-block" />
+                    <p style="font-size:13px; color:var(--nx-text-secondary); margin:12px 0 0;">
+                        « Traité » : une suite a été donnée (suspension, masquage, contact du professionnel…).
+                        « Rejeté » : rien de contraire aux règles de Nexora. Dans les deux cas, la personne qui a signalé est prévenue,
+                        sans le détail de la décision.
+                    </p>
+                </ui:fragment>
+            </div>
+        </div>
+    </div>
+    </h:form>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

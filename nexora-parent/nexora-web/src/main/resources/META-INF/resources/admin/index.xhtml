@@ -32,7 +32,7 @@
             <div class="nx-admin-tuile #{t.signalementsEnAttente gt 0 ? 'attention' : ''}">
                 <span class="valeur">#{t.signalementsEnAttente}</span>
                 <span class="libelle">signalement(s) en attente</span>
-                <span class="detail">Traitement : étape 6d</span>
+                <span class="detail"><h:link outcome="/admin/signalements" value="Voir la file" rendered="#{acces.signalements}" /></span>
             </div>
         </ui:fragment>
         <div class="nx-admin-tuile">

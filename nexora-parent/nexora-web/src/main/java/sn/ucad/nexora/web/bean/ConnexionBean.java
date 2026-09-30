@@ -32,10 +32,7 @@ public class ConnexionBean implements Serializable {
         try {
             AuthenticationResponse reponse = authApiClient.connecter(email, motDePasse);
             session.connecter(reponse.accessToken(), reponse.refreshToken(), reponse.account());
-            if (redirect != null && !redirect.isBlank()) {
-                return redirect.replaceFirst("\\.xhtml$", "") + "?faces-redirect=true";
-            }
-            return "index?faces-redirect=true";
+            return destination(redirect);
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Connexion impossible", e.getMessage()));
@@ -65,5 +62,19 @@ public class ConnexionBean implements Serializable {
 
     public void setRedirect(String redirect) {
         this.redirect = redirect;
+    }
+
+    /**
+     * Où aller après la connexion : la page demandée, paramètres compris (« /signaler.xhtml?espace=4 »).
+     * Uniquement une vue de Nexora : un chemin absolu local, jamais une adresse externe.
+     */
+    static String destination(String redirect) {
+        if (redirect == null || redirect.isBlank() || !redirect.startsWith("/") || redirect.startsWith("//")
+                || redirect.contains(":") || redirect.contains("\\")) {
+            return "index?faces-redirect=true";
+        }
+        String[] parties = redirect.split("\\?", 2);
+        String parametres = parties.length > 1 && !parties[1].isBlank() ? parties[1] + "&" : "";
+        return parties[0].replaceFirst("\\.xhtml$", "") + "?" + parametres + "faces-redirect=true";
     }
 }

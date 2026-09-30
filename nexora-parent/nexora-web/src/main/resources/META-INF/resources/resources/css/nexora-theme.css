@@ -1302,6 +1302,26 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 .nx-footer-credit a { color: #C9D8D4; }
 
 
+/* Avis publics et signalement (§9.10) */
+.nx-avis-liste { display: flex; flex-direction: column; gap: 10px; }
+.nx-avis { padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.7); border: 1px solid var(--nx-border); }
+.nx-avis-tete { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.nx-avis-tete strong { color: var(--nx-forest); font-size: 14px; }
+.nx-avis p { margin: 6px 0 0; color: var(--nx-text-secondary); line-height: 1.6; }
+.nx-avis-etoiles { color: var(--nx-gold-deep); letter-spacing: 1px; font-size: 14px; }
+.nx-avis-date { font-size: 12px; color: var(--nx-text-light); }
+.nx-avis-signaler { margin-left: auto; font-size: 12px; color: var(--nx-text-light); text-decoration: none; }
+.nx-avis-signaler:hover { color: var(--nx-error); text-decoration: underline; }
+.nx-avis-form { margin-top: 16px; padding: 18px; border-radius: 18px; border: 1px dashed rgba(231, 184, 75, 0.7); background: var(--nx-gold-soft); }
+.nx-avis-form h4 { margin: 0 0 10px; color: var(--nx-forest); font-family: var(--nx-font-display); font-size: 18px; }
+.nx-avis-form .nx-button { margin-top: 10px; }
+.nx-avis-choix { margin-bottom: 10px; }
+.nx-avis-choix td { padding: 4px 10px 4px 0; font-size: 14px; }
+.nx-avis-choix label { color: var(--nx-gold-deep); cursor: pointer; margin-left: 4px; }
+.nx-signaler-ligne { margin-top: 18px; font-size: 13px; color: var(--nx-text-light); }
+.nx-signaler-ligne a { color: var(--nx-text-secondary); }
+.nx-signaler-ligne a:hover { color: var(--nx-error); }
+
 /* =========================================================
    RESPONSIVE
 ========================================================= */

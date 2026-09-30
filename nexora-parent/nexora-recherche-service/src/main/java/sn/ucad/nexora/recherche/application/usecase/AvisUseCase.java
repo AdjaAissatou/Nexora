@@ -9,4 +9,6 @@ public interface AvisUseCase {
     List<AvisResponse> listerParOffre(Long offreId);
     List<AvisResponse> listerParEspace(Long espaceId);
     void supprimer(Long utilisateurId, Long avisId);
+    /** Un avis visible (non masqué), pour le formulaire de signalement. */
+    AvisResponse visible(Long avisId);
 }

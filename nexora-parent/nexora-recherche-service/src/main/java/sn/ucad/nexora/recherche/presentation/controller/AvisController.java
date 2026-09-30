@@ -30,11 +30,24 @@ public class AvisController {
 
     private final AvisUseCase avisUseCase;
     private final UtilisateurLookupRepository lookupRepository;
+    private final sn.ucad.nexora.recherche.infrastructure.persistence.moderation.AvisModerationRepository avisLecture;
 
     public AvisController(AvisUseCase avisUseCase,
-                          UtilisateurLookupRepository lookupRepository) {
+                          UtilisateurLookupRepository lookupRepository,
+                          sn.ucad.nexora.recherche.infrastructure.persistence.moderation.AvisModerationRepository avisLecture) {
         this.avisUseCase = avisUseCase;
         this.lookupRepository = lookupRepository;
+        this.avisLecture = avisLecture;
+    }
+
+    /** L'avis du compte connecté sur un espace, même masqué (avec le motif) ; 204 s'il n'en a pas. */
+    @GetMapping("/mien")
+    @Operation(summary = "Mon avis sur un espace")
+    public ResponseEntity<sn.ucad.nexora.recherche.infrastructure.persistence.moderation.AvisModerationRepository.MonAvis> mien(
+            Authentication auth, @RequestParam Long espaceId) {
+        Long utilisateurId = PrincipalHelper.resolveUtilisateurId(auth, lookupRepository);
+        return avisLecture.monAvisSurEspace(utilisateurId, espaceId).map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/offre/{offreId}")
@@ -44,6 +57,12 @@ public class AvisController {
             @Parameter(description = "Identifiant de l'offre")
             @PathVariable Long offreId) {
         return ResponseEntity.ok(avisUseCase.listerParOffre(offreId));
+    }
+
+    @GetMapping("/{id:\\d+}")
+    @Operation(summary = "Un avis", description = "Un avis visible (non masqué). Accessible sans authentification.")
+    public ResponseEntity<AvisResponse> un(@PathVariable Long id) {
+        return ResponseEntity.ok(avisUseCase.visible(id));
     }
 
     @GetMapping("/espace/{espaceId}")

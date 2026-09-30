@@ -1,0 +1,88 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerModererAvis}" />
+</f:metadata>
+<ui:param name="section" value="avis" />
+<ui:define name="titre">Avis</ui:define>
+<ui:define name="titre-page">Avis</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty avisAdminBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{avisAdminBean.erreur}</div>
+    </ui:fragment>
+
+    <div class="nx-card">
+        <h:form id="filtres" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="nx-field" style="margin:0; flex:1; min-width:220px;">
+                <label for="filtres:recherche">Texte de l'avis, espace ou auteur</label>
+                <h:inputText id="recherche" value="#{avisAdminBean.recherche}" styleClass="nx-input" />
+            </div>
+            <div class="nx-field" style="margin:0;">
+                <label for="filtres:etat">État</label>
+                <h:selectOneMenu id="etat" value="#{avisAdminBean.etat}" styleClass="nx-select">
+                    <f:selectItem itemLabel="Tous" itemValue="" />
+                    <f:selectItem itemLabel="Visibles" itemValue="VISIBLE" />
+                    <f:selectItem itemLabel="Masqués" itemValue="MASQUE" />
+                </h:selectOneMenu>
+            </div>
+            <h:commandButton value="Filtrer" action="#{avisAdminBean.filtrer}" styleClass="nx-button nx-button-primary" />
+        </h:form>
+    </div>
+
+    <ui:fragment rendered="#{not empty avisAdminBean.resultat}">
+    <h:form id="decisions">
+    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+    <div class="nx-card">
+        <div class="nx-field">
+            <label for="decisions:motif">Motif de la décision (obligatoire) : envoyé à l'auteur de l'avis et écrit dans le journal</label>
+            <h:inputText id="motif" value="#{avisAdminBean.motif}" styleClass="nx-input" />
+        </div>
+        <h3>#{avisAdminBean.resultat.total} avis</h3>
+        <table class="nx-verif-tableau">
+            <tr><th>Avis</th><th>Espace</th><th>État</th><th></th></tr>
+            <ui:repeat var="a" value="#{avisAdminBean.resultat.avis}">
+                <tr>
+                    <td><span class="nx-avis-etoiles">#{format.etoiles(a.note)}</span> <strong>#{a.auteurNom}</strong>
+                        <span style="font-size:12px; color:var(--nx-text-secondary);"> · #{format.date(a.dateCreation)}</span><br />
+                        <span style="font-size:13px;">#{empty a.commentaire ? '(sans commentaire)' : a.commentaire}</span>
+                        <ui:fragment rendered="#{a.signalementsOuverts gt 0}"><br /><span style="font-size:12px; color:var(--nx-error);">#{a.signalementsOuverts} signalement(s) ouvert(s)</span></ui:fragment></td>
+                    <td><h:link outcome="/admin/espace" value="#{a.espaceNom}" rendered="#{acces.modererEspaces and not empty a.espaceId}"><f:param name="id" value="#{a.espaceId}" /></h:link>
+                        <h:outputText value="#{a.espaceNom}" rendered="#{!acces.modererEspaces}" />
+                        <ui:fragment rendered="#{not empty a.offreTitre}"><br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{a.offreTitre}</span></ui:fragment></td>
+                    <td><span class="nx-badge #{a.masque ? 'nx-badge-alerte' : 'nx-badge-verifie'}">#{a.masque ? 'Masqué' : 'Visible'}</span>
+                        <ui:fragment rendered="#{a.masque}"><br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{a.motifModeration}</span></ui:fragment></td>
+                    <td style="text-align:right; white-space:nowrap;">
+                        <h:commandButton value="Masquer" action="#{avisAdminBean.masquer(a.id)}" rendered="#{!a.masque}"
+                                         styleClass="nx-button nx-button-danger" onclick="return confirm('Masquer cet avis avec le motif saisi ?');" />
+                        <h:commandButton value="Rétablir" action="#{avisAdminBean.retablir(a.id)}" rendered="#{a.masque}"
+                                         styleClass="nx-button nx-button-primary" />
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+        <ui:fragment rendered="#{empty avisAdminBean.resultat.avis}">
+            <p style="color:var(--nx-text-secondary);">Aucun avis ne correspond à ces critères.</p>
+        </ui:fragment>
+        <div style="display:flex; justify-content:space-between; margin-top:14px;">
+            <h:link outcome="/admin/avis" value="← Précédents" rendered="#{avisAdminBean.page gt 0}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{avisAdminBean.page - 1}" />
+                <f:param name="recherche" value="#{avisAdminBean.recherche}" disable="#{empty avisAdminBean.recherche}" />
+                <f:param name="etat" value="#{avisAdminBean.etat}" disable="#{empty avisAdminBean.etat}" />
+            </h:link>
+            <span></span>
+            <h:link outcome="/admin/avis" value="Suivants →" rendered="#{avisAdminBean.resultat.pageSuivante}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{avisAdminBean.page + 1}" />
+                <f:param name="recherche" value="#{avisAdminBean.recherche}" disable="#{empty avisAdminBean.recherche}" />
+                <f:param name="etat" value="#{avisAdminBean.etat}" disable="#{empty avisAdminBean.etat}" />
+            </h:link>
+        </div>
+    </div>
+    </h:form>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

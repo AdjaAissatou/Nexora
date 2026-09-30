@@ -83,6 +83,7 @@
 \i 05_search/04_recherche_sauvegardee.sql
 \i 05_search/05_signalement.sql
 \i 05_search/06_avis.sql
+\i 05_search/07_moderation_avis_signalements.sql
 
 -------------------------------------------------------
 -- COMMUNICATION

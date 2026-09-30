@@ -12,6 +12,8 @@ public class AvisResponse {
     private String reponseFournisseur;
     private LocalDateTime dateCreation;
     private LocalDateTime dateReponse;
+    /** Prénom et initiale du nom de l'auteur (« Aïssatou D. »). */
+    private String auteur;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -31,4 +33,6 @@ public class AvisResponse {
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
     public LocalDateTime getDateReponse() { return dateReponse; }
     public void setDateReponse(LocalDateTime dateReponse) { this.dateReponse = dateReponse; }
+    public String getAuteur() { return auteur; }
+    public void setAuteur(String auteur) { this.auteur = auteur; }
 }

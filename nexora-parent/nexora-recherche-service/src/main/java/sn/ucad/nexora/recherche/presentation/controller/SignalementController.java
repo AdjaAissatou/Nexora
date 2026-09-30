@@ -14,7 +14,8 @@ import sn.ucad.nexora.recherche.infrastructure.persistence.UtilisateurLookupRepo
 /**
  * Endpoints pour les signalements.
  *
- * POST /api/v1/signalements   — Signaler une offre ou un espace (AUTHENTIFIÉ)
+ * POST /api/v1/signalements          — Signaler un espace, une offre ou un avis (AUTHENTIFIÉ)
+ * GET  /api/v1/signalements/motifs   — Motifs proposés (PUBLIC)
  */
 @RestController
 @RequestMapping("/api/v1/signalements")
@@ -28,6 +29,12 @@ public class SignalementController {
                                  UtilisateurLookupRepository lookupRepository) {
         this.signalementUseCase = signalementUseCase;
         this.lookupRepository = lookupRepository;
+    }
+
+    /** Motifs proposés (code → libellé), publics : le formulaire de signalement les affiche. */
+    @GetMapping("/motifs")
+    public ResponseEntity<java.util.Map<String, String>> motifs() {
+        return ResponseEntity.ok(new java.util.TreeMap<>(sn.ucad.nexora.recherche.application.service.moderation.SignalementAdminService.MOTIFS));
     }
 
     @PostMapping

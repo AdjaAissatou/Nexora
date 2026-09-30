@@ -13,6 +13,24 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /** Règle métier refusée (motif manquant, doublon, contenu non visible…). */
+    @ExceptionHandler(sn.ucad.nexora.common.exception.BusinessException.class)
+    public ResponseEntity<Map<String, Object>> handleMetier(sn.ucad.nexora.common.exception.BusinessException ex) {
+        return corps(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(sn.ucad.nexora.common.exception.ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleIntrouvable(sn.ucad.nexora.common.exception.ResourceNotFoundException ex) {
+        return corps(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    private static ResponseEntity<Map<String, Object>> corps(HttpStatus statut, String message) {
+        return ResponseEntity.status(statut).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", statut.value(),
+                "message", message == null ? statut.getReasonPhrase() : message));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequest(IllegalArgumentException ex) {
         HttpStatus status = ex.getMessage().contains("introuvable") || ex.getMessage().contains("Avis introuvable")

@@ -35,7 +35,17 @@ public class EspaceDetailBean implements Serializable {
     private transient RechercheApiClient rechercheApiClient;
 
     @Inject
+    private transient sn.ucad.nexora.web.client.UserApiClient userApiClient;
+
+    @Inject
     private SessionBean session;
+
+    /** Utilisateur connecté (id du profil) : pour savoir s'il est le propriétaire ou s'il a déjà noté. */
+    private Long monUtilisateurId;
+    /** Mon avis sur cet espace, même masqué (null si je n'en ai pas). */
+    private AvisApiClient.MonAvis monAvis;
+    private Integer nouvelleNote;
+    private String nouveauCommentaire;
 
     private Long id;
     private EspaceResponse espace;
@@ -67,6 +77,12 @@ public class EspaceDetailBean implements Serializable {
             avis = List.of();
         }
         if (session.isConnecte()) {
+            try {
+                monUtilisateurId = userApiClient.obtenir(session.getAccessToken(), session.getCompte().id()).id();
+            } catch (ApiException e) {
+                monUtilisateurId = null;
+            }
+            chargerMonAvis();
             rechercheApiClient.enregistrerConsultation(session.getAccessToken(), null, id);
             try {
                 favori = rechercheApiClient.listerFavoris(session.getAccessToken()).stream()
@@ -90,6 +106,64 @@ public class EspaceDetailBean implements Serializable {
             // Silencieux : un aller-retour favori raté n'empêche pas de consulter la fiche.
         }
     }
+
+    /** Publie l'avis du visiteur connecté ; la note de l'espace est recalculée par recherche-service. */
+    public void publierAvis() {
+        if (!isPeutDonnerAvis()) return;
+        if (nouvelleNote == null || nouvelleNote < 1 || nouvelleNote > 5) {
+            message(jakarta.faces.application.FacesMessage.SEVERITY_ERROR, "Choisissez une note de 1 à 5 étoiles.");
+            return;
+        }
+        try {
+            avisApiClient.publier(session.getAccessToken(), id, nouvelleNote, nouveauCommentaire);
+            avis = avisApiClient.parEspace(id);
+            espace = espaceApiClient.obtenir(id);
+            chargerMonAvis();
+            nouvelleNote = null;
+            nouveauCommentaire = null;
+            message(jakarta.faces.application.FacesMessage.SEVERITY_INFO, "Merci ! Votre avis est publié.");
+        } catch (ApiException e) {
+            message(jakarta.faces.application.FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
+    }
+
+    private static void message(jakarta.faces.application.FacesMessage.Severity gravite, String texte) {
+        jakarta.faces.context.FacesContext.getCurrentInstance()
+                .addMessage("avisForm", new jakarta.faces.application.FacesMessage(gravite, texte, null));
+    }
+
+    public boolean isProprietaire() {
+        return monUtilisateurId != null && espace != null && monUtilisateurId.equals(espace.utilisateurId());
+    }
+
+    private void chargerMonAvis() {
+        try {
+            monAvis = monUtilisateurId == null ? null : avisApiClient.mien(session.getAccessToken(), id);
+        } catch (ApiException e) {
+            monAvis = null;
+        }
+    }
+
+    /** Un avis par personne et par espace, y compris s'il a été masqué : on ne contourne pas la modération. */
+    public boolean isDejaNote() {
+        return monAvis != null;
+    }
+
+    public AvisApiClient.MonAvis getMonAvis() { return monAvis; }
+
+    public boolean isPeutDonnerAvis() {
+        return session.isConnecte() && monUtilisateurId != null && !isProprietaire() && !isDejaNote();
+    }
+
+    /** On ne signale ni son propre espace ni son propre avis. */
+    public boolean estMonAvis(AvisResponse a) {
+        return monUtilisateurId != null && monUtilisateurId.equals(a.utilisateurId());
+    }
+
+    public Integer getNouvelleNote() { return nouvelleNote; }
+    public void setNouvelleNote(Integer nouvelleNote) { this.nouvelleNote = nouvelleNote; }
+    public String getNouveauCommentaire() { return nouveauCommentaire; }
+    public void setNouveauCommentaire(String nouveauCommentaire) { this.nouveauCommentaire = nouveauCommentaire; }
 
     public boolean isFavori() { return favori; }
     public Long getId() { return id; }

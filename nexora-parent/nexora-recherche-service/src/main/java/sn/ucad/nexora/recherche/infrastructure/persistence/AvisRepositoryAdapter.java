@@ -15,7 +15,7 @@ public class AvisRepositoryAdapter implements AvisRepository {
 
     public AvisRepositoryAdapter(AvisJpaRepository jpa) { this.jpa = jpa; }
 
-    @Override public Avis save(Avis a) { return toDomain(jpa.save(toEntity(a))); }
+    @Override public Avis save(Avis a) { return toDomain(jpa.saveAndFlush(toEntity(a))); }
     @Override public Optional<Avis> findById(Long id) { return jpa.findById(id).map(this::toDomain); }
 
     @Override
@@ -39,6 +39,7 @@ public class AvisRepositoryAdapter implements AvisRepository {
     }
 
     @Override public void delete(Long id) { jpa.deleteById(id); }
+    @Override public void flush() { jpa.flush(); }
 
     private AvisJpaEntity toEntity(Avis a) {
         AvisJpaEntity e = new AvisJpaEntity();

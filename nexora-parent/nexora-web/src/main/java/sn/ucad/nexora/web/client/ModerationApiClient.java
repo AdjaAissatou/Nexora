@@ -96,6 +96,73 @@ public class ModerationApiClient {
                 .retrieve().body(OffreModeree.class));
     }
 
+    // ------------------------------------------------------------------ avis et signalements (recherche-service)
+
+    private final RestClient recherche = RestClient.builder().baseUrl(GatewayConfig.gatewayUrl() + "/recherche-service")
+            .requestInterceptor(EnTetesClient.IP_NAVIGATEUR).build();
+
+    public sn.ucad.nexora.web.dto.administration.ModerationDtos.PageAvis avis(String accessToken, String recherche, String etat,
+                                                                              Long idEspace, int page) {
+        LOG.info("Requête GET /recherche-service/api/v1/admin/avis (page {})", page);
+        return appel(() -> this.recherche.get()
+                .uri(u -> u.path("/api/v1/admin/avis")
+                        .queryParamIfPresent("recherche", non(recherche))
+                        .queryParamIfPresent("etat", non(etat))
+                        .queryParamIfPresent("idEspace", Optional.ofNullable(idEspace))
+                        .queryParam("page", page).build())
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve().body(sn.ucad.nexora.web.dto.administration.ModerationDtos.PageAvis.class));
+    }
+
+    public sn.ucad.nexora.web.dto.administration.ModerationDtos.AvisModere masquerAvis(String accessToken, Long id, String motif) {
+        return decisionRecherche(accessToken, "/api/v1/admin/avis/{id}/masquer", id, motif,
+                sn.ucad.nexora.web.dto.administration.ModerationDtos.AvisModere.class);
+    }
+
+    public sn.ucad.nexora.web.dto.administration.ModerationDtos.AvisModere retablirAvis(String accessToken, Long id, String motif) {
+        return decisionRecherche(accessToken, "/api/v1/admin/avis/{id}/retablir", id, motif,
+                sn.ucad.nexora.web.dto.administration.ModerationDtos.AvisModere.class);
+    }
+
+    public sn.ucad.nexora.web.dto.administration.ModerationDtos.PageSignalements signalements(String accessToken, String statut,
+                                                                                              String type, int page) {
+        LOG.info("Requête GET /recherche-service/api/v1/admin/signalements (page {})", page);
+        return appel(() -> this.recherche.get()
+                .uri(u -> u.path("/api/v1/admin/signalements")
+                        .queryParamIfPresent("statut", non(statut))
+                        .queryParamIfPresent("type", non(type))
+                        .queryParam("page", page).build())
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve().body(sn.ucad.nexora.web.dto.administration.ModerationDtos.PageSignalements.class));
+    }
+
+    public sn.ucad.nexora.web.dto.administration.ModerationDtos.SignalementDetail signalement(String accessToken, Long id) {
+        LOG.info("Requête GET /recherche-service/api/v1/admin/signalements/{}", id);
+        return appel(() -> this.recherche.get().uri("/api/v1/admin/signalements/{id}", id)
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve().body(sn.ucad.nexora.web.dto.administration.ModerationDtos.SignalementDetail.class));
+    }
+
+    public sn.ucad.nexora.web.dto.administration.ModerationDtos.SignalementDetail prendreSignalement(String accessToken, Long id) {
+        return decisionRecherche(accessToken, "/api/v1/admin/signalements/{id}/prendre", id, null,
+                sn.ucad.nexora.web.dto.administration.ModerationDtos.SignalementDetail.class);
+    }
+
+    /** {@code fonde} : TRAITE (une suite a été donnée) ou REJETE. */
+    public sn.ucad.nexora.web.dto.administration.ModerationDtos.SignalementDetail clore(String accessToken, Long id, boolean fonde,
+                                                                                        String commentaire) {
+        return decisionRecherche(accessToken, "/api/v1/admin/signalements/{id}/" + (fonde ? "traiter" : "rejeter"), id,
+                commentaire, sn.ucad.nexora.web.dto.administration.ModerationDtos.SignalementDetail.class);
+    }
+
+    private <T> T decisionRecherche(String accessToken, String chemin, Long id, String motif, Class<T> type) {
+        LOG.info("Requête POST /recherche-service{} ({})", chemin, id);
+        return appel(() -> this.recherche.post().uri(chemin, id)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(new MotifRequest(motif))
+                .retrieve().body(type));
+    }
+
     private static Optional<String> non(String s) {
         return Optional.ofNullable(s).filter(v -> !v.isBlank());
     }

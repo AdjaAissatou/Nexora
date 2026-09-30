@@ -75,6 +75,12 @@ public class FormatBean implements Serializable {
     }
 
     /** `2026-09-29T14:05` → `29/09/2026`. */
+    /** Note sur 5 en étoiles pleines et vides : 4 → « ★★★★☆ ». */
+    public String etoiles(int note) {
+        int n = Math.max(0, Math.min(5, note));
+        return "★".repeat(n) + "☆".repeat(5 - n);
+    }
+
     public String date(java.time.LocalDateTime date) {
         return date == null ? "" : DATE.format(date);
     }

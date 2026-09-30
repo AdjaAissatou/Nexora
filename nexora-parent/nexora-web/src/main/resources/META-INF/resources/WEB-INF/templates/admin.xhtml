@@ -46,8 +46,10 @@
                         styleClass="nx-admin-nav-item #{section == 'espaces' ? 'active' : ''}" />
                 <h:link outcome="/admin/offres" value="Offres" rendered="#{acces.modererOffres}"
                         styleClass="nx-admin-nav-item #{section == 'offres' ? 'active' : ''}" />
-                <span class="nx-admin-nav-item a-venir">Signalements <small>à venir</small></span>
-                <span class="nx-admin-nav-item a-venir">Avis <small>à venir</small></span>
+                <h:link outcome="/admin/signalements" value="Signalements" rendered="#{acces.signalements}"
+                        styleClass="nx-admin-nav-item #{section == 'signalements' ? 'active' : ''}" />
+                <h:link outcome="/admin/avis" value="Avis" rendered="#{acces.modererAvis}"
+                        styleClass="nx-admin-nav-item #{section == 'avis' ? 'active' : ''}" />
             </ui:fragment>
 
             <ui:fragment rendered="#{acces.verifications}">

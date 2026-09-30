@@ -12,4 +12,5 @@ public interface AvisRepository {
     List<Avis> findByUtilisateurId(Long utilisateurId);
     boolean existsByUtilisateurIdAndOffreId(Long utilisateurId, Long offreId);
     void delete(Long id);
+    void flush();
 }

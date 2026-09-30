@@ -12,4 +12,6 @@ public record AvisResponse(
         String commentaire,
         String reponseFournisseur,
         LocalDateTime dateCreation,
-        LocalDateTime dateReponse) {}
+        LocalDateTime dateReponse,
+        /** Prénom et initiale du nom (« Aïssatou D. »). */
+        String auteur) {}

@@ -2,34 +2,22 @@ package sn.ucad.nexora.recherche.application.service;
 
 import org.springframework.stereotype.Service;
 import sn.ucad.nexora.recherche.application.dto.request.SignalerRequest;
+import sn.ucad.nexora.recherche.application.service.moderation.SignalementAdminService;
 import sn.ucad.nexora.recherche.application.usecase.SignalementUseCase;
-import sn.ucad.nexora.recherche.domain.entity.Signalement;
-import sn.ucad.nexora.recherche.domain.repository.SignalementRepository;
 
-import java.time.LocalDateTime;
-
+/** Dépôt d'un signalement : les règles sont dans {@link SignalementAdminService#signaler}. */
 @Service
 public class SignalementService implements SignalementUseCase {
 
-    private final SignalementRepository repository;
+    private final SignalementAdminService service;
 
-    public SignalementService(SignalementRepository repository) {
-        this.repository = repository;
+    public SignalementService(SignalementAdminService service) {
+        this.service = service;
     }
 
     @Override
     public void signaler(Long utilisateurId, SignalerRequest request) {
-        if (request.getOffreId() == null && request.getEspaceId() == null) {
-            throw new IllegalArgumentException("offreId ou espaceId est requis");
-        }
-        Signalement s = new Signalement();
-        s.setUtilisateurId(utilisateurId);
-        s.setOffreId(request.getOffreId());
-        s.setEspaceId(request.getEspaceId());
-        s.setMotif(request.getMotif());
-        s.setDescription(request.getDescription());
-        s.setStatut("EN_ATTENTE");
-        s.setDateCreation(LocalDateTime.now());
-        repository.save(s);
+        service.signaler(utilisateurId, request.getEspaceId(), request.getOffreId(), request.getAvisId(),
+                request.getMotif(), request.getDescription());
     }
 }

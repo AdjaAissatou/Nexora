@@ -747,8 +747,8 @@ modifie depuis `/admin/roles` sans toucher au code.
    administratifs, et matrice rôles × permissions (§6).
 3. ✅ **6c — Espaces et offres** (§9.9) : modération (suspendre / réactiver, motif,
    notification).
-4. **6d — Signalements et avis** : bouton « Signaler » côté public, file de traitement,
-   masquage des avis.
+4. ✅ **6d — Signalements et avis** (§9.10) : bouton « Signaler » côté public, file de
+   traitement, masquage des avis.
 5. **6e — Catalogue** : gestion des catégories, types d'offre, attributs et tags.
 6. **6f — Paramètres** : paramètres Nexora et règles de justificatifs de la vérification.
 
@@ -928,6 +928,86 @@ le catalogue.
 - non-régression : vérification, 6a, 6b (API et navigateur), session, installation complète
   de la base.
 
+### 9.10 ✅ Étape 6d — avis et signalements
+
+**Avis**
+- Écrire un avis : tout compte connecté, depuis la fiche d'un espace : une note de 1 à 5 et un
+  commentaire facultatif (1 000 caractères au plus). **Un seul avis par personne et par
+  espace**, même masqué : on ne contourne pas la modération en en publiant un autre. Pas
+  d'avis sur son propre espace, ni sur un espace qui n'est pas visible.
+- L'auteur est affiché par son prénom et l'initiale de son nom (« Moussa D. »).
+- **La note d'un espace est une projection** : la moyenne de ses avis visibles, sur l'espace et
+  sur ses offres. Elle est recalculée à chaque avis publié, supprimé, masqué ou rétabli.
+  Auparavant, la publication d'un avis ne changeait pas la note. Les notes du jeu de
+  démonstration étaient inventées : `09_seed/25_demo_avis.sql` (hors installation) crée
+  18 avis réels et recalcule toutes les notes.
+- Modération (`MODERER_AVIS`) : **masquer** ou **rétablir**, avec un motif.
+  - Un avis masqué disparaît de la fiche publique et de la note.
+  - Son auteur reçoit une notification et voit, sur la fiche, que son avis a été masqué et
+    pourquoi.
+  - On ne modère ni son propre avis, ni un avis sur son propre espace.
+
+**Signalements**
+- **« Signaler »** sur la fiche d'un espace, d'une offre et sur chaque avis. Il faut être
+  connecté ; après la connexion, on revient au formulaire, paramètres compris. Cette
+  redirection vaut désormais pour tout le site, et n'accepte qu'une page de Nexora.
+- Six motifs : arnaque, informations fausses, contenu inapproprié, lieu inexistant ou fermé,
+  avis faux, autre (description alors obligatoire).
+- On ne signale pas son propre contenu, ni deux fois le même élément tant que le premier
+  signalement est ouvert.
+- Le signalement est confidentiel : le professionnel ne sait pas qui l'a envoyé.
+- File de traitement (`GERER_SIGNALEMENTS`) :
+  - `EN_ATTENTE` → prise en charge (`EN_COURS`, au nom du modérateur) ;
+  - puis clôture motivée : **traité** (une suite a été donnée) ou **rejeté** (rien de
+    contraire aux règles) ;
+  - la personne qui a signalé est prévenue de l'issue, sans le détail de la sanction ;
+  - on ne traite pas un signalement qui vise son propre contenu.
+- La sanction elle-même passe par la modération existante : masquer l'avis (directement depuis
+  le signalement), suspendre l'espace ou l'offre (lien vers la fiche de l'espace, §9.9).
+
+**API** (recherche-service)
+
+| Route | Accès |
+|---|---|
+| `GET /api/v1/avis/espace/{id}`, `/offre/{id}`, `/{id}` (avis visibles, avec l'auteur) | public |
+| `POST /api/v1/avis`, `DELETE /api/v1/avis/{id}` (le sien), `GET /api/v1/avis/mien?espaceId=` | connecté |
+| `GET /api/v1/signalements/motifs` | public |
+| `POST /api/v1/signalements` `{espaceId | offreId | avisId, motif, description}` | connecté |
+| `GET /api/v1/admin/avis?recherche=&etat=&idEspace=&page=`, `POST .../{id}/masquer`, `.../retablir` | `MODERER_AVIS` |
+| `GET /api/v1/admin/signalements?statut=&type=&page=`, `GET .../{id}`, `POST .../{id}/prendre`, `.../traiter`, `.../rejeter` | `GERER_SIGNALEMENTS` |
+
+Journal : modules `AVIS` et `SIGNALEMENTS`. Les exceptions métier de recherche-service
+donnent 400 / 404 au lieu de 500.
+
+**Base** : `05_search/07_moderation_avis_signalements.sql`, rejouable : colonnes de modération
+de `avis` et `signalement.id_avis`.
+
+**Web**
+- Fiche espace : avis avec étoiles, auteur et date ; formulaire « Votre avis » ; liens
+  « Signaler » ; bandeau pour l'auteur d'un avis masqué.
+- Fiche offre : « Signaler cette offre ».
+- `/signaler?espace=|offre=|avis=` : le formulaire de signalement.
+- Back-office :
+  - `/admin/signalements` : file, filtrée par défaut sur « en attente » ;
+  - `/admin/signalement?id=` : l'élément signalé, les précisions, le nombre de
+    signalements sur cet élément, et les décisions ;
+  - `/admin/avis` : recherche, masquer et rétablir.
+- Menu selon les permissions ; au tableau de bord, la tuile des signalements mène à la file.
+
+**Tests**
+- API, 63 contrôles rejouables (`test_6d.py`) :
+  - publication et règles, note recalculée à chaque étape ;
+  - dépôt et règles des signalements ;
+  - droits de chaque rôle, prise en charge, clôtures ;
+  - masquage et rétablissement ;
+  - notifications, journal, conflits d'intérêts, suppression par l'auteur ;
+- navigateur :
+  - un visiteur signale : il passe par la connexion puis revient au formulaire ;
+  - publication d'un avis, et signalement de cet avis par le professionnel ;
+  - dans la file : prise en charge, masquage, clôture ;
+  - disparition de l'avis et retour de la note ;
+- test unitaire de la redirection après connexion (jamais vers une adresse externe) ;
+- non-régression complète : vérification, 6a, 6b, 6c, session (API et navigateur).
+
 ---
-*Dernière mise à jour : session du 30/09/2026, nouveau langage visuel et modération des
-espaces et des offres livrée (étape 6c).*
+*Dernière mise à jour : session du 30/09/2026, avis et signalements livrés (étape 6d).*

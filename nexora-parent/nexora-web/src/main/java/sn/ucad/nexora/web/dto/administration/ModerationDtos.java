@@ -37,4 +37,27 @@ public final class ModerationDtos {
     public record PageOffres(List<OffreModeree> offres, int page, boolean pageSuivante, long total) {}
 
     public record MotifRequest(String motif) {}
+
+    // ------------------------------------------------------------------ avis et signalements (§9.10)
+
+    public record AvisModere(Long id, int note, String commentaire, Long auteurId, String auteurNom, String auteurEmail,
+                             Long espaceId, String espaceNom, Long offreId, String offreTitre, LocalDateTime dateCreation,
+                             boolean masque, String motifModeration, LocalDateTime dateModeration, String moderateur,
+                             long signalementsOuverts) {}
+
+    public record PageAvis(List<AvisModere> avis, int page, boolean pageSuivante, long total) {}
+
+    public record SignalementResume(Long id, String type, Long cibleId, String cibleLibelle, String cibleStatut,
+                                    Long espaceId, String motif, String description, Long signaleurId, String signaleurNom,
+                                    LocalDateTime dateCreation, String statut, String traitePar,
+                                    LocalDateTime dateTraitement, String commentaire, long signalementsSurLaCible) {
+
+        public boolean ouvert() {
+            return "EN_ATTENTE".equals(statut) || "EN_COURS".equals(statut);
+        }
+    }
+
+    public record PageSignalements(List<SignalementResume> signalements, int page, boolean pageSuivante, long total) {}
+
+    public record SignalementDetail(SignalementResume signalement, AvisModere avis) {}
 }

@@ -63,6 +63,14 @@ public class AccesAdminBean {
         return session.aLaPermission("MODERER_OFFRES");
     }
 
+    public boolean isSignalements() {
+        return session.aLaPermission("GERER_SIGNALEMENTS");
+    }
+
+    public boolean isModererAvis() {
+        return session.aLaPermission("MODERER_AVIS");
+    }
+
     public boolean isVerifications() {
         return session.aLaPermission("SUPERVISER_VERIFICATIONS");
     }
@@ -113,5 +121,13 @@ public class AccesAdminBean {
 
     public void exigerModererOffres() {
         session.exigerRole(session.isConnecte() && isModererOffres());
+    }
+
+    public void exigerSignalements() {
+        session.exigerRole(session.isConnecte() && isSignalements());
+    }
+
+    public void exigerModererAvis() {
+        session.exigerRole(session.isConnecte() && isModererAvis());
     }
 }

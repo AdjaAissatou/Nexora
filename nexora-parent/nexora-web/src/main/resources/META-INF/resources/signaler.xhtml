@@ -1,0 +1,61 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+<f:metadata>
+    <f:viewParam name="espace" value="#{signalerBean.espace}" />
+    <f:viewParam name="offre" value="#{signalerBean.offre}" />
+    <f:viewParam name="avis" value="#{signalerBean.avis}" />
+    <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}" />
+    <f:viewAction action="#{signalerBean.charger}" />
+</f:metadata>
+<ui:define name="titre">Signaler — Nexora</ui:define>
+<ui:define name="content">
+    <div class="nx-auth-wrap">
+        <div class="nx-auth-card" style="max-width:560px;">
+
+            <ui:fragment rendered="#{!signalerBean.trouve}">
+                <h1>Élément introuvable</h1>
+                <p class="nx-sub">Ce que vous voulez signaler n'existe plus ou n'est plus visible.</p>
+                <h:link outcome="/index" value="← Retour à l'accueil" styleClass="nx-back-link" />
+            </ui:fragment>
+
+            <ui:fragment rendered="#{signalerBean.trouve and signalerBean.envoye}">
+                <h1>Merci pour votre signalement</h1>
+                <p class="nx-sub">La modération de Nexora va l'examiner. Vous recevrez une notification quand ce sera fait.</p>
+                <h:outputLink value="#{request.contextPath}#{signalerBean.retour}" styleClass="nx-button nx-button-primary nx-button-block">Revenir à la page</h:outputLink>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{signalerBean.trouve and !signalerBean.envoye}">
+                <h1>Signaler #{signalerBean.type}</h1>
+                <p class="nx-sub"><strong>#{signalerBean.libelle}</strong><br />
+                    Votre signalement est confidentiel : le professionnel ne saura pas qui l'a envoyé.</p>
+
+                <h:form id="signalement">
+                    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" layout="table" />
+                    <div class="nx-field">
+                        <label for="signalement:motif">Que se passe-t-il ?</label>
+                        <h:selectOneMenu id="motif" value="#{signalerBean.motif}" styleClass="nx-select" required="true"
+                                         requiredMessage="Choisissez un motif.">
+                            <f:selectItem itemLabel="Choisir un motif…" itemValue="" noSelectionOption="true" />
+                            <f:selectItems value="#{signalerBean.motifs.entrySet()}" var="m" itemValue="#{m.key}" itemLabel="#{m.value}" />
+                        </h:selectOneMenu>
+                        <h:message for="motif" errorClass="nx-alert nx-alert-error" />
+                    </div>
+                    <div class="nx-field">
+                        <label for="signalement:description">Précisez (obligatoire pour « Autre »)</label>
+                        <h:inputTextarea id="description" value="#{signalerBean.description}" styleClass="nx-input" rows="4"
+                                         a:maxlength="1000" a:placeholder="Ce que vous avez constaté, quand, comment…" />
+                    </div>
+                    <h:commandButton id="envoyer" value="Envoyer le signalement" action="#{signalerBean.envoyer}"
+                                     styleClass="nx-button nx-button-primary nx-button-block" />
+                </h:form>
+                <p class="nx-auth-footer"><h:outputLink value="#{request.contextPath}#{signalerBean.retour}">Annuler</h:outputLink></p>
+            </ui:fragment>
+
+        </div>
+    </div>
+</ui:define>
+</ui:composition>
