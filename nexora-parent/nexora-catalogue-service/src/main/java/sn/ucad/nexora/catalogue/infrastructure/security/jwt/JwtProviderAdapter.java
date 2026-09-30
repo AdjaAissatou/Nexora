@@ -19,13 +19,16 @@ public class JwtProviderAdapter {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public UUID extractAccountId(String token) {
-        Claims claims = Jwts.parser()
+    public Claims claims(String token) {
+        return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return UUID.fromString(claims.getSubject());
+    }
+
+    public UUID extractAccountId(String token) {
+        return UUID.fromString(claims(token).getSubject());
     }
 
     public boolean isValid(String token) {

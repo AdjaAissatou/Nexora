@@ -53,6 +53,7 @@ public class JwtProviderAdapter implements JwtProviderPort {
                                 .map(role -> role.getCode())
                                 .collect(Collectors.toSet())
                 )
+                .claim("permissions", account.effectivePermissions())
                 .claim("type", "ACCESS")
                 .issuedAt(Date.from(now))
                 .expiration(

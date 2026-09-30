@@ -100,9 +100,21 @@ public class SessionBean implements Serializable {
         return aLeRole("FOURNISSEUR");
     }
 
-    /** Agent de vérification des espaces (docs/architecture-acteurs.md §8). */
+    /** Agent de vérification des espaces (docs/architecture-acteurs.md §8) : permission TRAITER_VERIFICATIONS. */
     public boolean isAgentVerification() {
-        return aLeRole("AGENT_VERIFICATION");
+        return aLaPermission("TRAITER_VERIFICATIONS");
+    }
+
+    /**
+     * Vrai si le compte a au moins une des permissions données (permissions effectives renvoyées
+     * par auth-service à la connexion et à chaque renouvellement du jeton, §6).
+     */
+    public boolean aLaPermission(String... codes) {
+        if (compte == null || compte.permissions() == null) return false;
+        for (String code : codes) {
+            if (compte.permissions().contains(code)) return true;
+        }
+        return false;
     }
 
     /** Vrai si le compte a au moins un des rôles donnés. */
@@ -152,7 +164,7 @@ public class SessionBean implements Serializable {
         contexte.responseComplete();
     }
 
-    /** Garde des pages de l'agent de vérification : connexion puis rôle AGENT_VERIFICATION. */
+    /** Garde des pages de l'agent de vérification : connexion puis permission TRAITER_VERIFICATIONS. */
     public void exigerAgentVerification() {
         exigerRole(isConnecte() && isAgentVerification());
     }

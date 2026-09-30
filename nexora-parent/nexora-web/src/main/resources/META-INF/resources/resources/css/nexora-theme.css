@@ -1006,3 +1006,10 @@ body.nx-admin { background: var(--nx-bg); }
     .nx-admin-shell { grid-template-columns: 1fr; }
     .nx-admin-sidebar { position: static; height: auto; }
 }
+.nx-matrice td, .nx-matrice th { padding: 6px 8px; }
+.nx-matrice-module { background: var(--nx-bg); font-weight: 700; font-size: 13px; }
+.nx-matrice-case { display: inline-block; width: 26px; height: 26px; line-height: 26px; border-radius: 6px;
+    text-decoration: none; font-weight: 700; }
+.nx-matrice-case.oui { background: var(--nx-primary-light); color: var(--nx-primary); }
+.nx-matrice-case.non { color: var(--nx-text-secondary); }
+a.nx-matrice-case:hover { outline: 2px solid var(--nx-primary); }

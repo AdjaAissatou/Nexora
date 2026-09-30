@@ -2,6 +2,7 @@ package sn.ucad.nexora.auth.infrastructure.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -47,6 +48,22 @@ public class SecurityConfig {
 
                 .requestMatchers("/api/v1/users/internal")
                 .permitAll()
+
+                // Administration (docs/architecture-acteurs.md §6, §9.2) : une permission par action.
+                .requestMatchers(HttpMethod.GET, "/api/v1/admin/comptes", "/api/v1/admin/comptes/*")
+                .hasAuthority("PERM_CONSULTER_UTILISATEURS")
+                .requestMatchers(HttpMethod.POST, "/api/v1/admin/comptes/*/suspendre")
+                .hasAuthority("PERM_SUSPENDRE_UTILISATEURS")
+                .requestMatchers(HttpMethod.POST, "/api/v1/admin/comptes/*/reactiver")
+                .hasAuthority("PERM_REACTIVER_UTILISATEURS")
+                .requestMatchers(HttpMethod.POST, "/api/v1/admin/comptes/*/roles/**")
+                .hasAuthority("PERM_GERER_ROLES")
+                .requestMatchers(HttpMethod.GET, "/api/v1/admin/roles")
+                .hasAuthority("PERM_ACCEDER_BACK_OFFICE")
+                .requestMatchers(HttpMethod.POST, "/api/v1/admin/roles/*/permissions/**")
+                .hasAuthority("PERM_GERER_PERMISSIONS")
+                .requestMatchers("/api/v1/admin/**")
+                .denyAll()
 
                 .anyRequest()
                 .authenticated()

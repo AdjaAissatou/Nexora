@@ -83,6 +83,19 @@ public class Account extends BaseDomainEntity{
                 .anyMatch(role -> role.getCode().equalsIgnoreCase(roleCode));
     }
 
+    /**
+     * Permissions effectives du compte : union des permissions actives de ses rôles actifs
+     * (docs/architecture-acteurs.md §6). Portées par le jeton d'accès, vérifiées par les services.
+     */
+    public java.util.Set<String> effectivePermissions() {
+        return roles.stream()
+                .filter(Role::isActive)
+                .flatMap(role -> role.getPermissions().stream())
+                .filter(Permission::isActive)
+                .map(Permission::getCode)
+                .collect(java.util.stream.Collectors.toCollection(java.util.TreeSet::new));
+    }
+
     public boolean hasPermission(String permissionCode) {
 
         return roles.stream()

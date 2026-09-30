@@ -34,10 +34,11 @@
             <h:link outcome="/admin/journal" value="Journal d'actions" rendered="#{acces.journal}"
                     styleClass="nx-admin-nav-item #{section == 'journal' ? 'active' : ''}" />
 
-            <ui:fragment rendered="#{acces.utilisateurs}">
-                <div class="nx-admin-nav-titre">Comptes</div>
-                <span class="nx-admin-nav-item a-venir">Utilisateurs <small>à venir</small></span>
-            </ui:fragment>
+            <div class="nx-admin-nav-titre">Comptes</div>
+            <h:link outcome="/admin/utilisateurs" value="Utilisateurs" rendered="#{acces.utilisateurs}"
+                    styleClass="nx-admin-nav-item #{section == 'utilisateurs' ? 'active' : ''}" />
+            <h:link outcome="/admin/roles" value="Rôles et permissions"
+                    styleClass="nx-admin-nav-item #{section == 'roles' ? 'active' : ''}" />
 
             <ui:fragment rendered="#{acces.moderation}">
                 <div class="nx-admin-nav-titre">Modération</div>

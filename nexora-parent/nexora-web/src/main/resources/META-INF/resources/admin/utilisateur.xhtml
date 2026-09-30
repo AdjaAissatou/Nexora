@@ -1,0 +1,124 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerUtilisateurs}" />
+</f:metadata>
+<ui:param name="section" value="utilisateurs" />
+<ui:define name="titre">Fiche utilisateur</ui:define>
+<ui:define name="titre-page">#{empty ficheUtilisateurBean.fiche ? 'Fiche utilisateur' : ficheUtilisateurBean.fiche.compte.nomComplet()}</ui:define>
+<ui:define name="content">
+
+    <p style="margin-top:0;"><h:link outcome="/admin/utilisateurs" value="← Tous les utilisateurs" /></p>
+
+    <ui:fragment rendered="#{not empty ficheUtilisateurBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{ficheUtilisateurBean.erreur}</div>
+    </ui:fragment>
+
+    <ui:fragment rendered="#{not empty ficheUtilisateurBean.fiche}">
+    <ui:param name="f" value="#{ficheUtilisateurBean.fiche}" />
+    <ui:param name="c" value="#{ficheUtilisateurBean.fiche.compte}" />
+
+    <h:form id="ficheForm">
+    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+
+    <div class="nx-verif-grille">
+        <div>
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Compte
+                    <span class="nx-badge #{libAdmin.classeEtat(c.etat)}">#{libAdmin.etat(c.etat)}</span></h3>
+                <dl class="nx-verif-infos">
+                    <dt>Nom</dt><dd>#{c.nomComplet()}</dd>
+                    <dt>E-mail</dt><dd>#{c.email}</dd>
+                    <dt>Téléphone</dt><dd>#{format.telephoneAffiche(c.telephone)}</dd>
+                    <dt>Inscrit le</dt><dd>#{format.dateHeure(c.dateCreation)}</dd>
+                    <dt>Dernière connexion</dt><dd>#{empty f.derniereConnexion ? '—' : format.dateHeure(f.derniereConnexion)}</dd>
+                </dl>
+            </div>
+
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Rôles et permissions</h3>
+                <p style="margin:0 0 8px;">
+                    <ui:repeat var="r" value="#{c.roles}"><span class="nx-badge nx-badge-neutre" style="margin:0 4px 4px 0;">#{libAdmin.role(r)}</span></ui:repeat>
+                </p>
+                <p style="font-size:13px; color:var(--nx-text-secondary); margin:0 0 6px;">
+                    Permissions effectives (données par ces rôles, voir <h:link outcome="/admin/roles" value="Rôles et permissions" />) :
+                </p>
+                <p style="margin:0;">
+                    <ui:repeat var="p" value="#{f.permissions}"><code style="display:inline-block; margin:0 6px 4px 0; font-size:12px;">#{p}</code></ui:repeat>
+                    <ui:fragment rendered="#{empty f.permissions}">Aucune.</ui:fragment>
+                </p>
+            </div>
+
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Espaces professionnels</h3>
+                <ui:fragment rendered="#{empty f.espaces}"><p style="color:var(--nx-text-secondary);">Aucun espace.</p></ui:fragment>
+                <ul class="nx-verif-liste">
+                    <ui:repeat var="e" value="#{f.espaces}">
+                        <li><span class="nx-verif-texte">
+                            <h:link outcome="/espace" value="#{e.nom}" target="_blank"><f:param name="id" value="#{e.id}" /></h:link></span>
+                            <span class="nx-verif-actions">
+                                <span class="nx-badge nx-badge-neutre">#{e.statut}</span>
+                                <ui:fragment rendered="#{e.verifie}"><span class="nx-badge nx-badge-verifie">Vérifié</span></ui:fragment>
+                            </span></li>
+                    </ui:repeat>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <ui:fragment rendered="#{ficheUtilisateurBean.soiMeme}">
+                <div class="nx-alert nx-alert-info">C'est votre compte : aucune action d'administration n'est possible sur soi-même.</div>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{!ficheUtilisateurBean.soiMeme and (acces.suspendre or acces.reactiver or acces.rolesAdministratifs)}">
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Actions</h3>
+                <div class="nx-field">
+                    <label for="ficheForm:motif">Motif (obligatoire, écrit dans le journal)</label>
+                    <h:inputTextarea id="motif" value="#{ficheUtilisateurBean.motif}" styleClass="nx-input" rows="3" />
+                </div>
+
+                <ui:fragment rendered="#{!ficheUtilisateurBean.suspendu and acces.suspendre}">
+                    <h:commandButton value="Suspendre le compte" action="#{ficheUtilisateurBean.suspendre}" styleClass="nx-button nx-button-danger nx-button-block"
+                                     onclick="return confirm('Suspendre ce compte ? La connexion sera refusée et sa session fermée au plus tard dans 15 minutes.');" />
+                </ui:fragment>
+                <ui:fragment rendered="#{ficheUtilisateurBean.suspendu and acces.reactiver}">
+                    <h:commandButton value="Réactiver le compte" action="#{ficheUtilisateurBean.reactiver}" styleClass="nx-button nx-button-primary nx-button-block" />
+                </ui:fragment>
+
+                <ui:fragment rendered="#{acces.rolesAdministratifs}">
+                    <h4 style="margin:18px 0 8px;">Rôles administratifs</h4>
+                    <ul class="nx-verif-liste">
+                        <ui:repeat var="r" value="#{ficheUtilisateurBean.rolesAdministratifsDetenus}">
+                            <li><span class="nx-verif-texte">#{libAdmin.role(r)}</span>
+                                <span class="nx-verif-actions"><h:commandLink value="Retirer" action="#{ficheUtilisateurBean.retirerRole(r)}"
+                                    onclick="return confirm('Retirer ce rôle ?');" /></span></li>
+                        </ui:repeat>
+                        <ui:repeat var="r" value="#{ficheUtilisateurBean.rolesAdministratifsDonnables}">
+                            <li style="opacity:.8;"><span class="nx-verif-texte">#{libAdmin.role(r)}</span>
+                                <span class="nx-verif-actions"><h:commandLink value="Donner" action="#{ficheUtilisateurBean.donnerRole(r)}" /></span></li>
+                        </ui:repeat>
+                    </ul>
+                </ui:fragment>
+            </div>
+            </ui:fragment>
+
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Historique d'administration</h3>
+                <ui:fragment rendered="#{empty f.historique}"><p style="color:var(--nx-text-secondary);">Aucune action.</p></ui:fragment>
+                <ul class="nx-verif-historique">
+                    <ui:repeat var="h" value="#{f.historique}">
+                        <li><span class="quand">#{format.dateHeure(h.date)} · #{h.auteur}</span>#{h.description}</li>
+                    </ui:repeat>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </h:form>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

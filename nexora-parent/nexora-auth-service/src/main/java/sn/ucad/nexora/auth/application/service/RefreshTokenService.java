@@ -126,6 +126,7 @@ public class RefreshTokenService implements RefreshTokenUseCase {
         accountResponse.setRoles(account.getRoles().stream()
                 .map(role -> role.getCode())
                 .collect(java.util.stream.Collectors.toSet()));
+        accountResponse.setPermissions(account.effectivePermissions());
 
         response.setAccount(accountResponse);
 

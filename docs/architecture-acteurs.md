@@ -27,9 +27,9 @@ compte « professionnel ») **correspond déjà à ce que la base de données mo
 À l'inscription, `RegisterAccountService` attribue uniquement `UTILISATEUR`
 (`database/01_security` + `RegisterAccountService.java:75`). **Aucun code
 n'attribue jamais `FOURNISSEUR`** : créer un espace ne change actuellement pas les
-rôles du compte. De même, aucun endpoint n'utilise encore `hasRole(...)` — tout est
-`permitAll()` ou `authenticated()` (n'importe quel compte connecté), jamais
-role-spécifique.
+rôles du compte. De même, aucun endpoint n'utilisait `hasRole(...)` — tout était
+`permitAll()` ou `authenticated()`. *Depuis : les routes protégées vérifient des permissions,
+voir §6.*
 
 **✅ Fait** : `CreateEspaceService.create(...)` attribue désormais le rôle
 `FOURNISSEUR` au compte s'il ne l'a pas déjà (`RoleAssignmentRepository`, écriture
@@ -126,7 +126,8 @@ d'actions et supervision des vérifications sont en place (étape 6a) ; le reste
 | Page | État |
 |---|---|
 | Tableau de bord admin | ✅ `/admin/index` (§9.7) |
-| Gérer les utilisateurs (suspendre/réactiver/supprimer) | 🚧 |
+| Gérer les utilisateurs (rechercher, suspendre, réactiver, rôles) | ✅ `/admin/utilisateurs`, `/admin/utilisateur?id=` (§9.8) |
+| Rôles et permissions (matrice) | ✅ `/admin/roles` (§6, §9.8) |
 | Gérer/modérer les espaces | 🚧 |
 | Gérer le catalogue (catégories, types d'offre, attributs, tags) | 🚧 (déjà en base et seedé, aucune UI d'admin) |
 | Modérer avis / traiter signalements | 🚧 |
@@ -187,28 +188,71 @@ Mon espace ; carte "Gérer mon espace" / invitation à en créer un dans Mon com
 réservations, commandes, messages, avis laissés et notifications restent à
 construire (§3).
 
-## 6. Permissions — mapping rôle → permission (déjà seedées, jamais appliquées)
+## 6. ✅ Rôles et permissions — le modèle appliqué
 
-Les permissions existent déjà en base (`database/09_seed/02_permissions.sql`,
-table `role_permissions`) mais **aucun contrôleur ne les vérifie** actuellement.
-Proposition de mapping pour quand on branchera `hasAuthority(...)` :
+### 6.1 Les quatre niveaux et leurs liaisons
 
-| Permission (déjà seedée) | Rôle(s) |
+```
+utilisateurs ──account_id──► accounts ──account_roles──► roles ──role_permissions──► permissions
+ (profil,                    (identité de                 (8 rôles)                 (41 permissions,
+  user-service)               connexion, auth-service)                               par module)
+```
+
+- **Utilisateur** : le profil (nom, téléphone…), lié à un seul **compte**.
+- **Compte** : ce qui se connecte ; il reçoit un ou plusieurs **rôles** (`account_roles`).
+  Tout compte a `UTILISATEUR` ; `FOURNISSEUR` suit la possession d'un espace (§1) ;
+  `AGENT_VERIFICATION` est donné par la supervision des vérifications (§8) ; les rôles
+  administratifs (`SUPER_ADMIN`, `ADMIN`, `MODERATEUR`, `SUPPORT`, `GESTIONNAIRE`) sont donnés
+  par un super administrateur depuis la fiche du compte (§9.8).
+- **Rôle** : un paquet de **permissions** (`role_permissions`).
+- **Permission** : un droit précis (`CONSULTER_UTILISATEURS`, `MODERER_AVIS`…).
+
+### 6.2 Comment c'est vérifié
+
+1. À la connexion et à chaque renouvellement du jeton, auth-service calcule les **permissions
+   effectives** du compte : l'union des permissions actives de ses rôles actifs
+   (`Account.effectivePermissions()`). Le JWT porte `roles` **et** `permissions`.
+2. Chaque service transforme le jeton en autorités Spring Security, de la même façon partout
+   (`nexora-common`, `AutoritesJwt`) : `ROLE_<rôle>` et `PERM_<permission>`. Un jeton de
+   rafraîchissement n'ouvre plus aucune route. Catalogue et recherche l'acceptaient jusqu'ici :
+   corrigé.
+3. Les routes protégées vérifient une **permission** (`hasAuthority("PERM_…")`), jamais une liste
+   de rôles. Le web fait de même pour son menu et ses gardes (`SessionBean.aLaPermission`,
+   `AccesAdminBean`).
+4. La vérification applicative reste en plus : la permission dit *« ce type d'action est
+   permis »*, le service vérifie *« cette instance précise appartient à ce compte »* (ex.
+   `GERER_OFFRES` + propriétaire de l'offre).
+
+Conséquence : **modifier la matrice change les droits sans toucher au code**. Un changement
+s'applique à la prochaine connexion des comptes concernés, ou au plus tard au renouvellement
+du jeton (15 minutes).
+
+### 6.3 Matrice par défaut (`database/09_seed/24_rbac_permissions.sql`)
+
+| Rôle | Permissions |
 |---|---|
-| `GERER_ESPACES` (créer/modifier son propre espace) | `FOURNISSEUR` sur ses propres espaces ; `ADMIN` sur tous |
-| `GERER_OFFRES` | `FOURNISSEUR` sur ses offres ; `ADMIN` sur toutes |
-| `GERER_FAVORIS`, `GERER_AVIS` (écriture), `GERER_PANIERS`, `GERER_COMMANDES`, `GERER_RESERVATIONS` | `UTILISATEUR` (tout compte connecté) |
-| `GERER_CATEGORIES`, `GERER_TYPES_OFFRES`, `GERER_ATTRIBUTS`, `GERER_CERTIFICATIONS` | `ADMIN` uniquement |
-| `GERER_SIGNALEMENTS`, `GERER_AVIS` (modération) | `MODERATEUR`, `ADMIN` |
-| `GERER_UTILISATEURS`, `GERER_ROLES`, `GERER_PERMISSIONS` | `SUPER_ADMIN` uniquement |
-| `VOIR_STATISTIQUES`, `GERER_PARAMETRES`, `GERER_JOURNAL` | `ADMIN`, `GESTIONNAIRE` |
+| `UTILISATEUR` | `CONSULTER_RECHERCHE`, `GERER_FAVORIS`, `GERER_AVIS` (ses avis), `GERER_CONVERSATIONS`, `GERER_MESSAGES`, `GERER_NOTIFICATIONS`, `GERER_PANIERS`, `GERER_COMMANDES`, `GERER_RESERVATIONS` |
+| `FOURNISSEUR` | `GERER_ESPACES`, `GERER_HORAIRES`, `GERER_OFFRES`, `GERER_PROMOTIONS`, `GERER_IMAGES` (les siens) |
+| `AGENT_VERIFICATION` | `TRAITER_VERIFICATIONS` |
+| `SUPPORT` | `ACCEDER_BACK_OFFICE`, `CONSULTER_UTILISATEURS`, `REACTIVER_UTILISATEURS` |
+| `MODERATEUR` | `ACCEDER_BACK_OFFICE`, `CONSULTER_UTILISATEURS`, `MODERER_ESPACES`, `MODERER_OFFRES`, `MODERER_AVIS`, `GERER_SIGNALEMENTS` |
+| `GESTIONNAIRE` | `ACCEDER_BACK_OFFICE`, `GERER_CATEGORIES`, `GERER_TYPES_OFFRES`, `GERER_ATTRIBUTS`, `GERER_PARAMETRES`, `VOIR_STATISTIQUES` |
+| `ADMIN` | tout le back-office : les permissions ci-dessus + `SUSPENDRE_UTILISATEURS`, `SUPERVISER_VERIFICATIONS`, `GERER_AGENTS_VERIFICATION`, `GERER_CERTIFICATIONS`, `GERER_JOURNAL` |
+| `SUPER_ADMIN` | celles d'`ADMIN` + `GERER_ROLES` (rôles administratifs des comptes) et `GERER_PERMISSIONS` (cette matrice) |
 
-Aujourd'hui, la seule protection réelle est applicative (ex. `OffreController`
-vérifie que `accountId` correspond au propriétaire de l'espace avant de modifier une
-offre) — pas encore de vérification de rôle Spring Security. Les deux se
-complètent : le rôle dit *"cette catégorie d'action est permise à ce type de
-compte"*, la vérification applicative dit *"cette instance précise appartient à ce
-compte"*.
+Changements du catalogue : 7 permissions ajoutées (`ACCEDER_BACK_OFFICE`,
+`CONSULTER_/SUSPENDRE_/REACTIVER_UTILISATEURS`, `MODERER_ESPACES/OFFRES/AVIS`).
+`GERER_UTILISATEURS`, qui mélangeait consulter, suspendre et supprimer, est retirée. Les
+descriptions distinguent désormais *gérer ses propres données* et *modérer celles des autres*.
+Les 7 permissions du module commerce (paiements, escrow, litiges…) n'ont encore aucun rôle :
+elles en recevront un quand le module sera branché.
+
+Garde-fous, tous testés :
+- le rôle `SUPER_ADMIN` garde toujours `ACCEDER_BACK_OFFICE`, `GERER_ROLES` et
+  `GERER_PERMISSIONS` ;
+- on ne suspend pas le dernier super administrateur actif, et on ne lui retire pas son rôle ;
+- personne n'agit sur son propre compte ;
+- toute modification est motivée et journalisée.
 
 ## 7. Ordre de chantiers proposé
 
@@ -636,6 +680,9 @@ compte peut en cumuler plusieurs.
 | Statistiques | ✅ | ✅ | — | — | ✅ |
 | Journal d'actions | ✅ | ✅ | — | — | — |
 
+Ce tableau est **appliqué par des permissions** (§6.3), pas par des noms de rôles : il se
+modifie depuis `/admin/roles` sans toucher au code.
+
 `AGENT_VERIFICATION` reste hors du back-office (§8.1). Règles transverses :
 - personne ne suspend son propre compte ni ne retire son propre rôle ;
 - un compte `SUPER_ADMIN` ne peut être suspendu que par un autre `SUPER_ADMIN` ;
@@ -695,7 +742,8 @@ compte peut en cumuler plusieurs.
    - layout admin et menu par rôle ;
    - pages Tableau de bord et Journal ;
    - supervision des vérifications déplacée dans le layout admin.
-2. **6b — Utilisateurs** : recherche, fiche, suspension / réactivation, rôles administratifs.
+2. ✅ **6b — Utilisateurs** (§9.8) : recherche, fiche, suspension / réactivation, rôles
+   administratifs, et matrice rôles × permissions (§6).
 3. **6c — Espaces et offres** : modération (suspendre / réactiver, motif, notification).
 4. **6d — Signalements et avis** : bouton « Signaler » côté public, file de traitement,
    masquage des avis.
@@ -749,6 +797,59 @@ mot de passe `Password1!`) : `superadmin.demo`, `moderateur.demo`, `support.demo
   tableau de bord, supervision dans le nouveau layout, journal filtré ;
 - non-régression : scénario de vérification (53 contrôles) et navigation publique.
 
+### 9.8 ✅ Étape 6b — utilisateurs, rôles et permissions
+
+**auth-service** (propriétaire des comptes, rôles et permissions), une permission par route :
+
+| Route | Permission |
+|---|---|
+| `GET /api/v1/admin/comptes?recherche=&role=&etat=&page=` | `CONSULTER_UTILISATEURS` |
+| `GET /api/v1/admin/comptes/{id}` (fiche : rôles, permissions effectives, espaces, dernière connexion, historique) | `CONSULTER_UTILISATEURS` |
+| `POST /api/v1/admin/comptes/{id}/suspendre` | `SUSPENDRE_UTILISATEURS` |
+| `POST /api/v1/admin/comptes/{id}/reactiver` | `REACTIVER_UTILISATEURS` |
+| `POST /api/v1/admin/comptes/{id}/roles/{rôle}` et `.../retirer` | `GERER_ROLES` |
+| `GET /api/v1/admin/roles` (matrice) | `ACCEDER_BACK_OFFICE` |
+| `POST /api/v1/admin/roles/{rôle}/permissions/{permission}` et `.../retirer` | `GERER_PERMISSIONS` |
+
+- **Suspension** : `accounts.locked` passe à vrai, et le profil suit (`utilisateurs.statut =
+  SUSPENDU`, `compte_bloque`). La connexion et `/refresh` sont refusés, donc la session web du
+  compte se ferme au plus tard 15 minutes après. La réactivation fait l'inverse.
+- **Rôles donnés ici** : uniquement les rôles administratifs. `UTILISATEUR`, `FOURNISSEUR` et
+  `AGENT_VERIFICATION` suivent leur propre cycle (§6.1).
+- Règles métier : motif obligatoire, jamais sur son propre compte. Un admin ne suspend pas un
+  super admin, on ne suspend pas le dernier super admin actif et on ne lui retire pas son
+  rôle, et les permissions vitales du rôle `SUPER_ADMIN` sont protégées. Toutes ces actions
+  sont journalisées (modules `COMPTES` et `PERMISSIONS`) et visibles dans l'historique de la
+  fiche.
+
+**Web** :
+- `/admin/utilisateurs` : recherche par nom, e-mail ou téléphone, filtres par rôle et par état,
+  pagination ;
+- `/admin/utilisateur?id=` : fiche avec les rôles, les permissions effectives, les espaces et
+  l'historique. Les actions (motif obligatoire) n'apparaissent que si le compte a la
+  permission correspondante, et jamais sur sa propre fiche ;
+- `/admin/roles` : les 8 rôles (nombre de comptes, lien vers la liste filtrée) et la matrice
+  permissions × rôles groupée par module. Elle se lit depuis tout le back-office ; avec
+  `GERER_PERMISSIONS`, chaque case s'active ou se désactive d'un clic.
+
+**Tests** :
+- 7 tests unitaires des règles (auth-service) et 2 du helper d'autorités (nexora-common) ;
+- API, 45 contrôles, rejouables :
+  - contenu du jeton, droits de chaque rôle, recherche et filtres ;
+  - suspension (connexion refusée), réactivation par le support ;
+  - rôles donnés et retirés, arrivée des permissions dans le jeton ;
+  - garde-fous ;
+  - une permission accordée au support puis retirée **sans changer le code** ;
+  - jeton de rafraîchissement refusé ;
+  - journalisation complète ;
+- navigateur : liste, filtres, fiche, suspension et réactivation, rôles, matrice, vues du
+  support et du gestionnaire, sa propre fiche ;
+- non-régression complète : vérification (API et navigateur), tableau de bord, journal,
+  navigation publique ; installation complète de la base.
+
+Donnée corrigée au passage : les comptes créés en SQL (administrateur initial,
+démonstration) n'avaient pas le rôle `UTILISATEUR`. Le script 24 le leur donne.
+
 ---
-*Dernière mise à jour : session du 30/09/2026, back-office cadré (§9) et fondations
-livrées (étape 6a).*
+*Dernière mise à jour : session du 30/09/2026, rôles et permissions appliqués (§6) et
+administration des utilisateurs livrée (étape 6b).*

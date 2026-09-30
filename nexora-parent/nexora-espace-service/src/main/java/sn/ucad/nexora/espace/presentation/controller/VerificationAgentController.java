@@ -84,8 +84,8 @@ public class VerificationAgentController {
     /** Téléchargement contrôlé : jamais d'URL publique pour un justificatif. */
     @GetMapping("/{id}/documents/{documentId}/fichier")
     public ResponseEntity<InputStreamResource> fichier(Authentication auth, @PathVariable Long id, @PathVariable Long documentId) {
-        boolean agent = aLeRole(auth, "ROLE_AGENT_VERIFICATION");
-        boolean admin = aLeRole(auth, "ROLE_ADMIN") || aLeRole(auth, "ROLE_SUPER_ADMIN");
+        boolean agent = aLAutorite(auth, "PERM_TRAITER_VERIFICATIONS");
+        boolean admin = aLAutorite(auth, "PERM_SUPERVISER_VERIFICATIONS");
         JustificatifAccesService.Fichier f = acces.ouvrir((UUID) auth.getPrincipal(), agent, admin, id, documentId);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(f.typeMime()))
@@ -97,7 +97,7 @@ public class VerificationAgentController {
                 .body(new InputStreamResource(f.contenu()));
     }
 
-    private static boolean aLeRole(Authentication auth, String role) {
-        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role::equals);
+    private static boolean aLAutorite(Authentication auth, String autorite) {
+        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(autorite::equals);
     }
 }

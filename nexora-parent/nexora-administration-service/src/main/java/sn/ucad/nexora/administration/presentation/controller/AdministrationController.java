@@ -21,11 +21,10 @@ public class AdministrationController {
         this.service = service;
     }
 
-    /** Tous les rôles du back-office ; les dernières actions du journal seulement pour ADMIN / SUPER_ADMIN. */
+    /** Tout le back-office ; les dernières actions du journal seulement avec la permission GERER_JOURNAL. */
     @GetMapping("/tableau-de-bord")
     public ResponseEntity<TableauDeBordResponse> tableauDeBord(Authentication auth) {
-        boolean journal = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_SUPER_ADMIN"));
+        boolean journal = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("PERM_GERER_JOURNAL"));
         return ResponseEntity.ok(service.tableauDeBord(journal));
     }
 

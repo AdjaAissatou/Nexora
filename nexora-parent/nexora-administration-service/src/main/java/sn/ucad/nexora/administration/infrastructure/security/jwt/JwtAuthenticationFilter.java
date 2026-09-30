@@ -6,8 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,8 +13,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import sn.ucad.nexora.common.security.AutoritesJwt;
 
-/** Jeton d'accès → compte authentifié (UUID) avec ses rôles en autorités {@code ROLE_*}. */
+/** Jeton d'accès → compte authentifié (UUID), rôles en {@code ROLE_*} et permissions en {@code PERM_*}. */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -38,10 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = jwt.parseToken(entete.substring(7));
             if (!"ACCESS".equals(claims.get("type", String.class))) throw new IllegalArgumentException();
             UUID compte = UUID.fromString(claims.getSubject());
-            List<SimpleGrantedAuthority> autorites = new ArrayList<>();
-            if (claims.get("roles") instanceof Collection<?> roles) {
-                for (Object role : roles) if (role != null) autorites.add(new SimpleGrantedAuthority("ROLE_" + role));
-            }
+            List<SimpleGrantedAuthority> autorites = AutoritesJwt.depuis(claims).stream()
+                    .map(SimpleGrantedAuthority::new).toList();
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(compte, null, autorites));
         } catch (Exception e) {

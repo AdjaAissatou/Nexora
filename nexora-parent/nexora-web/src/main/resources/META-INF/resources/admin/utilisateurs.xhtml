@@ -1,0 +1,82 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerUtilisateurs}" />
+</f:metadata>
+<ui:param name="section" value="utilisateurs" />
+<ui:define name="titre">Utilisateurs</ui:define>
+<ui:define name="titre-page">Utilisateurs</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty utilisateursAdminBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{utilisateursAdminBean.erreur}</div>
+    </ui:fragment>
+
+    <div class="nx-card">
+        <h:form id="filtres" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="nx-field" style="margin:0; flex:1; min-width:220px;">
+                <label for="filtres:recherche">Nom, e-mail ou téléphone</label>
+                <h:inputText id="recherche" value="#{utilisateursAdminBean.recherche}" styleClass="nx-input" />
+            </div>
+            <div class="nx-field" style="margin:0;">
+                <label for="filtres:role">Rôle</label>
+                <h:selectOneMenu id="role" value="#{utilisateursAdminBean.role}" styleClass="nx-select">
+                    <f:selectItem itemLabel="Tous" itemValue="" />
+                    <f:selectItems value="#{utilisateursAdminBean.roles}" var="r" itemLabel="#{libAdmin.role(r.code)}" itemValue="#{r.code}" />
+                </h:selectOneMenu>
+            </div>
+            <div class="nx-field" style="margin:0;">
+                <label for="filtres:etat">État</label>
+                <h:selectOneMenu id="etat" value="#{utilisateursAdminBean.etat}" styleClass="nx-select">
+                    <f:selectItem itemLabel="Tous" itemValue="" />
+                    <f:selectItems value="#{libAdmin.etats}" var="e" itemLabel="#{libAdmin.etat(e)}" itemValue="#{e}" />
+                </h:selectOneMenu>
+            </div>
+            <h:commandButton value="Filtrer" action="#{utilisateursAdminBean.filtrer}" styleClass="nx-button nx-button-primary" />
+        </h:form>
+    </div>
+
+    <ui:fragment rendered="#{not empty utilisateursAdminBean.resultat}">
+    <div class="nx-card">
+        <h3 style="margin-top:0;">#{utilisateursAdminBean.resultat.total} compte(s)</h3>
+        <table class="nx-verif-tableau">
+            <tr><th>Compte</th><th>Rôles</th><th>État</th><th>Inscrit le</th><th></th></tr>
+            <ui:repeat var="c" value="#{utilisateursAdminBean.resultat.comptes}">
+                <tr>
+                    <td><strong>#{c.nomComplet()}</strong><br />
+                        <span style="font-size:13px; color:var(--nx-text-secondary);">#{c.email} · #{format.telephoneAffiche(c.telephone)}</span></td>
+                    <td><ui:repeat var="r" value="#{c.roles}"><span class="nx-badge nx-badge-neutre" style="margin:0 4px 4px 0;">#{libAdmin.role(r)}</span></ui:repeat></td>
+                    <td><span class="nx-badge #{libAdmin.classeEtat(c.etat)}">#{libAdmin.etat(c.etat)}</span></td>
+                    <td>#{format.date(c.dateCreation)}</td>
+                    <td style="text-align:right;">
+                        <h:link outcome="/admin/utilisateur" value="Fiche" styleClass="nx-button nx-button-outline">
+                            <f:param name="id" value="#{c.accountId}" />
+                        </h:link>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+        <div style="display:flex; justify-content:space-between; margin-top:14px;">
+            <h:link outcome="/admin/utilisateurs" value="← Précédents" rendered="#{utilisateursAdminBean.page gt 0}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{utilisateursAdminBean.page - 1}" />
+                <f:param name="recherche" value="#{utilisateursAdminBean.recherche}" disable="#{empty utilisateursAdminBean.recherche}" />
+                <f:param name="role" value="#{utilisateursAdminBean.role}" disable="#{empty utilisateursAdminBean.role}" />
+                <f:param name="etat" value="#{utilisateursAdminBean.etat}" disable="#{empty utilisateursAdminBean.etat}" />
+            </h:link>
+            <span></span>
+            <h:link outcome="/admin/utilisateurs" value="Suivants →" rendered="#{utilisateursAdminBean.resultat.pageSuivante}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{utilisateursAdminBean.page + 1}" />
+                <f:param name="recherche" value="#{utilisateursAdminBean.recherche}" disable="#{empty utilisateursAdminBean.recherche}" />
+                <f:param name="role" value="#{utilisateursAdminBean.role}" disable="#{empty utilisateursAdminBean.role}" />
+                <f:param name="etat" value="#{utilisateursAdminBean.etat}" disable="#{empty utilisateursAdminBean.etat}" />
+            </h:link>
+        </div>
+    </div>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

@@ -8,12 +8,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import sn.ucad.nexora.administration.infrastructure.security.jwt.JwtAuthenticationFilter;
 
-/** Accès par rôle administratif, selon le tableau §9.2 de docs/architecture-acteurs.md. */
+/** Chaque route exige une permission (docs/architecture-acteurs.md §6, §9.2), portée par le jeton. */
 @Configuration
 public class SecurityConfig {
-
-    /** Tous les rôles du back-office (AGENT_VERIFICATION n'en fait pas partie). */
-    public static final String[] ROLES_BACK_OFFICE = {"SUPER_ADMIN", "ADMIN", "MODERATEUR", "SUPPORT", "GESTIONNAIRE"};
 
     private final JwtAuthenticationFilter jwt;
 
@@ -28,8 +25,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/v1/admin/tableau-de-bord").hasAnyRole(ROLES_BACK_OFFICE)
-                        .requestMatchers("/api/v1/admin/journal", "/api/v1/admin/journal/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/api/v1/admin/tableau-de-bord").hasAuthority("PERM_ACCEDER_BACK_OFFICE")
+                        .requestMatchers("/api/v1/admin/journal", "/api/v1/admin/journal/**").hasAuthority("PERM_GERER_JOURNAL")
                         .anyRequest().denyAll())
                 .addFilterBefore(jwt, UsernamePasswordAuthenticationFilter.class)
                 .build();

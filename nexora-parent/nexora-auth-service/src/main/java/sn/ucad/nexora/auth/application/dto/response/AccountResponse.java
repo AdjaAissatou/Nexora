@@ -10,6 +10,9 @@ public class AccountResponse {
     /** Codes des rôles du compte (UTILISATEUR, FOURNISSEUR, ADMIN...) — utilisés par le web pour adapter la navigation. */
     private Set<String> roles;
 
+    /** Permissions effectives (union des permissions des rôles), pour adapter l'interface. */
+    private Set<String> permissions;
+
     private String firstName;
 
     private String lastName;
@@ -64,6 +67,14 @@ public class AccountResponse {
 
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
+	}
+
+	public Set<String> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(Set<String> permissions) {
+		this.permissions = permissions;
 	}
 
     // getters & setters

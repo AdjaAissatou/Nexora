@@ -96,7 +96,14 @@
             <scope>test</scope>
         </dependency>
 
-    </dependencies>
+            <!-- Common : autorités JWT (rôles + permissions), journal des actions d'administration.
+             Son gestionnaire d'erreurs est exclu : ce service garde le sien (voir l'application). -->
+        <dependency>
+            <groupId>sn.ucad.nexora</groupId>
+            <artifactId>nexora-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+</dependencies>
 
     <build>
         <plugins>

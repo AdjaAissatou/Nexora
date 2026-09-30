@@ -86,22 +86,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             List<SimpleGrantedAuthority> authorities =
                     new ArrayList<>();
 
-            Object rolesClaim =
-                    claims.get("roles");
-
-            if (rolesClaim instanceof Collection<?> roles) {
-
-                for (Object role : roles) {
-
-                    if (role != null) {
-
-                        authorities.add(
-                                new SimpleGrantedAuthority(
-                                        "ROLE_" + role.toString()
-                                )
-                        );
-                    }
-                }
+            // Rôles (ROLE_*) et permissions effectives (PERM_*) : docs/architecture-acteurs.md §6
+            for (String autorite : sn.ucad.nexora.common.security.AutoritesJwt.depuis(claims)) {
+                authorities.add(new SimpleGrantedAuthority(autorite));
             }
 
             // Authentification Spring Security

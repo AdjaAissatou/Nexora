@@ -5,9 +5,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 /**
- * Qui voit quoi dans le back-office (docs/architecture-acteurs.md §9.2), exposé à l'EL sous
- * {@code #{acces.xxx}} pour le menu, et gardes {@code preRenderView} des pages {@code /admin/...}.
- * Ce n'est qu'un confort d'affichage : chaque service revérifie le rôle sur ses propres routes.
+ * Qui voit quoi dans le back-office, exposé à l'EL sous {@code #{acces.xxx}} pour le menu, et gardes
+ * {@code preRenderView} des pages {@code /admin/...}. Tout repose sur les PERMISSIONS effectives du
+ * compte (docs/architecture-acteurs.md §6), jamais sur des noms de rôles : changer la matrice rôles ×
+ * permissions change aussi ce que montre l'interface. Ce n'est qu'un confort d'affichage : chaque
+ * service revérifie la permission sur ses propres routes.
  */
 @Named("acces")
 @RequestScoped
@@ -22,36 +24,48 @@ public class AccesAdminBean {
     @Inject
     private SessionBean session;
 
-    /** Un des rôles du back-office ({@code AGENT_VERIFICATION} n'en fait pas partie). */
     public boolean isBackOffice() {
-        return session.aLeRole(SUPER_ADMIN, ADMIN, MODERATEUR, SUPPORT, GESTIONNAIRE);
+        return session.aLaPermission("ACCEDER_BACK_OFFICE");
     }
 
     public boolean isUtilisateurs() {
-        return session.aLeRole(SUPER_ADMIN, ADMIN, MODERATEUR, SUPPORT);
+        return session.aLaPermission("CONSULTER_UTILISATEURS");
+    }
+
+    public boolean isSuspendre() {
+        return session.aLaPermission("SUSPENDRE_UTILISATEURS");
+    }
+
+    public boolean isReactiver() {
+        return session.aLaPermission("REACTIVER_UTILISATEURS");
+    }
+
+    /** Donner ou retirer les rôles administratifs d'un compte. */
+    public boolean isRolesAdministratifs() {
+        return session.aLaPermission("GERER_ROLES");
+    }
+
+    /** Modifier la matrice rôles × permissions. */
+    public boolean isPermissions() {
+        return session.aLaPermission("GERER_PERMISSIONS");
     }
 
     /** Espaces, offres, avis, signalements. */
     public boolean isModeration() {
-        return session.aLeRole(SUPER_ADMIN, ADMIN, MODERATEUR);
+        return session.aLaPermission("MODERER_ESPACES", "MODERER_OFFRES", "MODERER_AVIS", "GERER_SIGNALEMENTS");
     }
 
     public boolean isVerifications() {
-        return session.aLeRole(SUPER_ADMIN, ADMIN);
+        return session.aLaPermission("SUPERVISER_VERIFICATIONS");
     }
 
     /** Catalogue, paramètres, statistiques. */
     public boolean isGestion() {
-        return session.aLeRole(SUPER_ADMIN, ADMIN, GESTIONNAIRE);
+        return session.aLaPermission("GERER_CATEGORIES", "GERER_TYPES_OFFRES", "GERER_ATTRIBUTS", "GERER_PARAMETRES");
     }
 
     public boolean isJournal() {
-        return session.aLeRole(SUPER_ADMIN, ADMIN);
-    }
-
-    /** Donner ou retirer les rôles administratifs : réservé au super administrateur. */
-    public boolean isRolesAdministratifs() {
-        return session.aLeRole(SUPER_ADMIN);
+        return session.aLaPermission("GERER_JOURNAL");
     }
 
     private static final java.util.Map<String, String> LIBELLES_ROLES = java.util.Map.of(
@@ -79,5 +93,9 @@ public class AccesAdminBean {
 
     public void exigerJournal() {
         session.exigerRole(session.isConnecte() && isJournal());
+    }
+
+    public void exigerUtilisateurs() {
+        session.exigerRole(session.isConnecte() && isUtilisateurs());
     }
 }

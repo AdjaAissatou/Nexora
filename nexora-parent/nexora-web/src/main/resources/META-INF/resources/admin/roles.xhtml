@@ -1,0 +1,95 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<!-- Rôles et permissions (docs/architecture-acteurs.md §6) : utilisateur → compte → rôles → permissions.
+     Lecture pour tout le back-office ; modification avec la permission GERER_PERMISSIONS. -->
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerBackOffice}" />
+</f:metadata>
+<ui:param name="section" value="roles" />
+<ui:define name="titre">Rôles et permissions</ui:define>
+<ui:define name="titre-page">Rôles et permissions</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty rolesPermissionsBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{rolesPermissionsBean.erreur}</div>
+    </ui:fragment>
+
+    <div class="nx-card">
+        <p style="margin-top:0;">
+            Chaque <strong>compte</strong> reçoit un ou plusieurs <strong>rôles</strong> ; chaque rôle donne des
+            <strong>permissions</strong>. Les services vérifient uniquement les permissions : modifier ce tableau change les
+            droits sans toucher au code. Un changement s'applique à la prochaine connexion des comptes concernés, ou au plus
+            tard dans 15 minutes.
+        </p>
+        <div class="nx-admin-tuiles" style="margin-bottom:0;">
+            <ui:repeat var="r" value="#{rolesPermissionsBean.roles}">
+                <div class="nx-admin-tuile">
+                    <span class="valeur" style="font-size:18px;">#{libAdmin.role(r.code)}</span>
+                    <span class="libelle">#{r.description}</span>
+                    <span class="detail">
+                        <ui:fragment rendered="#{acces.utilisateurs}">
+                            <h:link outcome="/admin/utilisateurs" value="#{r.nombreComptes} compte(s)"><f:param name="role" value="#{r.code}" /></h:link>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{!acces.utilisateurs}">#{r.nombreComptes} compte(s)</ui:fragment>
+                        · #{r.permissions.size()} permission(s)
+                        <ui:fragment rendered="#{r.administratif}"> · rôle administratif</ui:fragment>
+                    </span>
+                </div>
+            </ui:repeat>
+        </div>
+    </div>
+
+    <h:form id="matriceForm">
+        <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+        <ui:fragment rendered="#{acces.permissions}">
+            <div class="nx-card">
+                <div class="nx-field" style="margin:0;">
+                    <label for="matriceForm:motif">Motif de la modification (obligatoire, écrit dans le journal)</label>
+                    <h:inputText id="motif" value="#{rolesPermissionsBean.motif}" styleClass="nx-input" />
+                </div>
+                <p style="font-size:13px; color:var(--nx-text-secondary); margin:8px 0 0;">
+                    Cliquez sur une case pour accorder ou retirer la permission. Le rôle Super administrateur garde toujours
+                    ACCEDER_BACK_OFFICE, GERER_ROLES et GERER_PERMISSIONS.
+                </p>
+            </div>
+        </ui:fragment>
+
+        <div class="nx-card" style="overflow-x:auto;">
+            <table class="nx-verif-tableau nx-matrice">
+                <tr>
+                    <th>Permission</th>
+                    <ui:repeat var="r" value="#{rolesPermissionsBean.roles}">
+                        <th style="text-align:center;">#{libAdmin.role(r.code)}</th>
+                    </ui:repeat>
+                </tr>
+                <ui:repeat var="m" value="#{rolesPermissionsBean.modules}">
+                    <tr><td colspan="99" class="nx-matrice-module">#{m.nom}</td></tr>
+                    <ui:repeat var="p" value="#{m.permissions}">
+                        <tr>
+                            <td><code style="font-size:12px;">#{p.code}</code><br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{p.description}</span></td>
+                            <ui:repeat var="r" value="#{rolesPermissionsBean.roles}">
+                                <td style="text-align:center;">
+                                    <ui:fragment rendered="#{acces.permissions}">
+                                        <h:commandLink value="#{rolesPermissionsBean.aLaPermission(r.code, p.code) ? '✓' : '·'}"
+                                                       action="#{rolesPermissionsBean.basculer(r.code, p.code)}"
+                                                       styleClass="nx-matrice-case #{rolesPermissionsBean.aLaPermission(r.code, p.code) ? 'oui' : 'non'}"
+                                                       title="#{rolesPermissionsBean.aLaPermission(r.code, p.code) ? 'Retirer' : 'Accorder'} #{p.code} — #{libAdmin.role(r.code)}" />
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{!acces.permissions}">
+                                        <span class="nx-matrice-case #{rolesPermissionsBean.aLaPermission(r.code, p.code) ? 'oui' : 'non'}">#{rolesPermissionsBean.aLaPermission(r.code, p.code) ? '✓' : '·'}</span>
+                                    </ui:fragment>
+                                </td>
+                            </ui:repeat>
+                        </tr>
+                    </ui:repeat>
+                </ui:repeat>
+            </table>
+        </div>
+    </h:form>
+
+</ui:define>
+</ui:composition>

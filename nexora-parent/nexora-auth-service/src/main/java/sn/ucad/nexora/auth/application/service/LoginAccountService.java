@@ -122,6 +122,7 @@ public class LoginAccountService implements LoginUseCase {
         accountResponse.setRoles(account.getRoles().stream()
                 .map(role -> role.getCode())
                 .collect(java.util.stream.Collectors.toSet()));
+        accountResponse.setPermissions(account.effectivePermissions());
 
         AuthenticationResponse response =
                 new AuthenticationResponse();
