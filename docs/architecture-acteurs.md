@@ -113,16 +113,17 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Commandes reçues | — | 🚧 |
 | Avis reçus + réponse | — | 🚧 (lecture publique déjà ok sur `/espace`, pas de vue dédiée côté pro, pas de réponse) |
 | Statistiques détaillées (au-delà de la Vue d'ensemble) | — | 🚧 |
-| Vérification de mon espace (dossier, justificatifs, suivi) | `/mon-espace` (onglet « Vérification ») | 🚧 — processus complet décrit au §8 |
+| Vérification de mon espace (dossier, justificatifs, suivi) | `/mon-espace` (onglet « Vérification ») | ✅ (§8.11) |
 | Certification 🏅 | — | — (après la vérification, critères à définir, §8.3) |
 | Ma fiche publique | `/espace?id=` (lien depuis Mon espace) | ✅ |
 
 ### Administrateur
 
-**Rien n'existe aujourd'hui** : pas de rôle vérifié côté endpoints, pas de page,
-`nexora-administration-service` a son schéma (`statistique`, `journal_action`,
-`parametre`) mais aucun contrôleur ni page web. C'est le chantier le plus vide et le
-plus structurant à cadrer avant de coder quoi que ce soit dessus.
+Seule la supervision de la vérification existe (`/admin/verifications`, §8.11), dans le
+layout public en attendant le back-office. `nexora-administration-service` a son schéma
+(`statistique`, `journal_action`, `parametre`) mais aucun contrôleur ni page web. C'est le
+chantier le plus vide et le plus structurant à cadrer avant de coder quoi que ce soit
+dessus.
 
 | Page | État |
 |---|---|
@@ -131,7 +132,7 @@ plus structurant à cadrer avant de coder quoi que ce soit dessus.
 | Gérer/modérer les espaces | 🚧 |
 | Gérer le catalogue (catégories, types d'offre, attributs, tags) | 🚧 (déjà en base et seedé, aucune UI d'admin) |
 | Modérer avis / traiter signalements | 🚧 |
-| Vérifications : supervision, règles, agents (§8) | 🚧 |
+| Vérifications : supervision, agents (§8) | ✅ `/admin/verifications` — l'édition des règles de justificatifs reste à faire |
 | Certifications 🏅 | — (après la vérification) |
 | Statistiques plateforme | 🚧 |
 | Journal d'activité | 🚧 |
@@ -143,14 +144,18 @@ plus structurant à cadrer avant de coder quoi que ce soit dessus.
 - **Client** (sans espace) : Accueil · Explorer · Mon compte · Déconnexion.
 - **Professionnel** (au moins un espace) : Accueil · Explorer · Mon compte · **Mon
   espace** · Déconnexion.
-- **Agent de vérification** : espace de travail séparé `/verification/...` (layout dédié) :
-  À traiter · En cours · Informations demandées · Approuvées · Refusées · Historique.
-  Aucun lien vers l'administration. Lien « Vérifications » dans le menu si le compte a
-  le rôle `AGENT_VERIFICATION`.
+- **Agent de vérification** : ✅ espace de travail `/verifications/index` (files À traiter ·
+  En cours · Informations demandées · Approuvées · Refusées) et `/verifications/examen?id=`.
+  Aucun lien vers l'administration. Lien « Vérifications » dans le menu si le compte a le
+  rôle `AGENT_VERIFICATION` ; un compte sans ce rôle est renvoyé vers l'accueil
+  (`SessionBean.exigerAgentVerification`). Layout public pour l'instant ; un layout dédié
+  viendra avec la refonte visuelle.
 - **Admin** : navigation séparée, jamais mélangée à la navigation publique
   (`/admin/...`, layout dédié, pas le header Nexora grand public) — pas encore construite.
   Menu cible : Utilisateurs · Espaces · Vérifications · Agents · Catalogue · Catégories ·
-  Offres · Avis · Signalements · Statistiques · Paramètres.
+  Offres · Avis · Signalements · Statistiques · Paramètres. Aujourd'hui : un lien
+  « Supervision » (rôles `ADMIN`/`SUPER_ADMIN`) vers `/admin/verifications`, protégé par
+  `SessionBean.exigerAdministrateur`.
 
 Menu cible de **Mon espace** (professionnel), à construire au fil des chantiers :
 Vue d'ensemble · Mes espaces · Mes offres · Demandes · Réservations · Commandes ·
@@ -227,11 +232,13 @@ précédent :
    - 5a. ✅ Base et règles métier : tables `verification_*`, rôle `AGENT_VERIFICATION`,
      machine à états dans `espace-service`, API complète (pro, agent, admin), stockage
      privé des justificatifs, tests (voir §8.10).
-   - 5b. Côté professionnel : onglet « Vérification » de Mon espace (complétude,
+   - 5b. ✅ Côté professionnel : onglet « Vérification » de Mon espace (complétude,
      dépôt privé des justificatifs, demande, suivi, compléments).
-   - 5c. Côté agent : `/verification/...` (files, examen, décision motivée).
-   - 5d. Côté admin : supervision (toutes les demandes, réattribution, annulation,
-     révocation, statistiques) — intégré au back-office du point 6.
+   - 5c. ✅ Côté agent : `/verifications/...` (files, examen, décision motivée).
+   - 5d. ✅ Côté admin : supervision (toutes les demandes, réattribution, annulation,
+     révocation, statistiques, agents) — à intégrer au back-office du point 6.
+   Reste : la page d'administration des règles de justificatifs (`justificatif_requis`),
+   aujourd'hui modifiables en SQL uniquement.
 6. **Back-office admin** : le plus gros chantier, à cadrer précisément (pages,
    permissions, layout séparé) avant de commencer à coder — probablement sa propre
    session de conception dédiée plutôt qu'un ajout au fil de l'eau.
@@ -442,7 +449,7 @@ Deux notions à ne pas confondre, et que les pages montrent différemment :
 | Agent | `PUT /api/v1/verifications/{id}/controles/{code}`, `.../documents/{doc}/examen` | agent assigné uniquement |
 | Agent | `POST /api/v1/verifications/{id}/demander-infos` · `approuver` · `refuser` | motif obligatoire pour infos et refus |
 | Pro / agent / admin | `GET /api/v1/verifications/{id}/documents/{doc}/fichier` | téléchargement contrôlé, jamais d'URL publique |
-| Admin | `GET/POST /api/v1/admin/verifications/...` (liste complète, réattribuer, annuler, révoquer, statistiques) | `hasRole('ADMIN')` ou `SUPER_ADMIN` |
+| Admin | `GET/POST /api/v1/admin/verifications/...` (liste complète, réattribuer, annuler, révoquer, statistiques ; `GET/POST/DELETE .../agents` pour les agents) | `hasRole('ADMIN')` ou `SUPER_ADMIN` |
 
 Ce sont les **premiers endpoints de Nexora qui vérifient un rôle** (`hasRole`) : jusqu'ici
 tout est `permitAll()` ou `authenticated()` (§1). Toute transition non prévue par le
@@ -543,9 +550,57 @@ demandes par agent).
   contrôles, approbation, badge sur la fiche publique, notifications, retrait automatique du
   badge après changement de téléphone, supervision admin, et refus d'accès (tiers, rôles).
 
-**Reste** : les pages (5b professionnel, 5c agent, 5d admin). Le web n'appelle pas encore
-cette API.
+### 8.11 ✅ Étapes 5b, 5c, 5d — les pages
+
+Mise en forme fonctionnelle, dans le style actuel : la refonte visuelle viendra ensuite.
+
+**Professionnel** — onglet « Vérification » de `/mon-espace` (`VerificationEspaceBean`) :
+- état en clair (non vérifié, en cours, informations demandées avec le motif, vérifié,
+  refusé, retiré) ; rappel de l'état dans la navigation et la vue d'ensemble ;
+- liste de complétude, justificatifs obligatoires et facultatifs pour **son** type
+  d'espace, un bouton d'envoi par justificatif (`p:fileUpload`, PDF/JPG/PNG, 8 Mo),
+  « Voir » et « Retirer » sur chaque document, motif affiché sous un document rejeté ;
+- « Demander la vérification » (ou « Renvoyer mon dossier ») grisé tant qu'il manque un
+  élément obligatoire ; « Retirer ma demande » avant la prise en charge ;
+- historique simplifié et demandes précédentes ;
+- onglet des informations : encadré d'avertissement si l'espace est vérifié, et
+  confirmation avant d'enregistrer une modification du nom, du téléphone, de l'adresse,
+  du NINEA ou du RCCM ; après coup, message « Badge Vérifié retiré ».
+
+**Confidentialité côté professionnel** (règle ajoutée) : l'API ne lui renvoie ni le nom de
+l'agent, ni ses notes de contrôle, ni les points bloquants internes, ni les
+réattributions — protection des agents contre les pressions. Le motif d'un document
+rejeté reste visible : c'est ce qu'il doit corriger.
+
+**Agent** — `/verifications/index` (`FileVerificationBean`) et
+`/verifications/examen?id=` (`ExamenVerificationBean`) : files de travail, fiche du
+professionnel et de l'espace (carte OpenStreetMap, lien vers la fiche publique),
+documents (voir, accepter, rejeter avec motif, empreinte SHA-256), cinq points de
+contrôle, points bloquants, décision motivée, historique complet.
+
+**Administrateur** — `/admin/verifications` (`SupervisionVerificationBean`) : chiffres
+clés, toutes les demandes filtrables par statut, détail, réattribution (ou remise dans
+la file), annulation et révocation motivées, gestion des agents par e-mail. Un agent
+qui suit encore des demandes ne peut pas perdre son rôle avant leur réattribution. Le
+rôle donné s'applique à la prochaine connexion de l'agent, ou au plus tard au
+renouvellement de sa session (15 minutes).
+
+**Téléchargement des justificatifs** : le web ne les stocke jamais. Le fichier passe
+d'espace-service, qui a vérifié le droit d'accès, directement à la réponse HTTP
+(`TelechargementJustificatif`), en `Cache-Control: private, no-store`.
+
+**Tests** : parcours navigateur (Playwright) complet et croisé :
+- dépôt et envoi par le professionnel ;
+- prise en charge, rejet d'un document et demande d'informations par l'agent ;
+- complément et renvoi par le professionnel ;
+- contrôles et approbation ;
+- badge sur la fiche publique ;
+- retrait du badge après modification du téléphone ;
+- supervision : agents, réattribution, annulation, révocation ;
+- refus d'accès aux pages agent et admin, pour les visiteurs comme pour les autres rôles.
+
+Le scénario API (53 contrôles) reste vert.
 
 ---
-*Dernière mise à jour : session du 30/09/2026, ajout de l'agent de vérification et du
-processus de vérification des espaces (§8), étape 5a livrée.*
+*Dernière mise à jour : session du 30/09/2026, vérification des espaces livrée de bout en
+bout (§8, étapes 5a à 5d).*

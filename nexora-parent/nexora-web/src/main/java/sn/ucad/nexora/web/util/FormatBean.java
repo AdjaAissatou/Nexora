@@ -64,6 +64,29 @@ public class FormatBean implements Serializable {
         return PRIX_FORMAT.format(montant) + " FCFA";
     }
 
+    private static final java.time.format.DateTimeFormatter DATE_HEURE =
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy 'à' HH:mm");
+    private static final java.time.format.DateTimeFormatter DATE =
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    /** `2026-09-29T14:05` → `29/09/2026 à 14:05`. */
+    public String dateHeure(java.time.LocalDateTime date) {
+        return date == null ? "" : DATE_HEURE.format(date);
+    }
+
+    /** `2026-09-29T14:05` → `29/09/2026`. */
+    public String date(java.time.LocalDateTime date) {
+        return date == null ? "" : DATE.format(date);
+    }
+
+    /** Taille de fichier lisible : `245 Ko`, `1,2 Mo`. */
+    public String taille(Long octets) {
+        if (octets == null) return "";
+        if (octets < 1024) return octets + " o";
+        if (octets < 1024 * 1024) return Math.round(octets / 1024.0) + " Ko";
+        return String.format(Locale.FRANCE, "%.1f Mo", octets / (1024.0 * 1024.0));
+    }
+
     public int getAnneeCourante() {
         return java.time.Year.now().getValue();
     }

@@ -85,6 +85,18 @@
                                 styleClass="nx-nav-link"
                                 rendered="#{sessionBean.fournisseur}" />
 
+                        <!-- Agent de vérification : son espace de travail, sans lien vers l'administration (§8.1) -->
+                        <h:link outcome="/verifications/index"
+                                value="Vérifications"
+                                styleClass="nx-nav-link"
+                                rendered="#{sessionBean.agentVerification}" />
+
+                        <!-- Administrateur : supervision de la vérification (en attendant le back-office, chantier 6) -->
+                        <h:link outcome="/admin/verifications"
+                                value="Supervision"
+                                styleClass="nx-nav-link"
+                                rendered="#{sessionBean.administrateur}" />
+
                         <span class="nx-user-greeting">
                             Bonjour, #{sessionBean.prenom}
                         </span>

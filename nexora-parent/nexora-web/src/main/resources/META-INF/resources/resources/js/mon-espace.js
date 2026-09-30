@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // d'erreur doit rester affiché plutôt que de revenir silencieusement sur "Mes offres".
     var ongletAvecErreur = null;
     document.querySelectorAll('.nx-tab-pane').forEach(function (pane) {
-        if (pane.querySelector('.nx-alert-error')) ongletAvecErreur = pane.id.replace('tab-', '');
+        // .nx-alert-etat : encadrés décrivant un état (ex. vérification refusée), pas une erreur de saisie.
+        if (pane.querySelector('.nx-alert-error:not(.nx-alert-etat)')) ongletAvecErreur = pane.id.replace('tab-', '');
     });
 
     var nom = ongletAvecErreur;
@@ -28,3 +29,27 @@ document.addEventListener('DOMContentLoaded', function () {
         nexoraAfficherOnglet(nom, bouton);
     }
 });
+
+/* Informations couvertes par la vérification (docs/architecture-acteurs.md §8.4.4) : les modifier
+ * retire le badge « Vérifié ». On mémorise leurs valeurs au chargement pour prévenir avant d'enregistrer. */
+var NEXORA_CHAMPS_VERIFIES = ['nom', 'telephone', 'rc', 'ninea', 'rccm', 'region', 'departement', 'commune',
+    'quartier', 'adresseComplete'];
+var nexoraValeursVerifiees = {};
+
+document.addEventListener('DOMContentLoaded', function () {
+    NEXORA_CHAMPS_VERIFIES.forEach(function (champ) {
+        var el = document.getElementById('espaceForm:' + champ);
+        if (el) nexoraValeursVerifiees[champ] = (el.value || '').trim().toLowerCase();
+    });
+});
+
+function nexoraConfirmerModificationVerifiee(espaceVerifie) {
+    if (!espaceVerifie) return true;
+    var modifie = NEXORA_CHAMPS_VERIFIES.some(function (champ) {
+        var el = document.getElementById('espaceForm:' + champ);
+        return el && champ in nexoraValeursVerifiees
+            && (el.value || '').trim().toLowerCase() !== nexoraValeursVerifiees[champ];
+    });
+    return !modifie || confirm('Vous modifiez une information vérifiée (nom, téléphone, adresse, NINEA ou RCCM).\n'
+        + 'Votre espace perdra le badge « Vérifié » ; vous pourrez redemander la vérification.\n\nContinuer ?');
+}

@@ -83,6 +83,12 @@
                             <f:param name="idEspace" value="#{monEspaceBean.espace.id}" />
                         </h:link>
                         <button type="button" class="nx-espace-nav-item" data-tab="infos" onclick="nexoraAfficherOnglet('infos', this)">Gérer les informations de l'espace</button>
+                        <button type="button" class="nx-espace-nav-item" data-tab="verification" onclick="nexoraAfficherOnglet('verification', this)">
+                            Vérification
+                            <ui:fragment rendered="#{not empty verificationEspaceBean.codeEtat}">
+                                <span class="nx-badge #{verif.classe(verificationEspaceBean.codeEtat)}" style="margin-left:6px;">#{verif.etat(verificationEspaceBean.codeEtat)}</span>
+                            </ui:fragment>
+                        </button>
                         <h:link outcome="/creer-espace" styleClass="nx-espace-nav-item" value="+ Créer un autre espace" rendered="#{!monEspaceBean.plusieursEspaces}" />
 
                         <div class="nx-espace-nav-separateur"></div>
@@ -128,6 +134,13 @@
                                 <span class="nx-apercu-label">#{monEspaceBean.espace.nombreAvis} avis</span>
                             </div>
                         </div>
+                        <ui:fragment rendered="#{not empty verificationEspaceBean.codeEtat}">
+                            <p style="margin:14px 0 0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                Vérification :
+                                <span class="nx-badge #{verif.classe(verificationEspaceBean.codeEtat)}">#{verif.etat(verificationEspaceBean.codeEtat)}</span>
+                                <a href="#" onclick="nexoraAfficherOnglet('verification', document.querySelector('[data-tab=verification]')); return false;">Voir le détail</a>
+                            </p>
+                        </ui:fragment>
                     </div>
 
                     <div class="nx-card">
@@ -195,7 +208,15 @@
                         <h3>Informations de l'espace</h3>
 
                         <h:form id="espaceForm">
+                            <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
                             <h:messages for="espaceForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                            <ui:fragment rendered="#{monEspaceBean.espace.verifie}">
+                                <div class="nx-alert nx-alert-warn">
+                                    Votre espace est vérifié. Modifier le nom, le téléphone, l'adresse, le NINEA ou le RCCM
+                                    retirera le badge Vérifié ; vous pourrez ensuite redemander la vérification.
+                                </div>
+                            </ui:fragment>
 
                             <div class="nx-field">
                                 <label for="espaceForm:nom">Nom de l'espace</label>
@@ -343,9 +364,192 @@
                             <h:inputHidden id="latitude" value="#{monEspaceBean.latitude}" />
                             <h:inputHidden id="longitude" value="#{monEspaceBean.longitude}" />
 
-                            <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerEspace}" styleClass="nx-button nx-button-primary nx-button-block" />
+                            <h:commandButton value="Enregistrer" action="#{monEspaceBean.enregistrerEspace}" styleClass="nx-button nx-button-primary nx-button-block"
+                                             onclick="return nexoraConfirmerModificationVerifiee(#{monEspaceBean.espace.verifie});" />
                         </h:form>
                     </div>
+                </div>
+
+                <!-- ===================== Onglet Vérification (docs/architecture-acteurs.md §8.8) ===================== -->
+                <div class="nx-tab-pane" id="tab-verification">
+                    <h:form id="verificationForm">
+                    <h:panelGroup id="verificationBloc" layout="block">
+
+                        <h:messages for="verificationForm" errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                        <ui:fragment rendered="#{empty verificationEspaceBean.etat}">
+                            <div class="nx-alert nx-alert-error">
+                                La vérification est momentanément indisponible. #{verificationEspaceBean.erreur}
+                            </div>
+                        </ui:fragment>
+
+                        <ui:fragment rendered="#{not empty verificationEspaceBean.etat}">
+                        <ui:param name="ve" value="#{verificationEspaceBean.etat}" />
+                        <ui:param name="dem" value="#{verificationEspaceBean.etat.demande}" />
+
+                        <!-- État -->
+                        <div class="nx-card">
+                            <div class="nx-verif-statut">
+                                <div style="flex:1;">
+                                    <h3>Vérification de votre espace</h3>
+                                    <p style="margin-bottom:10px;">
+                                        Statut :
+                                        <span class="nx-badge #{verif.classe(ve.etat)}">#{verif.etat(ve.etat)}</span>
+                                    </p>
+
+                                    <ui:fragment rendered="#{ve.etat == 'NON_VERIFIE'}">
+                                        <p>Le badge « Vérifié sur Nexora » indique aux visiteurs que Nexora a contrôlé l'identité du
+                                            responsable, l'existence de l'activité, l'adresse et les coordonnées. Déposez les justificatifs
+                                            ci-dessous, puis envoyez votre demande.</p>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{ve.etat == 'EN_COURS'}">
+                                        <p>Votre demande a été reçue le #{format.dateHeure(dem.resume.dateSoumission)}.
+                                            Vous serez informé lorsque l'examen sera terminé.</p>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{ve.etat == 'A_COMPLETER'}">
+                                        <div class="nx-alert nx-alert-etat nx-alert-warn" style="margin:0;">
+                                            <strong>L'agent de vérification demande des compléments :</strong><br />
+                                            #{dem.resume.motif}
+                                        </div>
+                                        <p style="margin-top:8px;">Remplacez les documents rejetés ou ajoutez ceux qui manquent, puis renvoyez votre dossier.</p>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{ve.etat == 'VERIFIE'}">
+                                        <p>Votre espace est vérifié depuis le #{format.date(ve.dateVerification)}. Le badge s'affiche sur votre
+                                            fiche et dans les résultats de recherche.</p>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{ve.etat == 'REFUSEE'}">
+                                        <div class="nx-alert nx-alert-etat nx-alert-error" style="margin:0;">
+                                            <strong>Motif du refus :</strong> #{dem.resume.motif}
+                                        </div>
+                                        <p style="margin-top:8px;">Vous pouvez déposer une nouvelle demande avec des justificatifs corrigés.</p>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{ve.etat == 'REVOQUEE'}">
+                                        <div class="nx-alert nx-alert-etat nx-alert-error" style="margin:0;">
+                                            <strong>Badge retiré :</strong> #{dem.resume.motif}
+                                        </div>
+                                        <p style="margin-top:8px;">Vous pouvez redemander la vérification en déposant de nouveaux justificatifs.</p>
+                                    </ui:fragment>
+                                </div>
+                            </div>
+
+                            <ui:fragment rendered="#{ve.peutRetirer}">
+                                <h:commandButton value="Retirer ma demande" action="#{verificationEspaceBean.retirerDemande}"
+                                                 styleClass="nx-button nx-button-outline-dark" style="margin-top:12px;"
+                                                 onclick="return confirm('Retirer votre demande de vérification ?');" />
+                            </ui:fragment>
+                        </div>
+
+                        <!-- Dossier : complétude et justificatifs (seulement quand on peut encore le modifier) -->
+                        <ui:fragment rendered="#{ve.peutDeposerDocuments}">
+                            <div class="nx-card">
+                                <h3>Votre dossier</h3>
+                                <ul class="nx-verif-liste">
+                                    <ui:repeat var="c" value="#{ve.completude}">
+                                        <li>
+                                            <span class="nx-verif-marque #{c.complet ? 'ok' : 'manque'}">#{c.complet ? '✓' : '⚠'}</span>
+                                            <span class="nx-verif-texte">
+                                                #{c.libelle}
+                                                <ui:fragment rendered="#{not empty c.detail}"><span class="nx-verif-detail">#{c.detail}</span></ui:fragment>
+                                            </span>
+                                        </li>
+                                    </ui:repeat>
+                                </ul>
+                                <p style="font-size:13px; color:var(--nx-text-secondary); margin-top:10px;">
+                                    Informations, coordonnées et adresse se modifient dans l'onglet « Gérer les informations de l'espace ».
+                                </p>
+                            </div>
+
+                            <div class="nx-card">
+                                <h3>Justificatifs</h3>
+                                <p style="color:var(--nx-text-secondary); font-size:14px;">
+                                    PDF, JPG ou PNG, 8 Mo maximum. Vos documents restent privés : seuls vous et l'agent de
+                                    vérification y avez accès.
+                                </p>
+
+                                <h4 style="margin:16px 0 8px;">Obligatoires</h4>
+                                <ul class="nx-verif-liste">
+                                    <ui:repeat var="j" value="#{verificationEspaceBean.justificatifsObligatoires}">
+                                        <ui:include src="/WEB-INF/includes/justificatif-ligne.xhtml" />
+                                    </ui:repeat>
+                                </ul>
+                                <p style="font-size:13px; color:var(--nx-text-secondary); margin-top:6px;">
+                                    Un seul des documents marqués « au choix » suffit.
+                                </p>
+
+                                <h4 style="margin:16px 0 8px;">Facultatifs</h4>
+                                <ul class="nx-verif-liste">
+                                    <ui:repeat var="j" value="#{verificationEspaceBean.justificatifsFacultatifs}">
+                                        <ui:include src="/WEB-INF/includes/justificatif-ligne.xhtml" />
+                                    </ui:repeat>
+                                </ul>
+
+                                <div style="margin-top:20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                                    <h:commandButton value="#{verificationEspaceBean.libelleEnvoi}" action="#{verificationEspaceBean.soumettre}"
+                                                     styleClass="nx-button nx-button-primary" disabled="#{!ve.peutSoumettre}" />
+                                    <ui:fragment rendered="#{!ve.peutSoumettre}">
+                                        <span style="font-size:13px; color:var(--nx-text-secondary);">Complétez les éléments marqués ⚠ pour envoyer votre demande.</span>
+                                    </ui:fragment>
+                                </div>
+                            </div>
+                        </ui:fragment>
+
+                        <!-- Documents envoyés (demande en cours d'examen ou décidée) -->
+                        <ui:fragment rendered="#{not empty dem and !ve.peutDeposerDocuments and not empty verificationEspaceBean.documentsEnvoyes}">
+                            <div class="nx-card">
+                                <h3>Documents envoyés</h3>
+                                <ul class="nx-verif-liste">
+                                    <ui:repeat var="d" value="#{verificationEspaceBean.documentsEnvoyes}">
+                                        <li>
+                                            <span class="nx-verif-texte">
+                                                #{d.typeLibelle} — #{d.nomOriginal}
+                                                <span class="nx-verif-detail">Déposé le #{format.dateHeure(d.dateDepot)} · #{format.taille(d.taille)}</span>
+                                            </span>
+                                            <span class="nx-verif-actions">
+                                                <span class="nx-badge #{verif.classe(d.statut)}">#{verif.document(d.statut)}</span>
+                                                <h:commandLink value="Voir" action="#{verificationEspaceBean.telecharger(d.id)}" target="_blank" />
+                                            </span>
+                                        </li>
+                                    </ui:repeat>
+                                </ul>
+                            </div>
+                        </ui:fragment>
+
+                        <!-- Historique -->
+                        <ui:fragment rendered="#{not empty verificationEspaceBean.historique}">
+                            <div class="nx-card">
+                                <h3>Historique de la demande</h3>
+                                <ul class="nx-verif-historique">
+                                    <ui:repeat var="h" value="#{verificationEspaceBean.historique}">
+                                        <li>
+                                            <span class="quand">#{format.dateHeure(h.date)} · #{verif.role(h.roleActeur)}</span>
+                                            #{verif.evenement(h.type)}
+                                            <ui:fragment rendered="#{not empty h.commentaire}"> — #{h.commentaire}</ui:fragment>
+                                        </li>
+                                    </ui:repeat>
+                                </ul>
+                            </div>
+                        </ui:fragment>
+
+                        <!-- Demandes précédentes -->
+                        <ui:fragment rendered="#{not empty ve.demandesPrecedentes}">
+                            <div class="nx-card">
+                                <h3>Demandes précédentes</h3>
+                                <table class="nx-verif-tableau">
+                                    <tr><th>Envoyée le</th><th>Résultat</th><th>Motif</th></tr>
+                                    <ui:repeat var="p" value="#{ve.demandesPrecedentes}">
+                                        <tr>
+                                            <td>#{empty p.dateSoumission ? '—' : format.date(p.dateSoumission)}</td>
+                                            <td><span class="nx-badge #{verif.classe(p.statut)}">#{verif.statut(p.statut)}</span></td>
+                                            <td>#{p.motif}</td>
+                                        </tr>
+                                    </ui:repeat>
+                                </table>
+                            </div>
+                        </ui:fragment>
+
+                        </ui:fragment>
+                    </h:panelGroup>
+                    </h:form>
                 </div>
 
             </div>

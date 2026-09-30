@@ -926,3 +926,47 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
     .nx-hero h1 { font-size: 32px; }
     .nx-hero-description { font-size: 16px; }
 }
+
+/* ===================== Vérification des espaces (docs/architecture-acteurs.md §8) =====================
+   Mise en forme fonctionnelle : la refonte visuelle viendra avec le nouveau langage visuel. */
+.nx-badge-attente { background: var(--nx-warning-soft); color: var(--nx-warning); }
+.nx-badge-alerte { background: var(--nx-error-soft); color: var(--nx-error); }
+
+.nx-verif-statut { display: flex; align-items: flex-start; gap: 14px; }
+.nx-verif-statut h3 { margin: 0 0 4px; }
+.nx-verif-statut p { margin: 0; color: var(--nx-text-secondary); }
+
+.nx-verif-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.nx-verif-liste li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+    border: 1px solid var(--nx-border); border-radius: 10px; background: var(--nx-surface, #fff); }
+.nx-verif-liste .nx-verif-marque { flex: 0 0 22px; font-weight: 700; text-align: center; }
+.nx-verif-liste .ok { color: var(--nx-primary); }
+.nx-verif-liste .manque { color: var(--nx-warning); }
+.nx-verif-liste .nx-verif-texte { flex: 1; min-width: 0; }
+.nx-verif-liste .nx-verif-detail { display: block; font-size: 13px; color: var(--nx-text-secondary); }
+.nx-verif-liste .nx-verif-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+.nx-verif-motif { margin-top: 6px; font-size: 13px; color: var(--nx-error); }
+
+.nx-verif-historique { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--nx-border); }
+.nx-verif-historique li { position: relative; padding: 0 0 12px 10px; font-size: 14px; }
+.nx-verif-historique li::before { content: ""; position: absolute; left: -20px; top: 5px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--nx-primary); }
+.nx-verif-historique .quand { display: block; font-size: 12px; color: var(--nx-text-secondary); }
+
+.nx-verif-tableau { width: 100%; border-collapse: collapse; font-size: 14px; }
+.nx-verif-tableau th, .nx-verif-tableau td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--nx-border); vertical-align: top; }
+.nx-verif-tableau th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--nx-text-secondary); }
+
+.nx-verif-onglets { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0; }
+.nx-verif-grille { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .nx-verif-grille { grid-template-columns: 1fr; } }
+.nx-verif-infos { display: grid; grid-template-columns: 160px 1fr; gap: 6px 12px; font-size: 14px; margin: 0; }
+.nx-verif-infos dt { color: var(--nx-text-secondary); }
+.nx-verif-infos dd { margin: 0; }
+/* p:fileUpload : seul le bouton sert ici ; la zone de liste n'apparaît que pour afficher une erreur
+   (format ou taille refusés côté navigateur). */
+.nx-verif-actions .ui-fileupload-content { display: none; }
+.nx-verif-actions .ui-fileupload-content:has(.ui-messages-error) { display: block; max-width: 260px; }
+.nx-verif-actions .ui-fileupload-buttonbar { padding: 0; border: 0; background: transparent; }
+.nx-verif-actions .ui-fileupload { border: 0; }

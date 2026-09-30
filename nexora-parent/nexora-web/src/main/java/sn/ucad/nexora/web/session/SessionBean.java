@@ -97,7 +97,21 @@ public class SessionBean implements Serializable {
 
     /** Vrai si le compte possède au moins un espace professionnel (rôle FOURNISSEUR). */
     public boolean isFournisseur() {
-        return compte != null && compte.roles() != null && compte.roles().contains("FOURNISSEUR");
+        return aLeRole("FOURNISSEUR");
+    }
+
+    /** Agent de vérification des espaces (docs/architecture-acteurs.md §8). */
+    public boolean isAgentVerification() {
+        return aLeRole("AGENT_VERIFICATION");
+    }
+
+    /** Administrateur (ADMIN ou SUPER_ADMIN) : supervision de la vérification. */
+    public boolean isAdministrateur() {
+        return aLeRole("ADMIN") || aLeRole("SUPER_ADMIN");
+    }
+
+    private boolean aLeRole(String code) {
+        return compte != null && compte.roles() != null && compte.roles().contains(code);
     }
 
     public synchronized void deconnecter() {
@@ -132,6 +146,36 @@ public class SessionBean implements Serializable {
         String vue = URLEncoder.encode(contexte.getViewRoot().getViewId(), StandardCharsets.UTF_8);
         try {
             externe.redirect(externe.getRequestContextPath() + "/connexion.xhtml?redirect=" + vue);
+        } catch (IOException e) {
+            throw new FacesException(e);
+        }
+        contexte.responseComplete();
+    }
+
+    /** Garde des pages de l'agent de vérification : connexion puis rôle AGENT_VERIFICATION. */
+    public void exigerAgentVerification() {
+        exigerRole(isConnecte() && isAgentVerification());
+    }
+
+    /** Garde des pages d'administration : connexion puis rôle ADMIN ou SUPER_ADMIN. */
+    public void exigerAdministrateur() {
+        exigerRole(isConnecte() && isAdministrateur());
+    }
+
+    /**
+     * Visiteur non connecté : vers la connexion (comme {@link #exigerConnexion()}). Compte connecté
+     * sans le rôle : vers l'accueil — la page n'existe pas pour lui, pas même son contenu vide.
+     */
+    private void exigerRole(boolean autorise) {
+        if (autorise) return;
+        if (!isConnecte()) {
+            exigerConnexion();
+            return;
+        }
+        FacesContext contexte = FacesContext.getCurrentInstance();
+        ExternalContext externe = contexte.getExternalContext();
+        try {
+            externe.redirect(externe.getRequestContextPath() + "/index.xhtml");
         } catch (IOException e) {
             throw new FacesException(e);
         }

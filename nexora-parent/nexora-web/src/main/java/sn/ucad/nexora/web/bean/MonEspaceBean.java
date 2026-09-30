@@ -43,6 +43,9 @@ public class MonEspaceBean implements Serializable {
     @Inject
     private SessionBean session;
 
+    @Inject
+    private VerificationEspaceBean verification;
+
     private List<EspaceResponse> mesEspaces;
     private EspaceResponse espace;
     private List<OffreSummaryResponse> mesOffres;
@@ -103,6 +106,7 @@ public class MonEspaceBean implements Serializable {
             vocabulaireOffres = VocabulaireOffres.pour(nomTypeEspaceDe(espace));
             mesOffres = espace == null ? List.of()
                     : catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
+            if (espace != null) verification.initialiser(espace.id());
         } catch (ApiException e) {
             // Pas encore de profil utilisateur exploitable côté espace-service : pas une erreur bloquante,
             // l'utilisateur voit simplement la proposition de créer son espace.
@@ -184,6 +188,7 @@ public class MonEspaceBean implements Serializable {
     }
 
     public String enregistrerEspace() {
+        boolean etaitVerifie = espace.verifie();
         try {
             espace = espaceApiClient.mettreAJour(
                     session.getAccessToken(),
@@ -214,6 +219,13 @@ public class MonEspaceBean implements Serializable {
             mesEspaces = mesEspaces.stream().map(e -> e.id().equals(espace.id()) ? espace : e).toList();
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Espace mis à jour.", null));
+            if (etaitVerifie && !espace.verifie()) {
+                // §8.4.4 : une information vérifiée a changé, espace-service a retiré le badge.
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+                        "Badge Vérifié retiré",
+                        "Vous avez modifié une information vérifiée. Vous pouvez redemander la vérification dans l'onglet Vérification."));
+            }
+            verification.recharger();
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));

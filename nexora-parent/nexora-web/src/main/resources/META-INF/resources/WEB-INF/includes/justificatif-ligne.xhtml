@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <!-- Une ligne de justificatif attendu dans l'onglet Vérification de Mon espace.
+         Variable attendue : j (JustificatifAttendu). -->
+    <li>
+        <ui:param name="m" value="#{verificationEspaceBean.marque(j)}" />
+        <span class="nx-verif-marque #{m}">#{m == 'ok' ? '✓' : (m == 'manque' ? '⚠' : '·')}</span>
+        <span class="nx-verif-texte">
+            <strong>#{j.libelle}</strong>
+            <ui:fragment rendered="#{not empty j.groupeAlternatif}"> <span class="nx-badge nx-badge-neutre">au choix</span></ui:fragment>
+            <span class="nx-verif-detail">#{j.description}</span>
+
+            <ui:repeat var="d" value="#{verificationEspaceBean.documentsDuType(j.typeJustificatifId)}">
+                <span class="nx-verif-detail" style="margin-top:6px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <span class="nx-badge #{verif.classe(d.statut)}">#{verif.document(d.statut)}</span>
+                    #{d.nomOriginal} · #{format.taille(d.taille)}
+                    <h:commandLink value="Voir" action="#{verificationEspaceBean.telecharger(d.id)}" target="_blank" />
+                    <ui:fragment rendered="#{d.statut == 'DEPOSE'}">
+                        <h:commandLink value="Retirer" action="#{verificationEspaceBean.retirerDocument(d.id)}"
+                                       onclick="return confirm('Retirer ce document ?');" />
+                    </ui:fragment>
+                </span>
+                <ui:fragment rendered="#{d.statut == 'REJETE' and not empty d.motif}">
+                    <span class="nx-verif-motif">Rejeté : #{d.motif} — déposez un nouveau document.</span>
+                </ui:fragment>
+            </ui:repeat>
+        </span>
+        <span class="nx-verif-actions">
+            <p:fileUpload mode="advanced" auto="true" dragDrop="false" multiple="false"
+                          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                          listener="#{verificationEspaceBean.deposer}" update="@form"
+                          label="#{j.fourni ? 'Ajouter' : 'Déposer'}">
+                <f:attribute name="typeJustificatifId" value="#{j.typeJustificatifId}" />
+                <p:validateFile sizeLimit="8388608" allowTypes="/(\.|\/)(pdf|jpe?g|png)$/i" />
+            </p:fileUpload>
+        </span>
+    </li>
+</ui:composition>

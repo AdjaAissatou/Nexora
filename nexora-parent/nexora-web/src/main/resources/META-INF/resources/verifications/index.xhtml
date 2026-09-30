@@ -1,0 +1,77 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<!-- Espace de travail de l'agent de vérification (docs/architecture-acteurs.md §8.8) :
+     réservé au rôle AGENT_VERIFICATION, sans aucun lien vers l'administration. -->
+<f:metadata>
+    <f:event type="preRenderView" listener="#{sessionBean.exigerAgentVerification}" />
+</f:metadata>
+<ui:define name="titre">Vérifications — Nexora</ui:define>
+<ui:define name="content">
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Vérifications</h1>
+            <p>Examinez les demandes de vérification des espaces professionnels.</p>
+        </div>
+    </section>
+
+    <div class="nx-container" style="padding-bottom:60px;">
+
+        <nav class="nx-verif-onglets">
+            <ui:repeat var="o" value="#{fileVerificationBean.onglets}">
+                <h:link outcome="/verifications/index" value="#{o.libelle}"
+                        styleClass="#{o.statut == fileVerificationBean.statut ? 'nx-button nx-button-primary' : 'nx-button nx-button-outline'}">
+                    <f:param name="statut" value="#{o.statut}" />
+                </h:link>
+            </ui:repeat>
+        </nav>
+
+        <ui:fragment rendered="#{not empty fileVerificationBean.erreur}">
+            <div class="nx-alert nx-alert-error">#{fileVerificationBean.erreur}</div>
+        </ui:fragment>
+
+        <div class="nx-card">
+            <h3 style="margin-top:0;">#{fileVerificationBean.libelleOnglet} (#{fileVerificationBean.demandes.size()})</h3>
+
+            <ui:fragment rendered="#{empty fileVerificationBean.demandes}">
+                <p style="color:var(--nx-text-secondary);">Aucune demande dans cette liste.</p>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{not empty fileVerificationBean.demandes}">
+                <table class="nx-verif-tableau">
+                    <tr>
+                        <th>Espace</th>
+                        <th>Responsable</th>
+                        <th>Envoyée le</th>
+                        <th>Statut</th>
+                        <th></th>
+                    </tr>
+                    <ui:repeat var="d" value="#{fileVerificationBean.demandes}">
+                        <tr>
+                            <td>
+                                <strong>#{d.espaceNom}</strong><br />
+                                <span style="color:var(--nx-text-secondary); font-size:13px;">#{d.typeEspace}<ui:fragment rendered="#{not empty d.commune}"> · #{d.commune}</ui:fragment></span>
+                            </td>
+                            <td>#{d.demandeurNom}</td>
+                            <td>#{format.dateHeure(d.dateSoumission)}</td>
+                            <td>
+                                <span class="nx-badge #{verif.classe(d.statut)}">#{verif.statut(d.statut)}</span>
+                                <ui:fragment rendered="#{d.urgent}"> <span class="nx-badge nx-badge-alerte">Urgent</span></ui:fragment>
+                            </td>
+                            <td style="text-align:right;">
+                                <h:link outcome="/verifications/examen" value="Examiner" styleClass="nx-button nx-button-outline">
+                                    <f:param name="id" value="#{d.id}" />
+                                </h:link>
+                            </td>
+                        </tr>
+                    </ui:repeat>
+                </table>
+            </ui:fragment>
+        </div>
+    </div>
+
+</ui:define>
+</ui:composition>

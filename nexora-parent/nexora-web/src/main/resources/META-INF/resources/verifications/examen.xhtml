@@ -1,0 +1,203 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+<!-- Examen d'une demande par l'agent de vérification (docs/architecture-acteurs.md §8.8). -->
+<f:metadata>
+    <f:event type="preRenderView" listener="#{sessionBean.exigerAgentVerification}" />
+</f:metadata>
+<ui:define name="titre">Examiner une demande — Nexora</ui:define>
+<ui:define name="content">
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <p style="margin:0 0 6px;"><h:link outcome="/verifications/index" value="← Toutes les demandes" /></p>
+            <h1>#{empty examenVerificationBean.demande ? 'Demande de vérification' : examenVerificationBean.demande.espace.nom}</h1>
+            <ui:fragment rendered="#{not empty examenVerificationBean.demande}">
+                <p>
+                    <span class="nx-badge #{verif.classe(examenVerificationBean.statut)}">#{verif.statut(examenVerificationBean.statut)}</span>
+                    <ui:fragment rendered="#{examenVerificationBean.demande.resume.urgent}"> <span class="nx-badge nx-badge-alerte">Urgent</span></ui:fragment>
+                    · Envoyée le #{format.dateHeure(examenVerificationBean.demande.resume.dateSoumission)}
+                    <ui:fragment rendered="#{not empty examenVerificationBean.demande.resume.agentNom}"> · Suivie par #{examenVerificationBean.demande.resume.agentNom}</ui:fragment>
+                </p>
+            </ui:fragment>
+        </div>
+    </section>
+
+    <div class="nx-container" style="padding-bottom:60px;">
+
+        <ui:fragment rendered="#{not empty examenVerificationBean.erreur}">
+            <div class="nx-alert nx-alert-error">#{examenVerificationBean.erreur}</div>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{not empty examenVerificationBean.demande}">
+        <ui:param name="dem" value="#{examenVerificationBean.demande}" />
+        <ui:param name="esp" value="#{examenVerificationBean.demande.espace}" />
+
+        <h:form id="examenForm">
+            <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+
+            <ui:fragment rendered="#{examenVerificationBean.prenable}">
+                <div class="nx-alert nx-alert-info" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    Cette demande attend un agent. Prenez-la en charge pour contrôler le dossier et décider.
+                    <h:commandButton value="Prendre en charge" action="#{examenVerificationBean.prendre}" styleClass="nx-button nx-button-primary" />
+                </div>
+            </ui:fragment>
+
+            <div class="nx-verif-grille">
+                <div>
+                    <!-- Professionnel et informations de l'espace -->
+                    <div class="nx-card">
+                        <h3>Professionnel</h3>
+                        <dl class="nx-verif-infos">
+                            <dt>Responsable</dt><dd>#{esp.responsableNom}</dd>
+                            <dt>E-mail du compte</dt><dd>#{esp.responsableEmail}</dd>
+                            <dt>Téléphone du compte</dt><dd>#{format.telephoneAffiche(esp.responsableTelephone)}</dd>
+                        </dl>
+
+                        <h3 style="margin-top:22px;">Espace</h3>
+                        <dl class="nx-verif-infos">
+                            <dt>Nom</dt><dd>#{esp.nom}</dd>
+                            <dt>Type d'espace</dt><dd>#{esp.typeEspace}</dd>
+                            <dt>Description</dt><dd>#{esp.description}</dd>
+                            <dt>Téléphone</dt><dd>#{format.telephoneAffiche(esp.telephone)}<ui:fragment rendered="#{not empty esp.telephoneSecondaire}"> · #{format.telephoneAffiche(esp.telephoneSecondaire)}</ui:fragment></dd>
+                            <dt>E-mail</dt><dd>#{esp.email}</dd>
+                            <dt>Site web</dt><dd>#{esp.siteWeb}</dd>
+                            <dt>NINEA</dt><dd>#{empty esp.numeroNinea ? '—' : esp.numeroNinea}</dd>
+                            <dt>RCCM</dt><dd>#{empty esp.numeroRccm ? (empty esp.registreCommerce ? '—' : esp.registreCommerce) : esp.numeroRccm}</dd>
+                            <dt>Adresse</dt>
+                            <dd>#{esp.adresseComplete}<ui:fragment rendered="#{not empty esp.adresseComplete}"><br /></ui:fragment>
+                                #{esp.quartier}, #{esp.commune} — #{esp.departement}, #{esp.region}</dd>
+                        </dl>
+                        <ui:fragment rendered="#{not empty esp.latitude}">
+                            <iframe src="#{format.lienCarteEmbed(esp.latitude, esp.longitude)}" title="Position de l'espace"
+                                    style="width:100%; height:220px; border:1px solid var(--nx-border); border-radius:10px; margin-top:14px;" loading="lazy"></iframe>
+                        </ui:fragment>
+                        <p style="margin-top:12px;">
+                            <h:link outcome="/espace" value="Voir la fiche publique" target="_blank"><f:param name="id" value="#{esp.id}" /></h:link>
+                        </p>
+                    </div>
+
+                    <!-- Documents -->
+                    <div class="nx-card">
+                        <h3>Documents</h3>
+                        <ui:fragment rendered="#{empty examenVerificationBean.documents}">
+                            <p style="color:var(--nx-text-secondary);">Aucun document.</p>
+                        </ui:fragment>
+                        <ul class="nx-verif-liste">
+                            <ui:repeat var="d" value="#{examenVerificationBean.documents}">
+                                <li>
+                                    <span class="nx-verif-texte">
+                                        <strong>#{d.typeLibelle}</strong> — #{d.nomOriginal}
+                                        <span class="nx-verif-detail">Déposé le #{format.dateHeure(d.dateDepot)} · #{format.taille(d.taille)} · SHA-256 #{d.empreinteSha256.substring(0, 12)}…</span>
+                                        <ui:fragment rendered="#{d.statut == 'REJETE'}"><span class="nx-verif-motif">Rejeté : #{d.motif}</span></ui:fragment>
+                                        <ui:fragment rendered="#{examenVerificationBean.modifiable and d.statut == 'DEPOSE'}">
+                                            <span style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">
+                                                <h:commandButton value="Accepter" action="#{examenVerificationBean.accepterDocument(d.id)}" styleClass="nx-button nx-button-outline" />
+                                                <h:inputText value="#{examenVerificationBean.motifsDocuments[d.id]}" styleClass="nx-input" style="flex:1; min-width:180px;"
+                                                             pt:placeholder="Motif du rejet (illisible, expiré…)" />
+                                                <h:commandButton value="Rejeter" action="#{examenVerificationBean.rejeterDocument(d.id)}" styleClass="nx-button nx-button-danger" />
+                                            </span>
+                                        </ui:fragment>
+                                    </span>
+                                    <span class="nx-verif-actions">
+                                        <span class="nx-badge #{verif.classe(d.statut)}">#{verif.document(d.statut)}</span>
+                                        <h:commandLink value="Voir" action="#{examenVerificationBean.telecharger(d.id)}" target="_blank" />
+                                    </span>
+                                </li>
+                            </ui:repeat>
+                        </ul>
+                    </div>
+
+                    <!-- Points de contrôle -->
+                    <div class="nx-card">
+                        <h3>Contrôles</h3>
+                        <p style="color:var(--nx-text-secondary); font-size:14px;">Tous les points doivent être conformes pour approuver. Expliquez chaque point non conforme.</p>
+                        <table class="nx-verif-tableau">
+                            <ui:repeat var="c" value="#{dem.controles}">
+                                <tr>
+                                    <td style="width:34%;"><strong>#{c.libelle}</strong>
+                                        <ui:fragment rendered="#{not empty c.dateControle}"><span class="nx-verif-detail" style="display:block; font-size:12px; color:var(--nx-text-secondary);">#{format.dateHeure(c.dateControle)}</span></ui:fragment>
+                                    </td>
+                                    <ui:fragment rendered="#{examenVerificationBean.modifiable}">
+                                        <td style="width:26%;">
+                                            <h:selectOneMenu value="#{examenVerificationBean.resultats[c.code]}" styleClass="nx-select">
+                                                <f:selectItem itemValue="NON_FAIT" itemLabel="À contrôler" />
+                                                <f:selectItem itemValue="CONFORME" itemLabel="Conforme" />
+                                                <f:selectItem itemValue="NON_CONFORME" itemLabel="Non conforme" />
+                                            </h:selectOneMenu>
+                                        </td>
+                                        <td><h:inputText value="#{examenVerificationBean.commentaires[c.code]}" styleClass="nx-input"
+                                                         pt:placeholder="Commentaire" /></td>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{!examenVerificationBean.modifiable}">
+                                        <td><span class="nx-badge #{verif.classe(c.resultat)}">#{verif.resultat(c.resultat)}</span></td>
+                                        <td>#{c.commentaire}</td>
+                                    </ui:fragment>
+                                </tr>
+                            </ui:repeat>
+                        </table>
+                        <ui:fragment rendered="#{examenVerificationBean.modifiable}">
+                            <h:commandButton value="Enregistrer les contrôles" action="#{examenVerificationBean.enregistrerControles}"
+                                             styleClass="nx-button nx-button-outline-dark" style="margin-top:12px;" />
+                        </ui:fragment>
+                    </div>
+                </div>
+
+                <div>
+                    <!-- Décision -->
+                    <ui:fragment rendered="#{examenVerificationBean.modifiable}">
+                        <div class="nx-card">
+                            <h3>Décision</h3>
+                            <ui:fragment rendered="#{not empty dem.pointsBloquants}">
+                                <div class="nx-alert nx-alert-warn">
+                                    <strong>Avant d'approuver :</strong>
+                                    <ul style="margin:6px 0 0; padding-left:18px;">
+                                        <ui:repeat var="p" value="#{dem.pointsBloquants}"><li>#{p}</li></ui:repeat>
+                                    </ul>
+                                </div>
+                            </ui:fragment>
+                            <div class="nx-field">
+                                <label for="examenForm:motifDecision">Motif (obligatoire pour demander des informations ou refuser)</label>
+                                <h:inputTextarea id="motifDecision" value="#{examenVerificationBean.motifDecision}" styleClass="nx-input" rows="4" />
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                                <h:commandButton value="Demander des informations" action="#{examenVerificationBean.demanderInformations}" styleClass="nx-button nx-button-outline-dark" />
+                                <h:commandButton value="Refuser" action="#{examenVerificationBean.refuser}" styleClass="nx-button nx-button-danger"
+                                                 onclick="return confirm('Refuser la vérification de cet espace ?');" />
+                                <h:commandButton value="Approuver la vérification" action="#{examenVerificationBean.approuver}" styleClass="nx-button nx-button-primary"
+                                                 disabled="#{not empty dem.pointsBloquants}" />
+                            </div>
+                        </div>
+                    </ui:fragment>
+
+                    <ui:fragment rendered="#{not empty dem.resume.motif and !examenVerificationBean.modifiable}">
+                        <div class="nx-card">
+                            <h3>Dernier motif</h3>
+                            <p>#{dem.resume.motif}</p>
+                        </div>
+                    </ui:fragment>
+
+                    <!-- Historique -->
+                    <div class="nx-card">
+                        <h3>Historique</h3>
+                        <ul class="nx-verif-historique">
+                            <ui:repeat var="h" value="#{examenVerificationBean.historique}">
+                                <li>
+                                    <span class="quand">#{format.dateHeure(h.date)} · #{empty h.acteurNom ? verif.role(h.roleActeur) : h.acteurNom}</span>
+                                    #{verif.evenement(h.type)}
+                                    <ui:fragment rendered="#{not empty h.commentaire}"> — #{h.commentaire}</ui:fragment>
+                                </li>
+                            </ui:repeat>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        </ui:fragment>
+    </div>
+
+</ui:define>
+</ui:composition>

@@ -1,0 +1,186 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+<!-- Supervision de la vérification (docs/architecture-acteurs.md §8.8) : réservée à ADMIN / SUPER_ADMIN.
+     Première page d'administration ; elle rejoindra le back-office et son layout dédié (chantier 6). -->
+<f:metadata>
+    <f:event type="preRenderView" listener="#{sessionBean.exigerAdministrateur}" />
+</f:metadata>
+<ui:define name="titre">Supervision des vérifications — Nexora</ui:define>
+<ui:define name="content">
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Supervision des vérifications</h1>
+            <p>Toutes les demandes, les agents et les statistiques de vérification.</p>
+        </div>
+    </section>
+
+    <div class="nx-container" style="padding-bottom:60px;">
+        <h:form id="supervisionForm">
+        <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+        <ui:fragment rendered="#{not empty supervisionVerificationBean.erreur}">
+            <div class="nx-alert nx-alert-error">#{supervisionVerificationBean.erreur}</div>
+        </ui:fragment>
+
+        <!-- Statistiques -->
+        <div class="nx-card nx-apercu-card">
+            <div class="nx-apercu-grid">
+                <div class="nx-apercu-stat"><span class="nx-apercu-valeur">#{supervisionVerificationBean.compte('EN_ATTENTE')}</span><span class="nx-apercu-label">en attente</span></div>
+                <div class="nx-apercu-stat"><span class="nx-apercu-valeur">#{supervisionVerificationBean.compte('EN_COURS') + supervisionVerificationBean.compte('A_COMPLETER')}</span><span class="nx-apercu-label">en cours d'examen</span></div>
+                <div class="nx-apercu-stat"><span class="nx-apercu-valeur">#{supervisionVerificationBean.compte('APPROUVEE')}</span><span class="nx-apercu-label">espaces vérifiés</span></div>
+                <div class="nx-apercu-stat"><span class="nx-apercu-valeur">#{supervisionVerificationBean.delaiMoyen}</span><span class="nx-apercu-label">délai moyen de décision</span></div>
+            </div>
+        </div>
+
+        <div class="nx-verif-grille">
+            <div>
+                <!-- Demandes -->
+                <div class="nx-card">
+                    <h3 style="margin-top:0;">Demandes</h3>
+                    <nav class="nx-verif-onglets" style="margin-top:0;">
+                        <h:link outcome="/admin/verifications" value="Toutes"
+                                styleClass="#{empty supervisionVerificationBean.filtreStatut ? 'nx-button nx-button-primary' : 'nx-button nx-button-outline'}" />
+                        <ui:repeat var="s" value="#{supervisionVerificationBean.statutsFiltre}">
+                            <h:link outcome="/admin/verifications" value="#{verif.statut(s)}"
+                                    styleClass="#{s == supervisionVerificationBean.filtreStatut ? 'nx-button nx-button-primary' : 'nx-button nx-button-outline'}">
+                                <f:param name="statut" value="#{s}" />
+                            </h:link>
+                        </ui:repeat>
+                    </nav>
+                    <ui:fragment rendered="#{empty supervisionVerificationBean.demandes}">
+                        <p style="color:var(--nx-text-secondary);">Aucune demande.</p>
+                    </ui:fragment>
+                    <ui:fragment rendered="#{not empty supervisionVerificationBean.demandes}">
+                        <table class="nx-verif-tableau">
+                            <tr><th>Espace</th><th>Envoyée le</th><th>Agent</th><th>Statut</th><th></th></tr>
+                            <ui:repeat var="d" value="#{supervisionVerificationBean.demandes}">
+                                <tr>
+                                    <td><strong>#{d.espaceNom}</strong><br />
+                                        <span style="color:var(--nx-text-secondary); font-size:13px;">#{d.typeEspace} · #{d.demandeurNom}</span></td>
+                                    <td>#{format.dateHeure(d.dateSoumission)}</td>
+                                    <td>#{empty d.agentNom ? '—' : d.agentNom}</td>
+                                    <td><span class="nx-badge #{verif.classe(d.statut)}">#{verif.statut(d.statut)}</span>
+                                        <ui:fragment rendered="#{d.urgent}"> <span class="nx-badge nx-badge-alerte">Urgent</span></ui:fragment></td>
+                                    <td style="text-align:right;">
+                                        <h:link outcome="/admin/verifications" value="Détail" styleClass="nx-button nx-button-outline">
+                                            <f:param name="id" value="#{d.id}" />
+                                            <f:param name="statut" value="#{supervisionVerificationBean.filtreStatut}" disable="#{empty supervisionVerificationBean.filtreStatut}" />
+                                        </h:link>
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                        </table>
+                    </ui:fragment>
+                </div>
+
+                <!-- Détail de la demande sélectionnée -->
+                <ui:fragment rendered="#{not empty supervisionVerificationBean.selection}">
+                <ui:param name="sel" value="#{supervisionVerificationBean.selection}" />
+                <div class="nx-card" id="detail">
+                    <h3 style="margin-top:0;">#{sel.espace.nom}
+                        <span class="nx-badge #{verif.classe(sel.resume.statut)}">#{verif.statut(sel.resume.statut)}</span></h3>
+                    <p style="color:var(--nx-text-secondary);">
+                        #{sel.espace.typeEspace} · #{sel.espace.commune} · Responsable : #{sel.espace.responsableNom}<br />
+                        Agent : #{empty sel.resume.agentNom ? 'aucun' : sel.resume.agentNom}
+                        <ui:fragment rendered="#{not empty sel.resume.motif}"><br />Dernier motif : #{sel.resume.motif}</ui:fragment>
+                    </p>
+
+                    <h4>Documents</h4>
+                    <ul class="nx-verif-liste">
+                        <ui:repeat var="doc" value="#{sel.documents}">
+                            <li>
+                                <span class="nx-verif-texte">#{doc.typeLibelle} — #{doc.nomOriginal}
+                                    <span class="nx-verif-detail">#{format.dateHeure(doc.dateDepot)} · SHA-256 #{doc.empreinteSha256.substring(0, 12)}…</span></span>
+                                <span class="nx-verif-actions">
+                                    <span class="nx-badge #{verif.classe(doc.statut)}">#{verif.document(doc.statut)}</span>
+                                    <h:commandLink value="Voir" action="#{supervisionVerificationBean.telecharger(doc.id)}" target="_blank" />
+                                </span>
+                            </li>
+                        </ui:repeat>
+                    </ul>
+
+                    <h4>Contrôles</h4>
+                    <table class="nx-verif-tableau">
+                        <ui:repeat var="c" value="#{sel.controles}">
+                            <tr><td>#{c.libelle}</td>
+                                <td><span class="nx-badge #{verif.classe(c.resultat)}">#{verif.resultat(c.resultat)}</span></td>
+                                <td>#{c.commentaire}</td></tr>
+                        </ui:repeat>
+                    </table>
+
+                    <ui:fragment rendered="#{supervisionVerificationBean.reattribuable or supervisionVerificationBean.annulable or supervisionVerificationBean.revocable}">
+                        <h4>Actions</h4>
+                        <div class="nx-field">
+                            <label for="supervisionForm:motif">Motif (obligatoire pour annuler ou révoquer)</label>
+                            <h:inputTextarea id="motif" value="#{supervisionVerificationBean.motif}" styleClass="nx-input" rows="3" />
+                        </div>
+                        <ui:fragment rendered="#{supervisionVerificationBean.reattribuable}">
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+                                <h:selectOneMenu id="agent" value="#{supervisionVerificationBean.agentChoisi}" styleClass="nx-select" style="max-width:320px;">
+                                    <f:selectItem itemLabel="Remettre dans la file d'attente" itemValue="#{null}" />
+                                    <f:selectItems value="#{supervisionVerificationBean.agents}" var="a" itemLabel="#{a.nomComplet} (#{a.demandesOuvertes} en cours)" itemValue="#{a.utilisateurId}" />
+                                    <f:converter converterId="jakarta.faces.Long" />
+                                </h:selectOneMenu>
+                                <h:commandButton value="Réattribuer" action="#{supervisionVerificationBean.reattribuer}" styleClass="nx-button nx-button-outline-dark" />
+                            </div>
+                        </ui:fragment>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <h:commandButton value="Annuler la demande" action="#{supervisionVerificationBean.annuler}" styleClass="nx-button nx-button-danger"
+                                             rendered="#{supervisionVerificationBean.annulable}"
+                                             onclick="return confirm('Annuler cette demande de vérification ?');" />
+                            <h:commandButton value="Révoquer la vérification" action="#{supervisionVerificationBean.revoquer}" styleClass="nx-button nx-button-danger"
+                                             rendered="#{supervisionVerificationBean.revocable}"
+                                             onclick="return confirm('Révoquer la vérification ? Le badge sera retiré de l\'espace.');" />
+                        </div>
+                    </ui:fragment>
+
+                    <h4>Historique</h4>
+                    <ul class="nx-verif-historique">
+                        <ui:repeat var="h" value="#{supervisionVerificationBean.historique}">
+                            <li>
+                                <span class="quand">#{format.dateHeure(h.date)} · #{empty h.acteurNom ? verif.role(h.roleActeur) : h.acteurNom}</span>
+                                #{verif.evenement(h.type)}
+                                <ui:fragment rendered="#{not empty h.commentaire}"> — #{h.commentaire}</ui:fragment>
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                </div>
+                </ui:fragment>
+            </div>
+
+            <!-- Agents -->
+            <div>
+                <div class="nx-card">
+                    <h3 style="margin-top:0;">Agents de vérification</h3>
+                    <ul class="nx-verif-liste">
+                        <ui:repeat var="a" value="#{supervisionVerificationBean.agents}">
+                            <li>
+                                <span class="nx-verif-texte">#{a.nomComplet}
+                                    <span class="nx-verif-detail">#{a.email} · #{a.demandesOuvertes} demande(s) en cours</span></span>
+                                <span class="nx-verif-actions">
+                                    <h:commandLink value="Retirer" action="#{supervisionVerificationBean.retirerAgent(a.utilisateurId)}"
+                                                   onclick="return confirm('Retirer le rôle d\'agent de vérification ?');" />
+                                </span>
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                    <div class="nx-field" style="margin-top:14px;">
+                        <label for="supervisionForm:emailAgent">Désigner un agent (e-mail de son compte Nexora)</label>
+                        <h:inputText id="emailAgent" value="#{supervisionVerificationBean.emailNouvelAgent}" styleClass="nx-input" pt:type="email" />
+                    </div>
+                    <h:commandButton value="Donner le rôle d'agent" action="#{supervisionVerificationBean.ajouterAgent}" styleClass="nx-button nx-button-outline-dark" />
+                    <p style="font-size:13px; color:var(--nx-text-secondary); margin-top:10px;">
+                        Le rôle prend effet à la prochaine connexion de l'agent, ou au plus tard 15 minutes après (renouvellement de sa session).
+                    </p>
+                </div>
+            </div>
+        </div>
+        </h:form>
+    </div>
+
+</ui:define>
+</ui:composition>
