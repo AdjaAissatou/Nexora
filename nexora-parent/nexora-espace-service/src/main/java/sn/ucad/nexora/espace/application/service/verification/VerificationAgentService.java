@@ -91,7 +91,7 @@ public class VerificationAgentService {
         c.setDateControle(LocalDateTime.now());
         support.controles.save(c);
         support.historiser(verificationId, TypeEvenement.CONTROLE, null, null, agent, RoleActeur.AGENT,
-                codeControle.getLibelle() + " : " + r.name() + (commentaire == null || commentaire.isBlank() ? "" : " — " + commentaire));
+                codeControle.getLibelle() + " : " + r.getLibelle() + (commentaire == null || commentaire.isBlank() ? "" : " — " + commentaire));
         return support.detail(support.demandeEntite(verificationId));
     }
 
@@ -120,7 +120,7 @@ public class VerificationAgentService {
         doc.setDateExamen(LocalDateTime.now());
         support.documents.save(doc);
         support.historiser(verificationId, TypeEvenement.DOCUMENT_EXAMINE, null, null, agent, RoleActeur.AGENT,
-                doc.getNomOriginal() + " : " + d.name() + (d == StatutDocument.REJETE ? " — " + motif : ""));
+                doc.getNomOriginal() + " : " + d.getLibelle() + (d == StatutDocument.REJETE ? " — " + motif : ""));
         return support.detail(support.demandeEntite(verificationId));
     }
 

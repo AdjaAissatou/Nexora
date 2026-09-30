@@ -68,4 +68,7 @@ public final class VerificationDtos {
 
     public record StatistiquesVerificationResponse(java.util.Map<String, Long> parStatut,
                                                    Double delaiMoyenDecisionHeures) {}
+
+    /** Agent de vérification, pour la gestion des agents et la réattribution. */
+    public record AgentVerificationResponse(Long utilisateurId, String nomComplet, String email, long demandesOuvertes) {}
 }

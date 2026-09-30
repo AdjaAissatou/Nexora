@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.nexora.common.exception.BusinessException;
 import sn.ucad.nexora.common.exception.UnauthorizedException;
+import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.AgentVerificationResponse;
 import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.StatistiquesVerificationResponse;
 import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.VerificationDetailResponse;
 import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.VerificationResumeResponse;
@@ -49,7 +50,7 @@ public class VerificationAdminService {
     public VerificationDetailResponse reattribuer(UUID accountId, Long verificationId, Long nouvelAgent, String motif) {
         Long admin = utilisateurId(accountId);
         VerificationEspaceJpaEntity entite = support.demandeEntite(verificationId);
-        if (nouvelAgent != null && !support.lookup.aLeRole(nouvelAgent, "AGENT_VERIFICATION")) {
+        if (nouvelAgent != null && !support.lookup.aLeRole(nouvelAgent, ROLE_AGENT)) {
             throw new BusinessException("Cet utilisateur n'est pas agent de vérification");
         }
         boolean proprietaire = nouvelAgent != null
@@ -86,6 +87,43 @@ public class VerificationAdminService {
             parStatut.put((String) ligne[0], ((Number) ligne[1]).longValue());
         }
         return new StatistiquesVerificationResponse(parStatut, support.demandes.delaiMoyenDecisionHeures());
+    }
+
+    // ------------------------------------------------------------------ agents (§8.1 « Gérer les agents »)
+
+    private static final String ROLE_AGENT = "AGENT_VERIFICATION";
+
+    @Transactional(readOnly = true)
+    public List<AgentVerificationResponse> agents() {
+        return support.lookup.agents().stream()
+                .map(a -> new AgentVerificationResponse(a.id(), a.nomComplet(), a.email(), a.demandesOuvertes()))
+                .toList();
+    }
+
+    /**
+     * Donne le rôle d'agent à un compte existant. Il prend effet à la prochaine connexion (ou au
+     * prochain renouvellement du jeton) de ce compte : les rôles voyagent dans le JWT.
+     */
+    @Transactional
+    public List<AgentVerificationResponse> ajouterAgent(String email) {
+        if (email == null || email.isBlank()) throw new BusinessException("Indiquez l'e-mail du compte");
+        Long utilisateurId = support.lookup.utilisateurParEmail(email)
+                .orElseThrow(() -> new BusinessException("Aucun compte Nexora avec cet e-mail"));
+        support.lookup.attribuerRole(utilisateurId, ROLE_AGENT);
+        return agents();
+    }
+
+    /** Retire le rôle d'agent ; refusé tant qu'il suit des demandes (à réattribuer d'abord). */
+    @Transactional
+    public List<AgentVerificationResponse> retirerAgent(Long utilisateurId) {
+        AgentVerificationResponse agent = agents().stream().filter(a -> a.utilisateurId().equals(utilisateurId))
+                .findFirst().orElseThrow(() -> new BusinessException("Cet utilisateur n'est pas agent de vérification"));
+        if (agent.demandesOuvertes() > 0) {
+            throw new BusinessException(agent.nomComplet() + " suit encore " + agent.demandesOuvertes()
+                    + " demande(s) : réattribuez-les avant de lui retirer le rôle");
+        }
+        support.lookup.retirerRole(utilisateurId, ROLE_AGENT);
+        return agents();
     }
 
     private VerificationDetailResponse appliquer(VerificationEspaceJpaEntity entite, DemandeVerification demande,

@@ -66,9 +66,11 @@ public class VerificationProfessionnelService {
         boolean peutSoumettre = dossierModifiable && VerificationSupport.manquants(completude).isEmpty();
         boolean peutRetirer = statut == StatutVerification.BROUILLON || statut == StatutVerification.EN_ATTENTE;
 
-        VerificationDetailResponse demande = derniere != null ? support.detail(derniere) : null;
+        VerificationDetailResponse demande = derniere != null ? support.detailPourProfessionnel(derniere) : null;
         List<VerificationResumeResponse> precedentes = historique.size() > 1
-                ? support.resumes(historique.subList(1, historique.size())) : List.of();
+                ? support.resumes(historique.subList(1, historique.size())).stream()
+                        .map(VerificationSupport::sansAgent).toList()
+                : List.of();
 
         return new EtatVerificationResponse(espaceId, etatAffiche(statut), Boolean.TRUE.equals(espace.getVerifie()),
                 espace.getDateVerification(), peutDeposer, peutSoumettre, peutRetirer, completude,

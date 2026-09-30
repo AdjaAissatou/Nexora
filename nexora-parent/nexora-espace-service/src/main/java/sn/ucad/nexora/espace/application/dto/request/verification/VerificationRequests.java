@@ -16,4 +16,7 @@ public final class VerificationRequests {
 
     /** Réattribution : l'utilisateur agent visé, ou null pour remettre la demande dans la file. */
     public record ReattributionRequest(Long agentUtilisateurId, String motif) {}
+
+    /** Désignation d'un agent par l'e-mail de son compte Nexora. */
+    public record AgentRequest(String email) {}
 }

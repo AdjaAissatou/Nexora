@@ -5,8 +5,10 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sn.ucad.nexora.espace.application.dto.request.verification.VerificationRequests.AgentRequest;
 import sn.ucad.nexora.espace.application.dto.request.verification.VerificationRequests.MotifRequest;
 import sn.ucad.nexora.espace.application.dto.request.verification.VerificationRequests.ReattributionRequest;
+import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.AgentVerificationResponse;
 import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.StatistiquesVerificationResponse;
 import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.VerificationDetailResponse;
 import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.VerificationResumeResponse;
@@ -33,7 +35,22 @@ public class VerificationAdminController {
         return ResponseEntity.ok(service.statistiques());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/agents")
+    public ResponseEntity<List<AgentVerificationResponse>> agents() {
+        return ResponseEntity.ok(service.agents());
+    }
+
+    @PostMapping("/agents")
+    public ResponseEntity<List<AgentVerificationResponse>> ajouterAgent(@RequestBody AgentRequest r) {
+        return ResponseEntity.ok(service.ajouterAgent(r.email()));
+    }
+
+    @DeleteMapping("/agents/{utilisateurId}")
+    public ResponseEntity<List<AgentVerificationResponse>> retirerAgent(@PathVariable Long utilisateurId) {
+        return ResponseEntity.ok(service.retirerAgent(utilisateurId));
+    }
+
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<VerificationDetailResponse> detail(@PathVariable Long id) {
         return ResponseEntity.ok(service.detail(id));
     }

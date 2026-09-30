@@ -385,6 +385,34 @@ public class VerificationSupport {
                 docs, controlesReponse, historique, bloquants);
     }
 
+    /** Événements internes au travail de l'agent, jamais montrés au professionnel. */
+    private static final Set<String> EVENEMENTS_INTERNES = Set.of(
+            TypeEvenement.CONTROLE.name(), TypeEvenement.REATTRIBUTION.name());
+
+    /**
+     * Vue du professionnel sur sa demande : sans les notes de contrôle ni les points bloquants de
+     * l'agent, et sans l'identité de l'agent (protection des agents contre les pressions). Le motif
+     * d'un document rejeté reste visible : c'est ce que le professionnel doit corriger.
+     */
+    VerificationDetailResponse detailPourProfessionnel(VerificationEspaceJpaEntity v) {
+        VerificationDetailResponse d = detail(v);
+        List<EvenementResponse> historique = d.historique().stream()
+                .filter(h -> !EVENEMENTS_INTERNES.contains(h.type()))
+                .map(h -> new EvenementResponse(h.type(), h.ancienStatut(), h.nouveauStatut(), h.roleActeur(),
+                        RoleActeur.AGENT.name().equals(h.roleActeur()) ? null : h.acteurNom(),
+                        TypeEvenement.DOCUMENT_EXAMINE.name().equals(h.type()) ? null : h.commentaire(),
+                        h.date()))
+                .toList();
+        return new VerificationDetailResponse(sansAgent(d.resume()), d.espace(), d.completude(), d.documents(),
+                List.of(), historique, List.of());
+    }
+
+    static VerificationResumeResponse sansAgent(VerificationResumeResponse r) {
+        return new VerificationResumeResponse(r.id(), r.espaceId(), r.espaceNom(), r.typeEspace(), r.commune(),
+                r.demandeurNom(), r.statut(), r.motif(), null, r.urgent(), r.dateCreation(), r.dateSoumission(),
+                r.datePriseEnCharge(), r.dateDecision());
+    }
+
     private static String nom(Map<Long, Personne> personnes, Long id) {
         Personne p = id == null ? null : personnes.get(id);
         return p != null ? p.nomComplet() : null;
