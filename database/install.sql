@@ -33,6 +33,7 @@
 \i 03_professional/04_horaire.sql
 \i 03_professional/05_certification.sql
 \i 03_professional/06_photo_espace.sql
+\i 03_professional/07_verification.sql
 
 
 -------------------------------------------------------
@@ -143,6 +144,7 @@
 \i 09_seed/18_lieux_publics.sql
 \i 09_seed/19_lieux_publics_extension.sql
 \i 09_seed/20_synchro_role_fournisseur.sql
+\i 09_seed/21_verification.sql
 
 -------------------------------------------------------
 -- VUES

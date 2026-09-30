@@ -7,6 +7,11 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  # Justificatifs de vérification : 8 Mo par fichier, comme les envois du web.
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 10MB
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,3 +24,10 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+
+# Dossier PRIVÉ des justificatifs de vérification (pièces d'identité…) : jamais servi en
+# statique, lu seulement par l'endpoint de téléchargement contrôlé. Par défaut
+# ~/nexora-justificatifs ; variable d'environnement NEXORA_JUSTIFICATIFS_DIR pour le changer.
+nexora:
+  justificatifs:
+    dir: ${NEXORA_JUSTIFICATIFS_DIR:${user.home}/nexora-justificatifs}

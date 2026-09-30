@@ -224,8 +224,9 @@ précédent :
    `database/01_security/09_revoked_tokens.sql`), puis renouvellement automatique du
    jeton d'accès avant son expiration (§4).
 5. **Vérification des espaces** (§8), en quatre étapes livrables séparément :
-   - 5a. Base et règles métier : tables `verification_*`, rôle `AGENT_VERIFICATION`,
-     machine à états dans `espace-service`, tests.
+   - 5a. ✅ Base et règles métier : tables `verification_*`, rôle `AGENT_VERIFICATION`,
+     machine à états dans `espace-service`, API complète (pro, agent, admin), stockage
+     privé des justificatifs, tests (voir §8.10).
    - 5b. Côté professionnel : onglet « Vérification » de Mon espace (complétude,
      dépôt privé des justificatifs, demande, suivi, compléments).
    - 5c. Côté agent : `/verification/...` (files, examen, décision motivée).
@@ -279,8 +280,8 @@ d'un espace qui lui appartient**.
                   ✓ espace vérifié            (motif : ce qui manque)        le pro pourra déposer
                         │                                │                   une NOUVELLE demande
                         │                   le pro complète et resoumet :
-                        │                   retour EN_ATTENTE, même dossier,
-                        │                   de préférence au même agent
+                        │                   retour EN_COURS chez le même agent
+                        │                   (EN_ATTENTE s'il a été retiré)
                         ↓
                    REVOQUEE  (admin : fraude ; ou automatique si une information
                               vérifiée est modifiée, voir 8.4)
@@ -445,7 +446,7 @@ Deux notions à ne pas confondre, et que les pages montrent différemment :
 
 Ce sont les **premiers endpoints de Nexora qui vérifient un rôle** (`hasRole`) : jusqu'ici
 tout est `permitAll()` ou `authenticated()` (§1). Toute transition non prévue par le
-schéma 8.2 est refusée (409), et chaque transition écrit son `verification_evenement`
+schéma 8.2 est refusée (400, message explicite), et chaque transition écrit son `verification_evenement`
 dans la même transaction.
 
 ### 8.7 Rôles et permissions
@@ -494,7 +495,8 @@ demandes par agent).
 
 ### 8.9 Questions ouvertes (décisions du porteur de projet)
 
-1. Justificatifs **obligatoires** pour ✓ Vérifié, par type d'espace. Proposition par
+1. ✅ *Tranché : proposition par défaut retenue.* Justificatifs **obligatoires** pour
+   ✓ Vérifié, par type d'espace. Proposition par
    défaut : pièce d'identité du responsable + justificatif d'adresse *ou* photo de la
    devanture pour tous ; autorisation d'exercer en plus pour pharmacie, clinique,
    école / université ; NINEA et RCCM facultatifs (réservés au 🏅).
@@ -504,6 +506,46 @@ demandes par agent).
 4. Durée de validité d'une vérification (revérification tous les 24 mois ?) — hors V1.
 5. Durée de conservation des pièces d'identité après la décision.
 
+### 8.10 ✅ Étape 5a — ce qui est en place
+
+**Base** (`database/`) :
+- `03_professional/07_verification.sql` : enum `statut_verification` et les 6 tables du §8.5.
+  Script **rejouable** : il sert à l'installation complète (inclus dans `install.sql`) comme à
+  la mise à jour d'une base existante.
+- `09_seed/21_verification.sql` (inclus dans `install.sql`) : rôle `AGENT_VERIFICATION`,
+  3 permissions, justificatifs et règles par défaut (§8.9, question 1), `GRANT` à
+  `nexora_user`, et **reprise de l'existant** : chaque espace déjà `verifie = true` reçoit une
+  demande `APPROUVEE` avec l'événement `REPRISE`, pour que le badge corresponde toujours à une
+  décision tracée.
+- `09_seed/22_demo_verification.sql` (hors `install.sql`, comme `07_demo_espaces.sql`) :
+  `agent.verification@nexora-demo.sn` (agent) et `admin.demo@nexora-demo.sn` (admin),
+  mot de passe `Password1!`.
+
+**`espace-service`** :
+- `domain/verification/DemandeVerification` : la machine à états, sans dépendance technique.
+- `application/service/verification/` : services professionnel, agent, administrateur,
+  accès aux justificatifs, et `VerificationModificationService` (règle §8.4.4, appelée par
+  `UpdateEspaceService`).
+- `infrastructure/storage/StockageJustificatifs` : dossier privé
+  (`NEXORA_JUSTIFICATIFS_DIR`, défaut `~/nexora-justificatifs`), type déduit du contenu
+  (PDF, JPG, PNG ; un faux PDF est refusé), 8 Mo, empreinte SHA-256, protection contre les
+  chemins hors du dossier.
+- `SecurityConfig` : `/api/v1/verifications/**` exige `AGENT_VERIFICATION`,
+  `/api/v1/admin/verifications/**` exige `ADMIN` ou `SUPER_ADMIN`.
+- Au passage, `nexora-common` : un fichier trop volumineux renvoie 400 « Fichier trop
+  volumineux » au lieu d'une erreur 500.
+
+**Tests** :
+- 19 tests unitaires (`mvn -pl nexora-espace-service test`) : machine à états, stockage,
+  détection des modifications d'informations vérifiées.
+- Scénario complet via la gateway, 52 contrôles, tous verts : dépôt, envoi, file de
+  l'agent, prise en charge, rejet d'un document, demande d'informations, resoumission,
+  contrôles, approbation, badge sur la fiche publique, notifications, retrait automatique du
+  badge après changement de téléphone, supervision admin, et refus d'accès (tiers, rôles).
+
+**Reste** : les pages (5b professionnel, 5c agent, 5d admin). Le web n'appelle pas encore
+cette API.
+
 ---
 *Dernière mise à jour : session du 30/09/2026, ajout de l'agent de vérification et du
-processus de vérification des espaces (§8).*
+processus de vérification des espaces (§8), étape 5a livrée.*

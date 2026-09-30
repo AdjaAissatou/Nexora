@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import sn.ucad.nexora.common.exception.BusinessException;
 import sn.ucad.nexora.common.exception.ResourceNotFoundException;
 import sn.ucad.nexora.common.exception.UnauthorizedException;
@@ -61,6 +62,12 @@ public class GlobalExceptionHandler {
                 .map(fe -> fe.getField() + " : " + fe.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         return corps(HttpStatus.BAD_REQUEST, "Validation échouée : " + details);
+    }
+
+    /** Fichier au-delà de spring.servlet.multipart.max-file-size : erreur de l'appelant, pas du serveur. */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleTailleFichier(MaxUploadSizeExceededException ex) {
+        return corps(HttpStatus.BAD_REQUEST, "Fichier trop volumineux");
     }
 
     @ExceptionHandler(Exception.class)

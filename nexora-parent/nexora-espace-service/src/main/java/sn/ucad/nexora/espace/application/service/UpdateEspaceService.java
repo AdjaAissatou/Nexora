@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.nexora.common.exception.UnauthorizedException;
 import sn.ucad.nexora.espace.application.dto.request.UpdateEspaceRequest;
+import sn.ucad.nexora.espace.application.service.verification.VerificationModificationService;
+import sn.ucad.nexora.espace.application.service.verification.VerificationModificationService.InformationsVerifiees;
 import sn.ucad.nexora.espace.application.usecase.UpdateEspaceUseCase;
 import sn.ucad.nexora.espace.domain.entity.EspaceProfessionnel;
 import sn.ucad.nexora.espace.domain.repository.EspaceRepository;
@@ -25,15 +27,18 @@ public class UpdateEspaceService implements UpdateEspaceUseCase {
     private final GeoQueryRepository geoRepository;
     private final AdresseLookupRepository adresseRepository;
     private final PhotoEspaceRepository photoRepository;
+    private final VerificationModificationService verificationModification;
 
     public UpdateEspaceService(EspaceRepository espaceRepository, UtilisateurLookupRepository utilisateurRepository,
                                 GeoQueryRepository geoRepository, AdresseLookupRepository adresseRepository,
-                                PhotoEspaceRepository photoRepository) {
+                                PhotoEspaceRepository photoRepository,
+                                VerificationModificationService verificationModification) {
         this.espaceRepository = espaceRepository;
         this.utilisateurRepository = utilisateurRepository;
         this.geoRepository = geoRepository;
         this.adresseRepository = adresseRepository;
         this.photoRepository = photoRepository;
+        this.verificationModification = verificationModification;
     }
 
     @Override
@@ -56,6 +61,19 @@ public class UpdateEspaceService implements UpdateEspaceUseCase {
 
         GeoQueryRepository.GeoNoms noms = geoRepository.verifierEtResoudre(
                 request.getIdRegion(), request.getIdDepartement(), request.getIdCommune());
+
+        AdresseJpaEntity adresseAvant = adresseRepository.findPrincipaleByEspaceId(espaceId).orElse(null);
+        InformationsVerifiees avant = new InformationsVerifiees(espace.getNom(), espace.getTelephone(),
+                espace.getNumeroNinea(), espace.getNumeroRccm(), espace.getRegistreCommerce(),
+                adresseAvant != null ? adresseAvant.getRegion() : null,
+                adresseAvant != null ? adresseAvant.getDepartement() : null,
+                adresseAvant != null ? adresseAvant.getCommune() : null,
+                adresseAvant != null ? adresseAvant.getQuartier() : null,
+                adresseAvant != null ? adresseAvant.getAdresseComplete() : null);
+        InformationsVerifiees apres = new InformationsVerifiees(request.getNom(), request.getTelephone(),
+                request.getNumeroNinea(), request.getNumeroRccm(), request.getRegistreCommerce(),
+                noms.region(), noms.departement(), noms.commune(), request.getQuartier(), request.getAdresseComplete());
+        List<String> champsVerifiesModifies = avant.differences(apres);
 
         espace.setNom(request.getNom().trim());
         espace.setSlogan(request.getSlogan());
@@ -90,6 +108,13 @@ public class UpdateEspaceService implements UpdateEspaceUseCase {
         adresseRepository.save(adresse);
 
         remplacerPhotos(espaceId, request.getPhotos());
+
+        // §8.4.4 : une information vérifiée modifiée retire le badge (ou est signalée à l'agent
+        // si une demande est en cours d'examen).
+        if (verificationModification.surModification(espaceId, utilisateurId, champsVerifiesModifies)) {
+            saved.setVerifie(false);
+            saved.setDateVerification(null);
+        }
 
         return saved;
     }
