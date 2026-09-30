@@ -44,7 +44,8 @@
         if (bounds.length === 1) {
             carte.setView(bounds[0], 13);
         } else {
-            carte.fitBounds(bounds, { padding: [30, 30] });
+            // Plusieurs résultats à la même adresse : ne pas zoomer jusqu'à la rue.
+            carte.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
         }
     }
 
