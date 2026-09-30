@@ -505,11 +505,12 @@
                                     <ui:fragment rendered="#{ve.etat == 'NON_VERIFIE'}">
                                         <p>Le badge « Vérifié sur Nexora » indique aux visiteurs que Nexora a contrôlé l'identité du
                                             responsable, l'existence de l'activité, l'adresse et les coordonnées. Déposez les justificatifs
-                                            ci-dessous, puis envoyez votre demande.</p>
+                                            ci-dessous, puis envoyez votre demande. Délai habituel de traitement : #{site.delaiVerification} jours.</p>
                                     </ui:fragment>
                                     <ui:fragment rendered="#{ve.etat == 'EN_COURS'}">
                                         <p>Votre demande a été reçue le #{format.dateHeure(dem.resume.dateSoumission)}.
-                                            Vous serez informé lorsque l'examen sera terminé.</p>
+                                            Délai habituel de traitement : #{site.delaiVerification} jours. Vous serez informé
+                                            lorsque l'examen sera terminé.</p>
                                     </ui:fragment>
                                     <ui:fragment rendered="#{ve.etat == 'A_COMPLETER'}">
                                         <div class="nx-alert nx-alert-etat nx-alert-warn" style="margin:0;">

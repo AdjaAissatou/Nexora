@@ -1,0 +1,17 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+    <!-- Une règle de justificatif (admin/parametres.xhtml) : variables r (Regle) et b (ParametresAdminBean). -->
+    <tr data-regle="#{r.code}" data-type-espace="#{empty r.typeEspaceId ? 'tous' : r.typeEspaceId}">
+        <td><strong>#{r.libelle}</strong></td>
+        <td>#{empty r.typeEspaceId ? 'Tous les espaces' : r.typeEspace}</td>
+        <td><h:selectBooleanCheckbox value="#{b.obligatoires[r.id]}" a:aria-label="Obligatoire" /></td>
+        <td><h:inputText value="#{b.groupes[r.id]}" styleClass="nx-input" style="max-width:150px;" a:aria-label="Groupe" /></td>
+        <td style="text-align:right; white-space:nowrap;">
+            <h:commandButton value="Enregistrer" action="#{b.modifierRegle(r.id)}" styleClass="nx-button nx-button-outline" />
+            <h:commandButton value="Retirer" action="#{b.retirerRegle(r.id)}" styleClass="nx-button nx-button-danger"
+                             onclick="return confirm('Ne plus demander ce justificatif (motif saisi plus haut) ?');" />
+        </td>
+    </tr>
+</ui:composition>

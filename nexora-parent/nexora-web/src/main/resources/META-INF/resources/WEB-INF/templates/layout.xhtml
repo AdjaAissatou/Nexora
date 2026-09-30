@@ -37,6 +37,11 @@
 
 <h:body>
 
+    <!-- Bandeau d'annonce : paramètre SITE_BANDEAU (§9.12), vide = aucun bandeau -->
+    <ui:fragment rendered="#{not empty site.bandeau}">
+        <div class="nx-bandeau" role="status">#{site.bandeau}</div>
+    </ui:fragment>
+
     <!-- ========================= -->
     <!-- NAVBAR -->
     <!-- ========================= -->
@@ -192,6 +197,19 @@
 
                     <h:link outcome="/inscription"
                             value="Créer un compte" />
+
+                </div>
+
+
+                <div class="nx-footer-links">
+
+                    <h4>Contact</h4>
+
+                    <a href="mailto:#{site.contactEmail}">#{site.contactEmail}</a>
+
+                    <ui:fragment rendered="#{not empty site.contactTelephone}">
+                        <a href="tel:#{site.contactTelephone.replace(' ', '')}">#{site.contactTelephone}</a>
+                    </ui:fragment>
 
                 </div>
 

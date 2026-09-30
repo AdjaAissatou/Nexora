@@ -4,9 +4,10 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import sn.ucad.nexora.common.notification.Notifications;
+import sn.ucad.nexora.common.parametre.Parametres;
 
 /**
- * Met {@link JournalActions} et {@link Notifications} à disposition de tous les services qui dépendent
+ * Met {@link JournalActions}, {@link Notifications} et {@link Parametres} à disposition de tous les services qui dépendent
  * de nexora-common.
  */
 @AutoConfiguration
@@ -22,5 +23,11 @@ public class JournalActionsAutoConfiguration {
     @ConditionalOnMissingBean
     public Notifications notifications() {
         return new Notifications();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public Parametres parametres() {
+        return new Parametres();
     }
 }

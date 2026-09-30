@@ -1266,7 +1266,15 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
     color: #E8EFEC;
     padding: 60px 0 26px;
 }
-.nx-footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; }
+.nx-footer-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
+.nx-footer-links a { overflow-wrap: anywhere; }
+
+/* Bandeau d'annonce (paramètre SITE_BANDEAU) : au-dessus de la barre de navigation */
+.nx-bandeau {
+    background: var(--nx-grad-gold); color: var(--nx-forest);
+    text-align: center; font-size: 14px; font-weight: 600; line-height: 1.5;
+    padding: 9px 16px;
+}
 .nx-footer-brand { font-size: 30px; font-weight: 700; font-family: var(--nx-font-display); }
 .nx-footer-brand span { background: var(--nx-grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .nx-footer p { max-width: 340px; color: #A9C0BA; line-height: 1.7; margin-top: 10px; }
@@ -1516,3 +1524,17 @@ body.nx-admin { background: var(--nx-bg); }
 .nx-matrice-case.oui { background: var(--nx-primary-light); color: var(--nx-primary); }
 .nx-matrice-case.non { color: var(--nx-text-secondary); }
 a.nx-matrice-case:hover { outline: 2px solid var(--nx-primary); }
+
+/* Paramètres de Nexora (admin/parametres.xhtml) */
+.nx-parametre { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 18px; padding: 14px 0; border-top: 1px solid var(--nx-border); }
+.nx-parametre:first-of-type { border-top: 0; }
+.nx-parametre-texte { display: flex; flex-direction: column; gap: 4px; }
+.nx-parametre-texte span { font-size: 13px; color: var(--nx-text-secondary); }
+.nx-parametre-texte small { font-size: 12px; color: var(--nx-text-secondary); }
+.nx-parametre-texte em { font-style: normal; font-weight: 600; color: var(--nx-text); }
+.nx-parametre-saisie { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.nx-parametre-saisie .nx-input, .nx-parametre-saisie .nx-select { margin: 0; }
+.nx-parametre-saisie > :first-child { flex: 1 1 100%; }
+.nx-parametre-saisie .nx-parametre-motif { flex: 1 1 160px; }
+.nx-parametre-saisie textarea.nx-input { min-height: 70px; }
+@media (max-width: 800px) { .nx-parametre { grid-template-columns: 1fr; gap: 10px; } }

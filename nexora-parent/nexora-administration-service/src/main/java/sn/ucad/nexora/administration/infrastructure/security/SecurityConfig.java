@@ -27,6 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**", "/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/admin/tableau-de-bord").hasAuthority("PERM_ACCEDER_BACK_OFFICE")
                         .requestMatchers("/api/v1/admin/journal", "/api/v1/admin/journal/**").hasAuthority("PERM_GERER_JOURNAL")
+                        .requestMatchers("/api/v1/admin/parametres", "/api/v1/admin/parametres/**").hasAuthority("PERM_GERER_PARAMETRES")
                         .anyRequest().denyAll())
                 .addFilterBefore(jwt, UsernamePasswordAuthenticationFilter.class)
                 .build();

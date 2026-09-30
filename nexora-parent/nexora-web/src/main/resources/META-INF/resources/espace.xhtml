@@ -180,7 +180,7 @@
                             <f:selectItem itemValue="1" itemLabel="★ À éviter" />
                         </h:selectOneRadio>
                         <h:inputTextarea id="commentaire" value="#{espaceDetailBean.nouveauCommentaire}" styleClass="nx-input" rows="3"
-                                         a:placeholder="Racontez votre expérience (facultatif)" a:maxlength="1000" />
+                                         a:placeholder="Racontez votre expérience (facultatif)" a:maxlength="#{site.avisLongueurMax}" />
                         <h:commandButton id="publier" value="Publier mon avis" action="#{espaceDetailBean.publierAvis}"
                                          styleClass="nx-button nx-button-primary" />
                     </h:form>

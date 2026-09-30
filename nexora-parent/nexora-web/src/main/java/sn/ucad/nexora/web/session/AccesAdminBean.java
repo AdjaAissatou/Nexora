@@ -97,6 +97,11 @@ public class AccesAdminBean {
         return session.aLaPermission("GERER_CATEGORIES", "GERER_TYPES_OFFRES", "GERER_ATTRIBUTS", "GERER_PARAMETRES");
     }
 
+    /** Paramètres de Nexora et règles des justificatifs, §9.12. */
+    public boolean isParametres() {
+        return session.aLaPermission("GERER_PARAMETRES");
+    }
+
     public boolean isJournal() {
         return session.aLaPermission("GERER_JOURNAL");
     }
@@ -146,6 +151,10 @@ public class AccesAdminBean {
 
     public void exigerSignalements() {
         session.exigerRole(session.isConnecte() && isSignalements());
+    }
+
+    public void exigerParametres() {
+        session.exigerRole(session.isConnecte() && isParametres());
     }
 
     public void exigerModererAvis() {

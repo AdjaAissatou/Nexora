@@ -40,12 +40,20 @@
                 </ui:fragment>
             </ui:fragment>
 
-            <ui:fragment rendered="#{!inscriptionBean.succes}">
+            <ui:fragment rendered="#{!inscriptionBean.succes and !site.inscriptionsOuvertes}">
+                <h1>Inscriptions fermées</h1>
+                <div class="nx-alert nx-alert-warn" id="inscriptions-fermees">
+                    Les inscriptions sont momentanément fermées. Réessayez plus tard, ou écrivez-nous à
+                    <a href="mailto:#{site.contactEmail}">#{site.contactEmail}</a>.
+                </div>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{!inscriptionBean.succes and site.inscriptionsOuvertes}">
                 <h1>Rejoindre Nexora</h1>
                 <p class="nx-sub">Créez votre compte pour rechercher, contacter et suivre vos espaces favoris.</p>
             </ui:fragment>
 
-            <h:form id="inscription" rendered="#{!inscriptionBean.succes}">
+            <h:form id="inscription" rendered="#{!inscriptionBean.succes and site.inscriptionsOuvertes}">
                 <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" layout="table" />
 
                 <div class="nx-form-grid">

@@ -149,6 +149,7 @@
 \i 09_seed/20_synchro_role_fournisseur.sql
 \i 09_seed/21_verification.sql
 \i 09_seed/24_rbac_permissions.sql
+\i 09_seed/27_parametres.sql
 
 -------------------------------------------------------
 -- VUES

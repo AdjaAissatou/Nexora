@@ -119,23 +119,21 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 
 ### Administrateur
 
-Back-office en construction, cadré au §9 : layout dédié, tableau de bord, journal
-d'actions et supervision des vérifications sont en place (étape 6a) ; le reste suit les
-étapes 6b à 6f.
+Back-office complet, cadré au §9 (étapes 6a à 6f) : layout dédié, menu filtré par permission.
 
 | Page | État |
 |---|---|
 | Tableau de bord admin | ✅ `/admin/index` (§9.7) |
 | Gérer les utilisateurs (rechercher, suspendre, réactiver, rôles) | ✅ `/admin/utilisateurs`, `/admin/utilisateur?id=` (§9.8) |
 | Rôles et permissions (matrice) | ✅ `/admin/roles` (§6, §9.8) |
-| Gérer/modérer les espaces | 🚧 |
-| Gérer le catalogue (catégories, types d'offre, attributs, tags) | 🚧 (déjà en base et seedé, aucune UI d'admin) |
-| Modérer avis / traiter signalements | 🚧 |
-| Vérifications : supervision, agents (§8) | ✅ `/admin/verifications`, dans le layout admin — l'édition des règles de justificatifs reste à faire (6f) |
+| Gérer/modérer les espaces et les offres | ✅ `/admin/espaces`, `/admin/espace?id=`, `/admin/offres` (§9.9) |
+| Gérer le catalogue (catégories, types d'offre, attributs) | ✅ `/admin/catalogue` (§9.11) |
+| Modérer avis / traiter signalements | ✅ `/admin/avis`, `/admin/signalements` (§9.10) |
+| Vérifications : supervision, agents (§8) | ✅ `/admin/verifications` ; règles des justificatifs dans `/admin/parametres` (§9.12) |
 | Certifications 🏅 | — (après la vérification) |
 | Statistiques plateforme | 🚧 |
 | Journal d'activité | ✅ `/admin/journal` (§9.7) |
-| Paramètres Nexora | 🚧 |
+| Paramètres Nexora | ✅ `/admin/parametres` (§9.12) |
 
 ## 4. ✅ Navigation par acteur
 
@@ -750,7 +748,7 @@ modifie depuis `/admin/roles` sans toucher au code.
 4. ✅ **6d — Signalements et avis** (§9.10) : bouton « Signaler » côté public, file de
    traitement, masquage des avis.
 5. ✅ **6e — Catalogue** (§9.11) : gestion des catégories, types d'offre, attributs et valeurs.
-6. **6f — Paramètres** : paramètres Nexora et règles de justificatifs de la vérification.
+6. ✅ **6f — Paramètres** (§9.12) : paramètres Nexora et règles de justificatifs de la vérification.
 
 Chaque étape est testée de bout en bout, comme le chantier 5, avant de passer à la
 suivante. Les pages suivent le style actuel ; la refonte visuelle viendra après.
@@ -1072,6 +1070,61 @@ Les corps JSON illisibles ou incomplets renvoient désormais 400, au lieu de 500
 - navigateur : parcours complet du gestionnaire, nettoyage compris par l'interface ;
 - non-régression complète.
 
+### 9.12 ✅ Étape 6f — paramètres et justificatifs de vérification
+
+**Paramètres de Nexora** (table `parametre`, seed `27_parametres.sql`). Seuls les paramètres
+connus du code se modifient, chacun avec ses bornes :
+
+| Code | Rôle | Valeur par défaut | Lu par |
+|---|---|---|---|
+| `SITE_BANDEAU` | bandeau d'annonce en haut des pages publiques (vide : aucun) | vide | web |
+| `SITE_CONTACT_EMAIL` | e-mail du pied de page | contact@nexora.sn | web |
+| `SITE_CONTACT_TELEPHONE` | téléphone du pied de page | 33 800 00 00 | web |
+| `INSCRIPTIONS_OUVERTES` | non : l'inscription est refusée (la connexion reste possible) | oui | auth-service, web |
+| `ESPACES_MAX_PAR_COMPTE` | espaces qu'un compte peut créer (1 à 50) | 5 | espace-service |
+| `AVIS_LONGUEUR_MAX` | caractères d'un commentaire d'avis (100 à 5000) | 1000 | recherche-service, web |
+| `VERIFICATION_DELAI_JOURS` | délai annoncé au pro pour sa vérification (1 à 60) | 5 | web |
+
+- Les services lisent la valeur à chaque usage (`Parametres` de nexora-common, avec la valeur
+  par défaut si la ligne manque) : pas de redémarrage.
+- Le web lit `GET /api/v1/public/parametres` (sans jeton, sans les paramètres internes) et garde
+  les valeurs une minute (`SiteBean`, `#{site.…}`).
+- Chaque modification demande un motif, est refusée si la valeur n'a pas changé, et est
+  journalisée (module `PARAMETRES`) : « libellé » : ancienne → nouvelle (motif).
+
+**Justificatifs de vérification** (tables `type_justificatif`, `justificatif_requis`, §8) :
+- types : créer (code dérivé du libellé), modifier, désactiver ou réactiver avec un motif. On
+  ne désactive pas un type encore demandé par une règle ;
+- règles : générales (tous les espaces) ou propres à un type d'espace ; obligatoire ou
+  facultative ; un *groupe* rend des justificatifs interchangeables (un seul suffit) ;
+- gardes : pas de doublon entre une règle générale et une règle de type sur le même
+  justificatif ; pas de règle sur un type désactivé ; il reste toujours au moins un justificatif
+  obligatoire pour tous les espaces ;
+- effet immédiat : le dossier de vérification du professionnel suit les règles en vigueur.
+
+**Permission** : `GERER_PARAMETRES` (super administrateur, administrateur, gestionnaire).
+
+**API**
+- administration-service : `GET /api/v1/public/parametres`, `GET /api/v1/admin/parametres`,
+  `PUT /api/v1/admin/parametres/{code}` `{valeur, motif}` ;
+- espace-service, `/api/v1/admin/justificatifs` : `GET`, `POST /types`, `PUT /types/{id}`,
+  `POST /types/{id}/activer|desactiver`, `POST /regles`, `PUT /regles/{id}`,
+  `POST /regles/{id}/supprimer`.
+
+**Web**
+- `/admin/parametres`, deux onglets : les paramètres par catégorie (valeur, motif,
+  enregistrer) ; les justificatifs (règles générales et celles d'un type d'espace choisi,
+  ajout, modification, retrait ; liste des types avec leur usage) ;
+- site public : bandeau, contact dans le pied de page, page d'inscription fermée, longueur
+  maximale du champ d'avis, délai annoncé dans l'onglet Vérification de Mon espace.
+
+**Tests**
+- API, 72 contrôles (`test_6f.py`) : droits, validation de chaque genre de valeur, effet sur
+  l'inscription, la création d'espace et la longueur des avis, lecture publique, journal ;
+  types et règles, gardes, effet sur le dossier de vérification du pro ;
+- navigateur : bandeau visible par un visiteur, inscription fermée puis rouverte, règles
+  d'un type d'espace, refus sans motif, modérateur sans accès, téléphone sans débordement.
+
 ## 10. ✅ Horaires des espaces
 
 **Le modèle** (tables `horaire` et `horaire_exception`, qui existaient sans être utilisées) :
@@ -1135,5 +1188,5 @@ Catalogue : la recherche accepte `ouvertMaintenant=true`, et chaque résultat po
 `jour_ferie`, vide pour l'instant) comme jours exceptionnels.
 
 ---
-*Dernière mise à jour : session du 30/09/2026, avis et signalements (6d), horaires des espaces et
-gestion du catalogue (6e) livrés.*
+*Dernière mise à jour : session du 30/09/2026, avis et signalements (6d), horaires des espaces,
+gestion du catalogue (6e) et paramètres (6f) livrés : le back-office est complet.*

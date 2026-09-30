@@ -33,6 +33,10 @@ public class RegisterAccountService implements RegisterAccountUseCase {
     private final EmailSenderPort emailSender;
     private final EventPublisherPort eventPublisher;
 
+    /** Paramètre INSCRIPTIONS_OUVERTES (§9.12) : fermer les inscriptions depuis le back-office. */
+    @org.springframework.beans.factory.annotation.Autowired
+    private sn.ucad.nexora.common.parametre.Parametres parametres;
+
     public RegisterAccountService(
             AccountRepository accountRepository,
             RoleRepository roleRepository,
@@ -55,6 +59,10 @@ public class RegisterAccountService implements RegisterAccountUseCase {
 
     @Override
     public RegisterResult register(RegisterCommand command) {
+
+        if (parametres != null && !parametres.booleen("INSCRIPTIONS_OUVERTES", true)) {
+            throw new BusinessException("Les inscriptions sont momentanément fermées. Réessayez plus tard.");
+        }
 
         // Vérification email
         if (accountRepository.existsByEmail(command.getEmail())) {

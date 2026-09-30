@@ -21,7 +21,11 @@ import sn.ucad.nexora.recherche.infrastructure.persistence.moderation.AvisModera
 @Service
 public class AvisService implements AvisUseCase {
 
+    /** Défaut du paramètre AVIS_LONGUEUR_MAX (§9.12). */
     private static final int COMMENTAIRE_MAX = 1000;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private sn.ucad.nexora.common.parametre.Parametres parametres;
 
     private final AvisRepository repository;
     private final AvisModerationRepository lecture;
@@ -38,8 +42,9 @@ public class AvisService implements AvisUseCase {
             throw new BusinessException("Un avis porte sur un espace ou sur une offre");
         }
         String commentaire = request.getCommentaire() == null || request.getCommentaire().isBlank() ? null : request.getCommentaire().trim();
-        if (commentaire != null && commentaire.length() > COMMENTAIRE_MAX) {
-            throw new BusinessException("Commentaire trop long (" + COMMENTAIRE_MAX + " caractères au plus)");
+        int max = parametres == null ? COMMENTAIRE_MAX : parametres.entier("AVIS_LONGUEUR_MAX", COMMENTAIRE_MAX);
+        if (commentaire != null && commentaire.length() > max) {
+            throw new BusinessException("Commentaire trop long (" + max + " caractères au plus)");
         }
         Cible cible = (request.getEspaceId() != null ? lecture.cibleEspace(request.getEspaceId()) : lecture.cibleOffre(request.getOffreId()))
                 .filter(Cible::visible)

@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean; import org.springframework.c
   .requestMatchers("/api/v1/admin/verifications","/api/v1/admin/verifications/**").hasAuthority("PERM_SUPERVISER_VERIFICATIONS")
   // Horaires (§10) : le propriétaire, avec la permission de gérer ses horaires
   .requestMatchers("/api/v1/espaces/{id:\\d+}/horaires","/api/v1/espaces/{id:\\d+}/horaires/**").hasAuthority("PERM_GERER_HORAIRES")
+  // Règles des justificatifs (§9.12)
+  .requestMatchers("/api/v1/admin/justificatifs","/api/v1/admin/justificatifs/**").hasAuthority("PERM_GERER_PARAMETRES")
   // Modération des espaces (§9.9)
   .requestMatchers("/api/v1/admin/espaces","/api/v1/admin/espaces/**").hasAuthority("PERM_MODERER_ESPACES")
   .anyRequest().authenticated()).addFilterBefore(jwt,UsernamePasswordAuthenticationFilter.class).build();}}

@@ -1,0 +1,171 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerParametres}" />
+</f:metadata>
+<ui:param name="section" value="parametres" />
+<ui:param name="b" value="#{parametresAdminBean}" />
+<ui:define name="titre">Paramètres</ui:define>
+<ui:define name="titre-page">Paramètres</ui:define>
+<ui:define name="content">
+
+    <nav class="nx-verif-onglets" style="margin-top:0;">
+        <h:link outcome="/admin/parametres" value="Paramètres de Nexora" id="onglet-parametres"
+                styleClass="#{b.ongletJustificatifs ? 'nx-button nx-button-outline' : 'nx-button nx-button-primary'}" />
+        <h:link outcome="/admin/parametres" value="Justificatifs de vérification" id="onglet-justificatifs"
+                styleClass="#{b.ongletJustificatifs ? 'nx-button nx-button-primary' : 'nx-button nx-button-outline'}">
+            <f:param name="vue" value="justificatifs" />
+        </h:link>
+    </nav>
+
+    <ui:fragment rendered="#{not empty b.erreur}">
+        <div class="nx-alert nx-alert-error">#{b.erreur}</div>
+    </ui:fragment>
+
+    <!-- ============================== Paramètres -->
+    <ui:fragment rendered="#{!b.ongletJustificatifs and empty b.erreur}">
+    <!-- Un seul formulaire : un h:form répété par ui:repeat partage son état « soumis » entre les lignes. -->
+    <h:form id="parametres" a:novalidate="novalidate">
+        <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+        <p style="color:var(--nx-text-secondary); margin-top:0;">
+            Chaque modification demande un motif et s'inscrit dans le journal d'actions, avec l'ancienne et la nouvelle valeur.
+            Le site public en tient compte dans la minute.
+        </p>
+        <ui:repeat var="cat" value="#{b.categories}">
+            <div class="nx-card">
+                <h3 style="margin-top:0;">#{b.libelleCategorie(cat)}</h3>
+                <ui:repeat var="p" value="#{b.parCategorie[cat]}">
+                    <div class="nx-parametre" data-code="#{p.code}">
+                        <div class="nx-parametre-texte">
+                            <strong>#{p.libelle}</strong>
+                            <span>#{p.description}</span>
+                            <small>Valeur actuelle : <em class="nx-parametre-valeur">#{b.valeurLisible(p)}</em>
+                                <ui:fragment rendered="#{not empty p.dateModification}"> · modifiée le #{format.dateHeure(p.dateModification)}</ui:fragment>
+                                <ui:fragment rendered="#{p.genre == 'NOMBRE'}"> · entre #{p.min} et #{p.max}</ui:fragment></small>
+                        </div>
+                        <div class="nx-parametre-saisie">
+                            <h:selectOneMenu value="#{b.saisies[p.code]}" styleClass="nx-select" rendered="#{p.genre == 'BOOLEEN'}" a:aria-label="#{p.libelle}">
+                                <f:selectItem itemLabel="Oui" itemValue="true" />
+                                <f:selectItem itemLabel="Non" itemValue="false" />
+                            </h:selectOneMenu>
+                            <h:inputText value="#{b.saisies[p.code]}" styleClass="nx-input" rendered="#{p.genre == 'NOMBRE'}"
+                                         a:type="number" a:min="#{p.min}" a:max="#{p.max}" a:aria-label="#{p.libelle}" />
+                            <h:inputText value="#{b.saisies[p.code]}" styleClass="nx-input" rendered="#{p.genre == 'EMAIL' or (p.genre == 'TEXTE' and p.max le 100)}"
+                                         a:type="#{p.genre == 'EMAIL' ? 'email' : 'text'}" a:maxlength="#{p.max}" a:aria-label="#{p.libelle}" />
+                            <h:inputTextarea value="#{b.saisies[p.code]}" styleClass="nx-input" rendered="#{p.genre == 'TEXTE' and p.max gt 100}" rows="2"
+                                             a:maxlength="#{p.max}" a:aria-label="#{p.libelle}" a:placeholder="#{p.code == 'SITE_BANDEAU' ? 'Vide : aucun bandeau' : ''}" />
+                            <h:inputText value="#{b.motifs[p.code]}" styleClass="nx-input nx-parametre-motif" a:placeholder="Motif (obligatoire)"
+                                         a:aria-label="Motif de la modification" />
+                            <h:commandButton value="Enregistrer" action="#{b.enregistrer(p.code)}" styleClass="nx-button nx-button-primary" />
+                        </div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </ui:repeat>
+    </h:form>
+    </ui:fragment>
+
+    <!-- ============================== Justificatifs -->
+    <ui:fragment rendered="#{b.ongletJustificatifs and empty b.erreur}">
+    <h:form id="justificatifs">
+        <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+        <div class="nx-card">
+            <h3 style="margin-top:0;">Pièces demandées</h3>
+            <p style="color:var(--nx-text-secondary); margin-top:0;">
+                Les règles générales s'appliquent à tous les espaces ; un type d'espace peut en demander d'autres
+                (ex. autorisation d'exercer pour une pharmacie). Des justificatifs d'un même <em>groupe</em> sont
+                interchangeables : un seul suffit. Il reste toujours au moins un justificatif obligatoire pour tous.
+            </p>
+            <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+                <div class="nx-field" style="margin:0; min-width:260px;">
+                    <label for="justificatifs:typeEspace">Voir aussi les règles d'un type d'espace</label>
+                    <h:selectOneMenu id="typeEspace" value="#{b.typeEspaceId}" styleClass="nx-select">
+                        <f:selectItem itemLabel="Règles générales seulement" itemValue="#{null}" />
+                        <f:selectItems value="#{b.typesEspace}" var="te" itemValue="#{te.id}"
+                                       itemLabel="#{te.nom}#{b.reglesPour(te.id) gt 0 ? ' ✦' : ''}" />
+                    </h:selectOneMenu>
+                </div>
+                <h:commandButton value="Afficher" action="#{b.choisirTypeEspace}" styleClass="nx-button nx-button-outline" immediate="false" />
+            </div>
+            <p style="font-size:12px; color:var(--nx-text-secondary);">✦ : type d'espace ayant ses propres règles.</p>
+
+            <div class="nx-field">
+                <label for="justificatifs:motif">Motif (obligatoire pour retirer une règle, activer ou désactiver un type) : écrit dans le journal</label>
+                <h:inputText id="motif" value="#{b.motif}" styleClass="nx-input" />
+            </div>
+
+            <table class="nx-verif-tableau" id="regles">
+                <tr><th>Justificatif</th><th>Demandé à</th><th>Obligatoire</th><th>Groupe</th><th></th></tr>
+                <ui:repeat var="r" value="#{b.reglesGenerales}">
+                    <ui:include src="/WEB-INF/includes/regle-justificatif.xhtml" />
+                </ui:repeat>
+                <ui:repeat var="r" value="#{b.reglesDuType}">
+                    <ui:include src="/WEB-INF/includes/regle-justificatif.xhtml" />
+                </ui:repeat>
+            </table>
+            <ui:fragment rendered="#{not empty b.typeEspaceId and empty b.reglesDuType}">
+                <p style="color:var(--nx-text-secondary);">Aucune règle propre à « #{b.nomTypeEspace} » : seules les règles générales s'appliquent.</p>
+            </ui:fragment>
+
+            <h4>Demander un justificatif #{empty b.typeEspaceId ? 'à tous les espaces' : 'aux espaces « '.concat(b.nomTypeEspace).concat(' »')}</h4>
+            <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+                <div class="nx-field" style="margin:0; min-width:220px;">
+                    <label for="justificatifs:regleJustificatif">Justificatif</label>
+                    <h:selectOneMenu id="regleJustificatif" value="#{b.regleJustificatif}" styleClass="nx-select">
+                        <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
+                        <f:selectItems value="#{b.typesActifs}" var="t" itemValue="#{t.id}" itemLabel="#{t.libelle}" />
+                    </h:selectOneMenu>
+                </div>
+                <div class="nx-field" style="margin:0; width:180px;">
+                    <label for="justificatifs:regleGroupe">Groupe (facultatif)</label>
+                    <h:inputText id="regleGroupe" value="#{b.regleGroupe}" styleClass="nx-input" a:placeholder="ex. ADRESSE" />
+                </div>
+                <label class="nx-field-check" style="margin-bottom:10px;"><h:selectBooleanCheckbox id="regleObligatoire" value="#{b.regleObligatoire}" /> Obligatoire</label>
+                <h:commandButton id="ajouterRegle" value="Ajouter" action="#{b.ajouterRegle}" styleClass="nx-button nx-button-primary" />
+            </div>
+        </div>
+
+        <div class="nx-card">
+            <h3 style="margin-top:0;">Types de justificatif</h3>
+            <table class="nx-verif-tableau" id="types">
+                <tr><th>Justificatif</th><th>Utilisation</th><th>État</th><th></th></tr>
+                <ui:repeat var="t" value="#{b.types}">
+                    <tr data-code="#{t.code}">
+                        <td><strong>#{t.libelle}</strong> <span style="font-size:12px; color:var(--nx-text-secondary);">#{t.code}</span>
+                            <ui:fragment rendered="#{not empty t.description}"><br /><span style="font-size:13px;">#{t.description}</span></ui:fragment></td>
+                        <td style="font-size:13px;">#{t.regles} règle(s) · #{t.documents} document(s) reçu(s)</td>
+                        <td><span class="nx-badge #{t.actif ? 'nx-badge-verifie' : 'nx-badge-alerte'}">#{t.actif ? 'Actif' : 'Désactivé'}</span></td>
+                        <td style="text-align:right; white-space:nowrap;">
+                            <h:commandButton value="Modifier" action="#{b.editerType(t)}" styleClass="nx-button nx-button-outline" />
+                            <h:commandButton value="Désactiver" action="#{b.activerType(t.id, false)}" rendered="#{t.actif}" styleClass="nx-button nx-button-danger"
+                                             onclick="return confirm('Désactiver ce type de justificatif avec le motif saisi ?');" />
+                            <h:commandButton value="Réactiver" action="#{b.activerType(t.id, true)}" rendered="#{!t.actif}" styleClass="nx-button nx-button-primary" />
+                        </td>
+                    </tr>
+                </ui:repeat>
+            </table>
+
+            <h4 id="edition-type">#{empty b.typeEdite ? 'Nouveau type de justificatif' : 'Modifier le type de justificatif'}</h4>
+            <div class="nx-form-grid">
+                <div class="nx-field">
+                    <label for="justificatifs:typeLibelle">Libellé</label>
+                    <h:inputText id="typeLibelle" value="#{b.typeLibelle}" styleClass="nx-input" a:maxlength="150" />
+                </div>
+                <div class="nx-field">
+                    <label for="justificatifs:typeDescription">Description (facultative)</label>
+                    <h:inputText id="typeDescription" value="#{b.typeDescription}" styleClass="nx-input" />
+                </div>
+            </div>
+            <h:commandButton id="enregistrerType" value="#{empty b.typeEdite ? 'Créer le type' : 'Enregistrer'}" action="#{b.enregistrerType}" styleClass="nx-button nx-button-primary" />
+            <h:commandButton value="Annuler" action="#{b.annulerType}" rendered="#{not empty b.typeEdite}" styleClass="nx-button nx-button-outline" style="margin-left:8px;" />
+        </div>
+    </h:form>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>
