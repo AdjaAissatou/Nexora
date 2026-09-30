@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import sn.ucad.nexora.web.config.GatewayConfig;
+import sn.ucad.nexora.web.dto.administration.ChiffresPublicsResponse;
 import sn.ucad.nexora.web.dto.administration.PageJournalResponse;
 import sn.ucad.nexora.web.dto.administration.TableauDeBordResponse;
 import sn.ucad.nexora.web.error.ApiErrors;
@@ -22,6 +23,16 @@ public class AdministrationApiClient {
     private final String baseUrl = GatewayConfig.gatewayUrl() + "/administration-service";
     private final RestClient client = RestClient.builder().baseUrl(baseUrl)
             .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
+
+    /** Chiffres publics de l'accueil ; {@code null} si indisponibles (la page n'affiche alors aucun chiffre). */
+    public ChiffresPublicsResponse chiffresPublics() {
+        try {
+            return client.get().uri("/api/v1/public/chiffres").retrieve().body(ChiffresPublicsResponse.class);
+        } catch (Exception e) {
+            LOG.warn("Chiffres publics indisponibles : {}", e.getMessage());
+            return null;
+        }
+    }
 
     public TableauDeBordResponse tableauDeBord(String accessToken) {
         LOG.info("Requête GET {}/api/v1/admin/tableau-de-bord", baseUrl);

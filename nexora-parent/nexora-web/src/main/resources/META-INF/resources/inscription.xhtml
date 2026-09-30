@@ -6,7 +6,21 @@
 <ui:define name="titre">Créer un compte — Nexora</ui:define>
 <ui:define name="content">
     <div class="nx-auth-wrap">
-        <div class="nx-auth-card" style="max-width:480px;">
+      <div class="nx-auth-split">
+
+        <div class="nx-auth-visuel"
+             style="--photo: url('#{resource['images:inscription-pirogues.jpg']}');"
+             role="img"
+             aria-label="Des pirogues colorées alignées sur le rivage">
+            <div class="nx-auth-visuel-marque">Nexora<span>.</span></div>
+            <div>
+                <blockquote>Chaque quartier a ses talents. <em>Rejoignez-les.</em></blockquote>
+                <p class="nx-auth-visuel-texte">Trouvez les bonnes adresses, suivez vos espaces favoris et,
+                    si vous êtes professionnel, créez votre espace en quelques minutes.</p>
+            </div>
+        </div>
+
+        <div class="nx-auth-card">
 
             <ui:fragment rendered="#{inscriptionBean.succes}">
                 <h1 style="display:flex; align-items:center; gap:10px;">
@@ -34,7 +48,7 @@
             <h:form id="inscription" rendered="#{!inscriptionBean.succes}">
                 <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" layout="table" />
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div class="nx-form-grid">
                     <div class="nx-field">
                         <label for="inscription:prenom">Prénom</label>
                         <h:inputText id="prenom" value="#{inscriptionBean.prenom}" styleClass="nx-input" required="true" />
@@ -72,6 +86,8 @@
                 Déjà un compte ? <h:link outcome="/connexion" value="Se connecter" />
             </p>
         </div>
+
+      </div>
     </div>
 </ui:define>
 </ui:composition>

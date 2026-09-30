@@ -3,16 +3,22 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:f="http://xmlns.jcp.org/jsf/core"
-    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
 
     <ui:define name="titre">
-        Nexora — Découvrez les espaces professionnels du Sénégal
+        Nexora — Découvrez ce qui fait vivre votre ville
+    </ui:define>
+
+    <ui:define name="head-extra">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     </ui:define>
 
     <ui:define name="content">
 
         <!-- =========================
-             HERO
+             HERO — la scène d'ouverture
         ========================== -->
         <section class="nx-hero">
 
@@ -22,24 +28,20 @@
 
                     <span class="nx-eyebrow">
                         <span class="nx-eyebrow-dot"></span>
-                        L'écosystème professionnel du Sénégal
+                        Les professionnels du Sénégal, près de vous
                     </span>
 
                     <h1>
-                        Trouvez le bon
-                        <span>professionnel</span>,
-                        près de chez vous.
+                        Découvrez ce qui fait vivre <em>votre ville</em>.
                     </h1>
 
                     <p class="nx-hero-description">
-                        Restaurants, boutiques, pharmacies, cliniques,
-                        hôtels, écoles, garages et bien plus encore.
-                        Découvrez les professionnels qui vous entourent
-                        sur une seule plateforme.
+                        Trouvez les professionnels, commerces et services qui vous entourent :
+                        restaurants, ateliers, boutiques, cliniques, garages et bien plus.
                     </p>
 
-                    <!-- RECHERCHE -->
-                    <h:form styleClass="nx-search-form">
+                    <!-- RECHERCHE : quoi + où -->
+                    <h:form styleClass="nx-search-form" id="recherche">
 
                         <div class="nx-search-box">
 
@@ -52,92 +54,86 @@
                             <h:inputText
                                 id="rechercheRapide"
                                 value="#{rechercheRapideBean.q}"
-                                placeholder="Que recherchez-vous ? Restaurant, pharmacie, garage..."
+                                pt:placeholder="Restaurant, couturier, pharmacie…"
+                                pt:aria-label="Que recherchez-vous ?"
                                 styleClass="nx-search-input"/>
 
+                            <div class="nx-search-lieu">
+                                <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/>
+                                </svg>
+                                <h:inputText
+                                    id="commune"
+                                    value="#{rechercheRapideBean.commune}"
+                                    pt:placeholder="Dakar"
+                                    pt:aria-label="Où ? (commune)"
+                                    styleClass="nx-search-input"/>
+                            </div>
+
                             <h:commandButton
-                                value="Rechercher"
+                                value="→"
                                 action="#{rechercheRapideBean.rechercher}"
-                                styleClass="nx-search-button"/>
+                                pt:aria-label="Rechercher"
+                                pt:title="Rechercher"
+                                styleClass="nx-search-button nx-search-fleche"/>
 
                         </div>
 
                     </h:form>
 
-                    <div class="nx-popular">
-                        <span>Recherches populaires :</span>
-
-                        <h:link
-                            outcome="/recherche"
-                            value="Restaurants"
-                            styleClass="nx-popular-link">
+                    <div class="nx-pastilles">
+                        <h:link outcome="/recherche" value="Restaurants" styleClass="nx-pastille">
                             <f:param name="typeEspace" value="Restaurant"/>
                         </h:link>
-
-                        <h:link
-                            outcome="/recherche"
-                            value="Pharmacies"
-                            styleClass="nx-popular-link">
+                        <h:link outcome="/recherche" value="Ateliers &amp; couture" styleClass="nx-pastille">
+                            <f:param name="typeEspace" value="Atelier"/>
+                        </h:link>
+                        <h:link outcome="/recherche" value="Boutiques" styleClass="nx-pastille">
+                            <f:param name="typeEspace" value="Boutique"/>
+                        </h:link>
+                        <h:link outcome="/recherche" value="Pharmacies" styleClass="nx-pastille">
                             <f:param name="typeEspace" value="Pharmacie"/>
                         </h:link>
-
-                        <h:link
-                            outcome="/recherche"
-                            value="Cliniques"
-                            styleClass="nx-popular-link">
-                            <f:param name="typeEspace" value="Clinique"/>
+                        <h:link outcome="/recherche" value="Services" styleClass="nx-pastille">
+                            <f:param name="typeEspace" value="Service"/>
                         </h:link>
                     </div>
 
                 </div>
 
-                <!-- Décoration -->
+                <!-- Photographie immersive -->
                 <div class="nx-hero-visual">
 
-                    <div class="nx-hero-orbit nx-orbit-one"></div>
-                    <div class="nx-hero-orbit nx-orbit-two"></div>
-
-                    <div class="nx-hero-card">
-
-                        <div class="nx-mini-icon">
-                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/>
-                            </svg>
+                    <div class="nx-hero-photo"
+                         style="--photo: url('#{resource['images:accueil-dakar.jpg']}');"
+                         role="img"
+                         aria-label="Un taxi jaune et un car dans une rue de Dakar">
+                        <div class="nx-hero-legende">
+                            ✦ Dakar
+                            <small>La ville qui ne s'arrête jamais</small>
                         </div>
-
-                        <div>
-                            <strong>Des professionnels</strong>
-                            <small>près de vous</small>
-                        </div>
-
-                        <span class="nx-check">
-                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 13l4 4L19 7"/>
-                            </svg>
-                        </span>
-
                     </div>
 
                     <div class="nx-floating-card nx-floating-top">
                         <span class="nx-floating-icon">
-                            <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                                <path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/>
+                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 13l4 4L19 7"/>
                             </svg>
                         </span>
                         <div>
                             <strong>Espaces vérifiés</strong>
-                            <small>Plus de confiance</small>
+                            <small>Contrôlés par nos agents</small>
                         </div>
                     </div>
 
                     <div class="nx-floating-card nx-floating-bottom">
-                        <span class="nx-floating-icon">
+                        <span class="nx-floating-icon vert">
                             <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/>
                             </svg>
                         </span>
                         <div>
-                            <strong>À proximité</strong>
+                            <strong>À deux pas</strong>
                             <small>Découvrez votre quartier</small>
                         </div>
                     </div>
@@ -150,74 +146,79 @@
 
 
         <!-- =========================
-             CATEGORIES
+             CATÉGORIES EN IMAGES
         ========================== -->
         <section class="nx-section nx-categories-section">
 
             <div class="nx-container">
 
                 <div class="nx-section-heading">
-
                     <div>
-                        <span class="nx-section-eyebrow">
-                            EXPLOREZ
-                        </span>
-
-                        <h2>
-                            Découvrez par catégorie
-                        </h2>
-
-                        <p>
-                            Trouvez rapidement le type d'espace professionnel
-                            dont vous avez besoin.
-                        </p>
+                        <span class="nx-section-eyebrow">Explorez</span>
+                        <h2>Ce que votre ville a de meilleur</h2>
+                        <p>Des tables généreuses, des ateliers de couture, des marchés vivants et des services de confiance.</p>
                     </div>
+                    <h:link outcome="/recherche" value="Tout explorer →" styleClass="nx-see-all"/>
+                </div>
 
-                    <h:link
-                        outcome="/recherche"
-                        value="Voir tout →"
-                        styleClass="nx-see-all"/>
+                <div class="nx-categories-photo">
+
+                    <h:link outcome="/recherche" styleClass="nx-categorie-photo"
+                            style="--photo: url('#{resource['images:categorie-restaurants.jpg']}');">
+                        <f:param name="typeEspace" value="Restaurant"/>
+                        <div class="nx-categorie-photo-texte">
+                            <strong>Restaurants</strong>
+                            <span>Les bonnes tables près de vous</span>
+                        </div>
+                    </h:link>
+
+                    <h:link outcome="/recherche" styleClass="nx-categorie-photo"
+                            style="--photo: url('#{resource['images:categorie-mode.jpg']}');">
+                        <f:param name="typeEspace" value="Atelier"/>
+                        <div class="nx-categorie-photo-texte">
+                            <strong>Ateliers &amp; couture</strong>
+                            <span>Le savoir-faire des artisans</span>
+                        </div>
+                    </h:link>
+
+                    <h:link outcome="/recherche" styleClass="nx-categorie-photo"
+                            style="--photo: url('#{resource['images:categorie-marches.jpg']}');">
+                        <f:param name="typeEspace" value="Boutique"/>
+                        <div class="nx-categorie-photo-texte">
+                            <strong>Marchés &amp; boutiques</strong>
+                            <span>Les produits frais et les commerces du quartier</span>
+                        </div>
+                    </h:link>
+
+                    <h:link outcome="/recherche" styleClass="nx-categorie-photo"
+                            style="--photo: url('#{resource['images:categorie-services.jpg']}');">
+                        <f:param name="typeEspace" value="Service"/>
+                        <div class="nx-categorie-photo-texte">
+                            <strong>Services</strong>
+                            <span>Des pros pour chaque besoin</span>
+                        </div>
+                    </h:link>
 
                 </div>
 
-
                 <div class="nx-category-grid">
 
-                    <ui:repeat
-                        var="type"
-                        value="#{rechercheRapideBean.categories}">
+                    <ui:repeat var="type" value="#{rechercheRapideBean.categories}">
 
-                        <h:link
-                            outcome="/recherche"
-                            styleClass="nx-category-card">
+                        <h:link outcome="/recherche" styleClass="nx-category-card">
 
-                            <f:param
-                                name="typeEspace"
-                                value="#{type.nom}"/>
+                            <f:param name="typeEspace" value="#{type.nom}"/>
 
-                            <div
-                                class="nx-category-icon"
-                                style="--category-color: #{type.couleur};">
-
+                            <div class="nx-category-icon" style="--category-color: #{type.couleur};">
                                 <h:outputText value="#{type.icone}" escape="false" />
-
                             </div>
 
                             <div class="nx-category-content">
-
-                                <strong>
-                                    #{type.nom}
-                                </strong>
-
-                                <span>
-                                    Découvrir
-                                </span>
-
+                                <strong>#{type.nom}</strong>
+                                <span>Découvrir</span>
                             </div>
 
-                            <span class="nx-category-arrow">
-                                →
-                            </span>
+                            <span class="nx-category-arrow">→</span>
 
                         </h:link>
 
@@ -228,6 +229,138 @@
             </div>
 
         </section>
+
+
+        <!-- =========================
+             TALENTS ET CHIFFRES (réels, calculés par administration-service)
+        ========================== -->
+        <section class="nx-section">
+
+            <div class="nx-container nx-talents">
+
+                <div class="nx-talents-photo"
+                     style="--photo: url('#{resource['images:talents-cuisine.jpg']}');"
+                     role="img"
+                     aria-label="Une femme prépare un plat sénégalais traditionnel"></div>
+
+                <div class="nx-talents-texte">
+
+                    <span class="nx-section-eyebrow">Le goût du local</span>
+
+                    <h2 class="nx-titre-editorial">
+                        Le Sénégal regorge de talents. Nexora vous aide à les trouver.
+                    </h2>
+
+                    <p>
+                        Derrière chaque adresse, il y a un savoir-faire : une cuisinière, un tailleur,
+                        une pharmacienne, un mécanicien. Nexora les rend visibles, avec des informations
+                        claires, des avis et des espaces vérifiés.
+                    </p>
+
+                    <ui:fragment rendered="#{accueilBean.chiffres ne null}">
+                        <div class="nx-chiffres">
+                            <div class="nx-chiffre">
+                                <strong>#{accueilBean.chiffres.espaces}</strong>
+                                <span>#{accueilBean.chiffres.espaces le 1 ? 'espace professionnel' : 'espaces professionnels'}</span>
+                            </div>
+                            <div class="nx-chiffre">
+                                <strong>#{accueilBean.chiffres.offres}</strong>
+                                <span>#{accueilBean.chiffres.offres le 1 ? 'offre publiée' : 'offres publiées'}</span>
+                            </div>
+                            <div class="nx-chiffre">
+                                <strong>#{accueilBean.chiffres.espacesVerifies}</strong>
+                                <span>#{accueilBean.chiffres.espacesVerifies le 1 ? 'espace vérifié' : 'espaces vérifiés'}</span>
+                            </div>
+                            <div class="nx-chiffre">
+                                <strong>#{accueilBean.chiffres.communes}</strong>
+                                <span>#{accueilBean.chiffres.communes le 1 ? 'commune' : 'communes'}</span>
+                            </div>
+                        </div>
+                    </ui:fragment>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PRÈS DE VOUS — carte et espaces
+        ========================== -->
+        <ui:fragment rendered="#{accueilBean.presDeVousVisible}">
+        <section class="nx-section nx-pres-section">
+
+            <div class="nx-container">
+
+                <div class="nx-section-heading">
+                    <div>
+                        <span class="nx-section-eyebrow">Près de vous</span>
+                        <h2>Ils vous attendent au coin de la rue</h2>
+                        <p>Les espaces de Nexora sur la carte. Choisissez une activité pour affiner.</p>
+                    </div>
+                    <h:link outcome="/recherche" value="Voir la carte complète →" styleClass="nx-see-all"/>
+                </div>
+
+                <div class="nx-pastilles nx-pres-filtres">
+                    <button type="button" class="nx-pastille active" data-type="">Tout</button>
+                    <ui:repeat var="t" value="#{accueilBean.typesPresents}">
+                        <button type="button" class="nx-pastille" data-type="#{t}">#{t}</button>
+                    </ui:repeat>
+                </div>
+
+                <div class="nx-pres-grille">
+
+                    <div class="nx-pres-carte">
+                        <div id="nx-accueil-map" class="nx-accueil-map" data-contexte="#{request.contextPath}" data-points="#{accueilBean.pointsJson}"></div>
+                        <div class="nx-pres-carte-legende">✦ Sénégal</div>
+                    </div>
+
+                    <div class="nx-pres-liste">
+                        <ui:repeat var="e" value="#{accueilBean.espacesAffiches}">
+                            <a class="nx-espace-carte"
+                               href="#{request.contextPath}/espace.xhtml?id=#{e.id}"
+                               data-type="#{e.typeEspace}">
+
+                                <div class="nx-espace-carte-media"
+                                     style="--repli: url('#{resource['images:'.concat(accueilBean.photoRepli(e.typeEspace))]}');">
+                                    <img src="#{e.photoInterne ? resource['images:'.concat(e.photo)] : e.photo}"
+                                         alt="#{e.nom}" loading="lazy"
+                                         onerror="this.remove()" />
+                                    <ui:fragment rendered="#{e.certifie}">
+                                        <span class="nx-badge nx-badge-certifie">✦ Certifié</span>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{e.verifie and !e.certifie}">
+                                        <span class="nx-badge nx-badge-verifie">✓ Vérifié</span>
+                                    </ui:fragment>
+                                </div>
+
+                                <div class="nx-espace-carte-corps">
+                                    <span class="nx-espace-carte-type">#{e.typeEspace}</span>
+                                    <strong>#{e.nom}</strong>
+                                    <div class="nx-espace-carte-meta">
+                                        <span>#{empty e.commune ? 'Sénégal' : e.commune}</span>
+                                        <ui:fragment rendered="#{e.nombreAvis gt 0}">
+                                            <span class="nx-etoiles">★ <h:outputText value="#{e.note}"><f:convertNumber maxFractionDigits="1" minFractionDigits="1" locale="fr"/></h:outputText>
+                                                <small>(#{e.nombreAvis})</small></span>
+                                        </ui:fragment>
+                                        <ui:fragment rendered="#{empty e.nombreAvis or e.nombreAvis le 0}">
+                                            <span>Nouveau</span>
+                                        </ui:fragment>
+                                    </div>
+                                    <span class="nx-espace-carte-action">Découvrir l'espace →</span>
+                                </div>
+
+                            </a>
+                        </ui:repeat>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        </ui:fragment>
 
 
         <!-- =========================
@@ -243,42 +376,25 @@
 
                     <div class="nx-professional-content">
 
-                        <span class="nx-gold-label">
-                            POUR LES PROFESSIONNELS
-                        </span>
+                        <span class="nx-gold-label">POUR LES PROFESSIONNELS</span>
 
-                        <h2>
-                            Donnez à votre activité
-                            la visibilité qu'elle mérite.
-                        </h2>
+                        <h2>Donnez à votre activité la lumière qu'elle mérite.</h2>
 
                         <p>
-                            Créez votre espace professionnel sur Nexora
-                            et présentez votre activité, vos coordonnées,
-                            vos services, vos avis et vos informations
-                            essentielles à vos futurs clients.
+                            Créez votre espace sur Nexora : présentez votre activité, vos offres,
+                            vos horaires et vos avis. Faites vérifier votre espace pour gagner
+                            la confiance de vos futurs clients.
                         </p>
 
                         <div class="nx-professional-actions">
-
-                            <h:link
-                                outcome="/inscription"
-                                value="Créer mon espace"
-                                styleClass="nx-button nx-button-gold"/>
-
-                            <h:link
-                                outcome="/recherche"
-                                value="Découvrir Nexora"
-                                styleClass="nx-button nx-button-outline"/>
-
+                            <h:link outcome="/inscription" value="Créer mon espace" styleClass="nx-button nx-button-gold"/>
+                            <h:link outcome="/recherche" value="Découvrir Nexora" styleClass="nx-button nx-button-outline"/>
                         </div>
 
                     </div>
 
                     <div class="nx-professional-symbol">
-                        <div class="nx-symbol-circle">
-                            N
-                        </div>
+                        <div class="nx-symbol-circle"><span>N</span></div>
                     </div>
 
                 </div>
@@ -298,68 +414,39 @@
                 <div class="nx-values-grid">
 
                     <div class="nx-value">
-
                         <div class="nx-value-icon">
                             <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/>
                             </svg>
                         </div>
-
                         <div>
-                            <h3>
-                                Proche de vous
-                            </h3>
-
-                            <p>
-                                Retrouvez les professionnels
-                                de votre quartier et de votre ville.
-                            </p>
+                            <h3>Découvrez</h3>
+                            <p>Les professionnels de votre quartier et de votre ville, sur une seule carte.</p>
                         </div>
-
                     </div>
 
-
                     <div class="nx-value">
-
                         <div class="nx-value-icon">
                             <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M5 13l4 4L19 7"/>
                             </svg>
                         </div>
-
                         <div>
-                            <h3>
-                                Plus de confiance
-                            </h3>
-
-                            <p>
-                                Consultez les informations,
-                                avis et badges des espaces.
-                            </p>
+                            <h3>Connectez</h3>
+                            <p>Des informations claires, des avis et des espaces vérifiés par nos agents.</p>
                         </div>
-
                     </div>
 
-
                     <div class="nx-value">
-
                         <div class="nx-value-icon">
-                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 3 2 9l10 6 10-6-10-6z"/><path d="M2 15l10 6 10-6"/>
+                            <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                                <path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/>
                             </svg>
                         </div>
-
                         <div>
-                            <h3>
-                                Un seul endroit
-                            </h3>
-
-                            <p>
-                                Une plateforme pour découvrir
-                                différents types de professionnels.
-                            </p>
+                            <h3>Faites vivre le local</h3>
+                            <p>Chaque visite soutient un commerce, un artisan, un savoir-faire d'ici.</p>
                         </div>
-
                     </div>
 
                 </div>
@@ -367,6 +454,8 @@
             </div>
 
         </section>
+
+        <h:outputScript library="js" name="accueil.js" target="body" />
 
     </ui:define>
 

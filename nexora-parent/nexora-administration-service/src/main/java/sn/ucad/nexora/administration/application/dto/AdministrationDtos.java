@@ -24,4 +24,10 @@ public final class AdministrationDtos {
 
     public record PageJournalResponse(List<ActionJournalResponse> actions, int page, boolean pageSuivante,
                                       List<String> modules) {}
+
+    /**
+     * Chiffres publics de la page d'accueil, toujours lus en direct : jamais de valeur inventée.
+     * {@code communes} : communes où au moins un espace actif est présent.
+     */
+    public record ChiffresPublicsResponse(long espaces, long offres, long espacesVerifies, long communes) {}
 }

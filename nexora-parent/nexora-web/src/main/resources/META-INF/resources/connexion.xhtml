@@ -9,6 +9,19 @@
 <ui:define name="titre">Connexion — Nexora</ui:define>
 <ui:define name="content">
     <div class="nx-auth-wrap">
+      <div class="nx-auth-split">
+
+        <div class="nx-auth-visuel"
+             style="--photo: url('#{resource['images:connexion-kayar.jpg']}');"
+             role="img"
+             aria-label="Des pêcheurs debout sur une pirogue, dans l'eau peu profonde de Kayar">
+            <div class="nx-auth-visuel-marque">Nexora<span>.</span></div>
+            <div>
+                <blockquote>Découvrez. Connectez. <em>Faites vivre le local.</em></blockquote>
+                <div class="nx-auth-visuel-lieu">Kayar</div>
+            </div>
+        </div>
+
         <div class="nx-auth-card">
             <h1>Content de vous revoir</h1>
             <p class="nx-sub">Connectez-vous pour accéder à votre compte Nexora.</p>
@@ -39,10 +52,11 @@
                 <h:link outcome="/mot-de-passe-oublie" value="Mot de passe oublié ?" />
             </p>
             <p class="nx-auth-footer">
-                Pas encore de compte ?
-                <h:link outcome="/inscription" value="Créer un compte" />
+                Pas encore de compte ?&#160;<h:link outcome="/inscription" value="Créer un compte" />
             </p>
         </div>
+
+      </div>
     </div>
 </ui:define>
 </ui:composition>

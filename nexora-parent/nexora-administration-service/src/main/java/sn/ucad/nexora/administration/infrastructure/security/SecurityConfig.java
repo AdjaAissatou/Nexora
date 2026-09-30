@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .csrf(c -> c.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/actuator/**", "/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/admin/tableau-de-bord").hasAuthority("PERM_ACCEDER_BACK_OFFICE")
                         .requestMatchers("/api/v1/admin/journal", "/api/v1/admin/journal/**").hasAuthority("PERM_GERER_JOURNAL")
                         .anyRequest().denyAll())

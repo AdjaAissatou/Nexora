@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.nexora.administration.application.dto.AdministrationDtos.ActionJournalResponse;
+import sn.ucad.nexora.administration.application.dto.AdministrationDtos.ChiffresPublicsResponse;
 import sn.ucad.nexora.administration.application.dto.AdministrationDtos.PageJournalResponse;
 import sn.ucad.nexora.administration.application.dto.AdministrationDtos.TableauDeBordResponse;
 import sn.ucad.nexora.administration.infrastructure.persistence.AdministrationLectureRepository;
@@ -39,6 +40,21 @@ public class AdministrationService {
                 lecture.compter("SELECT COUNT(*) FROM signalement WHERE statut = 'EN_ATTENTE'"),
                 lecture.compter("SELECT COUNT(*) FROM avis"),
                 avecJournal ? lecture.journal(null, null, DERNIERES_ACTIONS, 0) : List.of());
+    }
+
+    /** Ce que la vitrine publique montre : uniquement ce qui est visible (espaces actifs, offres publiées). */
+    @Transactional(readOnly = true)
+    public ChiffresPublicsResponse chiffresPublics() {
+        return new ChiffresPublicsResponse(
+                lecture.compter("SELECT COUNT(*) FROM espace_professionnel WHERE statut = 'ACTIF'"),
+                lecture.compter("""
+                        SELECT COUNT(*) FROM offre o JOIN espace_professionnel e ON e.id_espace = o.id_espace
+                        WHERE o.statut = 'PUBLIE' AND e.statut = 'ACTIF'"""),
+                lecture.compter("SELECT COUNT(*) FROM espace_professionnel WHERE statut = 'ACTIF' AND verifie"),
+                lecture.compter("""
+                        SELECT COUNT(DISTINCT LOWER(a.commune)) FROM adresse a
+                        JOIN espace_professionnel e ON e.id_espace = a.id_espace
+                        WHERE e.statut = 'ACTIF' AND a.commune IS NOT NULL"""));
     }
 
     @Transactional(readOnly = true)
