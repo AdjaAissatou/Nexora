@@ -44,6 +44,8 @@ public class EspaceDetailBean implements Serializable {
     private Long monUtilisateurId;
     /** Mon avis sur cet espace, même masqué (null si je n'en ai pas). */
     private AvisApiClient.MonAvis monAvis;
+    /** Horaires et état « ouvert maintenant » (§10) ; null si indisponibles. */
+    private sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse horaires;
     private Integer nouvelleNote;
     private String nouveauCommentaire;
 
@@ -70,6 +72,11 @@ public class EspaceDetailBean implements Serializable {
             offres = catalogueApiClient.rechercher(CritereRecherche.parEspace(id)).contenu();
         } catch (ApiException e) {
             offres = List.of();
+        }
+        try {
+            horaires = espaceApiClient.horaires(session.isConnecte() ? session.getAccessToken() : null, id);
+        } catch (ApiException e) {
+            horaires = null;
         }
         try {
             avis = avisApiClient.parEspace(id);
@@ -164,6 +171,8 @@ public class EspaceDetailBean implements Serializable {
     public void setNouvelleNote(Integer nouvelleNote) { this.nouvelleNote = nouvelleNote; }
     public String getNouveauCommentaire() { return nouveauCommentaire; }
     public void setNouveauCommentaire(String nouveauCommentaire) { this.nouveauCommentaire = nouveauCommentaire; }
+
+    public sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse getHoraires() { return horaires; }
 
     public boolean isFavori() { return favori; }
     public Long getId() { return id; }

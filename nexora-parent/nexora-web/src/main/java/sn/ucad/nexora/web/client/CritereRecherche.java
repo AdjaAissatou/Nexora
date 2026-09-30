@@ -19,15 +19,17 @@ public record CritereRecherche(
         Boolean estProduit,
         Boolean avecPromotion,
         Boolean espaceVerifie,
+        /** Uniquement les espaces ouverts en ce moment (horaires, heure de Dakar). */
+        Boolean ouvertMaintenant,
         String tri,
         int page,
         int taille) {
 
     public static CritereRecherche vide() {
-        return new CritereRecherche(null, null, null, null, null, null, null, null, null, null, null, null, "PERTINENCE", 0, 12);
+        return new CritereRecherche(null, null, null, null, null, null, null, null, null, null, null, null, null, "PERTINENCE", 0, 12);
     }
 
     public static CritereRecherche parEspace(Long idEspace) {
-        return new CritereRecherche(null, null, null, null, null, null, idEspace, null, null, null, null, null, "DATE_DESC", 0, 50);
+        return new CritereRecherche(null, null, null, null, null, null, idEspace, null, null, null, null, null, null, "DATE_DESC", 0, 50);
     }
 }

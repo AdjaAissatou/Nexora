@@ -61,6 +61,7 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         params.setEstProduit(request.getEstProduit());
         params.setAvecPromotion(request.getAvecPromotion());
         params.setEspaceVerifie(request.getEspaceVerifie());
+        params.setOuvertMaintenant(request.getOuvertMaintenant());
         params.setTri(request.getTri());
         params.setPage(request.getPage());
         params.setTaille(request.getTaille());
@@ -91,6 +92,7 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         r.setNegociable(o.isNegociable());
         r.setStatut(o.getStatut());
         r.setMotifModeration(o.getMotifModeration());
+        r.setEspaceOuvertMaintenant(o.getEspaceOuvertMaintenant());
         r.setEspaceId(o.getEspaceId());
         r.setEspaceNom(o.getEspaceNom());
         r.setEspaceLogo(o.getEspaceLogo());

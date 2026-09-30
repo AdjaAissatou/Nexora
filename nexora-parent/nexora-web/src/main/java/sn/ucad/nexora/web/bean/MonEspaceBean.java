@@ -46,6 +46,9 @@ public class MonEspaceBean implements Serializable {
     @Inject
     private VerificationEspaceBean verification;
 
+    @Inject
+    private HorairesEspaceBean horaires;
+
     private List<EspaceResponse> mesEspaces;
     private EspaceResponse espace;
     private List<OffreSummaryResponse> mesOffres;
@@ -107,6 +110,7 @@ public class MonEspaceBean implements Serializable {
             mesOffres = espace == null ? List.of()
                     : catalogueApiClient.gestion(session.getAccessToken(), espace.id()).contenu();
             if (espace != null) verification.initialiser(espace.id());
+            if (espace != null) horaires.initialiser(espace.id());
         } catch (ApiException e) {
             // Pas encore de profil utilisateur exploitable côté espace-service : pas une erreur bloquante,
             // l'utilisateur voit simplement la proposition de créer son espace.

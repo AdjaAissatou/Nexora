@@ -28,6 +28,8 @@ public class OffreSearchRequest {
     private Boolean estProduit;
     private Boolean avecPromotion;
     private Boolean espaceVerifie;
+    /** Uniquement les espaces ouverts en ce moment (horaires renseignés, heure de Dakar, §10). */
+    private Boolean ouvertMaintenant;
 
     /** PERTINENCE | PRIX_ASC | PRIX_DESC | DATE_DESC | NOTE */
     private String tri = "PERTINENCE";
@@ -60,6 +62,8 @@ public class OffreSearchRequest {
     public void setEstProduit(Boolean estProduit) { this.estProduit = estProduit; }
     public Boolean getAvecPromotion() { return avecPromotion; }
     public void setAvecPromotion(Boolean avecPromotion) { this.avecPromotion = avecPromotion; }
+    public Boolean getOuvertMaintenant() { return ouvertMaintenant; }
+    public void setOuvertMaintenant(Boolean ouvertMaintenant) { this.ouvertMaintenant = ouvertMaintenant; }
     public Boolean getEspaceVerifie() { return espaceVerifie; }
     public void setEspaceVerifie(Boolean espaceVerifie) { this.espaceVerifie = espaceVerifie; }
     public String getTri() { return tri; }

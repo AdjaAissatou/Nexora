@@ -29,7 +29,9 @@ public record OffreSummaryResponse(
         BigDecimal valeurReduction,
         // Liste de gestion du professionnel seulement (§9.9) ; PUBLIE en recherche publique
         String statut,
-        String motifModeration) {
+        String motifModeration,
+        /** Ouvert en ce moment ; null si l'espace n'a pas renseigné ses horaires (§10). */
+        Boolean espaceOuvertMaintenant) {
 
     public boolean suspendue() {
         return "SUSPENDU".equals(statut);

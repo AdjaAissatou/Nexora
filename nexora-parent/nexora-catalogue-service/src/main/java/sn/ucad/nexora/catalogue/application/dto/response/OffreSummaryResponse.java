@@ -19,6 +19,8 @@ public class OffreSummaryResponse {
     // Statut et modération : utiles à la liste de gestion du professionnel (PUBLIE en recherche publique)
     private String statut;
     private String motifModeration;
+    /** Ouvert en ce moment : null si l'espace n'a pas renseigné ses horaires (§10). */
+    private Boolean espaceOuvertMaintenant;
 
     // Espace
     private Long espaceId;
@@ -93,6 +95,8 @@ public class OffreSummaryResponse {
 
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+    public Boolean getEspaceOuvertMaintenant() { return espaceOuvertMaintenant; }
+    public void setEspaceOuvertMaintenant(Boolean v) { this.espaceOuvertMaintenant = v; }
     public String getMotifModeration() { return motifModeration; }
     public void setMotifModeration(String motifModeration) { this.motifModeration = motifModeration; }
 }

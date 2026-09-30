@@ -155,7 +155,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 NULL::BOOLEAN AS urgence,
 
                 img.url AS image_principale,
-                o.motif_moderation
+                o.motif_moderation,
+                -- État d'ouverture de l'espace à l'heure de Dakar (NULL sans horaires, §10) ; faux s'il est fermé par le pro
+                CASE WHEN NOT ep.ouvert THEN FALSE
+                     ELSE espace_ouvert_a(ep.id_espace, CAST(NOW() AT TIME ZONE 'Africa/Dakar' AS TIMESTAMP)) END AS espace_ouvert_maintenant
 
             FROM offre o
             JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
@@ -250,6 +253,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
 
         if (Boolean.TRUE.equals(params.getAvecPromotion())) {
             sql.append(" AND p.promotion_nom IS NOT NULL ");
+        }
+
+        if (Boolean.TRUE.equals(params.getOuvertMaintenant())) {
+            sql.append(" AND ep.ouvert AND espace_ouvert_a(ep.id_espace, CAST(NOW() AT TIME ZONE 'Africa/Dakar' AS TIMESTAMP)) IS TRUE ");
         }
 
         if (Boolean.TRUE.equals(params.getEspaceVerifie())) {
@@ -396,6 +403,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
         // Puis motif_moderation (index 64)
         if (r.length > 64) {
             o.setMotifModeration(str(r[64]));
+        }
+        // Puis espace_ouvert_maintenant (index 65)
+        if (r.length > 65) {
+            o.setEspaceOuvertMaintenant(r[65] == null ? null : toBool(r[65]));
         }
         return o;
     }

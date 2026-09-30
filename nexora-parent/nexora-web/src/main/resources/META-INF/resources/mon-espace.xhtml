@@ -3,7 +3,8 @@
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
                  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                 xmlns:p="http://primefaces.org/ui">
+                 xmlns:p="http://primefaces.org/ui"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 <f:metadata>
     <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}" />
 </f:metadata>
@@ -83,6 +84,7 @@
                             <f:param name="idEspace" value="#{monEspaceBean.espace.id}" />
                         </h:link>
                         <button type="button" class="nx-espace-nav-item" data-tab="infos" onclick="nexoraAfficherOnglet('infos', this)">Gérer les informations de l'espace</button>
+                        <button type="button" class="nx-espace-nav-item" data-tab="horaires" onclick="nexoraAfficherOnglet('horaires', this)">Horaires</button>
                         <button type="button" class="nx-espace-nav-item" data-tab="verification" onclick="nexoraAfficherOnglet('verification', this)">
                             Vérification
                             <ui:fragment rendered="#{not empty verificationEspaceBean.codeEtat}">
@@ -271,7 +273,7 @@
                             <div class="nx-field">
                                 <label class="nx-field-check">
                                     <h:selectBooleanCheckbox id="ouvert" value="#{monEspaceBean.espaceOuvert}" />
-                                    Espace ouvert (visible comme actif par les visiteurs)
+                                    Espace ouvert (décochez pour une fermeture temporaire : « Fermé temporairement » s'affiche quels que soient vos horaires)
                                 </label>
                             </div>
 
@@ -388,6 +390,89 @@
                                              onclick="return nexoraConfirmerModificationVerifiee(#{monEspaceBean.espace.verifie});" />
                         </h:form>
                     </div>
+                </div>
+
+                <!-- ===================== Onglet Horaires (docs/architecture-acteurs.md §10) ===================== -->
+                <div class="nx-tab-pane" id="tab-horaires">
+                    <h:form id="horairesForm">
+                        <div class="nx-card">
+                            <div class="nx-section-header">
+                                <h3 style="margin:0;">Horaires d'ouverture</h3>
+                                <ui:fragment rendered="#{horairesEspaceBean.horaires.renseignes}">
+                                    <span class="nx-etat-ouverture #{horairesEspaceBean.horaires.ouvertMaintenant ? 'ouvert' : ''}">#{horairesEspaceBean.horaires.etat}</span>
+                                </ui:fragment>
+                            </div>
+                            <p style="color:var(--nx-text-secondary); margin:0 0 14px;">
+                                Vos visiteurs voient si vous êtes ouvert en ce moment (heure de Dakar), et la recherche propose
+                                « Ouverts maintenant ». Une fermeture après minuit (ex. 18:00 – 02:00) se saisit telle quelle.
+                                <ui:fragment rendered="#{!horairesEspaceBean.horaires.renseignes}"><br /><strong>Vos horaires ne sont pas encore renseignés :
+                                    nous vous proposons 8 h – 18 h du lundi au samedi, à ajuster avant d'enregistrer.</strong></ui:fragment>
+                            </p>
+                            <h:messages for="horairesForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                            <table class="nx-horaires-edition">
+                                <tr><th>Jour</th><th>Ouvert</th><th>24 h/24</th><th>Ouverture</th><th>Fermeture</th><th>Pause (début)</th><th>Pause (fin)</th></tr>
+                                <ui:repeat var="l" value="#{horairesEspaceBean.lignes}" varStatus="i">
+                                    <tr>
+                                        <td class="jour">#{l.libelle}</td>
+                                        <td><h:selectBooleanCheckbox id="ouvert" value="#{l.ouvert}" /></td>
+                                        <td><h:selectBooleanCheckbox id="h24" value="#{l.ouvert24h}" /></td>
+                                        <td><h:inputText id="ouverture" value="#{l.ouverture}" styleClass="nx-input" a:type="time" /></td>
+                                        <td><h:inputText id="fermeture" value="#{l.fermeture}" styleClass="nx-input" a:type="time" /></td>
+                                        <td><h:inputText id="pauseDebut" value="#{l.pauseDebut}" styleClass="nx-input" a:type="time" /></td>
+                                        <td><h:inputText id="pauseFin" value="#{l.pauseFin}" styleClass="nx-input" a:type="time" /></td>
+                                    </tr>
+                                </ui:repeat>
+                            </table>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+                                <h:commandButton id="enregistrer" value="Enregistrer les horaires" action="#{horairesEspaceBean.enregistrer}" styleClass="nx-button nx-button-primary" />
+                                <h:commandButton id="copierLundi" value="Recopier le lundi jusqu'au samedi" action="#{horairesEspaceBean.copierLundi}" styleClass="nx-button nx-button-outline-dark" />
+                                <ui:fragment rendered="#{horairesEspaceBean.horaires.renseignes}">
+                                    <h:commandButton id="effacer" value="Effacer les horaires" action="#{horairesEspaceBean.effacer}" styleClass="nx-button nx-button-danger"
+                                                     onclick="return confirm('Effacer vos horaires ? Votre fiche n\'indiquera plus si vous êtes ouvert.');" />
+                                </ui:fragment>
+                            </div>
+                        </div>
+
+                        <div class="nx-card">
+                            <h3 style="margin-top:0;">Jours exceptionnels</h3>
+                            <p style="color:var(--nx-text-secondary); margin:0 0 14px;">
+                                Tabaski, Magal, inventaire, congés : un jour exceptionnel remplace vos horaires habituels pour cette date.
+                            </p>
+                            <ui:fragment rendered="#{empty horairesEspaceBean.horaires.exceptions}">
+                                <p style="color:var(--nx-text-light);">Aucun jour exceptionnel à venir.</p>
+                            </ui:fragment>
+                            <ul class="nx-verif-liste">
+                                <ui:repeat var="x" value="#{horairesEspaceBean.horaires.exceptions}">
+                                    <li><span class="nx-verif-texte"><strong>#{format.dateLongue(x.date)}</strong> · #{x.resume}#{empty x.motif ? '' : ' · '.concat(x.motif)}</span>
+                                        <span class="nx-verif-actions"><h:commandLink value="Supprimer" action="#{horairesEspaceBean.supprimerException(x.id)}" /></span></li>
+                                </ui:repeat>
+                            </ul>
+                            <div class="nx-form-grid" style="margin-top:14px;">
+                                <div class="nx-field">
+                                    <label for="horairesForm:dateException">Date</label>
+                                    <h:inputText id="dateException" value="#{horairesEspaceBean.dateException}" styleClass="nx-input" a:type="date" a:min="#{horairesEspaceBean.aujourdhui}" />
+                                </div>
+                                <div class="nx-field">
+                                    <label for="horairesForm:motifException">Motif (affiché aux visiteurs)</label>
+                                    <h:inputText id="motifException" value="#{horairesEspaceBean.motifException}" styleClass="nx-input" a:maxlength="255" a:placeholder="Tabaski" />
+                                </div>
+                            </div>
+                            <label class="nx-field-check" style="margin-bottom:10px;">
+                                <h:selectBooleanCheckbox id="fermeException" value="#{horairesEspaceBean.fermeException}" /> Fermé toute la journée
+                            </label>
+                            <div class="nx-form-grid">
+                                <div class="nx-field">
+                                    <label for="horairesForm:ouvertureException">Sinon, ouverture</label>
+                                    <h:inputText id="ouvertureException" value="#{horairesEspaceBean.ouvertureException}" styleClass="nx-input" a:type="time" />
+                                </div>
+                                <div class="nx-field">
+                                    <label for="horairesForm:fermetureException">et fermeture</label>
+                                    <h:inputText id="fermetureException" value="#{horairesEspaceBean.fermetureException}" styleClass="nx-input" a:type="time" />
+                                </div>
+                            </div>
+                            <h:commandButton id="ajouterException" value="Ajouter ce jour exceptionnel" action="#{horairesEspaceBean.ajouterException}" styleClass="nx-button nx-button-outline-dark" />
+                        </div>
+                    </h:form>
                 </div>
 
                 <!-- ===================== Onglet Vérification (docs/architecture-acteurs.md §8.8) ===================== -->

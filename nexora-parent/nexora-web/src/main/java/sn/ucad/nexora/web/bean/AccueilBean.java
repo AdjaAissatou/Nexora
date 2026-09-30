@@ -53,7 +53,7 @@ public class AccueilBean implements Serializable {
         chiffres = administrationApiClient.chiffresPublics();
         try {
             List<OffreSummaryResponse> offres = catalogueApiClient.rechercher(new CritereRecherche(
-                    null, null, null, null, null, null, null, null, null, null, null, null, "PERTINENCE", 0, 60)).contenu();
+                    null, null, null, null, null, null, null, null, null, null, null, null, null, "PERTINENCE", 0, 60)).contenu();
             Map<Long, EspaceVitrine> parEspace = new LinkedHashMap<>();
             for (OffreSummaryResponse o : offres) {
                 if (o.espaceId() == null) continue;

@@ -174,6 +174,9 @@ public class OffreController {
             @Parameter(description = "Uniquement les espaces vérifiés")
             @RequestParam(required = false) Boolean espaceVerifie,
 
+            @Parameter(description = "Uniquement les espaces ouverts en ce moment (heure de Dakar)")
+            @RequestParam(required = false) Boolean ouvertMaintenant,
+
             @Parameter(description = "Tri : PERTINENCE | PRIX_ASC | PRIX_DESC | DATE_DESC | NOTE")
             @RequestParam(defaultValue = "PERTINENCE") String tri,
 
@@ -196,6 +199,7 @@ public class OffreController {
         request.setEstProduit(estProduit);
         request.setAvecPromotion(avecPromotion);
         request.setEspaceVerifie(espaceVerifie);
+        request.setOuvertMaintenant(ouvertMaintenant);
         request.setTri(tri);
         request.setPage(page);
         request.setTaille(Math.min(taille, 100));

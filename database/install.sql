@@ -72,6 +72,7 @@
 \i 04_catalogue/15_categorie_type_espace.sql
 \i 04_catalogue/16_offre_espace_cascade.sql
 \i 03_professional/08_moderation.sql
+\i 03_professional/09_horaires.sql
 
 -------------------------------------------------------
 -- RECHERCHE

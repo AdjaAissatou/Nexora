@@ -65,6 +65,7 @@ public class CatalogueApiClient {
                             .queryParamIfPresent("estProduit", java.util.Optional.ofNullable(c.estProduit()))
                             .queryParamIfPresent("avecPromotion", java.util.Optional.ofNullable(c.avecPromotion()))
                             .queryParamIfPresent("espaceVerifie", java.util.Optional.ofNullable(c.espaceVerifie()))
+                            .queryParamIfPresent("ouvertMaintenant", java.util.Optional.ofNullable(c.ouvertMaintenant()))
                             .queryParam("tri", c.tri() == null ? "PERTINENCE" : c.tri())
                             .queryParam("page", c.page())
                             .queryParam("taille", c.taille())

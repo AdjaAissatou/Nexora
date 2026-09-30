@@ -30,6 +30,7 @@ public class Offre {
     private Double scorePertinence;
     private String statut;
     private String motifModeration;
+    private Boolean espaceOuvertMaintenant;
 
     private LocalDateTime dateCreation;
     private LocalDateTime dateModification;
@@ -125,6 +126,8 @@ public class Offre {
 
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+    public Boolean getEspaceOuvertMaintenant() { return espaceOuvertMaintenant; }
+    public void setEspaceOuvertMaintenant(Boolean v) { this.espaceOuvertMaintenant = v; }
     public String getMotifModeration() { return motifModeration; }
     public void setMotifModeration(String motifModeration) { this.motifModeration = motifModeration; }
 

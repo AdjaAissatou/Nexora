@@ -34,6 +34,7 @@ public class RechercheParams {
     private Boolean disponible;
     private Boolean avecPromotion;
     private Boolean espaceVerifie;
+    private Boolean ouvertMaintenant;
 
     /** Tri : PERTINENCE, PRIX_ASC, PRIX_DESC, DATE_DESC, NOTE */
     private String tri;
@@ -83,4 +84,6 @@ public class RechercheParams {
     public void setPage(int page) { this.page = page; }
     public int getTaille() { return taille; }
     public void setTaille(int taille) { this.taille = taille; }
+    public Boolean getOuvertMaintenant() { return ouvertMaintenant; }
+    public void setOuvertMaintenant(Boolean ouvertMaintenant) { this.ouvertMaintenant = ouvertMaintenant; }
 }

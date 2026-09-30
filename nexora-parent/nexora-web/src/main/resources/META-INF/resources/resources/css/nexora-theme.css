@@ -1322,6 +1322,29 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 .nx-signaler-ligne a { color: var(--nx-text-secondary); }
 .nx-signaler-ligne a:hover { color: var(--nx-error); }
 
+/* Horaires et état d'ouverture (§10) */
+.nx-ouverture { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); }
+.nx-ouverture::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #B9B3A7; }
+.nx-ouverture.ouvert { color: var(--nx-emerald); }
+.nx-ouverture.ouvert::before { background: #2BA36B; box-shadow: 0 0 0 3px rgba(43, 163, 107, 0.18); }
+.nx-etat-ouverture { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    background: #F1ECE3; color: var(--nx-text-secondary); }
+.nx-etat-ouverture::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #B9B3A7; }
+.nx-etat-ouverture.ouvert { background: var(--nx-primary-light); color: var(--nx-emerald); }
+.nx-etat-ouverture.ouvert::before { background: #2BA36B; }
+.nx-horaires { width: 100%; border-collapse: collapse; font-size: 14px; }
+.nx-horaires td { padding: 7px 0; border-bottom: 1px dashed var(--nx-border); }
+.nx-horaires td:last-child { text-align: right; color: var(--nx-text-secondary); }
+.nx-horaires tr.aujourdhui td { font-weight: 700; color: var(--nx-forest); }
+.nx-horaires tr.aujourdhui td:last-child { color: var(--nx-emerald); }
+.nx-horaires-exceptions { margin-top: 12px; font-size: 13px; color: var(--nx-text-secondary); }
+.nx-horaires-edition { width: 100%; border-collapse: collapse; font-size: 14px; }
+.nx-horaires-edition th { text-align: left; font-size: 12px; color: var(--nx-text-light); font-weight: 700; padding: 6px 6px 6px 0; }
+.nx-horaires-edition td { padding: 6px 6px 6px 0; border-top: 1px solid var(--nx-border); vertical-align: middle; }
+.nx-horaires-edition input[type=time] { padding: 7px 8px; font-size: 13px; width: 100%; min-width: 92px; }
+.nx-horaires-edition td.jour { font-weight: 700; color: var(--nx-forest); white-space: nowrap; }
+@media (max-width: 760px) { .nx-horaires-edition { display: block; overflow-x: auto; } }
+
 /* =========================================================
    RESPONSIVE
 ========================================================= */

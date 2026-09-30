@@ -41,6 +41,8 @@ public class RechercheBean implements Serializable {
     private String commune;
     private BigDecimal prixMax;
     private boolean verifieUniquement;
+    /** Uniquement les espaces ouverts en ce moment (§10). */
+    private boolean ouvertMaintenant;
     private String tri = "PERTINENCE";
 
     private int page = 0;
@@ -96,6 +98,7 @@ public class RechercheBean implements Serializable {
         commune = null;
         prixMax = null;
         verifieUniquement = false;
+        ouvertMaintenant = false;
         tri = "PERTINENCE";
         rechercher();
     }
@@ -105,7 +108,7 @@ public class RechercheBean implements Serializable {
         try {
             resultats = catalogueApiClient.rechercher(new CritereRecherche(
                     q, null, idCategorie, typeEspace, commune, null, null, null, prixMax, null, null,
-                    verifieUniquement ? Boolean.TRUE : null, tri, page, TAILLE_PAGE));
+                    verifieUniquement ? Boolean.TRUE : null, ouvertMaintenant ? Boolean.TRUE : null, tri, page, TAILLE_PAGE));
         } catch (ApiException e) {
             resultats = OffrePageResponse.vide();
             erreur = e.getMessage();
@@ -254,6 +257,14 @@ public class RechercheBean implements Serializable {
 
     public boolean isVerifieUniquement() {
         return verifieUniquement;
+    }
+
+    public boolean isOuvertMaintenant() {
+        return ouvertMaintenant;
+    }
+
+    public void setOuvertMaintenant(boolean ouvertMaintenant) {
+        this.ouvertMaintenant = ouvertMaintenant;
     }
 
     public void setVerifieUniquement(boolean verifieUniquement) {

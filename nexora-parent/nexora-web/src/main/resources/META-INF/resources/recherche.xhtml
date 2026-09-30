@@ -10,6 +10,7 @@
         <f:converter converterId="jakarta.faces.Long" />
     </f:viewParam>
     <f:viewParam name="commune" value="#{rechercheBean.commune}" />
+    <f:viewParam name="ouvert" value="#{rechercheBean.ouvertMaintenant}" />
     <f:viewAction action="#{rechercheBean.chargerDepuisParametres}" />
 </f:metadata>
 <ui:define name="titre">Rechercher — Nexora</ui:define>
@@ -70,6 +71,13 @@
                         <label class="nx-field-check">
                             <h:selectBooleanCheckbox value="#{rechercheBean.verifieUniquement}" />
                             Espaces vérifiés uniquement
+                        </label>
+                    </div>
+
+                    <div class="nx-field">
+                        <label class="nx-field-check">
+                            <h:selectBooleanCheckbox id="ouvertMaintenant" value="#{rechercheBean.ouvertMaintenant}" />
+                            Ouverts maintenant
                         </label>
                     </div>
 
@@ -188,6 +196,8 @@
                                             </svg>
                                             #{o.localisationCourte}
                                         </span>
+                                        <ui:fragment rendered="#{o.espaceOuvertMaintenant eq true}"><span class="nx-ouverture ouvert">Ouvert</span></ui:fragment>
+                                        <ui:fragment rendered="#{o.espaceOuvertMaintenant eq false}"><span class="nx-ouverture">Fermé</span></ui:fragment>
                                         <ui:fragment rendered="#{o.enPromotion}"><span class="nx-badge nx-badge-promo">Promo</span></ui:fragment>
                                     </span>
                                 </div>

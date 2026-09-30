@@ -178,4 +178,54 @@ public class EspaceApiClient {
             throw ApiErrors.reseau(e);
         }
     }
+
+    // ------------------------------------------------------------------ horaires (§10)
+
+    /** Horaires et état actuel ; {@code accessToken} facultatif (espace suspendu : propriétaire seulement). */
+    public sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse horaires(String accessToken, Long espaceId) {
+        LOG.info("Requête GET {}/api/v1/espaces/{}/horaires", baseUrl, espaceId);
+        return appelHoraires(() -> {
+            var r = client.get().uri("/api/v1/espaces/{id}/horaires", espaceId);
+            if (accessToken != null) r = r.header("Authorization", "Bearer " + accessToken);
+            return r.retrieve().body(sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse.class);
+        });
+    }
+
+    public sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse enregistrerHoraires(
+            String accessToken, Long espaceId, java.util.List<sn.ucad.nexora.web.dto.espace.HorairesDtos.PlageDto> semaine) {
+        LOG.info("Requête PUT {}/api/v1/espaces/{}/horaires", baseUrl, espaceId);
+        return appelHoraires(() -> client.put().uri("/api/v1/espaces/{id}/horaires", espaceId)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(new sn.ucad.nexora.web.dto.espace.HorairesDtos.SemaineRequest(semaine))
+                .retrieve().body(sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse.class));
+    }
+
+    public sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse ajouterExceptionHoraire(
+            String accessToken, Long espaceId, sn.ucad.nexora.web.dto.espace.HorairesDtos.ExceptionRequest exception) {
+        LOG.info("Requête POST {}/api/v1/espaces/{}/horaires/exceptions", baseUrl, espaceId);
+        return appelHoraires(() -> client.post().uri("/api/v1/espaces/{id}/horaires/exceptions", espaceId)
+                .header("Authorization", "Bearer " + accessToken)
+                .body(exception)
+                .retrieve().body(sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse.class));
+    }
+
+    public sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse supprimerExceptionHoraire(
+            String accessToken, Long espaceId, Long exceptionId) {
+        LOG.info("Requête DELETE {}/api/v1/espaces/{}/horaires/exceptions/{}", baseUrl, espaceId, exceptionId);
+        return appelHoraires(() -> client.delete().uri("/api/v1/espaces/{id}/horaires/exceptions/{x}", espaceId, exceptionId)
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve().body(sn.ucad.nexora.web.dto.espace.HorairesDtos.HorairesResponse.class));
+    }
+
+    private static <T> T appelHoraires(java.util.function.Supplier<T> requete) {
+        try {
+            return requete.get();
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (sn.ucad.nexora.web.error.ApiException e) {
+            throw e;
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
 }

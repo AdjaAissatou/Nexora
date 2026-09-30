@@ -75,6 +75,13 @@ public class FormatBean implements Serializable {
     }
 
     /** `2026-09-29T14:05` → `29/09/2026`. */
+    /** « samedi 10 octobre » (année ajoutée si ce n'est pas l'année en cours). */
+    public String dateLongue(java.time.LocalDate date) {
+        if (date == null) return "";
+        String motif = date.getYear() == java.time.LocalDate.now().getYear() ? "EEEE d MMMM" : "EEEE d MMMM yyyy";
+        return date.format(java.time.format.DateTimeFormatter.ofPattern(motif, java.util.Locale.FRENCH));
+    }
+
     /** Note sur 5 en étoiles pleines et vides : 4 → « ★★★★☆ ». */
     public String etoiles(int note) {
         int n = Math.max(0, Math.min(5, note));

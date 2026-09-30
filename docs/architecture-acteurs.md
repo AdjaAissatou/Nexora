@@ -1009,5 +1009,68 @@ de `avis` et `signalement.id_avis`.
 - test unitaire de la redirection après connexion (jamais vers une adresse externe) ;
 - non-régression complète : vérification, 6a, 6b, 6c, session (API et navigateur).
 
+## 10. ✅ Horaires des espaces
+
+**Le modèle** (tables `horaire` et `horaire_exception`, qui existaient sans être utilisées) :
+- **Semaine type**, une ligne par jour : fermé, ouvert **24 h/24**, ou une plage
+  [ouverture, fermeture) avec une **pause** facultative. Si la fermeture est inférieure ou
+  égale à l'ouverture, la plage passe minuit (18 h – 2 h).
+- **Jours exceptionnels** : une date précise qui remplace la semaine type (fermé toute la
+  journée, ou une plage dans la journée), avec un motif affiché aux visiteurs (Tabaski,
+  Magal, inventaire…). Une exception n'annule pas la nuit qui déborde de la veille.
+- **Fermeture temporaire** : la case « Espace ouvert » décochée par le professionnel prime sur
+  les horaires (« Fermé temporairement »).
+- Toutes les heures sont celles de **Dakar** (`Africa/Dakar`).
+- Sans horaires renseignés, Nexora n'affiche **rien** : ni « Ouvert », ni « Fermé ».
+
+**Une seule règle, deux implémentations vérifiées l'une contre l'autre**
+- Java : `sn.ucad.nexora.espace.domain.horaire.Horaires`. Elle calcule l'état et son libellé :
+  « Ouvert · ferme à 19 h », « Fermé · ouvre demain à 8 h 30 », « Ouvert 24 h/24 »,
+  « Fermé · ouvre lundi à 8 h », « ferme vendredi à minuit ».
+- SQL : `espace_ouvert_a(espace, moment)`, dans `03_professional/09_horaires.sql` (rejouable),
+  utilisée par le filtre de recherche.
+- Les mêmes cas sont testés des deux côtés : tests unitaires Java d'un côté, `test_horaires.py`
+  sur la fonction SQL de l'autre.
+
+**API** (espace-service)
+
+| Route | Accès |
+|---|---|
+| `GET /api/v1/espaces/{id}/horaires` : semaine, exceptions à venir, `ouvertMaintenant`, `etat` | public (espace suspendu : propriétaire et modération) |
+| `PUT /api/v1/espaces/{id}/horaires` `{semaine: [...]}` (liste vide = effacer) | propriétaire, `GERER_HORAIRES` |
+| `POST /api/v1/espaces/{id}/horaires/exceptions` (une par date, remplacée) ; `DELETE .../exceptions/{id}` | propriétaire, `GERER_HORAIRES` |
+
+Catalogue : la recherche accepte `ouvertMaintenant=true`, et chaque résultat porte
+`espaceOuvertMaintenant`, ou null sans horaires.
+
+**Web**
+- Mon espace, onglet **Horaires** :
+  - un tableau de la semaine, avec des champs heure ;
+  - une première proposition, 8 h – 18 h du lundi au samedi, à ajuster ;
+  - « Recopier le lundi jusqu'au samedi » ;
+  - l'état actuel ;
+  - les jours exceptionnels, à ajouter ou supprimer.
+- Fiche espace : l'état en tête de fiche (vert si ouvert), puis la section Horaires, avec
+  le jour courant mis en avant et les jours exceptionnels à venir.
+- Recherche : la case « Ouverts maintenant », et une puce Ouvert / Fermé sur chaque carte.
+- Démonstration : `09_seed/26_demo_horaires.sql` (hors installation) donne des horaires
+  réalistes aux 7 espaces de démo. On y trouve un dépannage 24 h/24, un transport ouvert
+  jusqu'à 2 h le samedi et un atelier fermé le vendredi après-midi.
+
+**Tests**
+- 8 tests unitaires de la règle ;
+- API, 36 contrôles rejouables (`test_horaires.py`) :
+  - droits et validation ;
+  - 8 cas de la fonction SQL, identiques aux tests Java ;
+  - exceptions, 24 h/24, fermeture temporaire, espace suspendu ;
+  - filtre de recherche ;
+- navigateur : saisie, recopie, erreur de pause, jour exceptionnel, fiche publique,
+  puces et filtre de recherche ;
+- non-régression complète.
+
+À venir, si utile : proposer au professionnel les jours fériés du Sénégal (table
+`jour_ferie`, vide pour l'instant) comme jours exceptionnels.
+
 ---
-*Dernière mise à jour : session du 30/09/2026, avis et signalements livrés (étape 6d).*
+*Dernière mise à jour : session du 30/09/2026, avis et signalements (étape 6d) et horaires des
+espaces livrés.*
