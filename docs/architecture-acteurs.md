@@ -239,9 +239,8 @@ précédent :
      révocation, statistiques, agents) — à intégrer au back-office du point 6.
    Reste : la page d'administration des règles de justificatifs (`justificatif_requis`),
    aujourd'hui modifiables en SQL uniquement.
-6. **Back-office admin** : le plus gros chantier, à cadrer précisément (pages,
-   permissions, layout séparé) avant de commencer à coder — probablement sa propre
-   session de conception dédiée plutôt qu'un ajout au fil de l'eau.
+6. **Back-office admin** : cadré au §9 (rôles administratifs, architecture, pages), en
+   six étapes 6a à 6f.
 7. **Messagerie, réservations, commandes** (client ET pro) : dépendent de
    `nexora-communication-service` et `nexora-commerce-service`, aujourd'hui non
    branchés au web du tout — chantier à part entière une fois 1-4 posés.
@@ -600,6 +599,113 @@ d'espace-service, qui a vérifié le droit d'accès, directement à la réponse 
 - refus d'accès aux pages agent et admin, pour les visiteurs comme pour les autres rôles.
 
 Le scénario API (53 contrôles) reste vert.
+
+## 9. Back-office administrateur — conception
+
+### 9.1 Ce qui existe, vérifié dans le code
+
+| Domaine | Base | API | Web |
+|---|---|---|---|
+| Comptes | `accounts.enabled/locked` ; `utilisateurs.statut` (`statut_compte`), `compte_bloque`, `actif` | aucune route d'administration ; **la connexion et `/refresh` refusent déjà un compte `locked` ou désactivé** | — |
+| Espaces | `statut_espace` (`ACTIF`, `SUSPENDU`, `FERME`…) ; la recherche ne montre que `ACTIF` | aucune route de modération | — |
+| Offres | `statut_offre` (`PUBLIE`, `SUSPENDU`…) ; la recherche ne montre que `PUBLIE` | aucune route de modération | — |
+| Catalogue | 735 catégories, 1 240 types d'offre, attributs, tags | **lecture seule** (`CategorieController`) | — |
+| Avis | table `avis`, **aucune colonne de modération** | lecture publique | lecture sur la fiche espace |
+| Signalements | table `signalement` (statut, traité par, commentaire) | `POST /api/v1/signalements` uniquement | **aucun bouton « Signaler »** |
+| Vérification | tables `verification_*` | complète (§8) | `/admin/verifications` |
+| Journal, paramètres, statistiques | tables `journal_action`, `parametre`, `statistique`, vue `vue_dashboard_admin` | `nexora-administration-service` n'est qu'un `pom.xml` vide | — |
+
+Conséquence utile : **suspendre un compte revient à passer `accounts.locked` à vrai**. La
+connexion est refusée, et comme le web renouvelle le jeton toutes les 15 minutes (§4), la
+session d'un compte suspendu se ferme d'elle-même au plus tard 15 minutes après.
+
+### 9.2 Qui fait quoi — les rôles administratifs
+
+Les rôles existent déjà (`09_seed/01_roles.sql`) ; on leur donne un périmètre précis. Un
+compte peut en cumuler plusieurs.
+
+| Section du back-office | `SUPER_ADMIN` | `ADMIN` | `MODERATEUR` | `SUPPORT` | `GESTIONNAIRE` |
+|---|---|---|---|---|---|
+| Tableau de bord | ✅ | ✅ | ✅ (ses files) | ✅ (ses files) | ✅ |
+| Utilisateurs : consulter | ✅ | ✅ | ✅ | ✅ | — |
+| Utilisateurs : suspendre / réactiver | ✅ | ✅ | — | ✅ réactiver seulement | — |
+| Rôles administratifs (donner / retirer) | ✅ **seul** | — | — | — | — |
+| Espaces et offres : suspendre / réactiver | ✅ | ✅ | ✅ | — | — |
+| Avis et signalements | ✅ | ✅ | ✅ | — | — |
+| Vérifications : supervision, agents | ✅ | ✅ | — | — | — |
+| Catalogue (catégories, types d'offre, attributs, tags) | ✅ | ✅ | — | — | ✅ |
+| Paramètres, règles de justificatifs | ✅ | ✅ | — | — | ✅ |
+| Statistiques | ✅ | ✅ | — | — | ✅ |
+| Journal d'actions | ✅ | ✅ | — | — | — |
+
+`AGENT_VERIFICATION` reste hors du back-office (§8.1). Règles transverses :
+- personne ne suspend son propre compte ni ne retire son propre rôle ;
+- un compte `SUPER_ADMIN` ne peut être suspendu que par un autre `SUPER_ADMIN` ;
+- **toute action du back-office est motivée et écrite dans `journal_action`** : qui, quoi,
+  sur quelle entité, pourquoi, quand, depuis quelle adresse IP.
+
+### 9.3 Architecture
+
+- **Chaque service administre son propre domaine**, sous `/api/v1/admin/**`, avec
+  `hasAnyRole(...)` selon le tableau 9.2 :
+  - `auth-service` : les comptes et les rôles ;
+  - `espace-service` : les espaces et la vérification (déjà fait) ;
+  - `catalogue-service` : les offres et le catalogue ;
+  - `recherche-service` : les avis et les signalements.
+- **`nexora-administration-service` devient réel** pour ce qui est transverse : tableau de
+  bord (compteurs lus sur la base partagée), lecture du journal, paramètres.
+- **Journal d'actions** : un composant partagé dans `nexora-common`
+  (`sn.ucad.nexora.common.audit.JournalActions`). Chaque service l'appelle dans la
+  transaction de l'action : si l'action échoue, rien n'est journalisé, et inversement.
+- **Web** : un layout dédié `WEB-INF/templates/admin.xhtml` (barre latérale, sans le
+  header public), toutes les pages sous `/admin/...`. Le menu n'affiche que les sections
+  permises par les rôles du compte. Chaque page est protégée par une garde de
+  `SessionBean`. Un lien « Administration » apparaît dans le menu public pour les comptes
+  administratifs.
+- Le badge « Vérifié », la visibilité dans la recherche, etc. ne changent **que** par
+  ces actions motivées. Aucune page n'édite directement une colonne d'état.
+
+### 9.4 Pages
+
+| Page | Route | Contenu |
+|---|---|---|
+| Tableau de bord | `/admin/index` | compteurs (comptes, espaces, offres, espaces vérifiés), files en attente (vérifications, signalements), dernières actions du journal |
+| Utilisateurs | `/admin/utilisateurs`, `/admin/utilisateur?id=` | recherche (nom, e-mail, téléphone), filtres (rôle, suspendu) ; fiche : rôles, espaces, dates, historique ; suspendre / réactiver (motif) ; rôles administratifs |
+| Espaces | `/admin/espaces` | recherche, statut, vérifié ; suspendre / réactiver (motif, notification au professionnel) |
+| Offres | `/admin/offres` | recherche ; suspendre / republier (motif) |
+| Signalements | `/admin/signalements` | file `EN_ATTENTE` ; traiter (avec action liée : suspendre l'offre ou l'espace) ou rejeter, avec commentaire |
+| Avis | `/admin/avis` | liste, masquer / rétablir (motif) |
+| Vérifications | `/admin/verifications` | existe (§8.11), passe dans le layout admin |
+| Catalogue | `/admin/catalogue` | arbre des catégories, types d'offre, attributs, tags : créer, renommer, désactiver (jamais supprimer ce qui est utilisé) |
+| Paramètres | `/admin/parametres` | paramètres Nexora, règles de justificatifs par type d'espace |
+| Journal | `/admin/journal` | toutes les actions, filtrables par module, auteur, entité, date |
+
+### 9.5 Évolutions de la base
+
+- `avis` : colonnes de modération (`masque`, `motif_moderation`, `modere_par`,
+  `date_moderation`). Un avis masqué disparaît de la fiche publique et de la note moyenne.
+- `espace_professionnel` / `offre` : motif et date de la dernière suspension (ou lecture
+  depuis le journal ; à trancher à l'étape 6c).
+- Rien d'autre : `journal_action`, `parametre` et `signalement` ont déjà les colonnes
+  nécessaires.
+
+### 9.6 Étapes
+
+1. **6a — Fondations** :
+   - `administration-service` opérationnel, avec tableau de bord et journal ;
+   - `JournalActions` partagé, et la supervision des vérifications journalisée ;
+   - layout admin et menu par rôle ;
+   - pages Tableau de bord et Journal ;
+   - supervision des vérifications déplacée dans le layout admin.
+2. **6b — Utilisateurs** : recherche, fiche, suspension / réactivation, rôles administratifs.
+3. **6c — Espaces et offres** : modération (suspendre / réactiver, motif, notification).
+4. **6d — Signalements et avis** : bouton « Signaler » côté public, file de traitement,
+   masquage des avis.
+5. **6e — Catalogue** : gestion des catégories, types d'offre, attributs et tags.
+6. **6f — Paramètres** : paramètres Nexora et règles de justificatifs de la vérification.
+
+Chaque étape est testée de bout en bout, comme le chantier 5, avant de passer à la
+suivante. Les pages suivent le style actuel ; la refonte visuelle viendra après.
 
 ---
 *Dernière mise à jour : session du 30/09/2026, vérification des espaces livrée de bout en
