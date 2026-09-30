@@ -1,0 +1,257 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerCatalogue}" />
+</f:metadata>
+<ui:param name="section" value="catalogue" />
+<ui:param name="b" value="#{catalogueAdminBean}" />
+<ui:define name="titre">Catalogue</ui:define>
+<ui:define name="titre-page">#{empty catalogueAdminBean.fiche ? 'Catalogue' : catalogueAdminBean.fiche.categorie.nom}</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty catalogueAdminBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{catalogueAdminBean.erreur}</div>
+    </ui:fragment>
+
+    <h:form id="cat">
+    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+    <!-- Recherche et fil d'Ariane -->
+    <div class="nx-card">
+        <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="nx-field" style="margin:0; flex:1; min-width:240px;">
+                <label for="cat:recherche">Chercher une catégorie ou un type d'offre (735 catégories, 1 240 types)</label>
+                <h:inputText id="recherche" value="#{catalogueAdminBean.recherche}" styleClass="nx-input" a:placeholder="ex. chaussures, plomberie, riz…" />
+            </div>
+            <h:commandButton id="chercher" value="Chercher" action="#{catalogueAdminBean.chercher}" styleClass="nx-button nx-button-primary" />
+        </div>
+        <ui:fragment rendered="#{not empty catalogueAdminBean.resultats}">
+            <ul class="nx-verif-liste" style="margin-top:14px;">
+                <ui:repeat var="r" value="#{catalogueAdminBean.resultats}">
+                    <li><span class="nx-verif-texte">
+                            <span class="nx-badge nx-badge-neutre">#{r.genre eq 'CATEGORIE' ? 'Catégorie' : 'Type d\'offre'}</span>
+                            <h:link outcome="/admin/catalogue" value="#{r.libelle}"><f:param name="id" value="#{r.categorieId}" /></h:link>
+                            <ui:fragment rendered="#{!r.actif}"> <span class="nx-badge nx-badge-alerte">Désactivé</span></ui:fragment>
+                            <br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{r.chemin}</span></span></li>
+                </ui:repeat>
+            </ul>
+        </ui:fragment>
+        <ui:fragment rendered="#{catalogueAdminBean.resultats ne null and empty catalogueAdminBean.resultats}">
+            <p style="margin:12px 0 0; color:var(--nx-text-secondary);">Aucun résultat.</p>
+        </ui:fragment>
+        <p class="nx-cat-chemin">
+            <h:link outcome="/admin/catalogue" value="Catalogue" />
+            <ui:repeat var="e" value="#{catalogueAdminBean.fiche.chemin}">
+                › <h:link outcome="/admin/catalogue" value="#{e.nom}" styleClass="#{e.actif ? '' : 'inactif'}"><f:param name="id" value="#{e.id}" /></h:link>
+            </ui:repeat>
+        </p>
+    </div>
+
+    <div class="nx-field nx-cat-motif">
+        <label for="cat:motif">Motif (obligatoire pour désactiver, réactiver ou supprimer ; écrit dans le journal)</label>
+        <h:inputText id="motif" value="#{catalogueAdminBean.motif}" styleClass="nx-input" />
+    </div>
+
+    <!-- ========================= Racines ========================= -->
+    <ui:fragment rendered="#{empty catalogueAdminBean.id and empty catalogueAdminBean.erreur}">
+        <div class="nx-card">
+            <h3 style="margin-top:0;">Catégories racines (#{catalogueAdminBean.racines.size()})</h3>
+            <ui:include src="/WEB-INF/includes/catalogue-noeuds.xhtml">
+                <ui:param name="noeuds" value="#{catalogueAdminBean.racines}" />
+            </ui:include>
+            <ui:fragment rendered="#{acces.categories}">
+                <div class="nx-cat-ajout">
+                    <h:inputText id="nouvelleRacine" value="#{catalogueAdminBean.nouvelleCategorie}" styleClass="nx-input" a:placeholder="Nouvelle catégorie racine" />
+                    <h:commandButton id="creerRacine" value="Créer" action="#{catalogueAdminBean.creerCategorie}" styleClass="nx-button nx-button-outline-dark" />
+                </div>
+            </ui:fragment>
+        </div>
+    </ui:fragment>
+
+    <!-- ========================= Fiche d'une catégorie ========================= -->
+    <ui:fragment rendered="#{not empty catalogueAdminBean.fiche}">
+    <ui:param name="c" value="#{catalogueAdminBean.fiche.categorie}" />
+
+    <ui:fragment rendered="#{!catalogueAdminBean.fiche.parentsActifs}">
+        <div class="nx-alert nx-alert-warn">Une catégorie parente est désactivée : celle-ci n'est pas proposée à la création d'offres, même active.</div>
+    </ui:fragment>
+
+    <div class="nx-verif-grille">
+        <div>
+            <!-- Sous-catégories -->
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Sous-catégories (#{catalogueAdminBean.fiche.sousCategories.size()})</h3>
+                <ui:fragment rendered="#{empty catalogueAdminBean.fiche.sousCategories}"><p style="color:var(--nx-text-secondary);">Aucune.</p></ui:fragment>
+                <ui:include src="/WEB-INF/includes/catalogue-noeuds.xhtml">
+                    <ui:param name="noeuds" value="#{catalogueAdminBean.fiche.sousCategories}" />
+                </ui:include>
+                <ui:fragment rendered="#{acces.categories}">
+                    <div class="nx-cat-ajout">
+                        <h:inputText id="nouvelleSousCategorie" value="#{catalogueAdminBean.nouvelleCategorie}" styleClass="nx-input" a:placeholder="Nouvelle sous-catégorie de « #{c.nom} »" />
+                        <h:commandButton id="creerSousCategorie" value="Créer" action="#{catalogueAdminBean.creerCategorie}" styleClass="nx-button nx-button-outline-dark" />
+                    </div>
+                </ui:fragment>
+            </div>
+
+            <!-- Types d'offre -->
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Types d'offre (#{catalogueAdminBean.fiche.typesOffre.size()})</h3>
+                <ui:fragment rendered="#{empty catalogueAdminBean.fiche.typesOffre}"><p style="color:var(--nx-text-secondary);">Aucun.</p></ui:fragment>
+                <table class="nx-verif-tableau">
+                    <ui:repeat var="t" value="#{catalogueAdminBean.fiche.typesOffre}">
+                        <tr class="#{t.actif ? '' : 'nx-cat-inactif'}">
+                            <td><strong>#{t.libelle}</strong><br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{t.principale eq 'SERVICE' ? 'Service' : 'Produit'} · #{t.offres} offre(s)</span></td>
+                            <td style="text-align:right; white-space:nowrap;">
+                                <ui:fragment rendered="#{acces.typesOffre}">
+                                    <h:commandLink value="Modifier" action="#{catalogueAdminBean.editerType(t)}" />
+                                    · <h:commandLink value="#{t.actif ? 'Désactiver' : 'Réactiver'}" action="#{catalogueAdminBean.actionType(t.id, t.actif ? 'desactiver' : 'activer')}" />
+                                    <ui:fragment rendered="#{t.offres eq 0}"> · <h:commandLink value="Supprimer" action="#{catalogueAdminBean.actionType(t.id, 'supprimer')}" onclick="return confirm('Supprimer ce type d\'offre ?');" /></ui:fragment>
+                                </ui:fragment>
+                            </td>
+                        </tr>
+                    </ui:repeat>
+                </table>
+                <ui:fragment rendered="#{acces.typesOffre}">
+                    <div class="nx-cat-formulaire">
+                        <h4>#{empty catalogueAdminBean.typeEdite ? 'Nouveau type d\'offre' : 'Modifier le type d\'offre'}</h4>
+                        <div class="nx-form-grid">
+                            <div class="nx-field"><label for="cat:typeLibelle">Libellé</label>
+                                <h:inputText id="typeLibelle" value="#{catalogueAdminBean.typeLibelle}" styleClass="nx-input" /></div>
+                            <div class="nx-field"><label for="cat:typePrincipale">Nature</label>
+                                <h:selectOneMenu id="typePrincipale" value="#{catalogueAdminBean.typePrincipale}" styleClass="nx-select">
+                                    <f:selectItem itemValue="PRODUIT" itemLabel="Produit" />
+                                    <f:selectItem itemValue="SERVICE" itemLabel="Service" />
+                                </h:selectOneMenu></div>
+                        </div>
+                        <div class="nx-field"><label for="cat:typeDescription">Description</label>
+                            <h:inputText id="typeDescription" value="#{catalogueAdminBean.typeDescription}" styleClass="nx-input" /></div>
+                        <h:commandButton id="enregistrerType" value="#{empty catalogueAdminBean.typeEdite ? 'Ajouter' : 'Enregistrer'}" action="#{catalogueAdminBean.enregistrerType}" styleClass="nx-button nx-button-outline-dark" />
+                        <ui:fragment rendered="#{not empty catalogueAdminBean.typeEdite}"> <h:commandLink value="Annuler" action="#{catalogueAdminBean.annulerType}" /></ui:fragment>
+                    </div>
+                </ui:fragment>
+            </div>
+
+            <!-- Attributs -->
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Attributs (#{catalogueAdminBean.fiche.attributs.size()})</h3>
+                <p style="font-size:13px; color:var(--nx-text-secondary); margin-top:0;">Les caractéristiques que le professionnel renseigne pour une offre de cette catégorie (taille, couleur, marque…).</p>
+                <ui:fragment rendered="#{empty catalogueAdminBean.fiche.attributs}"><p style="color:var(--nx-text-secondary);">Aucun.</p></ui:fragment>
+                <ui:repeat var="at" value="#{catalogueAdminBean.fiche.attributs}">
+                    <div class="nx-cat-attribut #{at.actif ? '' : 'nx-cat-inactif'}">
+                        <div class="nx-cat-attribut-tete">
+                            <div><strong>#{at.nom}</strong> <span class="nx-badge nx-badge-neutre">#{catalogueAdminBean.libelleChamp(at.typeChamp)}</span>
+                                <ui:fragment rendered="#{at.obligatoire}"> <span class="nx-badge nx-badge-attente">Obligatoire</span></ui:fragment>
+                                <br /><span style="font-size:12px; color:var(--nx-text-secondary);">code #{at.code}#{empty at.unite ? '' : ' · unité '.concat(at.unite)} · #{at.filtrable ? 'filtrable' : 'non filtrable'} · #{at.utilisations} utilisation(s)</span></div>
+                            <ui:fragment rendered="#{acces.attributs}">
+                                <div style="white-space:nowrap;">
+                                    <h:commandLink value="Modifier" action="#{catalogueAdminBean.editerAttribut(at)}" />
+                                    · <h:commandLink value="#{at.actif ? 'Désactiver' : 'Réactiver'}" action="#{catalogueAdminBean.actionAttribut(at.id, at.actif ? 'desactiver' : 'activer')}" />
+                                    <ui:fragment rendered="#{at.utilisations eq 0}"> · <h:commandLink value="Supprimer" action="#{catalogueAdminBean.actionAttribut(at.id, 'supprimer')}" onclick="return confirm('Supprimer cet attribut et ses valeurs ?');" /></ui:fragment>
+                                </div>
+                            </ui:fragment>
+                        </div>
+                        <ui:fragment rendered="#{at.liste()}">
+                            <div class="nx-cat-valeurs">
+                                <ui:repeat var="v" value="#{at.valeurs}">
+                                    <span class="nx-cat-valeur #{v.actif ? '' : 'inactif'}">#{v.valeur}
+                                        <ui:fragment rendered="#{acces.attributs}">
+                                            <h:commandLink value="#{v.actif ? '⏸' : '▶'}" title="#{v.actif ? 'Désactiver' : 'Réactiver'}" action="#{catalogueAdminBean.actionValeur(v.id, v.actif ? 'desactiver' : 'activer')}" />
+                                            <ui:fragment rendered="#{v.utilisations eq 0}"><h:commandLink value="✕" title="Supprimer" action="#{catalogueAdminBean.actionValeur(v.id, 'supprimer')}" /></ui:fragment>
+                                        </ui:fragment>
+                                    </span>
+                                </ui:repeat>
+                                <ui:fragment rendered="#{acces.attributs}">
+                                    <span class="nx-cat-ajout-valeur">
+                                        <h:inputText value="#{catalogueAdminBean.nouvellesValeurs[at.id]}" styleClass="nx-input" a:placeholder="Nouvelle valeur" />
+                                        <h:commandButton value="+" action="#{catalogueAdminBean.ajouterValeur(at.id)}" styleClass="nx-button nx-button-outline-dark" />
+                                    </span>
+                                </ui:fragment>
+                            </div>
+                        </ui:fragment>
+                    </div>
+                </ui:repeat>
+                <ui:fragment rendered="#{acces.attributs}">
+                    <div class="nx-cat-formulaire">
+                        <h4>#{empty catalogueAdminBean.attributEdite ? 'Nouvel attribut' : 'Modifier l\'attribut'}</h4>
+                        <div class="nx-form-grid">
+                            <div class="nx-field"><label for="cat:attNom">Nom</label>
+                                <h:inputText id="attNom" value="#{catalogueAdminBean.attNom}" styleClass="nx-input" /></div>
+                            <div class="nx-field"><label for="cat:attType">Type de champ</label>
+                                <h:selectOneMenu id="attType" value="#{catalogueAdminBean.attType}" styleClass="nx-select">
+                                    <f:selectItems value="#{catalogueAdminBean.typesChamp}" var="tc" itemValue="#{tc}" itemLabel="#{catalogueAdminBean.libelleChamp(tc)}" />
+                                </h:selectOneMenu></div>
+                            <div class="nx-field"><label for="cat:attUnite">Unité (facultatif)</label>
+                                <h:inputText id="attUnite" value="#{catalogueAdminBean.attUnite}" styleClass="nx-input" a:placeholder="kg, pouces, m²…" /></div>
+                            <div class="nx-field"><label for="cat:attOrdre">Ordre d'affichage</label>
+                                <h:inputText id="attOrdre" value="#{catalogueAdminBean.attOrdre}" styleClass="nx-input" a:type="number" /></div>
+                        </div>
+                        <div class="nx-field"><label for="cat:attAide">Aide affichée au professionnel</label>
+                            <h:inputText id="attAide" value="#{catalogueAdminBean.attAide}" styleClass="nx-input" /></div>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox id="attObligatoire" value="#{catalogueAdminBean.attObligatoire}" /> Obligatoire</label>
+                        <label class="nx-field-check" style="margin-bottom:10px;"><h:selectBooleanCheckbox id="attFiltrable" value="#{catalogueAdminBean.attFiltrable}" /> Filtrable dans la recherche</label>
+                        <h:commandButton id="enregistrerAttribut" value="#{empty catalogueAdminBean.attributEdite ? 'Ajouter' : 'Enregistrer'}" action="#{catalogueAdminBean.enregistrerAttribut}" styleClass="nx-button nx-button-outline-dark" />
+                        <ui:fragment rendered="#{not empty catalogueAdminBean.attributEdite}"> <h:commandLink value="Annuler" action="#{catalogueAdminBean.annulerAttribut}" /></ui:fragment>
+                    </div>
+                </ui:fragment>
+            </div>
+        </div>
+
+        <div>
+            <!-- La catégorie elle-même -->
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Catégorie
+                    <span class="nx-badge #{c.actif ? 'nx-badge-verifie' : 'nx-badge-alerte'}">#{c.actif ? 'Active' : 'Désactivée'}</span></h3>
+                <p style="font-size:13px; color:var(--nx-text-secondary); margin-top:0;">#{c.offres} offre(s) dans cette catégorie et ses sous-catégories.</p>
+                <div class="nx-field"><label for="cat:catNom">Nom</label>
+                    <h:inputText id="catNom" value="#{catalogueAdminBean.catNom}" styleClass="nx-input" disabled="#{!acces.categories}" /></div>
+                <div class="nx-field"><label for="cat:catDescription">Description</label>
+                    <h:inputTextarea id="catDescription" value="#{catalogueAdminBean.catDescription}" styleClass="nx-input" rows="2" disabled="#{!acces.categories}" /></div>
+                <div class="nx-form-grid">
+                    <div class="nx-field"><label for="cat:catIcone">Icône</label>
+                        <h:inputText id="catIcone" value="#{catalogueAdminBean.catIcone}" styleClass="nx-input" disabled="#{!acces.categories}" /></div>
+                    <div class="nx-field"><label for="cat:catCouleur">Couleur (#RRGGBB)</label>
+                        <h:inputText id="catCouleur" value="#{catalogueAdminBean.catCouleur}" styleClass="nx-input" disabled="#{!acces.categories}" /></div>
+                </div>
+                <div class="nx-field"><label for="cat:catOrdre">Ordre d'affichage</label>
+                    <h:inputText id="catOrdre" value="#{catalogueAdminBean.catOrdre}" styleClass="nx-input" a:type="number" disabled="#{!acces.categories}" /></div>
+                <ui:fragment rendered="#{acces.categories}">
+                    <h:commandButton id="modifierCategorie" value="Enregistrer" action="#{catalogueAdminBean.modifierCategorie}" styleClass="nx-button nx-button-primary nx-button-block" style="margin-bottom:10px;" />
+                    <h:commandButton id="desactiverCategorie" value="Désactiver la catégorie" rendered="#{c.actif}" action="#{catalogueAdminBean.activerCategorie(false)}"
+                                     styleClass="nx-button nx-button-danger nx-button-block" onclick="return confirm('Désactiver cette catégorie ? Elle et ses sous-catégories ne seront plus proposées à la création d\'offres. Les offres existantes restent visibles.');" />
+                    <h:commandButton id="activerCategorie" value="Réactiver la catégorie" rendered="#{!c.actif}" action="#{catalogueAdminBean.activerCategorie(true)}" styleClass="nx-button nx-button-outline-dark nx-button-block" />
+                    <ui:fragment rendered="#{c.vide()}">
+                        <h:commandButton id="supprimerCategorie" value="Supprimer (inutilisée)" action="#{catalogueAdminBean.supprimerCategorie}" styleClass="nx-button nx-button-outline nx-button-block"
+                                         style="margin-top:10px;" onclick="return confirm('Supprimer définitivement cette catégorie ?');" />
+                    </ui:fragment>
+                </ui:fragment>
+            </div>
+
+            <!-- Types d'espace, pour une racine -->
+            <ui:fragment rendered="#{not empty catalogueAdminBean.fiche.typesEspace}">
+                <div class="nx-card">
+                    <h3 style="margin-top:0;">Types d'espace</h3>
+                    <p style="font-size:13px; color:var(--nx-text-secondary); margin-top:0;">Les espaces de ces types voient « #{c.nom} » quand ils ajoutent une offre.</p>
+                    <ul class="nx-verif-liste">
+                        <ui:repeat var="te" value="#{catalogueAdminBean.fiche.typesEspace}">
+                            <li><span class="nx-verif-texte">#{te.nom}</span>
+                                <span class="nx-verif-actions">
+                                    <ui:fragment rendered="#{te.lie}"><span class="nx-badge nx-badge-verifie">Proposée</span></ui:fragment>
+                                    <ui:fragment rendered="#{acces.categories}">
+                                        <h:commandLink value="#{te.lie ? 'Retirer' : 'Proposer'}" action="#{catalogueAdminBean.lierTypeEspace(te.id, !te.lie)}" />
+                                    </ui:fragment>
+                                </span></li>
+                        </ui:repeat>
+                    </ul>
+                </div>
+            </ui:fragment>
+        </div>
+    </div>
+    </ui:fragment>
+
+    </h:form>
+</ui:define>
+</ui:composition>

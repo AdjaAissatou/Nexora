@@ -1345,6 +1345,27 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 .nx-horaires-edition td.jour { font-weight: 700; color: var(--nx-forest); white-space: nowrap; }
 @media (max-width: 760px) { .nx-horaires-edition { display: block; overflow-x: auto; } }
 
+/* Gestion du catalogue (§9.11) */
+.nx-cat-chemin { margin: 14px 0 0; font-size: 14px; color: var(--nx-text-secondary); }
+.nx-cat-chemin a { color: var(--nx-emerald); font-weight: 600; }
+.nx-cat-chemin a.inactif { color: var(--nx-text-light); text-decoration: line-through; }
+.nx-cat-motif { background: var(--nx-gold-soft); border: 1px dashed rgba(231, 184, 75, 0.7); border-radius: 14px; padding: 12px 14px; }
+.nx-cat-inactif { opacity: .55; }
+.nx-cat-ajout { display: flex; gap: 8px; margin-top: 14px; }
+.nx-cat-ajout .nx-input { flex: 1; }
+.nx-cat-formulaire { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--nx-border); }
+.nx-cat-formulaire h4 { margin: 0 0 10px; color: var(--nx-forest); }
+.nx-cat-attribut { padding: 12px 0; border-bottom: 1px solid var(--nx-border); }
+.nx-cat-attribut-tete { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.nx-cat-valeurs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+.nx-cat-valeur { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--nx-ivory);
+    border: 1px solid var(--nx-border); font-size: 13px; }
+.nx-cat-valeur.inactif { opacity: .5; text-decoration: line-through; }
+.nx-cat-valeur a { text-decoration: none; color: var(--nx-text-light); font-size: 11px; }
+.nx-cat-ajout-valeur { display: inline-flex; gap: 4px; }
+.nx-cat-ajout-valeur .nx-input { width: 150px; padding: 6px 10px; }
+.nx-cat-ajout-valeur .nx-button { padding: 6px 12px; }
+
 /* =========================================================
    RESPONSIVE
 ========================================================= */

@@ -37,6 +37,15 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        // Gestion du catalogue (§9.11) : une permission par nature d'élément, la plus précise d'abord
+                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/catalogue/**")
+                            .hasAnyAuthority("PERM_GERER_CATEGORIES", "PERM_GERER_TYPES_OFFRES", "PERM_GERER_ATTRIBUTS")
+                        .requestMatchers("/api/v1/admin/catalogue/categories/*/types", "/api/v1/admin/catalogue/types/**")
+                            .hasAuthority("PERM_GERER_TYPES_OFFRES")
+                        .requestMatchers("/api/v1/admin/catalogue/categories/*/attributs", "/api/v1/admin/catalogue/attributs/**",
+                                         "/api/v1/admin/catalogue/valeurs/**")
+                            .hasAuthority("PERM_GERER_ATTRIBUTS")
+                        .requestMatchers("/api/v1/admin/catalogue/**").hasAuthority("PERM_GERER_CATEGORIES")
                         // Modération des offres (docs/architecture-acteurs.md §9.9)
                         .requestMatchers("/api/v1/admin/offres", "/api/v1/admin/offres/**").hasAuthority("PERM_MODERER_OFFRES")
                         .anyRequest().authenticated()

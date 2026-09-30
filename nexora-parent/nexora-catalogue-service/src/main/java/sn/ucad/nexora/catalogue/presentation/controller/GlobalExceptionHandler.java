@@ -20,6 +20,12 @@ public class GlobalExceptionHandler {
         return corps(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    /** Corps JSON illisible ou incomplet : erreur de l'appelant. */
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleIllisible(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        return corps(HttpStatus.BAD_REQUEST, "Requête invalide : corps JSON illisible ou incomplet");
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleIntrouvable(ResourceNotFoundException ex) {
         return corps(HttpStatus.NOT_FOUND, ex.getMessage());

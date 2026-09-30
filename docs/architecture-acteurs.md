@@ -749,7 +749,7 @@ modifie depuis `/admin/roles` sans toucher au code.
    notification).
 4. ✅ **6d — Signalements et avis** (§9.10) : bouton « Signaler » côté public, file de
    traitement, masquage des avis.
-5. **6e — Catalogue** : gestion des catégories, types d'offre, attributs et tags.
+5. ✅ **6e — Catalogue** (§9.11) : gestion des catégories, types d'offre, attributs et valeurs.
 6. **6f — Paramètres** : paramètres Nexora et règles de justificatifs de la vérification.
 
 Chaque étape est testée de bout en bout, comme le chantier 5, avant de passer à la
@@ -1009,6 +1009,69 @@ de `avis` et `signalement.id_avis`.
 - test unitaire de la redirection après connexion (jamais vers une adresse externe) ;
 - non-régression complète : vérification, 6a, 6b, 6c, session (API et navigateur).
 
+### 9.11 ✅ Étape 6e — gestion du catalogue
+
+**Ce qui se gère** : l'arbre des 735 catégories, les 1 240 types d'offre, les attributs d'une
+catégorie (taille, couleur, marque…) et les valeurs proposées des attributs « liste ». Pour
+chaque catégorie racine, on choisit aussi les types d'espace auxquels elle est proposée : ce
+que voit un restaurant, une boutique… quand il ajoute une offre. Les tags ne sont gérés nulle
+part : aucune offre ne les utilise.
+
+**Règles**
+- On **crée**, on **modifie** (renommer, décrire, ordonner, couleur #RRGGBB, icône), on
+  **désactive** ou **réactive** (avec un motif).
+- On ne **supprime** (avec un motif) que ce qui n'a jamais servi :
+  - une catégorie sans sous-catégorie, type d'offre, attribut ni offre ;
+  - un type d'offre sans offre ;
+  - un attribut, ou une valeur, qu'aucune offre n'a renseigné.
+  Pour le reste, on désactive.
+- **Désactiver** retire l'élément, et pour une catégorie toute sa branche, du parcours de
+  création d'offre. Les offres existantes restent intactes et visibles, dans la recherche comme
+  sur leur fiche.
+- Noms uniques là où il le faut : une catégorie parmi ses sœurs, un type d'offre ou un attribut
+  dans sa catégorie, une valeur dans son attribut. La casse n'est pas prise en compte.
+- Le type de champ d'un attribut déjà renseigné par des offres ne change plus. Le code technique
+  d'un attribut est dérivé de son nom (« Taille d'écran » → `taille_d_ecran`) et reste unique.
+- Tout est journalisé (module `CATALOGUE`), avec le chemin complet de la catégorie concernée.
+
+**Permissions** : une par nature d'élément, conformément à la matrice (§6.3) :
+- `GERER_CATEGORIES` : catégories et liens aux types d'espace ;
+- `GERER_TYPES_OFFRES` : types d'offre ;
+- `GERER_ATTRIBUTS` : attributs et valeurs ;
+- la lecture demande l'une des trois.
+
+Le test le vérifie en retirant `GERER_ATTRIBUTS` au gestionnaire : il crée toujours des
+catégories et des types d'offre, mais plus d'attributs.
+
+**API** (catalogue-service, `/api/v1/admin/catalogue`) :
+- `GET /categories` (les racines) ;
+- `GET /categories/{id}` : la fiche, avec son chemin, ses sous-catégories, types, attributs,
+  valeurs, types d'espace et compteurs d'offres (branche comprise) ;
+- `GET /recherche?q=` : catégories et types d'offre, avec leur chemin ;
+- `POST /categories`, `PUT /categories/{id}`, `POST /categories/{id}/activer|desactiver|supprimer` ;
+- `POST|…/types-espace/{te}[/retirer]` ;
+- `POST /categories/{id}/types`, `PUT /types/{id}`, `POST /types/{id}/activer|desactiver|supprimer` ;
+- la même chose pour `/attributs` et pour `/valeurs`.
+
+Les corps JSON illisibles ou incomplets renvoient désormais 400, au lieu de 500.
+
+**Web** : `/admin/catalogue[?id=]`.
+- En haut : la recherche, le fil d'Ariane, et un seul champ « motif » pour les actions sensibles.
+- Sans id : les catégories racines, avec leurs compteurs.
+- Avec id, la fiche en deux colonnes :
+  - à gauche : les sous-catégories, les types d'offre (ajout, modification sur place), les
+    attributs avec leurs valeurs en pastilles ;
+  - à droite : la catégorie elle-même, et ses types d'espace s'il s'agit d'une racine.
+- Chaque bouton n'apparaît qu'avec la permission correspondante.
+- Un avertissement s'affiche si une catégorie parente est désactivée.
+
+**Tests**
+- API, 54 contrôles rejouables (`test_6e.py`) : droits, création et règles d'unicité,
+  désactivation et effet sur le parcours public, protections des éléments utilisés, types
+  d'espace, suppressions, permissions séparées, journal (24 actions attendues) ;
+- navigateur : parcours complet du gestionnaire, nettoyage compris par l'interface ;
+- non-régression complète.
+
 ## 10. ✅ Horaires des espaces
 
 **Le modèle** (tables `horaire` et `horaire_exception`, qui existaient sans être utilisées) :
@@ -1072,5 +1135,5 @@ Catalogue : la recherche accepte `ouvertMaintenant=true`, et chaque résultat po
 `jour_ferie`, vide pour l'instant) comme jours exceptionnels.
 
 ---
-*Dernière mise à jour : session du 30/09/2026, avis et signalements (étape 6d) et horaires des
-espaces livrés.*
+*Dernière mise à jour : session du 30/09/2026, avis et signalements (6d), horaires des espaces et
+gestion du catalogue (6e) livrés.*

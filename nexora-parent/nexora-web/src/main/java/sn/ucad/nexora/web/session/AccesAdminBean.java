@@ -71,6 +71,23 @@ public class AccesAdminBean {
         return session.aLaPermission("MODERER_AVIS");
     }
 
+    /** Catalogue : l'une des trois permissions (catégories, types d'offre, attributs), §9.11. */
+    public boolean isCatalogue() {
+        return session.aLaPermission("GERER_CATEGORIES", "GERER_TYPES_OFFRES", "GERER_ATTRIBUTS");
+    }
+
+    public boolean isCategories() {
+        return session.aLaPermission("GERER_CATEGORIES");
+    }
+
+    public boolean isTypesOffre() {
+        return session.aLaPermission("GERER_TYPES_OFFRES");
+    }
+
+    public boolean isAttributs() {
+        return session.aLaPermission("GERER_ATTRIBUTS");
+    }
+
     public boolean isVerifications() {
         return session.aLaPermission("SUPERVISER_VERIFICATIONS");
     }
@@ -121,6 +138,10 @@ public class AccesAdminBean {
 
     public void exigerModererOffres() {
         session.exigerRole(session.isConnecte() && isModererOffres());
+    }
+
+    public void exigerCatalogue() {
+        session.exigerRole(session.isConnecte() && isCatalogue());
     }
 
     public void exigerSignalements() {
