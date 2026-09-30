@@ -37,6 +37,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        // Modération des offres (docs/architecture-acteurs.md §9.9)
+                        .requestMatchers("/api/v1/admin/offres", "/api/v1/admin/offres/**").hasAuthority("PERM_MODERER_OFFRES")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

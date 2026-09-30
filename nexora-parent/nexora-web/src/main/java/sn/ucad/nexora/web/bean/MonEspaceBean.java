@@ -101,11 +101,11 @@ public class MonEspaceBean implements Serializable {
                     .filter(e -> e.id().equals(idSelectionne))
                     .findFirst()
                     .orElse(mesEspaces.isEmpty() ? null : mesEspaces.get(0));
-            espace = selectionne == null ? null : espaceApiClient.obtenir(selectionne.id());
+            espace = selectionne == null ? null : espaceApiClient.obtenir(session.getAccessToken(), selectionne.id());
             remplirChampsEspace();
             vocabulaireOffres = VocabulaireOffres.pour(nomTypeEspaceDe(espace));
             mesOffres = espace == null ? List.of()
-                    : catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
+                    : catalogueApiClient.gestion(session.getAccessToken(), espace.id()).contenu();
             if (espace != null) verification.initialiser(espace.id());
         } catch (ApiException e) {
             // Pas encore de profil utilisateur exploitable côté espace-service : pas une erreur bloquante,
@@ -250,7 +250,7 @@ public class MonEspaceBean implements Serializable {
     public void supprimerOffre(Long idOffre) {
         try {
             catalogueApiClient.supprimerOffre(session.getAccessToken(), idOffre);
-            mesOffres = catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
+            mesOffres = catalogueApiClient.gestion(session.getAccessToken(), espace.id()).contenu();
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
@@ -260,7 +260,7 @@ public class MonEspaceBean implements Serializable {
     public void basculerDisponibiliteOffre(Long idOffre, boolean disponible) {
         try {
             catalogueApiClient.basculerDisponibiliteOffre(session.getAccessToken(), idOffre, disponible);
-            mesOffres = catalogueApiClient.rechercher(CritereRecherche.parEspace(espace.id())).contenu();
+            mesOffres = catalogueApiClient.gestion(session.getAccessToken(), espace.id()).contenu();
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));

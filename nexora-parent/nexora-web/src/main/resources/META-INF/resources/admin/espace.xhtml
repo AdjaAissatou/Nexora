@@ -1,0 +1,129 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerModererEspaces}" />
+</f:metadata>
+<ui:param name="section" value="espaces" />
+<ui:define name="titre">Fiche espace</ui:define>
+<ui:define name="titre-page">#{empty ficheEspaceAdminBean.fiche ? 'Fiche espace' : ficheEspaceAdminBean.fiche.espace.nom}</ui:define>
+<ui:define name="content">
+
+    <p style="margin-top:0;"><h:link outcome="/admin/espaces" value="← Tous les espaces" /></p>
+
+    <ui:fragment rendered="#{not empty ficheEspaceAdminBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{ficheEspaceAdminBean.erreur}</div>
+    </ui:fragment>
+
+    <ui:fragment rendered="#{not empty ficheEspaceAdminBean.fiche}">
+    <ui:param name="f" value="#{ficheEspaceAdminBean.fiche}" />
+    <ui:param name="e" value="#{ficheEspaceAdminBean.fiche.espace}" />
+
+    <h:form id="ficheForm">
+    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+
+    <ui:fragment rendered="#{ficheEspaceAdminBean.suspendu}">
+        <div class="nx-alert nx-alert-error">
+            <strong>Espace suspendu</strong> le #{format.dateHeure(e.dateModeration)}#{empty e.moderateur ? '' : ' par '.concat(e.moderateur)} :
+            #{e.motifModeration}<br />
+            Il n'apparaît ni dans la recherche ni sur l'accueil, et sa fiche publique répond « introuvable ».
+        </div>
+    </ui:fragment>
+
+    <div class="nx-verif-grille">
+        <div>
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Espace
+                    <span class="nx-badge #{libAdmin.classeStatut(e.statut)}">#{libAdmin.statutEspace(e.statut)}</span>
+                    <ui:fragment rendered="#{e.verifie}"><span class="nx-badge nx-badge-verifie">Vérifié</span></ui:fragment>
+                    <ui:fragment rendered="#{e.certifie}"><span class="nx-badge nx-badge-certifie">Certifié</span></ui:fragment></h3>
+                <dl class="nx-verif-infos">
+                    <dt>Type</dt><dd>#{e.typeEspace}</dd>
+                    <dt>Adresse</dt><dd>#{empty f.adresse ? '—' : f.adresse}</dd>
+                    <dt>Téléphone</dt><dd>#{empty f.telephone ? '—' : format.telephoneAffiche(f.telephone)}</dd>
+                    <dt>E-mail</dt><dd>#{empty f.email ? '—' : f.email}</dd>
+                    <dt>Créé le</dt><dd>#{format.dateHeure(e.dateCreation)}</dd>
+                    <dt>Propriétaire</dt>
+                    <dd>
+                        <ui:fragment rendered="#{acces.utilisateurs and not empty e.proprietaireCompte}">
+                            <h:link outcome="/admin/utilisateur" value="#{e.proprietaireNom}"><f:param name="id" value="#{e.proprietaireCompte}" /></h:link>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{!acces.utilisateurs or empty e.proprietaireCompte}">#{e.proprietaireNom}</ui:fragment>
+                        · #{e.proprietaireEmail}
+                    </dd>
+                </dl>
+                <ui:fragment rendered="#{not empty f.description}">
+                    <p style="margin:14px 0 0; color:var(--nx-text-secondary); white-space:pre-line;">#{f.description}</p>
+                </ui:fragment>
+                <ui:fragment rendered="#{ficheEspaceAdminBean.actif}">
+                    <p style="margin:14px 0 0;"><h:link outcome="/espace" value="Voir la fiche publique ↗" target="_blank"><f:param name="id" value="#{e.id}" /></h:link></p>
+                </ui:fragment>
+            </div>
+
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Offres (#{f.offres.size()})</h3>
+                <ui:fragment rendered="#{empty f.offres}"><p style="color:var(--nx-text-secondary);">Aucune offre.</p></ui:fragment>
+                <ul class="nx-verif-liste">
+                    <ui:repeat var="o" value="#{f.offres}">
+                        <li><span class="nx-verif-texte"><strong>#{o.titre}</strong>
+                                <ui:fragment rendered="#{not empty o.prix}"> · #{format.prix(o.prix)}</ui:fragment>
+                                <ui:fragment rendered="#{not empty o.motifModeration}"><br /><span style="font-size:13px; color:var(--nx-error);">#{o.motifModeration}</span></ui:fragment></span>
+                            <span class="nx-verif-actions">
+                                <span class="nx-badge #{libAdmin.classeStatut(o.statut)}">#{libAdmin.statutOffre(o.statut)}</span>
+                                <ui:fragment rendered="#{ficheEspaceAdminBean.peutAgirSurOffres and o.statut eq 'PUBLIE'}">
+                                    <h:commandLink value="Suspendre" action="#{ficheEspaceAdminBean.suspendreOffre(o.id)}"
+                                                   onclick="return confirm('Suspendre cette offre avec le motif saisi ?');" />
+                                </ui:fragment>
+                                <ui:fragment rendered="#{ficheEspaceAdminBean.peutAgirSurOffres and o.statut eq 'SUSPENDU'}">
+                                    <h:commandLink value="Republier" action="#{ficheEspaceAdminBean.republierOffre(o.id)}" />
+                                </ui:fragment>
+                            </span></li>
+                    </ui:repeat>
+                </ul>
+            </div>
+        </div>
+
+        <div>
+            <ui:fragment rendered="#{ficheEspaceAdminBean.sonPropreEspace}">
+                <div class="nx-alert nx-alert-info">C'est votre espace : vous ne pouvez pas le modérer vous-même.</div>
+            </ui:fragment>
+
+            <ui:fragment rendered="#{!ficheEspaceAdminBean.sonPropreEspace}">
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Décision</h3>
+                <div class="nx-field">
+                    <label for="ficheForm:motif">Motif (obligatoire) : envoyé au professionnel et écrit dans le journal</label>
+                    <h:inputTextarea id="motif" value="#{ficheEspaceAdminBean.motif}" styleClass="nx-input" rows="3" />
+                </div>
+                <ui:fragment rendered="#{ficheEspaceAdminBean.actif}">
+                    <h:commandButton id="suspendre" value="Suspendre l'espace" action="#{ficheEspaceAdminBean.suspendre}" styleClass="nx-button nx-button-danger nx-button-block"
+                                     onclick="return confirm('Suspendre cet espace ? Il disparaîtra de la recherche, avec toutes ses offres.');" />
+                </ui:fragment>
+                <ui:fragment rendered="#{ficheEspaceAdminBean.suspendu}">
+                    <h:commandButton id="reactiver" value="Réactiver l'espace" action="#{ficheEspaceAdminBean.reactiver}" styleClass="nx-button nx-button-primary nx-button-block" />
+                </ui:fragment>
+                <p style="font-size:13px; color:var(--nx-text-secondary); margin:12px 0 0;">
+                    Ce motif sert aussi aux actions sur les offres de la liste.
+                    Suspendre l'espace masque toutes ses offres sans changer leur statut.
+                </p>
+            </div>
+            </ui:fragment>
+
+            <div class="nx-card">
+                <h3 style="margin-top:0;">Historique de modération</h3>
+                <ui:fragment rendered="#{empty f.historique}"><p style="color:var(--nx-text-secondary);">Aucune action.</p></ui:fragment>
+                <ul class="nx-verif-historique">
+                    <ui:repeat var="h" value="#{f.historique}">
+                        <li><span class="quand">#{format.dateHeure(h.date)} · #{h.auteur}</span>#{h.description}</li>
+                    </ui:repeat>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </h:form>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

@@ -31,6 +31,21 @@ public class CatalogueApiClient {
     private final RestClient client = RestClient.builder().baseUrl(baseUrl)
             .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
 
+    /** Toutes les offres d'un espace du compte connecté, suspendues comprises, avec statut et motif (§9.9). */
+    public OffrePageResponse gestion(String accessToken, Long idEspace) {
+        LOG.info("Requête GET {}/api/v1/offres/gestion?idEspace={}", baseUrl, idEspace);
+        try {
+            return client.get()
+                    .uri(u -> u.path("/api/v1/offres/gestion").queryParam("idEspace", idEspace).build())
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve().body(OffrePageResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
     public OffrePageResponse rechercher(CritereRecherche c) {
         LOG.info("Requête GET {}/api/v1/offres/recherche ({})", baseUrl, c);
         try {

@@ -7,9 +7,36 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import sn.ucad.nexora.common.exception.BusinessException;
+import sn.ucad.nexora.common.exception.ResourceNotFoundException;
+import sn.ucad.nexora.common.exception.UnauthorizedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /** Règle métier refusée (ex. modération : motif manquant, offre déjà suspendue). */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Map<String, Object>> handleMetier(BusinessException ex) {
+        return corps(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleIntrouvable(ResourceNotFoundException ex) {
+        return corps(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Map<String, Object>> handleInterdit(UnauthorizedException ex) {
+        return corps(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    private static ResponseEntity<Map<String, Object>> corps(HttpStatus statut, String message) {
+        return ResponseEntity.status(statut).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", statut.value(),
+                "message", message == null ? statut.getReasonPhrase() : message
+        ));
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(IllegalArgumentException ex) {

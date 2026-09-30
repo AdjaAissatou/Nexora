@@ -59,6 +59,23 @@ public class EspaceApiClient {
         }
     }
 
+    /**
+     * Fiche d'un espace avec le jeton du compte connecté : un espace suspendu reste visible de son
+     * propriétaire (et de la modération), avec le motif ; pour les autres il est introuvable (§9.9).
+     */
+    public EspaceResponse obtenir(String accessToken, Long id) {
+        LOG.info("Requête GET {}/api/v1/espaces/{} (authentifiée)", baseUrl, id);
+        try {
+            return client.get().uri("/api/v1/espaces/{id}", id)
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve().body(EspaceResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
     public EspaceResponse obtenir(Long id) {
         LOG.info("Requête GET {}/api/v1/espaces/{}", baseUrl, id);
         try {

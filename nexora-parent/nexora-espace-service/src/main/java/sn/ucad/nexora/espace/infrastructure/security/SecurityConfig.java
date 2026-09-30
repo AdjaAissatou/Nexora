@@ -7,4 +7,6 @@ import org.springframework.context.annotation.Bean; import org.springframework.c
   .requestMatchers("/api/v1/verifications","/api/v1/verifications/**").hasAuthority("PERM_TRAITER_VERIFICATIONS")
   .requestMatchers("/api/v1/admin/verifications/agents","/api/v1/admin/verifications/agents/**").hasAuthority("PERM_GERER_AGENTS_VERIFICATION")
   .requestMatchers("/api/v1/admin/verifications","/api/v1/admin/verifications/**").hasAuthority("PERM_SUPERVISER_VERIFICATIONS")
+  // Modération des espaces (§9.9)
+  .requestMatchers("/api/v1/admin/espaces","/api/v1/admin/espaces/**").hasAuthority("PERM_MODERER_ESPACES")
   .anyRequest().authenticated()).addFilterBefore(jwt,UsernamePasswordAuthenticationFilter.class).build();}}

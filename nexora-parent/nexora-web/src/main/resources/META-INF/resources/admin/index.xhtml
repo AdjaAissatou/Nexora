@@ -51,12 +51,17 @@
         <div class="nx-admin-tuile">
             <span class="valeur">#{t.espaces}</span>
             <span class="libelle">espaces professionnels</span>
-            <span class="detail">#{t.espacesActifs} actifs · #{t.espacesSuspendus} suspendus · #{t.espacesVerifies} vérifiés</span>
+            <span class="detail">#{t.espacesActifs} actifs ·
+                <h:link outcome="/admin/espaces" value="#{t.espacesSuspendus} suspendus" rendered="#{acces.modererEspaces}"><f:param name="statut" value="SUSPENDU" /></h:link>
+                <h:outputText value="#{t.espacesSuspendus} suspendus" rendered="#{!acces.modererEspaces}" />
+                · #{t.espacesVerifies} vérifiés</span>
         </div>
         <div class="nx-admin-tuile">
             <span class="valeur">#{t.offres}</span>
             <span class="libelle">offres</span>
-            <span class="detail">#{t.offresPubliees} publiées · #{t.offresSuspendues} suspendues</span>
+            <span class="detail">#{t.offresPubliees} publiées ·
+                <h:link outcome="/admin/offres" value="#{t.offresSuspendues} suspendues" rendered="#{acces.modererOffres}"><f:param name="statut" value="SUSPENDU" /></h:link>
+                <h:outputText value="#{t.offresSuspendues} suspendues" rendered="#{!acces.modererOffres}" /></span>
         </div>
         <div class="nx-admin-tuile">
             <span class="valeur">#{t.avis}</span>

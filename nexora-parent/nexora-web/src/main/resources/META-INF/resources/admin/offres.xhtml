@@ -1,0 +1,86 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerModererOffres}" />
+</f:metadata>
+<ui:param name="section" value="offres" />
+<ui:define name="titre">Offres</ui:define>
+<ui:define name="titre-page">Offres</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty offresAdminBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{offresAdminBean.erreur}</div>
+    </ui:fragment>
+
+    <div class="nx-card">
+        <h:form id="filtres" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="nx-field" style="margin:0; flex:1; min-width:220px;">
+                <label for="filtres:recherche">Titre de l'offre ou nom de l'espace</label>
+                <h:inputText id="recherche" value="#{offresAdminBean.recherche}" styleClass="nx-input" />
+            </div>
+            <div class="nx-field" style="margin:0;">
+                <label for="filtres:statut">Statut</label>
+                <h:selectOneMenu id="statut" value="#{offresAdminBean.statut}" styleClass="nx-select">
+                    <f:selectItem itemLabel="Tous" itemValue="" />
+                    <f:selectItems value="#{libAdmin.statutsOffre}" var="s" itemLabel="#{libAdmin.statutOffre(s)}" itemValue="#{s}" />
+                </h:selectOneMenu>
+            </div>
+            <h:commandButton value="Filtrer" action="#{offresAdminBean.filtrer}" styleClass="nx-button nx-button-primary" />
+        </h:form>
+    </div>
+
+    <ui:fragment rendered="#{not empty offresAdminBean.resultat}">
+    <h:form id="decisions">
+    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+    <div class="nx-card">
+        <div class="nx-field">
+            <label for="decisions:motif">Motif de la décision (obligatoire) : envoyé au professionnel et écrit dans le journal</label>
+            <h:inputText id="motif" value="#{offresAdminBean.motif}" styleClass="nx-input" />
+        </div>
+        <h3>#{offresAdminBean.resultat.total} offre(s)</h3>
+        <table class="nx-verif-tableau">
+            <tr><th>Offre</th><th>Espace</th><th>Statut</th><th></th></tr>
+            <ui:repeat var="o" value="#{offresAdminBean.resultat.offres}">
+                <tr>
+                    <td><strong>#{o.titre}</strong><br />
+                        <span style="font-size:13px; color:var(--nx-text-secondary);">#{o.categorie}#{empty o.prix ? '' : ' · '.concat(format.prix(o.prix))}</span></td>
+                    <td><h:link outcome="/admin/espace" value="#{o.espaceNom}" rendered="#{acces.modererEspaces}"><f:param name="id" value="#{o.espaceId}" /></h:link>
+                        <h:outputText value="#{o.espaceNom}" rendered="#{!acces.modererEspaces}" />
+                        <ui:fragment rendered="#{o.espaceStatut ne 'ACTIF'}"><br /><span class="nx-badge #{libAdmin.classeStatut(o.espaceStatut)}">Espace #{libAdmin.statutEspace(o.espaceStatut).toLowerCase()}</span></ui:fragment><br />
+                        <span style="font-size:13px; color:var(--nx-text-secondary);">#{o.proprietaireNom}</span></td>
+                    <td><span class="nx-badge #{libAdmin.classeStatut(o.statut)}">#{libAdmin.statutOffre(o.statut)}</span>
+                        <ui:fragment rendered="#{not empty o.motifModeration}"><br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{o.motifModeration}</span></ui:fragment></td>
+                    <td style="text-align:right; white-space:nowrap;">
+                        <h:commandButton value="Suspendre" action="#{offresAdminBean.suspendre(o.id)}" rendered="#{o.statut eq 'PUBLIE'}"
+                                         styleClass="nx-button nx-button-danger" onclick="return confirm('Suspendre cette offre avec le motif saisi ?');" />
+                        <h:commandButton value="Republier" action="#{offresAdminBean.republier(o.id)}" rendered="#{o.statut eq 'SUSPENDU'}"
+                                         styleClass="nx-button nx-button-primary" />
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+        <ui:fragment rendered="#{empty offresAdminBean.resultat.offres}">
+            <p style="color:var(--nx-text-secondary);">Aucune offre ne correspond à ces critères.</p>
+        </ui:fragment>
+        <div style="display:flex; justify-content:space-between; margin-top:14px;">
+            <h:link outcome="/admin/offres" value="← Précédentes" rendered="#{offresAdminBean.page gt 0}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{offresAdminBean.page - 1}" />
+                <f:param name="recherche" value="#{offresAdminBean.recherche}" disable="#{empty offresAdminBean.recherche}" />
+                <f:param name="statut" value="#{offresAdminBean.statut}" disable="#{empty offresAdminBean.statut}" />
+            </h:link>
+            <span></span>
+            <h:link outcome="/admin/offres" value="Suivantes →" rendered="#{offresAdminBean.resultat.pageSuivante}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{offresAdminBean.page + 1}" />
+                <f:param name="recherche" value="#{offresAdminBean.recherche}" disable="#{empty offresAdminBean.recherche}" />
+                <f:param name="statut" value="#{offresAdminBean.statut}" disable="#{empty offresAdminBean.statut}" />
+            </h:link>
+        </div>
+    </div>
+    </h:form>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

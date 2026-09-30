@@ -1,5 +1,9 @@
 package sn.ucad.nexora.catalogue.presentation.controller;
 
+import org.springframework.security.core.Authentication;
+import sn.ucad.nexora.catalogue.application.dto.response.moderation.ModerationOffreDtos.Visibilite;
+import sn.ucad.nexora.catalogue.infrastructure.persistence.moderation.ModerationOffreRepository;
+import sn.ucad.nexora.common.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +46,7 @@ public class OffreController {
     private final GetOffreEditionUseCase getOffreEdition;
     private final DeleteOffreUseCase deleteOffre;
     private final ToggleDisponibiliteOffreUseCase toggleDisponibiliteOffre;
+    private final ModerationOffreRepository moderation;
 
     public OffreController(RechercherOffresUseCase rechercherOffres,
                            GetOffreUseCase getOffre,
@@ -49,7 +54,8 @@ public class OffreController {
                            UpdateOffreUseCase updateOffre,
                            GetOffreEditionUseCase getOffreEdition,
                            DeleteOffreUseCase deleteOffre,
-                           ToggleDisponibiliteOffreUseCase toggleDisponibiliteOffre) {
+                           ToggleDisponibiliteOffreUseCase toggleDisponibiliteOffre,
+                           ModerationOffreRepository moderation) {
         this.rechercherOffres = rechercherOffres;
         this.getOffre = getOffre;
         this.createOffre = createOffre;
@@ -57,6 +63,7 @@ public class OffreController {
         this.getOffreEdition = getOffreEdition;
         this.deleteOffre = deleteOffre;
         this.toggleDisponibiliteOffre = toggleDisponibiliteOffre;
+        this.moderation = moderation;
     }
 
     /**
@@ -205,8 +212,31 @@ public class OffreController {
                description = "Retourne la fiche complète d'une offre avec localisation, espace, images et attributs spécifiques")
     public ResponseEntity<OffreDetailResponse> get(
             @Parameter(description = "Identifiant de l'offre")
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            Authentication auth) {
 
+        // Une offre suspendue, ou d'un espace suspendu, n'est visible que de son propriétaire et de la
+        // modération (§9.9) : pour tous les autres elle est « introuvable », comme dans la recherche.
+        Visibilite v = moderation.visibilite(id).orElseThrow(() -> new ResourceNotFoundException("Offre introuvable"));
+        if (!v.publique() && !peutVoirNonPublique(v, auth)) {
+            throw new ResourceNotFoundException("Offre introuvable");
+        }
         return ResponseEntity.ok(getOffre.get(id));
+    }
+
+    private boolean peutVoirNonPublique(Visibilite v, Authentication auth) {
+        if (auth == null || !(auth.getPrincipal() instanceof UUID compte)) return false;
+        boolean moderateur = auth.getAuthorities().stream()
+                .anyMatch(a -> "PERM_MODERER_OFFRES".equals(a.getAuthority()) || "PERM_MODERER_ESPACES".equals(a.getAuthority()));
+        return moderateur || moderation.utilisateurId(compte).map(u -> u.equals(v.proprietaireId())).orElse(false);
+    }
+
+    /** Toutes les offres d'un espace, statut et motif de modération compris : réservé à son propriétaire. */
+    @GetMapping("/gestion")
+    @Operation(summary = "Offres d'un espace (gestion)",
+               description = "Toutes les offres de l'espace, suspendues comprises, pour son propriétaire")
+    public ResponseEntity<OffrePageResponse> gestion(@AuthenticationPrincipal UUID accountId,
+                                                     @RequestParam Long idEspace) {
+        return ResponseEntity.ok(rechercherOffres.gestion(accountId, idEspace));
     }
 }

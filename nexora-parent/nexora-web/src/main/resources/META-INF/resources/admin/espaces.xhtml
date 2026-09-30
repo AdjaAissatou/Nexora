@@ -1,0 +1,89 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerModererEspaces}" />
+</f:metadata>
+<ui:param name="section" value="espaces" />
+<ui:define name="titre">Espaces</ui:define>
+<ui:define name="titre-page">Espaces professionnels</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty espacesAdminBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{espacesAdminBean.erreur}</div>
+    </ui:fragment>
+
+    <div class="nx-card">
+        <h:form id="filtres" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+            <div class="nx-field" style="margin:0; flex:1; min-width:220px;">
+                <label for="filtres:recherche">Nom de l'espace, nom ou e-mail du propriétaire</label>
+                <h:inputText id="recherche" value="#{espacesAdminBean.recherche}" styleClass="nx-input" />
+            </div>
+            <div class="nx-field" style="margin:0;">
+                <label for="filtres:statut">Statut</label>
+                <h:selectOneMenu id="statut" value="#{espacesAdminBean.statut}" styleClass="nx-select">
+                    <f:selectItem itemLabel="Tous" itemValue="" />
+                    <f:selectItems value="#{libAdmin.statutsEspace}" var="s" itemLabel="#{libAdmin.statutEspace(s)}" itemValue="#{s}" />
+                </h:selectOneMenu>
+            </div>
+            <div class="nx-field" style="margin:0;">
+                <label for="filtres:verifie">Vérification</label>
+                <h:selectOneMenu id="verifie" value="#{espacesAdminBean.verifie}" styleClass="nx-select">
+                    <f:selectItem itemLabel="Tous" itemValue="" />
+                    <f:selectItem itemLabel="Vérifiés" itemValue="true" />
+                    <f:selectItem itemLabel="Non vérifiés" itemValue="false" />
+                </h:selectOneMenu>
+            </div>
+            <h:commandButton value="Filtrer" action="#{espacesAdminBean.filtrer}" styleClass="nx-button nx-button-primary" />
+        </h:form>
+    </div>
+
+    <ui:fragment rendered="#{not empty espacesAdminBean.resultat}">
+    <div class="nx-card">
+        <h3 style="margin-top:0;">#{espacesAdminBean.resultat.total} espace(s)</h3>
+        <table class="nx-verif-tableau">
+            <tr><th>Espace</th><th>Propriétaire</th><th>Offres</th><th>Statut</th><th></th></tr>
+            <ui:repeat var="e" value="#{espacesAdminBean.resultat.espaces}">
+                <tr>
+                    <td><strong>#{e.nom}</strong>
+                        <ui:fragment rendered="#{e.verifie}"> <span class="nx-badge nx-badge-verifie">Vérifié</span></ui:fragment><br />
+                        <span style="font-size:13px; color:var(--nx-text-secondary);">#{e.typeEspace}#{empty e.commune ? '' : ' · '.concat(e.commune)}</span></td>
+                    <td>#{e.proprietaireNom}<br />
+                        <span style="font-size:13px; color:var(--nx-text-secondary);">#{e.proprietaireEmail}</span></td>
+                    <td>#{e.offresPubliees} publiée(s)
+                        <ui:fragment rendered="#{e.offresSuspendues gt 0}"><br /><span style="font-size:13px; color:var(--nx-error);">#{e.offresSuspendues} suspendue(s)</span></ui:fragment></td>
+                    <td><span class="nx-badge #{libAdmin.classeStatut(e.statut)}">#{libAdmin.statutEspace(e.statut)}</span>
+                        <ui:fragment rendered="#{not empty e.motifModeration}"><br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{e.motifModeration}</span></ui:fragment></td>
+                    <td style="text-align:right;">
+                        <h:link outcome="/admin/espace" value="Fiche" styleClass="nx-button nx-button-outline">
+                            <f:param name="id" value="#{e.id}" />
+                        </h:link>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+        <ui:fragment rendered="#{empty espacesAdminBean.resultat.espaces}">
+            <p style="color:var(--nx-text-secondary);">Aucun espace ne correspond à ces critères.</p>
+        </ui:fragment>
+        <div style="display:flex; justify-content:space-between; margin-top:14px;">
+            <h:link outcome="/admin/espaces" value="← Précédents" rendered="#{espacesAdminBean.page gt 0}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{espacesAdminBean.page - 1}" />
+                <f:param name="recherche" value="#{espacesAdminBean.recherche}" disable="#{empty espacesAdminBean.recherche}" />
+                <f:param name="statut" value="#{espacesAdminBean.statut}" disable="#{empty espacesAdminBean.statut}" />
+                <f:param name="verifie" value="#{espacesAdminBean.verifie}" disable="#{empty espacesAdminBean.verifie}" />
+            </h:link>
+            <span></span>
+            <h:link outcome="/admin/espaces" value="Suivants →" rendered="#{espacesAdminBean.resultat.pageSuivante}" styleClass="nx-button nx-button-outline">
+                <f:param name="page" value="#{espacesAdminBean.page + 1}" />
+                <f:param name="recherche" value="#{espacesAdminBean.recherche}" disable="#{empty espacesAdminBean.recherche}" />
+                <f:param name="statut" value="#{espacesAdminBean.statut}" disable="#{empty espacesAdminBean.statut}" />
+                <f:param name="verifie" value="#{espacesAdminBean.verifie}" disable="#{empty espacesAdminBean.verifie}" />
+            </h:link>
+        </div>
+    </div>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

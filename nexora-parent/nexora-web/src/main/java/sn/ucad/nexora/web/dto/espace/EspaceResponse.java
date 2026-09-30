@@ -38,4 +38,12 @@ public record EspaceResponse(
         String registreCommerce,
         String numeroNinea,
         String numeroRccm,
-        List<String> photos) {}
+        List<String> photos,
+        // Modération (§9.9) : renseignés pour le propriétaire quand l'espace est suspendu
+        String motifModeration,
+        java.time.LocalDateTime dateModeration) {
+
+    public boolean suspendu() {
+        return "SUSPENDU".equals(statut);
+    }
+}

@@ -154,7 +154,8 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 NULL::BOOLEAN AS reservation,
                 NULL::BOOLEAN AS urgence,
 
-                img.url AS image_principale
+                img.url AS image_principale,
+                o.motif_moderation
 
             FROM offre o
             JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
@@ -171,10 +172,11 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 WHERE actif = TRUE AND NOW() BETWEEN date_debut AND date_fin
             ) p ON (p.id_offre = o.id_offre OR p.id_espace = ep.id_espace)
             LEFT JOIN image img ON img.id_offre = o.id_offre AND img.principale = TRUE
-            WHERE CAST(o.statut AS TEXT) = 'PUBLIE'
-              AND ep.ouvert = TRUE
-              AND CAST(ep.statut AS TEXT) = 'ACTIF'
             """);
+        // Recherche publique : seulement ce qui est visible. Gestion : tout ce que le professionnel possède.
+        sql.append(params.isGestion()
+                ? " WHERE CAST(o.statut AS TEXT) <> 'SUPPRIME' "
+                : " WHERE CAST(o.statut AS TEXT) = 'PUBLIE' AND ep.ouvert = TRUE AND CAST(ep.statut AS TEXT) = 'ACTIF' ");
 
         Map<String, Object> paramMap = new LinkedHashMap<>();
 
@@ -390,6 +392,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
         // Dernière colonne : image_principale (index 63)
         if (r.length > 63) {
             o.setImagePrincipale(str(r[63]));
+        }
+        // Puis motif_moderation (index 64)
+        if (r.length > 64) {
+            o.setMotifModeration(str(r[64]));
         }
         return o;
     }

@@ -16,6 +16,10 @@ public class OffreSummaryResponse {
     private boolean disponible;
     private boolean negociable;
 
+    // Statut et modération : utiles à la liste de gestion du professionnel (PUBLIE en recherche publique)
+    private String statut;
+    private String motifModeration;
+
     // Espace
     private Long espaceId;
     private String espaceNom;
@@ -86,4 +90,9 @@ public class OffreSummaryResponse {
     public void setTypeReduction(String typeReduction) { this.typeReduction = typeReduction; }
     public BigDecimal getValeurReduction() { return valeurReduction; }
     public void setValeurReduction(BigDecimal valeurReduction) { this.valeurReduction = valeurReduction; }
+
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
+    public String getMotifModeration() { return motifModeration; }
+    public void setMotifModeration(String motifModeration) { this.motifModeration = motifModeration; }
 }

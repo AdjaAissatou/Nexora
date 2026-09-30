@@ -729,8 +729,9 @@ modifie depuis `/admin/roles` sans toucher au code.
 
 - `avis` : colonnes de modération (`masque`, `motif_moderation`, `modere_par`,
   `date_moderation`). Un avis masqué disparaît de la fiche publique et de la note moyenne.
-- `espace_professionnel` / `offre` : motif et date de la dernière suspension (ou lecture
-  depuis le journal ; à trancher à l'étape 6c).
+- `espace_professionnel` / `offre` : motif, date et auteur de la dernière décision de
+  modération (`motif_moderation`, `date_moderation`, `id_moderateur`). Tranché à l'étape 6c :
+  des colonnes plutôt qu'une lecture du journal, pour que le professionnel voie le motif (§9.9).
 - Rien d'autre : `journal_action`, `parametre` et `signalement` ont déjà les colonnes
   nécessaires.
 
@@ -744,7 +745,8 @@ modifie depuis `/admin/roles` sans toucher au code.
    - supervision des vérifications déplacée dans le layout admin.
 2. ✅ **6b — Utilisateurs** (§9.8) : recherche, fiche, suspension / réactivation, rôles
    administratifs, et matrice rôles × permissions (§6).
-3. **6c — Espaces et offres** : modération (suspendre / réactiver, motif, notification).
+3. ✅ **6c — Espaces et offres** (§9.9) : modération (suspendre / réactiver, motif,
+   notification).
 4. **6d — Signalements et avis** : bouton « Signaler » côté public, file de traitement,
    masquage des avis.
 5. **6e — Catalogue** : gestion des catégories, types d'offre, attributs et tags.
@@ -850,6 +852,82 @@ mot de passe `Password1!`) : `superadmin.demo`, `moderateur.demo`, `support.demo
 Donnée corrigée au passage : les comptes créés en SQL (administrateur initial,
 démonstration) n'avaient pas le rôle `UTILISATEUR`. Le script 24 le leur donne.
 
+### 9.9 ✅ Étape 6c — modération des espaces et des offres
+
+**Règles**
+- Deux décisions seulement, toujours motivées : **suspendre** (`ACTIF → SUSPENDU` pour un
+  espace, `PUBLIE → SUSPENDU` pour une offre) et **réactiver / republier** (retour à l'état
+  visible). Aucune autre transition ici.
+- **Ce que change une suspension** :
+  - l'espace ou l'offre disparaît de la recherche, de l'accueil et de la carte ;
+  - sa fiche publique répond « introuvable ». Suspendre un espace masque aussi toutes ses
+    offres, sans changer leur statut ; elles reviennent avec lui.
+- **Le professionnel est prévenu** :
+  - une notification (`AVERTISSEMENT` à la suspension, `SUCCES` au retour) ;
+  - dans Mon espace, un bandeau pour l'espace et un badge « Suspendue » sur l'offre, avec le
+    motif ;
+  - il voit toujours sa fiche et toutes ses offres, et peut les modifier pour corriger ce
+    qui est signalé. Mais **seule la modération rend visible** : aucune modification du
+    professionnel ne change le statut.
+- On ne modère **jamais son propre espace ni ses propres offres** (refusé par le service, et
+  masqué dans l'interface).
+- Chaque décision est journalisée (module `MODERATION`, entité `espace` ou `offre`, adresse
+  IP), et la notification est écrite dans la même transaction : pas de décision sans trace,
+  pas de trace sans décision.
+
+**API**
+
+| Route | Service | Permission |
+|---|---|---|
+| `GET /api/v1/admin/espaces?recherche=&statut=&verifie=&page=` | espace-service | `MODERER_ESPACES` |
+| `GET /api/v1/admin/espaces/{id}` (fiche : propriétaire, offres, historique espace et offres) | espace-service | `MODERER_ESPACES` |
+| `POST /api/v1/admin/espaces/{id}/suspendre` et `.../reactiver` `{motif}` | espace-service | `MODERER_ESPACES` |
+| `GET /api/v1/admin/offres?recherche=&statut=&idEspace=&page=` | catalogue-service | `MODERER_OFFRES` |
+| `POST /api/v1/admin/offres/{id}/suspendre` et `.../republier` `{motif}` | catalogue-service | `MODERER_OFFRES` |
+| `GET /api/v1/offres/gestion?idEspace=` : toutes les offres d'un espace, statut et motif compris | catalogue-service | propriétaire de l'espace |
+
+Changements de comportement :
+- `GET /api/v1/espaces/{id}` et `GET /api/v1/offres/{id}` restent publics, mais un espace non
+  actif, une offre non publiée ou une offre d'un espace suspendu ne sont servis qu'à leur
+  propriétaire et aux modérateurs (jeton facultatif) ;
+- `GET /api/v1/espaces/me` porte le motif de modération.
+
+Mon espace utilise désormais la liste de gestion au lieu de la recherche publique. Cela
+corrige aussi un défaut ancien : un espace marqué « fermé » par son propriétaire voyait ses
+offres disparaître de sa propre page.
+
+**Composants partagés**
+- `nexora-common` : `Notifications`, à côté de `JournalActions`, écrit dans la transaction de
+  l'action qui la motive.
+- Le gestionnaire d'erreurs du catalogue traduit désormais les exceptions métier en 400 /
+  403 / 404 au lieu de 500.
+
+**Base** : `database/03_professional/08_moderation.sql`, rejouable, dans `install.sql` après
+le catalogue.
+
+**Web**
+- `/admin/espaces` : recherche par nom de l'espace, nom ou e-mail du propriétaire ; filtres
+  par statut et par vérification.
+- `/admin/espace?id=` : informations, propriétaire (lien vers sa fiche utilisateur), offres
+  avec leurs actions, décision motivée, historique.
+- `/admin/offres` : recherche par titre ou par espace, filtre par statut, suspension et
+  republication depuis la ligne.
+- Menu : Espaces et Offres selon `MODERER_ESPACES` / `MODERER_OFFRES`. Au tableau de bord, les
+  compteurs « suspendus » mènent aux listes filtrées.
+
+**Tests**
+- API, 64 contrôles rejouables (`test_6c.py`) :
+  - droits de chaque rôle, recherche et filtres ;
+  - motif obligatoire, transitions interdites ;
+  - visibilité pour l'anonyme, un autre utilisateur, le propriétaire et le modérateur ;
+  - disparition et retour dans la recherche, liste de gestion ;
+  - notifications, journal et historique ;
+  - refus de modérer son propre espace ou ses propres offres ;
+- navigateur : menus selon le rôle, parcours du modérateur (espace puis offre), bandeau et
+  badge côté professionnel, fiche publique introuvable ;
+- non-régression : vérification, 6a, 6b (API et navigateur), session, installation complète
+  de la base.
+
 ---
-*Dernière mise à jour : session du 30/09/2026, rôles et permissions appliqués (§6) et
-administration des utilisateurs livrée (étape 6b).*
+*Dernière mise à jour : session du 30/09/2026, nouveau langage visuel et modération des
+espaces et des offres livrée (étape 6c).*

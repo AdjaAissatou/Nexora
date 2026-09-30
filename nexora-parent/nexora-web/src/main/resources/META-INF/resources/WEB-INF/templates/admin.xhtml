@@ -42,8 +42,10 @@
 
             <ui:fragment rendered="#{acces.moderation}">
                 <div class="nx-admin-nav-titre">Modération</div>
-                <span class="nx-admin-nav-item a-venir">Espaces <small>à venir</small></span>
-                <span class="nx-admin-nav-item a-venir">Offres <small>à venir</small></span>
+                <h:link outcome="/admin/espaces" value="Espaces" rendered="#{acces.modererEspaces}"
+                        styleClass="nx-admin-nav-item #{section == 'espaces' ? 'active' : ''}" />
+                <h:link outcome="/admin/offres" value="Offres" rendered="#{acces.modererOffres}"
+                        styleClass="nx-admin-nav-item #{section == 'offres' ? 'active' : ''}" />
                 <span class="nx-admin-nav-item a-venir">Signalements <small>à venir</small></span>
                 <span class="nx-admin-nav-item a-venir">Avis <small>à venir</small></span>
             </ui:fragment>

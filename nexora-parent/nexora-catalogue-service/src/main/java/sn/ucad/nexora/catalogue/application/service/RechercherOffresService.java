@@ -8,16 +8,40 @@ import sn.ucad.nexora.catalogue.application.usecase.RechercherOffresUseCase;
 import sn.ucad.nexora.catalogue.domain.entity.Offre;
 import sn.ucad.nexora.catalogue.domain.repository.OffreRepository;
 import sn.ucad.nexora.catalogue.domain.repository.RechercheParams;
+import sn.ucad.nexora.catalogue.infrastructure.persistence.moderation.ModerationOffreRepository;
+import sn.ucad.nexora.common.exception.ResourceNotFoundException;
+import sn.ucad.nexora.common.exception.UnauthorizedException;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class RechercherOffresService implements RechercherOffresUseCase {
 
-    private final OffreRepository offreRepository;
+    /** Au-delà, la liste de gestion est tronquée (un espace en a rarement autant). */
+    private static final int TAILLE_GESTION = 200;
 
-    public RechercherOffresService(OffreRepository offreRepository) {
+    private final OffreRepository offreRepository;
+    private final ModerationOffreRepository moderation;
+
+    public RechercherOffresService(OffreRepository offreRepository, ModerationOffreRepository moderation) {
         this.offreRepository = offreRepository;
+        this.moderation = moderation;
+    }
+
+    @Override
+    public OffrePageResponse gestion(UUID accountId, Long idEspace) {
+        Long utilisateur = accountId == null ? null : moderation.utilisateurId(accountId).orElse(null);
+        Long proprietaire = moderation.proprietaireEspace(idEspace).orElseThrow(() -> new ResourceNotFoundException("Espace introuvable"));
+        if (!proprietaire.equals(utilisateur)) throw new UnauthorizedException("Cet espace ne vous appartient pas");
+        RechercheParams params = new RechercheParams();
+        params.setGestion(true);
+        params.setIdEspace(idEspace);
+        params.setTri("DATE_DESC");
+        params.setPage(0);
+        params.setTaille(TAILLE_GESTION);
+        List<OffreSummaryResponse> items = offreRepository.search(params).stream().map(this::toSummary).toList();
+        return new OffrePageResponse(items, 0, TAILLE_GESTION, items.size());
     }
 
     @Override
@@ -65,6 +89,8 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         r.setImagePrincipale(o.getImagePrincipale());
         r.setDisponible(o.isDisponible());
         r.setNegociable(o.isNegociable());
+        r.setStatut(o.getStatut());
+        r.setMotifModeration(o.getMotifModeration());
         r.setEspaceId(o.getEspaceId());
         r.setEspaceNom(o.getEspaceNom());
         r.setEspaceLogo(o.getEspaceLogo());

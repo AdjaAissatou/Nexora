@@ -108,6 +108,17 @@
 
             <div>
 
+                <!-- Modération (docs/architecture-acteurs.md §9.9) : visible sur tous les onglets.
+                     nx-alert-etat : mon-espace.js ne bascule pas d'onglet pour ce bandeau. -->
+                <ui:fragment rendered="#{monEspaceBean.espace.suspendu()}">
+                    <div class="nx-alert nx-alert-etat nx-alert-error">
+                        <strong>Votre espace est suspendu par la modération de Nexora.</strong><br />
+                        Motif : #{empty monEspaceBean.espace.motifModeration ? 'non précisé' : monEspaceBean.espace.motifModeration}<br />
+                        Il n'apparaît plus dans la recherche et sa fiche publique n'est plus accessible, offres comprises.
+                        Vous pouvez toujours le modifier : corrigez ce qui est signalé, la modération pourra alors le réactiver.
+                    </div>
+                </ui:fragment>
+
                 <div class="nx-tab-pane active" id="tab-offres">
 
                     <div class="nx-card nx-apercu-card">
@@ -167,12 +178,21 @@
                                                     <path d="M3 3h8l10 10-8 8L3 11V3z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
                                                 </svg>
                                             </ui:fragment>
-                                            <span class="nx-badge #{o.disponible ? 'nx-badge-verifie' : 'nx-badge-neutre'} nx-offre-media-badge">
-                                                #{o.disponible ? 'Disponible' : 'Indisponible'}
-                                            </span>
+                                            <ui:fragment rendered="#{o.suspendue()}">
+                                                <span class="nx-badge nx-badge-alerte nx-offre-media-badge">Suspendue</span>
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{!o.suspendue()}">
+                                                <span class="nx-badge #{o.disponible ? 'nx-badge-verifie' : 'nx-badge-neutre'} nx-offre-media-badge">
+                                                    #{o.disponible ? 'Disponible' : 'Indisponible'}
+                                                </span>
+                                            </ui:fragment>
                                         </div>
                                         <div class="nx-offre-body">
                                             <span class="nx-offre-titre">#{o.titre}</span>
+                                            <ui:fragment rendered="#{o.suspendue()}">
+                                                <span class="nx-offre-moderation">Suspendue par la modération : #{empty o.motifModeration ? 'motif non précisé' : o.motifModeration}.
+                                                    Modifiez-la pour corriger : la modération pourra la republier.</span>
+                                            </ui:fragment>
                                             <span class="nx-offre-prix">
                                                 #{format.prix(o.prix)}
                                             </span>

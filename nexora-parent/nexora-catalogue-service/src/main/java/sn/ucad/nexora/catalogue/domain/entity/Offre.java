@@ -29,6 +29,7 @@ public class Offre {
     private Long vueCount;
     private Double scorePertinence;
     private String statut;
+    private String motifModeration;
 
     private LocalDateTime dateCreation;
     private LocalDateTime dateModification;
@@ -124,6 +125,8 @@ public class Offre {
 
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+    public String getMotifModeration() { return motifModeration; }
+    public void setMotifModeration(String motifModeration) { this.motifModeration = motifModeration; }
 
     public LocalDateTime getDateCreation() { return dateCreation; }
     public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }

@@ -26,7 +26,15 @@ public record OffreSummaryResponse(
         BigDecimal longitude,
         String promotionNom,
         String typeReduction,
-        BigDecimal valeurReduction) {
+        BigDecimal valeurReduction,
+        // Liste de gestion du professionnel seulement (§9.9) ; PUBLIE en recherche publique
+        String statut,
+        String motifModeration) {
+
+    public boolean suspendue() {
+        return "SUSPENDU".equals(statut);
+    }
+
 
     public boolean enPromotion() {
         return promotionNom != null && !promotionNom.isBlank();

@@ -19,6 +19,12 @@ public class RechercheParams {
     private String region;
     private Long idEspace;
 
+    /**
+     * Mode « gestion » : toutes les offres de l'espace (sauf supprimées), quel que soit leur statut ou
+     * celui de l'espace — pour le professionnel lui-même, jamais pour la recherche publique.
+     */
+    private boolean gestion;
+
     /** Filtre prix */
     private BigDecimal prixMin;
     private BigDecimal prixMax;
@@ -55,6 +61,8 @@ public class RechercheParams {
     public void setCommune(String commune) { this.commune = commune; }
     public String getRegion() { return region; }
     public void setRegion(String region) { this.region = region; }
+    public boolean isGestion() { return gestion; }
+    public void setGestion(boolean gestion) { this.gestion = gestion; }
     public Long getIdEspace() { return idEspace; }
     public void setIdEspace(Long idEspace) { this.idEspace = idEspace; }
     public BigDecimal getPrixMin() { return prixMin; }
