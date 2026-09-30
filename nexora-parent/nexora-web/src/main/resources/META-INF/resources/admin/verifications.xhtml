@@ -1,25 +1,19 @@
-<ui:composition template="/WEB-INF/templates/layout.xhtml"
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
                  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                  xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
-<!-- Supervision de la vérification (docs/architecture-acteurs.md §8.8) : réservée à ADMIN / SUPER_ADMIN.
-     Première page d'administration ; elle rejoindra le back-office et son layout dédié (chantier 6). -->
+<!-- Supervision de la vérification (docs/architecture-acteurs.md §8.8, §9) : réservée à ADMIN / SUPER_ADMIN. -->
 <f:metadata>
-    <f:event type="preRenderView" listener="#{sessionBean.exigerAdministrateur}" />
+    <f:event type="preRenderView" listener="#{acces.exigerVerifications}" />
 </f:metadata>
-<ui:define name="titre">Supervision des vérifications — Nexora</ui:define>
+<ui:param name="section" value="verifications" />
+<ui:define name="titre">Vérifications</ui:define>
+<ui:define name="titre-page">Vérifications et agents</ui:define>
 <ui:define name="content">
 
-    <section class="nx-page-header">
-        <div class="nx-container">
-            <h1>Supervision des vérifications</h1>
-            <p>Toutes les demandes, les agents et les statistiques de vérification.</p>
-        </div>
-    </section>
-
-    <div class="nx-container" style="padding-bottom:60px;">
+    <div>
         <h:form id="supervisionForm">
         <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
         <ui:fragment rendered="#{not empty supervisionVerificationBean.erreur}">

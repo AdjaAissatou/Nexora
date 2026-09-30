@@ -105,13 +105,13 @@ public class SessionBean implements Serializable {
         return aLeRole("AGENT_VERIFICATION");
     }
 
-    /** Administrateur (ADMIN ou SUPER_ADMIN) : supervision de la vérification. */
-    public boolean isAdministrateur() {
-        return aLeRole("ADMIN") || aLeRole("SUPER_ADMIN");
-    }
-
-    private boolean aLeRole(String code) {
-        return compte != null && compte.roles() != null && compte.roles().contains(code);
+    /** Vrai si le compte a au moins un des rôles donnés. */
+    public boolean aLeRole(String... codes) {
+        if (compte == null || compte.roles() == null) return false;
+        for (String code : codes) {
+            if (compte.roles().contains(code)) return true;
+        }
+        return false;
     }
 
     public synchronized void deconnecter() {
@@ -157,16 +157,12 @@ public class SessionBean implements Serializable {
         exigerRole(isConnecte() && isAgentVerification());
     }
 
-    /** Garde des pages d'administration : connexion puis rôle ADMIN ou SUPER_ADMIN. */
-    public void exigerAdministrateur() {
-        exigerRole(isConnecte() && isAdministrateur());
-    }
-
     /**
+     * Garde générique des pages réservées à un rôle (voir aussi {@link AccesAdminBean}).
      * Visiteur non connecté : vers la connexion (comme {@link #exigerConnexion()}). Compte connecté
      * sans le rôle : vers l'accueil — la page n'existe pas pour lui, pas même son contenu vide.
      */
-    private void exigerRole(boolean autorise) {
+    public void exigerRole(boolean autorise) {
         if (autorise) return;
         if (!isConnecte()) {
             exigerConnexion();

@@ -73,3 +73,13 @@ spring:
                   args:
                     parts: "1"
 
+            - id: administration-service
+              uri: lb://administration-service
+              predicates:
+                - name: Path
+                  args:
+                    pattern: /administration-service/**
+              filters:
+                - name: StripPrefix
+                  args:
+                    parts: "1"

@@ -27,7 +27,8 @@ public class AuthApiClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthApiClient.class);
     private final String baseUrl = GatewayConfig.gatewayUrl() + "/auth-service";
-    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl)
+            .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
 
     public AuthenticationResponse connecter(String email, String motDePasse) {
         LOG.info("Requête POST {}/api/v1/auth/login", baseUrl);

@@ -970,3 +970,39 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 .nx-verif-actions .ui-fileupload-content:has(.ui-messages-error) { display: block; max-width: 260px; }
 .nx-verif-actions .ui-fileupload-buttonbar { padding: 0; border: 0; background: transparent; }
 .nx-verif-actions .ui-fileupload { border: 0; }
+
+/* ===================== Back-office (docs/architecture-acteurs.md §9) =====================
+   Mise en forme fonctionnelle ; la refonte visuelle viendra ensuite. */
+body.nx-admin { background: var(--nx-bg); }
+.nx-admin-shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
+.nx-admin-sidebar { background: var(--nx-primary); color: #fff; padding: 22px 16px; position: sticky; top: 0;
+    height: 100vh; overflow-y: auto; }
+.nx-admin-brand { display: block; color: #fff; text-decoration: none; font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 700; margin-bottom: 22px; }
+.nx-admin-brand small { display: block; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+    letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+.nx-admin-nav { display: flex; flex-direction: column; gap: 2px; }
+.nx-admin-nav-titre { margin: 16px 0 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
+.nx-admin-nav-item { display: block; padding: 8px 10px; border-radius: 8px; color: #fff; text-decoration: none; font-size: 14px; }
+.nx-admin-nav-item:hover, .nx-admin-nav-item.active { background: rgba(255,255,255,.14); }
+.nx-admin-nav-item.a-venir { opacity: .45; cursor: default; }
+.nx-admin-nav-item.a-venir:hover { background: none; }
+.nx-admin-nav-item small { font-size: 11px; margin-left: 4px; }
+.nx-admin-main { min-width: 0; }
+.nx-admin-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    padding: 18px 28px; background: var(--nx-surface); border-bottom: 1px solid var(--nx-border); }
+.nx-admin-topbar h1 { margin: 0; font-size: 22px; }
+.nx-admin-compte { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+.nx-admin-compte small { display: block; font-size: 12px; color: var(--nx-text-secondary); }
+.nx-admin-compte form { margin: 0; }
+.nx-admin-contenu { padding: 24px 28px 60px; }
+.nx-admin-tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.nx-admin-tuile { background: var(--nx-surface); border: 1px solid var(--nx-border); border-radius: 12px; padding: 16px; }
+.nx-admin-tuile .valeur { display: block; font-size: 26px; font-weight: 700; }
+.nx-admin-tuile .libelle { color: var(--nx-text-secondary); font-size: 13px; }
+.nx-admin-tuile .detail { display: block; margin-top: 6px; font-size: 12px; color: var(--nx-text-secondary); }
+.nx-admin-tuile.attention { border-color: var(--nx-warning); background: var(--nx-warning-soft); }
+@media (max-width: 800px) {
+    .nx-admin-shell { grid-template-columns: 1fr; }
+    .nx-admin-sidebar { position: static; height: auto; }
+}

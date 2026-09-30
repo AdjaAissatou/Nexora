@@ -1,0 +1,23 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <!-- Tableau d'actions du journal. Paramètres : actions (liste), detaille (affiche IP et entité). -->
+    <ui:fragment rendered="#{not empty actions}">
+        <table class="nx-verif-tableau">
+            <tr>
+                <th>Date</th><th>Auteur</th><th>Action</th><th>Description</th>
+                <ui:fragment rendered="#{detaille}"><th>Adresse IP</th></ui:fragment>
+            </tr>
+            <ui:repeat var="a" value="#{actions}">
+                <tr>
+                    <td style="white-space:nowrap;">#{format.dateHeure(a.date)}</td>
+                    <td>#{empty a.auteurNom ? 'Nexora' : a.auteurNom}<br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{a.auteurEmail}</span></td>
+                    <td><span class="nx-badge nx-badge-neutre">#{a.module}</span><br /><span style="font-size:12px;">#{a.action}</span></td>
+                    <td>#{a.description}
+                        <ui:fragment rendered="#{detaille and not empty a.entite}"><br /><span style="font-size:12px; color:var(--nx-text-secondary);">#{a.entite} n° #{a.idEntite}</span></ui:fragment></td>
+                    <ui:fragment rendered="#{detaille}"><td>#{a.adresseIp}</td></ui:fragment>
+                </tr>
+            </ui:repeat>
+        </table>
+    </ui:fragment>
+</ui:composition>

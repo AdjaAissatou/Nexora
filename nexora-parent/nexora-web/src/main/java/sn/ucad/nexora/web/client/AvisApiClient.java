@@ -19,7 +19,8 @@ public class AvisApiClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(AvisApiClient.class);
     private final String baseUrl = GatewayConfig.gatewayUrl() + "/recherche-service";
-    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl)
+            .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
 
     public List<AvisResponse> parEspace(Long espaceId) {
         LOG.info("Requête GET {}/api/v1/avis/espace/{}", baseUrl, espaceId);

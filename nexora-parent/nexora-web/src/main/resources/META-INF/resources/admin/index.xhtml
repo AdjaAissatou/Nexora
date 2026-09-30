@@ -1,0 +1,84 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerBackOffice}" />
+</f:metadata>
+<ui:param name="section" value="tableau" />
+<ui:define name="titre">Tableau de bord</ui:define>
+<ui:define name="titre-page">Tableau de bord</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty tableauDeBordBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{tableauDeBordBean.erreur}</div>
+    </ui:fragment>
+
+    <ui:fragment rendered="#{not empty tableauDeBordBean.tableau}">
+    <ui:param name="t" value="#{tableauDeBordBean.tableau}" />
+
+    <h3>À traiter</h3>
+    <div class="nx-admin-tuiles">
+        <ui:fragment rendered="#{acces.verifications}">
+            <div class="nx-admin-tuile #{t.verificationsEnAttente gt 0 ? 'attention' : ''}">
+                <span class="valeur">#{t.verificationsEnAttente}</span>
+                <span class="libelle">vérification(s) en attente d'un agent</span>
+                <span class="detail">#{t.verificationsEnCours} en cours d'examen ·
+                    <h:link outcome="/admin/verifications" value="Voir"><f:param name="statut" value="EN_ATTENTE" /></h:link></span>
+            </div>
+        </ui:fragment>
+        <ui:fragment rendered="#{acces.moderation}">
+            <div class="nx-admin-tuile #{t.signalementsEnAttente gt 0 ? 'attention' : ''}">
+                <span class="valeur">#{t.signalementsEnAttente}</span>
+                <span class="libelle">signalement(s) en attente</span>
+                <span class="detail">Traitement : étape 6d</span>
+            </div>
+        </ui:fragment>
+        <div class="nx-admin-tuile">
+            <span class="valeur">#{t.comptesSuspendus}</span>
+            <span class="libelle">compte(s) suspendu(s) ou désactivé(s)</span>
+        </div>
+    </div>
+
+    <h3>Nexora en chiffres</h3>
+    <div class="nx-admin-tuiles">
+        <div class="nx-admin-tuile">
+            <span class="valeur">#{t.comptes}</span>
+            <span class="libelle">comptes</span>
+            <span class="detail">+#{t.nouveauxComptes30Jours} ces 30 derniers jours</span>
+        </div>
+        <div class="nx-admin-tuile">
+            <span class="valeur">#{t.espaces}</span>
+            <span class="libelle">espaces professionnels</span>
+            <span class="detail">#{t.espacesActifs} actifs · #{t.espacesSuspendus} suspendus · #{t.espacesVerifies} vérifiés</span>
+        </div>
+        <div class="nx-admin-tuile">
+            <span class="valeur">#{t.offres}</span>
+            <span class="libelle">offres</span>
+            <span class="detail">#{t.offresPubliees} publiées · #{t.offresSuspendues} suspendues</span>
+        </div>
+        <div class="nx-admin-tuile">
+            <span class="valeur">#{t.avis}</span>
+            <span class="libelle">avis</span>
+        </div>
+    </div>
+
+    <ui:fragment rendered="#{acces.journal}">
+        <div class="nx-card">
+            <div class="nx-section-header">
+                <h3 style="margin:0;">Dernières actions</h3>
+                <h:link outcome="/admin/journal" value="Tout le journal" styleClass="nx-button nx-button-outline" />
+            </div>
+            <ui:fragment rendered="#{empty t.dernieresActions}">
+                <p style="color:var(--nx-text-secondary);">Aucune action enregistrée pour le moment.</p>
+            </ui:fragment>
+            <ui:include src="/WEB-INF/includes/journal-tableau.xhtml">
+                <ui:param name="actions" value="#{t.dernieresActions}" />
+            </ui:include>
+        </div>
+    </ui:fragment>
+    </ui:fragment>
+
+</ui:define>
+</ui:composition>

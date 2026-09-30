@@ -20,7 +20,8 @@ public class UserApiClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserApiClient.class);
     private final String baseUrl = GatewayConfig.gatewayUrl() + "/user-service";
-    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl)
+            .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
 
     public UserResponse obtenir(String accessToken, UUID accountId) {
         LOG.info("Requête GET {}/api/v1/users/{}", baseUrl, accountId);

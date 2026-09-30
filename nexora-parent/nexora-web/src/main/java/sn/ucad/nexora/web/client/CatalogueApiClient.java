@@ -28,7 +28,8 @@ public class CatalogueApiClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(CatalogueApiClient.class);
     private final String baseUrl = GatewayConfig.gatewayUrl() + "/catalogue-service";
-    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl)
+            .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
 
     public OffrePageResponse rechercher(CritereRecherche c) {
         LOG.info("Requête GET {}/api/v1/offres/recherche ({})", baseUrl, c);

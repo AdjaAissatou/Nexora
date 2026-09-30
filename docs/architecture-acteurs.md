@@ -119,23 +119,21 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 
 ### Administrateur
 
-Seule la supervision de la vérification existe (`/admin/verifications`, §8.11), dans le
-layout public en attendant le back-office. `nexora-administration-service` a son schéma
-(`statistique`, `journal_action`, `parametre`) mais aucun contrôleur ni page web. C'est le
-chantier le plus vide et le plus structurant à cadrer avant de coder quoi que ce soit
-dessus.
+Back-office en construction, cadré au §9 : layout dédié, tableau de bord, journal
+d'actions et supervision des vérifications sont en place (étape 6a) ; le reste suit les
+étapes 6b à 6f.
 
 | Page | État |
 |---|---|
-| Tableau de bord admin | 🚧 tout |
+| Tableau de bord admin | ✅ `/admin/index` (§9.7) |
 | Gérer les utilisateurs (suspendre/réactiver/supprimer) | 🚧 |
 | Gérer/modérer les espaces | 🚧 |
 | Gérer le catalogue (catégories, types d'offre, attributs, tags) | 🚧 (déjà en base et seedé, aucune UI d'admin) |
 | Modérer avis / traiter signalements | 🚧 |
-| Vérifications : supervision, agents (§8) | ✅ `/admin/verifications` — l'édition des règles de justificatifs reste à faire |
+| Vérifications : supervision, agents (§8) | ✅ `/admin/verifications`, dans le layout admin — l'édition des règles de justificatifs reste à faire (6f) |
 | Certifications 🏅 | — (après la vérification) |
 | Statistiques plateforme | 🚧 |
-| Journal d'activité | 🚧 |
+| Journal d'activité | ✅ `/admin/journal` (§9.7) |
 | Paramètres Nexora | 🚧 |
 
 ## 4. ✅ Navigation par acteur
@@ -150,12 +148,12 @@ dessus.
   rôle `AGENT_VERIFICATION` ; un compte sans ce rôle est renvoyé vers l'accueil
   (`SessionBean.exigerAgentVerification`). Layout public pour l'instant ; un layout dédié
   viendra avec la refonte visuelle.
-- **Admin** : navigation séparée, jamais mélangée à la navigation publique
-  (`/admin/...`, layout dédié, pas le header Nexora grand public) — pas encore construite.
+- **Admin** : ✅ navigation séparée, jamais mélangée à la navigation publique
+  (`/admin/...`, layout `WEB-INF/templates/admin.xhtml`, barre latérale filtrée par rôle).
+  Lien « Administration » dans le menu public pour les rôles du back-office (§9.2).
   Menu cible : Utilisateurs · Espaces · Vérifications · Agents · Catalogue · Catégories ·
-  Offres · Avis · Signalements · Statistiques · Paramètres. Aujourd'hui : un lien
-  « Supervision » (rôles `ADMIN`/`SUPER_ADMIN`) vers `/admin/verifications`, protégé par
-  `SessionBean.exigerAdministrateur`.
+  Offres · Avis · Signalements · Statistiques · Paramètres. Les sections pas encore
+  construites apparaissent grisées (« à venir »).
 
 Menu cible de **Mon espace** (professionnel), à construire au fil des chantiers :
 Vue d'ensemble · Mes espaces · Mes offres · Demandes · Réservations · Commandes ·
@@ -691,7 +689,7 @@ compte peut en cumuler plusieurs.
 
 ### 9.6 Étapes
 
-1. **6a — Fondations** :
+1. ✅ **6a — Fondations** (§9.7) :
    - `administration-service` opérationnel, avec tableau de bord et journal ;
    - `JournalActions` partagé, et la supervision des vérifications journalisée ;
    - layout admin et menu par rôle ;
@@ -707,6 +705,50 @@ compte peut en cumuler plusieurs.
 Chaque étape est testée de bout en bout, comme le chantier 5, avant de passer à la
 suivante. Les pages suivent le style actuel ; la refonte visuelle viendra après.
 
+### 9.7 ✅ Étape 6a — fondations en place
+
+**`nexora-administration-service`** (port 8086, route Gateway `/administration-service/**`) :
+- `GET /api/v1/admin/tableau-de-bord` (tous les rôles du back-office) : compteurs lus en
+  direct (comptes, suspendus, nouveaux sur 30 jours, espaces actifs / suspendus /
+  vérifiés, offres publiées / suspendues, vérifications en attente et en cours,
+  signalements en attente, avis), plus les dernières actions du journal pour
+  `ADMIN` / `SUPER_ADMIN` ;
+- `GET /api/v1/admin/journal?module=&recherche=&page=` (`ADMIN`, `SUPER_ADMIN`) : 50
+  actions par page, les plus récentes d'abord ;
+- toute autre route est refusée (`denyAll`).
+
+**Journal d'actions** — `sn.ucad.nexora.common.audit.JournalActions` (nexora-common,
+auto-configuré dans tous les services) :
+- écrit dans `journal_action` **dans la transaction de l'action** (`MANDATORY`) : une
+  action refusée ou en échec ne laisse aucune trace, une action réussie en laisse
+  toujours une ;
+- l'auteur est retrouvé depuis le compte du JWT ;
+- l'adresse IP est celle du navigateur, transmise par le web dans l'en-tête
+  `X-Nexora-Client-IP` (`EnTetesClient`, ajouté à tous les clients d'API du web).
+- Déjà journalisés : réattribution, annulation, révocation d'une vérification, ajout et
+  retrait d'un agent. Nouvelle règle appliquée : on ne peut pas se retirer son propre rôle
+  d'agent.
+
+**Web** :
+- layout `admin.xhtml` : barre latérale par rôle, compte et rôles en clair, retour au
+  site, déconnexion ;
+- `AccesAdminBean` (`#{acces.*}`) : qui voit quoi, et gardes des pages. Un visiteur va
+  vers la connexion, un compte sans le rôle vers l'accueil ;
+- pages `/admin/index` (tableau de bord) et `/admin/journal` (filtres module et
+  recherche, pagination) ; `/admin/verifications` passe dans ce layout.
+
+**Comptes de démonstration** (`09_seed/23_demo_administration.sql`, hors `install.sql`,
+mot de passe `Password1!`) : `superadmin.demo`, `moderateur.demo`, `support.demo`,
+`gestionnaire.demo` @nexora-demo.sn ; `admin.demo` existe déjà (22).
+
+**Tests** :
+- API, 22 contrôles : accès au tableau de bord et au journal pour chacun des 7 rôles,
+  exactitude des compteurs, journalisation avec l'IP, rien de journalisé pour une action
+  refusée, filtres du journal ;
+- navigateur : menu et gardes de chaque rôle, du visiteur au super administrateur,
+  tableau de bord, supervision dans le nouveau layout, journal filtré ;
+- non-régression : scénario de vérification (53 contrôles) et navigation publique.
+
 ---
-*Dernière mise à jour : session du 30/09/2026, vérification des espaces livrée de bout en
-bout (§8, étapes 5a à 5d).*
+*Dernière mise à jour : session du 30/09/2026, back-office cadré (§9) et fondations
+livrées (étape 6a).*

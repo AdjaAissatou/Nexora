@@ -91,11 +91,11 @@
                                 styleClass="nx-nav-link"
                                 rendered="#{sessionBean.agentVerification}" />
 
-                        <!-- Administrateur : supervision de la vérification (en attendant le back-office, chantier 6) -->
-                        <h:link outcome="/admin/verifications"
-                                value="Supervision"
+                        <!-- Rôles du back-office (docs/architecture-acteurs.md §9.2) -->
+                        <h:link outcome="/admin/index"
+                                value="Administration"
                                 styleClass="nx-nav-link"
-                                rendered="#{sessionBean.administrateur}" />
+                                rendered="#{acces.backOffice}" />
 
                         <span class="nx-user-greeting">
                             Bonjour, #{sessionBean.prenom}

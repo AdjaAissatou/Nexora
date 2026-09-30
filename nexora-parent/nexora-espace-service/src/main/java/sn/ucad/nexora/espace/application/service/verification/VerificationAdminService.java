@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sn.ucad.nexora.common.audit.JournalActions;
 import sn.ucad.nexora.common.exception.BusinessException;
 import sn.ucad.nexora.common.exception.UnauthorizedException;
 import sn.ucad.nexora.espace.application.dto.response.verification.VerificationDtos.AgentVerificationResponse;
@@ -27,12 +28,17 @@ import sn.ucad.nexora.espace.infrastructure.persistence.verification.Verificatio
 @Service
 public class VerificationAdminService {
 
+    private static final String MODULE = "VERIFICATION";
+
     private final VerificationSupport support;
     private final UtilisateurLookupRepository utilisateurs;
+    private final JournalActions journal;
 
-    public VerificationAdminService(VerificationSupport support, UtilisateurLookupRepository utilisateurs) {
+    public VerificationAdminService(VerificationSupport support, UtilisateurLookupRepository utilisateurs,
+                                    JournalActions journal) {
         this.support = support;
         this.utilisateurs = utilisateurs;
+        this.journal = journal;
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +66,7 @@ public class VerificationAdminService {
         String nomAgent = nouvelAgent == null ? "file d'attente"
                 : support.lookup.personnes(List.of(nouvelAgent)).get(nouvelAgent).nomComplet();
         String commentaire = "Confiée à : " + nomAgent + (motif == null || motif.isBlank() ? "" : " — " + motif);
-        return appliquer(entite, demande, t, admin, commentaire);
+        return appliquer(accountId, "REATTRIBUER", entite, demande, t, admin, commentaire);
     }
 
     @Transactional
@@ -68,7 +74,7 @@ public class VerificationAdminService {
         Long admin = utilisateurId(accountId);
         VerificationEspaceJpaEntity entite = support.demandeEntite(verificationId);
         DemandeVerification demande = VerificationSupport.versDomaine(entite);
-        return appliquer(entite, demande, demande.annuler(motif), admin, motif);
+        return appliquer(accountId, "ANNULER", entite, demande, demande.annuler(motif), admin, motif);
     }
 
     @Transactional
@@ -76,7 +82,7 @@ public class VerificationAdminService {
         Long admin = utilisateurId(accountId);
         VerificationEspaceJpaEntity entite = support.demandeEntite(verificationId);
         DemandeVerification demande = VerificationSupport.versDomaine(entite);
-        return appliquer(entite, demande, demande.revoquer(motif), admin, motif);
+        return appliquer(accountId, "REVOQUER", entite, demande, demande.revoquer(motif), admin, motif);
     }
 
     @Transactional(readOnly = true)
@@ -105,17 +111,22 @@ public class VerificationAdminService {
      * prochain renouvellement du jeton) de ce compte : les rôles voyagent dans le JWT.
      */
     @Transactional
-    public List<AgentVerificationResponse> ajouterAgent(String email) {
+    public List<AgentVerificationResponse> ajouterAgent(UUID accountId, String email) {
         if (email == null || email.isBlank()) throw new BusinessException("Indiquez l'e-mail du compte");
         Long utilisateurId = support.lookup.utilisateurParEmail(email)
                 .orElseThrow(() -> new BusinessException("Aucun compte Nexora avec cet e-mail"));
         support.lookup.attribuerRole(utilisateurId, ROLE_AGENT);
+        journal.enregistrer(accountId, MODULE, "DONNER_ROLE_AGENT", "utilisateur", utilisateurId,
+                "Rôle AGENT_VERIFICATION donné à " + email.trim());
         return agents();
     }
 
     /** Retire le rôle d'agent ; refusé tant qu'il suit des demandes (à réattribuer d'abord). */
     @Transactional
-    public List<AgentVerificationResponse> retirerAgent(Long utilisateurId) {
+    public List<AgentVerificationResponse> retirerAgent(UUID accountId, Long utilisateurId) {
+        if (utilisateurId.equals(utilisateurId(accountId))) {
+            throw new BusinessException("Vous ne pouvez pas retirer votre propre rôle");
+        }
         AgentVerificationResponse agent = agents().stream().filter(a -> a.utilisateurId().equals(utilisateurId))
                 .findFirst().orElseThrow(() -> new BusinessException("Cet utilisateur n'est pas agent de vérification"));
         if (agent.demandesOuvertes() > 0) {
@@ -123,13 +134,17 @@ public class VerificationAdminService {
                     + " demande(s) : réattribuez-les avant de lui retirer le rôle");
         }
         support.lookup.retirerRole(utilisateurId, ROLE_AGENT);
+        journal.enregistrer(accountId, MODULE, "RETIRER_ROLE_AGENT", "utilisateur", utilisateurId,
+                "Rôle AGENT_VERIFICATION retiré à " + agent.email());
         return agents();
     }
 
-    private VerificationDetailResponse appliquer(VerificationEspaceJpaEntity entite, DemandeVerification demande,
-                                                 Transition t, Long admin, String commentaire) {
+    private VerificationDetailResponse appliquer(UUID accountId, String action, VerificationEspaceJpaEntity entite,
+                                                 DemandeVerification demande, Transition t, Long admin, String commentaire) {
         support.enregistrer(demande, entite);
         support.historiser(entite.getId(), t, admin, RoleActeur.ADMIN, commentaire);
+        journal.enregistrer(accountId, MODULE, action, "verification_espace", entite.getId(),
+                "Espace « " + support.espace(entite.getEspaceId()).getNom() + " » : " + commentaire);
         support.appliquerEffets(demande, t);
         return support.detail(support.demandeEntite(entite.getId()));
     }

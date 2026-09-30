@@ -25,7 +25,8 @@ public class EspaceApiClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(EspaceApiClient.class);
     private final String baseUrl = GatewayConfig.gatewayUrl() + "/espace-service";
-    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl)
+            .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
 
     public List<TypeEspaceResponse> listerTypes() {
         LOG.info("Requête GET {}/api/v1/types-espaces", baseUrl);

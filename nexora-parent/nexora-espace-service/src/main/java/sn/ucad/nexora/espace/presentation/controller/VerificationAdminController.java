@@ -41,13 +41,15 @@ public class VerificationAdminController {
     }
 
     @PostMapping("/agents")
-    public ResponseEntity<List<AgentVerificationResponse>> ajouterAgent(@RequestBody AgentRequest r) {
-        return ResponseEntity.ok(service.ajouterAgent(r.email()));
+    public ResponseEntity<List<AgentVerificationResponse>> ajouterAgent(@AuthenticationPrincipal UUID accountId,
+                                                                        @RequestBody AgentRequest r) {
+        return ResponseEntity.ok(service.ajouterAgent(accountId, r.email()));
     }
 
     @DeleteMapping("/agents/{utilisateurId}")
-    public ResponseEntity<List<AgentVerificationResponse>> retirerAgent(@PathVariable Long utilisateurId) {
-        return ResponseEntity.ok(service.retirerAgent(utilisateurId));
+    public ResponseEntity<List<AgentVerificationResponse>> retirerAgent(@AuthenticationPrincipal UUID accountId,
+                                                                        @PathVariable Long utilisateurId) {
+        return ResponseEntity.ok(service.retirerAgent(accountId, utilisateurId));
     }
 
     @GetMapping("/{id:\\d+}")

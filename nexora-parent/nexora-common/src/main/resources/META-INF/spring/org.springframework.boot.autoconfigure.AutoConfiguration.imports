@@ -1,1 +1,2 @@
 sn.ucad.nexora.common.web.GlobalExceptionHandler
+sn.ucad.nexora.common.audit.JournalActionsAutoConfiguration

@@ -38,7 +38,8 @@ public class VerificationApiClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(VerificationApiClient.class);
     private final String baseUrl = GatewayConfig.gatewayUrl() + "/espace-service";
-    private final RestClient client = RestClient.builder().baseUrl(baseUrl).build();
+    private final RestClient client = RestClient.builder().baseUrl(baseUrl)
+            .requestInterceptor(sn.ucad.nexora.web.config.EnTetesClient.IP_NAVIGATEUR).build();
 
     private static final ParameterizedTypeReference<List<VerificationResumeResponse>> LISTE =
             new ParameterizedTypeReference<>() {};
