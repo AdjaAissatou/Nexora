@@ -1471,7 +1471,7 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
 
 .nx-verif-onglets { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0; }
 .nx-verif-grille { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 18px; align-items: start; }
-@media (max-width: 900px) { .nx-verif-grille { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .nx-verif-grille { grid-template-columns: minmax(0, 1fr); } }
 .nx-verif-infos { display: grid; grid-template-columns: 160px 1fr; gap: 6px 12px; font-size: 14px; margin: 0; }
 .nx-verif-infos dt { color: var(--nx-text-secondary); }
 .nx-verif-infos dd { margin: 0; }
@@ -1496,8 +1496,6 @@ body.nx-admin { background: var(--nx-bg); }
 .nx-admin-nav-titre { margin: 16px 0 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
 .nx-admin-nav-item { display: block; padding: 8px 10px; border-radius: 8px; color: #fff; text-decoration: none; font-size: 14px; }
 .nx-admin-nav-item:hover, .nx-admin-nav-item.active { background: rgba(255,255,255,.14); }
-.nx-admin-nav-item.a-venir { opacity: .45; cursor: default; }
-.nx-admin-nav-item.a-venir:hover { background: none; }
 .nx-admin-nav-item small { font-size: 11px; margin-left: 4px; }
 .nx-admin-main { min-width: 0; }
 .nx-admin-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
@@ -1538,3 +1536,17 @@ a.nx-matrice-case:hover { outline: 2px solid var(--nx-primary); }
 .nx-parametre-saisie .nx-parametre-motif { flex: 1 1 160px; }
 .nx-parametre-saisie textarea.nx-input { min-height: 70px; }
 @media (max-width: 800px) { .nx-parametre { grid-template-columns: 1fr; gap: 10px; } }
+
+/* Tableaux de travail sur téléphone : ils défilent dans leur cadre au lieu d'élargir la page */
+@media (max-width: 760px) {
+    .nx-verif-tableau, .nx-matrice { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+/* Une colonne de grille ne s'élargit jamais à la taille de son contenu (tableaux, longs e-mails) */
+.nx-verif-grille > * { min-width: 0; }
+@media (max-width: 760px) {
+    .nx-admin-contenu .nx-card { overflow-wrap: anywhere; }
+    /* Dans les tableaux, on garde les mots entiers : le tableau défile dans son cadre */
+    .nx-verif-tableau, .nx-matrice { overflow-wrap: normal; }
+    .nx-verif-tableau th, .nx-verif-tableau td { min-width: 90px; }
+    .nx-verif-tableau th { white-space: nowrap; }
+}

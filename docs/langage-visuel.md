@@ -49,6 +49,10 @@ Dégradés : `--nx-grad-primary` (forêt → émeraude, boutons), `--nx-grad-gol
 - **Navigation** : barre de verre collante, soulignée d'or au survol (non collante sur téléphone).
 - **Pied de page** : vert profond éclairé de halos.
 - **Back-office** : même palette, plus sobre (outil de travail, sans photos ni animations).
+  Sur téléphone, les tableaux défilent dans leur cadre (jamais la page entière) et les colonnes
+  de grille ne s'élargissent pas à la taille de leur contenu.
+- **Bandeau d'annonce** (`nx-bandeau`) : bande dorée au-dessus de la navigation, alimentée par
+  le paramètre `SITE_BANDEAU` (§9.12 de l'architecture).
 
 `prefers-reduced-motion` coupe les animations. Points de rupture : 1000, 760, 700 et 450 px.
 
