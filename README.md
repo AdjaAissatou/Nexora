@@ -57,6 +57,17 @@ database/09_seed/*.sql
 database/10_views/01_recherche_globale.sql
 ```
 
+**Base existante : ne rejouez pas `install.sql`.** Ses scripts de création commencent par
+`DROP TABLE ... CASCADE` et effaceraient vos données. Pour mettre à jour une base déjà installée,
+lancez depuis le dossier `database/` :
+
+```
+psql -U postgres -d nexora_marketplace -v ON_ERROR_STOP=1 -f mise_a_jour.sql
+```
+
+Le script est rejouable sans risque. Il ajoute ce qui manque : vérification des espaces,
+modération, horaires, permissions, paramètres et comptes de démonstration.
+
 ### Endpoints catalogue-service (port 8084)
 
 ```
