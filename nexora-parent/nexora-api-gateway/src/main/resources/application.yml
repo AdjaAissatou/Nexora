@@ -3,4 +3,7 @@ spring:
     name: api-gateway
 
   config:
-    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+    # Sans « optional: » : toutes les routes viennent du config-server (config-repo/api-gateway.yml).
+    # S'il ne répond pas, la passerelle refuse de démarrer au lieu de tourner sans aucune route
+    # (chaque appel répondrait alors 404). Démarrez donc le config-server avant la passerelle.
+    import: "configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
