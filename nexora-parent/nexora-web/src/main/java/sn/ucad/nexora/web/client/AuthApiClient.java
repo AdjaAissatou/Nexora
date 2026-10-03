@@ -46,6 +46,17 @@ public class AuthApiClient {
         }
     }
 
+    /** Révoque le jeton de session (refresh token) : il ne permet plus d'obtenir de jeton d'accès. */
+    public void deconnecter(String refreshToken) {
+        if (refreshToken == null) return;
+        try {
+            client.post().uri("/api/v1/auth/logout").body(new RefreshTokenRequest(refreshToken)).retrieve().toBodilessEntity();
+        } catch (Exception e) {
+            // La déconnexion locale a lieu quoi qu'il arrive ; le jeton expirera de lui-même.
+            LOG.warn("Révocation du jeton impossible à la déconnexion : {}", e.getMessage());
+        }
+    }
+
     /** Nouveau jeton d'accès, régénéré par auth-service à partir des rôles actuels du compte en base. */
     public AuthenticationResponse rafraichir(String refreshToken) {
         LOG.info("Requête POST {}/api/v1/auth/refresh", baseUrl);

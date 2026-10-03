@@ -134,9 +134,20 @@ public class SessionBean implements Serializable {
     }
 
     /** Action de navigation pour le lien « Déconnexion » de la barre de navigation. */
+    /**
+     * Déconnexion demandée par l'utilisateur : le jeton de session est révoqué par auth-service, puis
+     * la session du serveur est détruite. Revenir en arrière ne peut donc plus rien afficher de
+     * connecté (les pages ne sont pas gardées en cache : PagesSansCache).
+     */
     public String deconnecterEtRediriger() {
+        String jeton;
+        synchronized (this) {
+            jeton = refreshToken;
+        }
+        if (authApiClient != null) authApiClient.deconnecter(jeton);
         deconnecter();
-        return "index?faces-redirect=true";
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+        return "/index?faces-redirect=true"; // chemin absolu : depuis /admin/…, « index » visait /admin/index
     }
 
     public synchronized boolean isConnecte() {

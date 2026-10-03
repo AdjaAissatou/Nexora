@@ -33,6 +33,9 @@
 
     <ui:insert name="head-extra" />
 
+    <!-- Page restaurée par le bouton « Retour » depuis la mémoire du navigateur : on la recharge
+         depuis le serveur, qui sait si l'on est encore connecté. -->
+    <script>window.addEventListener('pageshow', function (e) { if (e.persisted) window.location.reload(); });</script>
 </h:head>
 
 <h:body>

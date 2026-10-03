@@ -1261,6 +1261,21 @@ Un message doit dire **pourquoi** l'action a échoué, en français, sans terme 
   8 caractères, tous contrôlés par auth-service avec un message clair (au lieu d'une erreur 500) ;
   l'e-mail est comparé en minuscules (une même adresse en majuscules est reconnue).
 
+## 13. Déconnexion et bouton « Retour »
+
+Après une déconnexion, le bouton « Retour » du navigateur ne doit rien réafficher de connecté
+(sur un ordinateur partagé, la personne suivante verrait le compte, l'espace ou le back-office).
+- Les pages ne sont jamais gardées en cache (`PagesSansCache` : `Cache-Control: no-store`) ;
+  feuilles de style, scripts et images restent en cache, ils ne contiennent rien de personnel.
+- Une page restaurée depuis la mémoire du navigateur (cache « aller-retour ») est rechargée
+  depuis le serveur (script `pageshow` des deux gabarits).
+- La déconnexion révoque le jeton de session auprès d'auth-service (`POST /api/v1/auth/logout` ;
+  il ne permet plus d'obtenir de jeton d'accès) puis détruit la session du serveur.
+- À la connexion, l'identifiant de session change (protection contre la fixation de session).
+
+Vérifié dans le navigateur, pour un professionnel et pour le super administrateur : après la
+déconnexion, trois « Retour » successifs n'affichent que des pages publiques ou la connexion.
+
 ---
 *Dernière mise à jour : session du 03/10/2026, recherche par photo, articles similaires,
 « Vous pourriez aussi aimer » et messages d'erreur explicites.*

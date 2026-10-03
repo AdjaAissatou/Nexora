@@ -31,6 +31,8 @@ public class ConnexionBean implements Serializable {
     public String connecter() {
         try {
             AuthenticationResponse reponse = authApiClient.connecter(email, motDePasse);
+            // Nouvel identifiant de session à la connexion (protection contre la fixation de session).
+            ((jakarta.servlet.http.HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest()).changeSessionId();
             session.connecter(reponse.accessToken(), reponse.refreshToken(), reponse.account());
             return destination(redirect);
         } catch (ApiException e) {
