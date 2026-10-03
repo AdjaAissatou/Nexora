@@ -14,6 +14,10 @@
 --   psql -U postgres -d nexora_marketplace -v ON_ERROR_STOP=1 -f mise_a_jour.sql
 -- ============================================================================
 
+-- Les scripts sont enregistrés en UTF-8 : sans cette ligne, psql sous Windows les lit
+-- en WIN1252 et abîme les accents (« journÃ©e »).
+SET client_encoding = 'UTF8';
+
 \echo '== Tables ajoutées les 28 et 29/09 (créées seulement si elles manquent)'
 SELECT to_regclass('public.region') IS NULL AS manque \gset
 \if :manque
@@ -100,5 +104,8 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 09_seed/23_demo_administration.sql
 \i 09_seed/25_demo_avis.sql
 \i 09_seed/26_demo_horaires.sql
+
+\echo '== Accents abîmés par un ancien passage en WIN1252 (réparés s''il y en a)'
+\i 11_migrations/02_reparer_accents.sql
 
 \echo '== Mise à jour terminée'

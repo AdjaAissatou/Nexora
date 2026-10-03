@@ -86,6 +86,8 @@ psql -U postgres -d nexora_marketplace -v ON_ERROR_STOP=1 -f mise_a_jour.sql
 ```
 
 Le script est rejouable sans risque et fonctionne pour toute base installée depuis le 27/09.
+Il répare aussi les accents abîmés par un ancien passage de script sous Windows (« journÃ©e »
+au lieu de « journée ») : tous les scripts imposent désormais l'encodage UTF-8.
 Il ajoute ce qui manque : géographie, catalogue détaillé, lieux publics, vérification des
 espaces, modération, horaires, permissions, paramètres et comptes de démonstration.
 

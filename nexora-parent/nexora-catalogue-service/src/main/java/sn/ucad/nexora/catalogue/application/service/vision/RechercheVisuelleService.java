@@ -57,6 +57,10 @@ public class RechercheVisuelleService {
     private final ImageVecteurRepository vecteurs;
     private final RechercherOffresService offres;
     private final ReentrantLock indexation = new ReentrantLock();
+    /** Message donné quand la base n'a pas encore la table des empreintes. */
+    static final String BASE_A_METTRE_A_JOUR = "La recherche par photo n'est pas encore installée sur cette base : "
+            + "lancez database/mise_a_jour.sql, puis relancez catalogue-service.";
+    private volatile boolean tableVerifiee;
 
     public RechercheVisuelleService(ModeleVision modele, SourceImages sources, ImageVecteurRepository vecteurs,
                                     RechercherOffresService offres) {
@@ -70,6 +74,10 @@ public class RechercheVisuelleService {
     @EventListener(ApplicationReadyEvent.class)
     public void indexerAuDemarrage() {
         Thread t = new Thread(() -> {
+            if (!basePrete()) {
+                LOG.warn("Recherche par photo désactivée : la table image_vecteur manque. {}", BASE_A_METTRE_A_JOUR);
+                return;
+            }
             if (!modele.pret()) return;
             indexation.lock();
             try {
@@ -108,7 +116,19 @@ public class RechercheVisuelleService {
         }
     }
 
+    /** Vrai si la table des empreintes existe (vérifié jusqu'à ce qu'elle apparaisse, puis mémorisé). */
+    private boolean basePrete() {
+        if (tableVerifiee) return true;
+        try {
+            tableVerifiee = vecteurs.tablePresente();
+        } catch (Exception e) {
+            LOG.warn("Vérification de la table image_vecteur impossible : {}", e.getMessage());
+        }
+        return tableVerifiee;
+    }
+
     private void exigerModele() {
+        if (!basePrete()) throw new BusinessException(BASE_A_METTRE_A_JOUR);
         if (!modele.pret()) {
             throw new BusinessException("La recherche par photo est momentanément indisponible"
                     + (modele.getIndisponibilite() == null ? "" : " (" + modele.getIndisponibilite() + ")"));
@@ -147,7 +167,7 @@ public class RechercheVisuelleService {
     /** Offres visuellement proches de celle-ci, dans d'autres espaces. */
     public List<Resultat> similaires(long offreId, Integer limite) {
         Object[] image = vecteurs.imageOffre(offreId).orElseThrow(() -> new ResourceNotFoundException("Offre introuvable ou sans image"));
-        if (!modele.pret()) return List.of();
+        if (!basePrete() || !modele.pret()) return List.of();
         String url = (String) image[0];
         long espace = ((Number) image[1]).longValue();
         float[] q = vecteurs.vecteur(url, ModeleVision.NOM).orElseGet(() -> {
@@ -172,7 +192,7 @@ public class RechercheVisuelleService {
         java.util.Set<Long> exclus = new java.util.HashSet<>(graines);
         Map<Long, Double> meilleure = new HashMap<>();
         Map<Long, float[]> image = new HashMap<>();
-        if (modele.pret()) {
+        if (basePrete() && modele.pret()) {
             List<Candidat> sources = vecteurs.candidatsDe(graines, ModeleVision.NOM);
             for (Candidat c : vecteurs.candidatsVisibles(ModeleVision.NOM)) {
                 if (graines.contains(c.offreId())) continue;

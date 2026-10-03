@@ -12,6 +12,10 @@
 -- Ensuite, pour les photos : les packs locaux (offres_demo_local.sql puis v2).
 -- ============================================================================
 
+-- Les scripts sont enregistrés en UTF-8 : sans cette ligne, psql sous Windows les lit
+-- en WIN1252 et abîme les accents (« journÃ©e »).
+SET client_encoding = 'UTF8';
+
 \echo '== Espaces et offres de démonstration'
 \i 09_seed/07_demo_espaces.sql
 \echo '== Comptes de vérification et du back-office'

@@ -19,6 +19,12 @@ public class ImageVecteurRepository {
     @PersistenceContext
     private EntityManager em;
 
+    /** La table image_vecteur existe-t-elle ? (absente tant que mise_a_jour.sql n'a pas été joué) */
+    @Transactional(readOnly = true)
+    public boolean tablePresente() {
+        return Boolean.TRUE.equals(em.createNativeQuery("SELECT to_regclass('public.image_vecteur') IS NOT NULL").getSingleResult());
+    }
+
     /** Images des offres non supprimées sans vecteur pour ce modèle ; les erreurs sont retentées après un jour. */
     @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")

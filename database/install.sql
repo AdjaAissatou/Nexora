@@ -1,3 +1,7 @@
+-- Les scripts sont enregistrés en UTF-8 : sans cette ligne, psql sous Windows les lit
+-- en WIN1252 et abîme les accents (« journÃ©e »).
+SET client_encoding = 'UTF8';
+
 /**************************************************************************
  * NEXORA MARKETPLACE
  * INSTALLATION COMPLETE
