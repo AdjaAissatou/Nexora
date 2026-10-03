@@ -182,6 +182,6 @@ public class VerificationEspaceBean implements Serializable {
     }
 
     private static void message(FacesMessage.Severity gravite, String resume, String detail) {
-        FacesContext.getCurrentInstance().addMessage("verificationForm", new FacesMessage(gravite, resume, detail));
+        FacesContext.getCurrentInstance().addMessage("verificationForm", sn.ucad.nexora.web.util.Messages.complet(gravite, resume, detail));
     }
 }

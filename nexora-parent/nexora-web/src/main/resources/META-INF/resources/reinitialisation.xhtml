@@ -31,22 +31,22 @@
 
                     <div class="nx-field">
                         <label for="reinitialisation:email">Adresse email</label>
-                        <h:inputText id="email" value="#{reinitialisationBean.email}" styleClass="nx-input" required="true" />
+                        <h:inputText id="email" value="#{reinitialisationBean.email}" styleClass="nx-input" required="true" label="Adresse email" />
                     </div>
 
                     <div class="nx-field">
                         <label for="reinitialisation:otp">Code reçu par email</label>
-                        <h:inputText id="otp" value="#{reinitialisationBean.otp}" styleClass="nx-input" required="true" placeholder="123456" />
+                        <h:inputText id="otp" value="#{reinitialisationBean.otp}" styleClass="nx-input" required="true" label="Code reçu par email" placeholder="123456" />
                     </div>
 
                     <div class="nx-field">
                         <label for="reinitialisation:motDePasse">Nouveau mot de passe</label>
-                        <h:inputSecret id="motDePasse" value="#{reinitialisationBean.motDePasse}" styleClass="nx-input" required="true" redisplay="true" />
+                        <h:inputSecret id="motDePasse" value="#{reinitialisationBean.motDePasse}" styleClass="nx-input" required="true" label="Nouveau mot de passe" redisplay="true" />
                     </div>
 
                     <div class="nx-field">
                         <label for="reinitialisation:confirmation">Confirmer le mot de passe</label>
-                        <h:inputSecret id="confirmation" value="#{reinitialisationBean.confirmationMotDePasse}" styleClass="nx-input" required="true" redisplay="true" />
+                        <h:inputSecret id="confirmation" value="#{reinitialisationBean.confirmationMotDePasse}" styleClass="nx-input" required="true" label="Confirmer le mot de passe" redisplay="true" />
                     </div>
 
                     <h:commandButton value="Réinitialiser mon mot de passe" action="#{reinitialisationBean.reinitialiser}" styleClass="nx-button nx-button-primary nx-button-block" />

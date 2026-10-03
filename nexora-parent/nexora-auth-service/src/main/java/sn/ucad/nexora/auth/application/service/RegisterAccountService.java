@@ -64,6 +64,23 @@ public class RegisterAccountService implements RegisterAccountUseCase {
             throw new BusinessException("Les inscriptions sont momentanément fermées. Réessayez plus tard.");
         }
 
+        // Champs obligatoires et formats : un message clair plutôt qu'une erreur technique.
+        String prenom = texte(command.getFirstName()), nom = texte(command.getLastName());
+        String email = texte(command.getEmail()).toLowerCase(), telephone = texte(command.getPhone());
+        if (prenom.isEmpty()) throw new BusinessException("Le prénom est obligatoire.");
+        if (nom.isEmpty()) throw new BusinessException("Le nom est obligatoire.");
+        if (email.isEmpty()) throw new BusinessException("L'adresse email est obligatoire.");
+        if (!email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")) throw new BusinessException("Adresse email invalide (exemple : prenom.nom@gmail.com).");
+        if (telephone.isEmpty()) throw new BusinessException("Le numéro de téléphone est obligatoire.");
+        if (!telephone.matches("\\+?[0-9 .-]{9,20}")) throw new BusinessException("Numéro de téléphone invalide (exemple : 77 123 45 67).");
+        if (command.getPassword() == null || command.getPassword().length() < 8) {
+            throw new BusinessException("Le mot de passe doit contenir au moins 8 caractères.");
+        }
+        command.setFirstName(prenom);
+        command.setLastName(nom);
+        command.setEmail(email);
+        command.setPhone(telephone);
+
         // Vérification email
         if (accountRepository.existsByEmail(command.getEmail())) {
             throw new BusinessException("Cette adresse email est déjà utilisée.");
@@ -136,4 +153,8 @@ public class RegisterAccountService implements RegisterAccountUseCase {
         return result;
     }
 
+
+    private static String texte(String s) {
+        return s == null ? "" : s.trim();
+    }
 }

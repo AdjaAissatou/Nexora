@@ -350,7 +350,7 @@ public class CreerOffreBean implements Serializable {
                         images);
                 catalogueApiClient.modifierOffre(session.getAccessToken(), idOffreEdition, requete);
                 FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Offre mise à jour.", null));
+                        .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, "Offre mise à jour.", null));
             } else {
                 CreateOffreRequest requete = new CreateOffreRequest(
                         espace.id(),
@@ -374,12 +374,12 @@ public class CreerOffreBean implements Serializable {
                         images);
                 catalogueApiClient.creerOffre(session.getAccessToken(), requete);
                 FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Offre publiée.", null));
+                        .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, "Offre publiée.", null));
             }
             return "mon-espace?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR,
                             idOffreEdition != null ? "Mise à jour impossible" : "Publication impossible", e.getMessage()));
             return null;
         }
@@ -462,7 +462,7 @@ public class CreerOffreBean implements Serializable {
             photosTexte = (photosTexte == null || photosTexte.isBlank()) ? url : photosTexte + "\n" + url;
         } catch (IOException | IllegalArgumentException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
         }
     }
 }

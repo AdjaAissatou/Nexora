@@ -22,7 +22,9 @@ public final class ApiErrors {
 
     public static ApiException depuis(RestClientResponseException e) {
         int statut = e.getStatusCode().value();
-        String message = extraireMessage(e.getResponseBodyAsString(), statut);
+        // Une erreur serveur (500 et plus) n'est jamais montrée telle quelle : son texte est technique
+        // (« Erreur interne : Cannot invoke… »). Le détail reste dans le journal ci-dessous.
+        String message = statut >= 500 ? messageParDefaut(statut) : extraireMessage(e.getResponseBodyAsString(), statut);
         // Diagnostic : l'URL exacte appelée, le statut reçu et le corps de la réponse.
         LOG.error(
                 "Appel API échoué [{}] {} -> {} {}\nCorps de la réponse : {}",
@@ -64,8 +66,8 @@ public final class ApiErrors {
     private static String messageParDefaut(int statut) {
         return switch (statut) {
             case 400 -> "Certaines informations sont invalides.";
-            case 401 -> "Email ou mot de passe incorrect.";
-            case 403 -> "Vous n'avez pas accès à cette ressource.";
+            case 401 -> "Votre session a expiré. Reconnectez-vous pour continuer.";
+            case 403 -> "Vous n'avez pas le droit de faire cette action.";
             case 404 -> "Élément introuvable.";
             case 409 -> "Cet élément existe déjà.";
             default -> statut >= 500

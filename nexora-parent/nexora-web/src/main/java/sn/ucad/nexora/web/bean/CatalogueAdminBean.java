@@ -254,13 +254,13 @@ public class CatalogueAdminBean implements Serializable {
     }
 
     private static void message(FacesMessage.Severity gravite, String texte) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(gravite, texte, null));
+        FacesContext.getCurrentInstance().addMessage(null, sn.ucad.nexora.web.util.Messages.complet(gravite, texte, null));
     }
 
     private static void flash(String texte) {
         FacesContext ctx = FacesContext.getCurrentInstance();
         ctx.getExternalContext().getFlash().setKeepMessages(true);
-        ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, texte, null));
+        ctx.addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, texte, null));
     }
 
     public String libelleChamp(String code) {

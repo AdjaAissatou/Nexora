@@ -113,7 +113,7 @@ public class RechercheBean implements Serializable {
             resultats = OffrePageResponse.vide();
             erreur = e.getMessage();
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Recherche indisponible", erreur));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_WARN, "Recherche indisponible", erreur));
         } finally {
             recherchee = true;
         }

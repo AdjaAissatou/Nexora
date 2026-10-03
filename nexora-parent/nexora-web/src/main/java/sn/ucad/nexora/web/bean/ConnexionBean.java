@@ -35,7 +35,7 @@ public class ConnexionBean implements Serializable {
             return destination(redirect);
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Connexion impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Connexion impossible", e.getMessage()));
             return null;
         }
     }

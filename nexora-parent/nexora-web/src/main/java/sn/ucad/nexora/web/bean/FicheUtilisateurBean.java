@@ -79,7 +79,7 @@ public class FicheUtilisateurBean implements Serializable {
     }
 
     private static void message(FacesMessage.Severity gravite, String texte) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(gravite, texte, null));
+        FacesContext.getCurrentInstance().addMessage(null, sn.ucad.nexora.web.util.Messages.complet(gravite, texte, null));
     }
 
     /** Vrai si la fiche est celle du compte connecté : aucune action possible sur soi-même. */

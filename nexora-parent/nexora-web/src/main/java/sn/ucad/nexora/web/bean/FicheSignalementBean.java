@@ -71,9 +71,9 @@ public class FicheSignalementBean implements Serializable {
         try {
             action.run();
             if (viderCommentaire) commentaire = null;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, succes, null));
+            FacesContext.getCurrentInstance().addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, succes, null));
         } catch (ApiException e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
+            FacesContext.getCurrentInstance().addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
         }
     }
 

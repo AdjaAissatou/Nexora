@@ -169,7 +169,7 @@ public class HorairesEspaceBean implements Serializable {
     }
 
     private static void message(FacesMessage.Severity gravite, String texte) {
-        FacesContext.getCurrentInstance().addMessage("horairesForm", new FacesMessage(gravite, texte, null));
+        FacesContext.getCurrentInstance().addMessage("horairesForm", sn.ucad.nexora.web.util.Messages.complet(gravite, texte, null));
     }
 
     static String texte(LocalTime t) {

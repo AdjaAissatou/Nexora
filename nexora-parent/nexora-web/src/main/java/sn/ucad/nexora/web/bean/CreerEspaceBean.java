@@ -127,7 +127,7 @@ public class CreerEspaceBean implements Serializable {
             return "mon-espace?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Création impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Création impossible", e.getMessage()));
             return null;
         }
     }
@@ -341,7 +341,7 @@ public class CreerEspaceBean implements Serializable {
                     event.getFile().getInputStream(), event.getFile().getFileName());
         } catch (IOException | IllegalArgumentException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
             return null;
         }
     }

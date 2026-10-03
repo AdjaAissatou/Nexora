@@ -82,7 +82,7 @@ public class FicheEspaceAdminBean implements Serializable {
     }
 
     private static void message(FacesMessage.Severity gravite, String texte) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(gravite, texte, null));
+        FacesContext.getCurrentInstance().addMessage(null, sn.ucad.nexora.web.util.Messages.complet(gravite, texte, null));
     }
 
     public boolean isSuspendu() {

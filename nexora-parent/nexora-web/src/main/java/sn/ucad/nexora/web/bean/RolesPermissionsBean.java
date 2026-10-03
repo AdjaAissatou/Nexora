@@ -82,7 +82,7 @@ public class RolesPermissionsBean implements Serializable {
     }
 
     private static void message(FacesMessage.Severity gravite, String texte) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(gravite, texte, null));
+        FacesContext.getCurrentInstance().addMessage(null, sn.ucad.nexora.web.util.Messages.complet(gravite, texte, null));
     }
 
     public List<RoleInfo> getRoles() { return matrice == null ? List.of() : matrice.roles(); }

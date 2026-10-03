@@ -28,7 +28,7 @@ public class ReinitialisationBean implements Serializable {
             FacesContext.getCurrentInstance()
                     .addMessage(
                             null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Les mots de passe ne correspondent pas.", null));
+                            sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Les mots de passe ne correspondent pas.", null));
             return null;
         }
         try {
@@ -36,7 +36,7 @@ public class ReinitialisationBean implements Serializable {
             reinitialise = true;
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Réinitialisation impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Réinitialisation impossible", e.getMessage()));
         }
         return null;
     }

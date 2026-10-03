@@ -31,14 +31,14 @@ public class VerificationBean implements Serializable {
                 FacesContext.getCurrentInstance()
                         .addMessage(
                                 null,
-                                new FacesMessage(
+                                sn.ucad.nexora.web.util.Messages.complet(
                                         FacesMessage.SEVERITY_ERROR,
                                         "Code incorrect",
                                         reponse.message() != null ? reponse.message() : "Vérifiez le code reçu par email."));
             }
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Vérification impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Vérification impossible", e.getMessage()));
         }
         return null;
     }

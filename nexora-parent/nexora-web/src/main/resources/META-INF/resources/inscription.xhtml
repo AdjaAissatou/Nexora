@@ -59,32 +59,32 @@
                 <div class="nx-form-grid">
                     <div class="nx-field">
                         <label for="inscription:prenom">Prénom</label>
-                        <h:inputText id="prenom" value="#{inscriptionBean.prenom}" styleClass="nx-input" required="true" />
+                        <h:inputText id="prenom" value="#{inscriptionBean.prenom}" styleClass="nx-input" required="true" label="Prénom" />
                     </div>
                     <div class="nx-field">
                         <label for="inscription:nom">Nom</label>
-                        <h:inputText id="nom" value="#{inscriptionBean.nom}" styleClass="nx-input" required="true" />
+                        <h:inputText id="nom" value="#{inscriptionBean.nom}" styleClass="nx-input" required="true" label="Nom" />
                     </div>
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:email">Adresse email</label>
-                    <h:inputText id="email" value="#{inscriptionBean.email}" styleClass="nx-input" required="true" />
+                    <h:inputText id="email" value="#{inscriptionBean.email}" styleClass="nx-input" required="true" label="Adresse email" />
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:telephone">Téléphone</label>
-                    <h:inputText id="telephone" value="#{inscriptionBean.telephone}" placeholder="77 123 45 67" styleClass="nx-input" />
+                    <h:inputText id="telephone" value="#{inscriptionBean.telephone}" placeholder="77 123 45 67" styleClass="nx-input" required="true" label="Téléphone" />
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:motDePasse">Mot de passe</label>
-                    <h:inputSecret id="motDePasse" value="#{inscriptionBean.motDePasse}" styleClass="nx-input" required="true" redisplay="true" />
+                    <h:inputSecret id="motDePasse" value="#{inscriptionBean.motDePasse}" styleClass="nx-input" required="true" label="Mot de passe" redisplay="true" />
                 </div>
 
                 <div class="nx-field">
                     <label for="inscription:confirmation">Confirmer le mot de passe</label>
-                    <h:inputSecret id="confirmation" value="#{inscriptionBean.confirmationMotDePasse}" styleClass="nx-input" required="true" redisplay="true" />
+                    <h:inputSecret id="confirmation" value="#{inscriptionBean.confirmationMotDePasse}" styleClass="nx-input" required="true" label="Confirmer le mot de passe" redisplay="true" />
                 </div>
 
                 <h:commandButton value="Créer mon compte" action="#{inscriptionBean.inscrire}" styleClass="nx-button nx-button-primary nx-button-block" />

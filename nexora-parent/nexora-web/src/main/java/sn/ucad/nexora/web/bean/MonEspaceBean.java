@@ -222,17 +222,17 @@ public class MonEspaceBean implements Serializable {
             remplirChampsEspace();
             mesEspaces = mesEspaces.stream().map(e -> e.id().equals(espace.id()) ? espace : e).toList();
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Espace mis à jour.", null));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, "Espace mis à jour.", null));
             if (etaitVerifie && !espace.verifie()) {
                 // §8.4.4 : une information vérifiée a changé, espace-service a retiré le badge.
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+                FacesContext.getCurrentInstance().addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_WARN,
                         "Badge Vérifié retiré",
                         "Vous avez modifié une information vérifiée. Vous pouvez redemander la vérification dans l'onglet Vérification."));
             }
             verification.recharger();
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));
         }
         return null;
     }
@@ -246,7 +246,7 @@ public class MonEspaceBean implements Serializable {
             return session.isFournisseur() ? "mon-espace?faces-redirect=true" : "mon-compte?faces-redirect=true";
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
             return null;
         }
     }
@@ -257,7 +257,7 @@ public class MonEspaceBean implements Serializable {
             mesOffres = catalogueApiClient.gestion(session.getAccessToken(), espace.id()).contenu();
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
         }
     }
 
@@ -267,7 +267,7 @@ public class MonEspaceBean implements Serializable {
             mesOffres = catalogueApiClient.gestion(session.getAccessToken(), espace.id()).contenu();
         } catch (ApiException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Mise à jour impossible", e.getMessage()));
         }
     }
 
@@ -520,7 +520,7 @@ public class MonEspaceBean implements Serializable {
             return ImageUploadService.enregistrer(event.getFile().getInputStream(), event.getFile().getFileName());
         } catch (IOException | IllegalArgumentException e) {
             FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
+                    .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Envoi impossible", e.getMessage()));
             return null;
         }
     }
