@@ -7,6 +7,8 @@
               version="4.0">
     <application>
         <message-bundle>sn.ucad.nexora.web.messages</message-bundle>
+        <!-- Version dans l'adresse des CSS et JS : le navigateur recharge le style après une mise à jour. -->
+        <resource-handler>sn.ucad.nexora.web.config.RessourcesVersionnees</resource-handler>
         <locale-config>
             <default-locale>fr</default-locale>
         </locale-config>

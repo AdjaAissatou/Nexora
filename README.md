@@ -70,6 +70,13 @@ database/09_seed/*.sql
 database/10_views/01_recherche_globale.sql
 ```
 
+**Données de démonstration** (7 espaces, leurs offres, avis et horaires, les comptes du
+back-office ; mot de passe `Password1!`), rejouable :
+
+```
+psql -U postgres -d nexora_marketplace -v ON_ERROR_STOP=1 -f demo.sql
+```
+
 **Base existante : ne rejouez pas `install.sql`.** Ses scripts de création commencent par
 `DROP TABLE ... CASCADE` et effaceraient vos données. Pour mettre à jour une base déjà installée,
 lancez depuis le dossier `database/` :
