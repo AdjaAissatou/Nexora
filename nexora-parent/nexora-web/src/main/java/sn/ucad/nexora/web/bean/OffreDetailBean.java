@@ -28,6 +28,8 @@ public class OffreDetailBean implements Serializable {
     private OffreDetailResponse offre;
     private String erreur;
     private boolean favori;
+    /** Le même genre d'article dans d'autres espaces (recherche par photo, §11) ; chargé à la demande. */
+    private java.util.List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> similaires;
 
     public void charger() {
         if (id == null) {
@@ -67,6 +69,19 @@ public class OffreDetailBean implements Serializable {
 
     public boolean isFavori() {
         return favori;
+    }
+
+    private java.util.List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> suggestions;
+
+    /** « Vous pourriez aussi aimer » : articles voisins, pas le même article ailleurs (§11). */
+    public java.util.List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> getSuggestions() {
+        if (suggestions == null) suggestions = offre == null ? java.util.List.of() : catalogueApiClient.suggestions(java.util.List.of(offre.id()), 4);
+        return suggestions;
+    }
+
+    public java.util.List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> getSimilaires() {
+        if (similaires == null) similaires = offre == null ? java.util.List.of() : catalogueApiClient.similaires(offre.id(), 4);
+        return similaires;
     }
 
     public boolean isTrouvee() {

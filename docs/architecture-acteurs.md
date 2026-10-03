@@ -1187,6 +1187,80 @@ Catalogue : la recherche accepte `ouvertMaintenant=true`, et chaque résultat po
 À venir, si utile : proposer au professionnel les jours fériés du Sénégal (table
 `jour_ferie`, vide pour l'instant) comme jours exceptionnels.
 
+## 11. ✅ Recherche par photo, articles similaires, « Vous pourriez aussi aimer »
+
+**Le besoin** : trouver un article à partir d'une photo (« je veux ces chaussures »), comparer
+les prix d'un même article chez plusieurs commerçants, et proposer des articles voisins.
+
+**Le modèle** : DINOv2-small (Meta, licence Apache 2.0), version quantifiée au format ONNX
+(24,5 Mo), exécutée par ONNX Runtime dans catalogue-service, sans service externe. Une image
+devient un vecteur de 384 nombres ; deux photos se ressemblent si le cosinus de leurs vecteurs
+est élevé.
+- Choix mesuré sur les photos de démonstration : une méthode classique (couleurs, contours,
+  empreinte) retrouve 100 % des photos identiques retouchées, mais seulement 8 paires
+  « même article, autre photo » sur 19 dans les 5 premiers ; DINOv2 en retrouve 18 sur 19.
+- Fichier cherché dans `NEXORA_MODELS_DIR` (par défaut `~/nexora-models`), téléchargé au
+  premier besoin depuis une révision figée de Hugging Face (`Xenova/dinov2-small`, `c2bb04a`),
+  empreinte SHA-256 vérifiée. Sans modèle, la recherche par photo répond qu'elle est
+  indisponible ; le reste du catalogue fonctionne.
+- L'image est posée sur un carré blanc (sans être rognée), réduite à 224 × 224 par un filtre
+  identique à celui de Pillow (les seuils ont été mesurés en Python ; parité Java/Python ≥ 0,99,
+  vérifiée par `ModeleVisionTest`), puis normalisée comme pour ImageNet.
+- Les appels au modèle passent par un fil dédié à grande pile (la pile par défaut d'un fil Java
+  fait planter la JVM au chargement).
+- Formats lus : JPEG, PNG, WebP (module TwelveMonkeys), GIF, BMP ; 10 Mo au plus.
+
+**L'index** : table `image_vecteur` (url, modèle, vecteur, erreur). Toutes les images des offres
+non supprimées sont indexées au démarrage, en arrière-plan (environ 0,2 s par image) ; les
+nouvelles le sont avant chaque recherche. Une image illisible garde son erreur et n'est
+retentée qu'après un jour. Changer de modèle (constante `ModeleVision.NOM`) recalcule tout.
+
+**Les trois usages** (publics, sans connexion) :
+
+| Usage | API (catalogue-service) | Règle |
+|---|---|---|
+| Recherche par photo | `POST /api/v1/offres/recherche-photo` (multipart « photo ») | offres visibles dont la ressemblance ≥ 0,35, 24 au plus, de la plus ressemblante à la moins ressemblante |
+| Le même genre d'article dans d'autres espaces | `GET /api/v1/offres/{id}/similaires` | ressemblance ≥ 0,55, autres espaces seulement, 8 au plus |
+| Vous pourriez aussi aimer | `GET /api/v1/offres/suggestions?offres=…` | voisins ≥ 0,30 sans « le même article ailleurs », deux par espace d'abord, un même produit une seule fois ; complété par les offres récentes des mêmes catégories puis du même espace |
+
+Seuils mesurés : un même article photographié autrement obtient au moins 0,37 (médiane 0,67),
+deux photos sans rapport 0,04 en médiane ; à 0,55, 15 paires sur 19 restent et moins de 1 %
+des photos sans rapport passent.
+
+**Web**
+- `/recherche-photo` : choisir ou prendre une photo (sur téléphone, l'appareil photo est
+  proposé), aperçu, résultats avec un badge « Très ressemblant / Ressemblant / Proche » (des
+  mots plutôt qu'un pourcentage : le score classe, ce n'est pas une probabilité), et, si
+  plusieurs espaces proposent des articles très ressemblants, la fourchette de prix.
+- Accès : pastille « Par photo » de l'accueil, lien « Ou rechercher par photo » de la recherche,
+  lien depuis la fiche d'un article.
+- Fiche d'un article : « Le même genre d'article dans d'autres espaces », puis « Vous pourriez
+  aussi aimer ».
+- Accueil d'un visiteur connecté : « Vous pourriez aussi aimer », d'après ses cinq dernières
+  consultations et ses favoris.
+- La carte d'offre est un fragment commun (`WEB-INF/includes/offre-carte.xhtml`).
+
+**Tests** : 24 contrôles API (`test_photo.py` : photo identique et retouchée, WebP et PNG,
+erreurs, indexation d'une nouvelle offre sans relance, offre non publiée exclue, similaires
+d'autres espaces, suggestions sans doublon ni recoupement) ; parcours navigateur sur ordinateur
+et téléphone ; tests unitaires du prétraitement et de la parité Java/Python.
+
+## 12. Messages d'erreur explicites
+
+Un message doit dire **pourquoi** l'action a échoué, en français, sans terme technique.
+- `h:messages` n'affiche que le résumé d'un message : tous les messages passent par
+  `Messages.complet(gravité, titre, détail)`, qui les réunit (« Connexion impossible :
+  Email/téléphone ou mot de passe incorrect. »).
+- Validation des formulaires : chaque champ obligatoire porte le libellé de son étiquette, et les
+  messages de JSF sont traduits (`messages.properties` : « Prénom : ce champ est obligatoire. »).
+- Erreurs de l'API (`ApiErrors`) : le message du service est repris ; une erreur serveur (500 et
+  plus) n'est jamais montrée telle quelle (« Nexora rencontre un souci technique… »), son détail
+  reste dans le journal ; 401 sans message : « Votre session a expiré. Reconnectez-vous » ;
+  403 : « Vous n'avez pas le droit de faire cette action ».
+- Inscription : champs obligatoires, format de l'e-mail et du téléphone, mot de passe d'au moins
+  8 caractères, tous contrôlés par auth-service avec un message clair (au lieu d'une erreur 500) ;
+  l'e-mail est comparé en minuscules (une même adresse en majuscules est reconnue).
+
 ---
-*Dernière mise à jour : session du 30/09/2026, avis et signalements (6d), horaires des espaces,
-gestion du catalogue (6e) et paramètres (6f) livrés : le back-office est complet.*
+*Dernière mise à jour : session du 03/10/2026, recherche par photo, articles similaires,
+« Vous pourriez aussi aimer » et messages d'erreur explicites.*

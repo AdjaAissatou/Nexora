@@ -167,6 +167,42 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Le même article ailleurs (§11) : offres d'autres espaces dont la photo ressemble à celle-ci -->
+            <ui:fragment rendered="#{not empty offreDetailBean.similaires}">
+                <section class="nx-similaires">
+                    <div class="nx-results-header">
+                        <h2>Le même genre d'article dans d'autres espaces</h2>
+                        <h:link outcome="/recherche-photo" styleClass="nx-lien-photo">
+                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                            Rechercher avec votre propre photo
+                        </h:link>
+                    </div>
+                    <p class="nx-photo-note" style="margin:0 0 14px;">Comparez les prix : ces articles ressemblent à celui-ci d'après leur photo.</p>
+                    <div class="nx-offre-grid nx-offre-grid-large">
+                        <ui:repeat var="r" value="#{offreDetailBean.similaires}">
+                            <ui:include src="/WEB-INF/includes/offre-carte.xhtml">
+                                <ui:param name="o" value="#{r.offre()}" />
+                                <ui:param name="ressemblance" value="#{r.ressemblance()}" />
+                            </ui:include>
+                        </ui:repeat>
+                    </div>
+                </section>
+            </ui:fragment>
+
+            <!-- Vous pourriez aussi aimer (§11) : articles voisins, dans tous les espaces -->
+            <ui:fragment rendered="#{not empty offreDetailBean.suggestions}">
+                <section class="nx-similaires nx-suggestions">
+                    <div class="nx-results-header">
+                        <h2>Vous pourriez aussi aimer</h2>
+                    </div>
+                    <div class="nx-offre-grid nx-offre-grid-large">
+                        <ui:repeat var="r" value="#{offreDetailBean.suggestions}">
+                            <ui:include src="/WEB-INF/includes/offre-carte.xhtml"><ui:param name="o" value="#{r.offre()}" /></ui:include>
+                        </ui:repeat>
+                    </div>
+                </section>
+            </ui:fragment>
         </ui:fragment>
     </div>
 

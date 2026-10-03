@@ -183,6 +183,12 @@ public class OffreRepositoryAdapter implements OffreRepository {
 
         Map<String, Object> paramMap = new LinkedHashMap<>();
 
+        if (params.getIdsOffres() != null) {
+            if (params.getIdsOffres().isEmpty()) return List.of();
+            sql.append(" AND o.id_offre IN (:idsOffres) ");
+            paramMap.put("idsOffres", params.getIdsOffres());
+        }
+
         // Filtre texte libre
         if (params.getQ() != null && !params.getQ().isBlank()) {
             sql.append("""

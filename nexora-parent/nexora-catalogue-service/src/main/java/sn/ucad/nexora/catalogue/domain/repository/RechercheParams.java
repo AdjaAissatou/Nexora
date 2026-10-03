@@ -24,6 +24,8 @@ public class RechercheParams {
      * celui de l'espace — pour le professionnel lui-même, jamais pour la recherche publique.
      */
     private boolean gestion;
+    /** Limite la recherche à ces offres (recherche par photo) ; null : pas de limite. */
+    private java.util.List<Long> idsOffres;
 
     /** Filtre prix */
     private BigDecimal prixMin;
@@ -84,6 +86,8 @@ public class RechercheParams {
     public void setPage(int page) { this.page = page; }
     public int getTaille() { return taille; }
     public void setTaille(int taille) { this.taille = taille; }
+    public java.util.List<Long> getIdsOffres() { return idsOffres; }
+    public void setIdsOffres(java.util.List<Long> idsOffres) { this.idsOffres = idsOffres; }
     public Boolean getOuvertMaintenant() { return ouvertMaintenant; }
     public void setOuvertMaintenant(Boolean ouvertMaintenant) { this.ouvertMaintenant = ouvertMaintenant; }
 }

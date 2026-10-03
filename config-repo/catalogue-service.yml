@@ -8,6 +8,12 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  # Recherche par photo (§11) : une photo de téléphone tient sous 10 Mo.
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+
   jpa:
     hibernate:
       ddl-auto: validate      # La BDD est gérée par les scripts SQL, pas par Hibernate

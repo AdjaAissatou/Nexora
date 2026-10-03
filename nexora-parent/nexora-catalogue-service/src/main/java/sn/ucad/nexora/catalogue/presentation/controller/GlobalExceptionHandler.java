@@ -26,6 +26,32 @@ public class GlobalExceptionHandler {
         return corps(HttpStatus.BAD_REQUEST, "Requête invalide : corps JSON illisible ou incomplet");
     }
 
+    /** Photo trop lourde pour la recherche par photo (§11). */
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleTropLourd(org.springframework.web.multipart.MaxUploadSizeExceededException ex) {
+        return corps(HttpStatus.BAD_REQUEST, "Photo trop lourde (10 Mo au plus)");
+    }
+
+    @ExceptionHandler({org.springframework.web.multipart.support.MissingServletRequestPartException.class,
+            org.springframework.web.multipart.MultipartException.class,
+            org.springframework.web.HttpMediaTypeNotSupportedException.class})
+    public ResponseEntity<Map<String, Object>> handleSansPhoto(Exception ex) {
+        return corps(HttpStatus.BAD_REQUEST, "Choisissez une photo");
+    }
+
+    /** Paramètre obligatoire absent ou mal formé : erreur de l'appelant. */
+    @ExceptionHandler({org.springframework.web.bind.MissingServletRequestParameterException.class,
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class})
+    public ResponseEntity<Map<String, Object>> handleParametre(Exception ex) {
+        return corps(HttpStatus.BAD_REQUEST, "Paramètre manquant ou invalide");
+    }
+
+    /** Chemin inconnu : 404 et non 500. */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleCheminInconnu(org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+        return corps(HttpStatus.NOT_FOUND, "Ressource introuvable");
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleIntrouvable(ResourceNotFoundException ex) {
         return corps(HttpStatus.NOT_FOUND, ex.getMessage());

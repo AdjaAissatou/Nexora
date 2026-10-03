@@ -82,6 +82,10 @@
                     </h:form>
 
                     <div class="nx-pastilles">
+                        <h:link outcome="/recherche-photo" styleClass="nx-pastille nx-pastille-photo" id="lienPhoto">
+                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                            Par photo
+                        </h:link>
                         <h:link outcome="/recherche" value="Restaurants" styleClass="nx-pastille">
                             <f:param name="typeEspace" value="Restaurant"/>
                         </h:link>
@@ -144,6 +148,29 @@
 
         </section>
 
+
+        <!-- =========================
+             VOUS POURRIEZ AUSSI AIMER — visiteur connecté, d'après ses consultations (§11)
+        ========================== -->
+        <ui:fragment rendered="#{not empty accueilBean.suggestions}">
+        <section class="nx-section nx-suggestions-section">
+            <div class="nx-container">
+                <div class="nx-section-heading">
+                    <div>
+                        <span class="nx-section-eyebrow">Pour vous</span>
+                        <h2>Vous pourriez aussi aimer</h2>
+                        <p>D'après les articles que vous avez consultés ou mis en favori.</p>
+                    </div>
+                    <h:link outcome="/mon-compte" value="Mon historique →" styleClass="nx-see-all"/>
+                </div>
+                <div class="nx-offre-grid nx-offre-grid-large">
+                    <ui:repeat var="r" value="#{accueilBean.suggestions}">
+                        <ui:include src="/WEB-INF/includes/offre-carte.xhtml"><ui:param name="o" value="#{r.offre()}" /></ui:include>
+                    </ui:repeat>
+                </div>
+            </div>
+        </section>
+        </ui:fragment>
 
         <!-- =========================
              CATÉGORIES EN IMAGES

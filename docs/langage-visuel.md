@@ -51,6 +51,8 @@ Dégradés : `--nx-grad-primary` (forêt → émeraude, boutons), `--nx-grad-gol
 - **Back-office** : même palette, plus sobre (outil de travail, sans photos ni animations).
   Sur téléphone, les tableaux défilent dans leur cadre (jamais la page entière) et les colonnes
   de grille ne s'élargissent pas à la taille de leur contenu.
+- **Badge de ressemblance** (`nx-ressemblance`) : posé sur la photo d'une carte d'offre dans la
+  recherche par photo ; doré pour « Très ressemblant », blanc sinon.
 - **Bandeau d'annonce** (`nx-bandeau`) : bande dorée au-dessus de la navigation, alimentée par
   le paramètre `SITE_BANDEAU` (§9.12 de l'architecture).
 

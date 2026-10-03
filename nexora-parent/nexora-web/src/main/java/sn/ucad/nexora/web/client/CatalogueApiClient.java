@@ -208,6 +208,55 @@ public class CatalogueApiClient {
         }
     }
 
+    /** Recherche par photo (§11) : offres visibles dont la photo ressemble à celle envoyée. */
+    public sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Reponse rechercherParPhoto(byte[] photo, String nomFichier) {
+        LOG.info("Requête POST {}/api/v1/offres/recherche-photo ({} octets)", baseUrl, photo.length);
+        org.springframework.util.LinkedMultiValueMap<String, Object> corps = new org.springframework.util.LinkedMultiValueMap<>();
+        corps.add("photo", new org.springframework.core.io.ByteArrayResource(photo) {
+            @Override
+            public String getFilename() {
+                return nomFichier == null || nomFichier.isBlank() ? "photo.jpg" : nomFichier;
+            }
+        });
+        try {
+            return client.post().uri("/api/v1/offres/recherche-photo?limite=24")
+                    .contentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA).body(corps)
+                    .retrieve().body(sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Reponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    /** « Vous pourriez aussi aimer » à partir de ces offres ; liste vide si le service ne répond pas. */
+    public List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> suggestions(List<Long> offres, int limite) {
+        if (offres == null || offres.isEmpty()) return List.of();
+        try {
+            List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> r = client.get()
+                    .uri(u -> u.path("/api/v1/offres/suggestions").queryParam("offres", offres.toArray()).queryParam("limite", limite).build())
+                    .retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat>>() {});
+            return r == null ? List.of() : r;
+        } catch (Exception e) {
+            LOG.warn("Suggestions indisponibles : {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    /** Offres d'autres espaces qui ressemblent à celle-ci ; liste vide si le service ne répond pas. */
+    public List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> similaires(Long idOffre, int limite) {
+        try {
+            List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> r = client.get()
+                    .uri("/api/v1/offres/{id}/similaires?limite={l}", idOffre, limite).retrieve()
+                    .body(new org.springframework.core.ParameterizedTypeReference<List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat>>() {});
+            return r == null ? List.of() : r;
+        } catch (Exception e) {
+            LOG.warn("Articles similaires indisponibles pour l'offre {} : {}", idOffre, e.getMessage());
+            return List.of();
+        }
+    }
+
     public List<LieuPublicResponse> rechercherLieuxPublics(String q, String commune, int limite) {
         LOG.info("Requête GET {}/api/v1/lieux-publics/recherche (q={}, commune={})", baseUrl, q, commune);
         try {

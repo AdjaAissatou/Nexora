@@ -71,6 +71,7 @@
 \i 04_catalogue/14_disponibilite.sql
 \i 04_catalogue/15_categorie_type_espace.sql
 \i 04_catalogue/16_offre_espace_cascade.sql
+\i 04_catalogue/17_image_vecteur.sql
 \i 03_professional/08_moderation.sql
 \i 03_professional/09_horaires.sql
 

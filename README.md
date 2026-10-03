@@ -41,6 +41,19 @@ DB_PASSWORD=nexora_pass
 JWT_SECRET=votre_secret_jwt_256bits_minimum
 ```
 
+Facultatives (valeurs par défaut entre parenthèses) :
+
+```
+NEXORA_UPLOADS_DIR   photos déposées sur Nexora, partagé par web et catalogue-service (~/nexora-uploads)
+NEXORA_MODELS_DIR    modèle de la recherche par photo (~/nexora-models)
+```
+
+**Recherche par photo.** Au premier démarrage, catalogue-service télécharge une fois le modèle
+DINOv2-small (24,5 Mo, Hugging Face, empreinte SHA-256 vérifiée) dans `NEXORA_MODELS_DIR`, puis
+calcule en arrière-plan l'empreinte visuelle des photos des offres. Sans accès Internet, déposez
+le fichier `dinov2-small-quantized.onnx` dans ce dossier (voir `docs/architecture-acteurs.md` §11) ;
+sans modèle, seule la recherche par photo est indisponible.
+
 ### Base de données
 
 Exécuter les scripts SQL dans cet ordre (voir `database/`) :
@@ -74,6 +87,9 @@ espaces, modération, horaires, permissions, paramètres et comptes de démonstr
 ```
 GET  /api/v1/offres/recherche?q=...&commune=...&prixMax=...&tri=PRIX_ASC
 GET  /api/v1/offres/{id}
+POST /api/v1/offres/recherche-photo          (multipart, champ « photo »)
+GET  /api/v1/offres/{id}/similaires          (le même genre d'article dans d'autres espaces)
+GET  /api/v1/offres/suggestions?offres=1,2   (vous pourriez aussi aimer)
 ```
 
 ### Endpoints recherche-service (port 8085)

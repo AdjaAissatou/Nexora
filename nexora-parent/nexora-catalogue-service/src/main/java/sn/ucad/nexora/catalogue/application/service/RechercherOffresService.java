@@ -81,6 +81,36 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         return new OffrePageResponse(items, request.getPage(), request.getTaille(), total);
     }
 
+    /** Résumés des offres visibles du public parmi ces identifiants (ordre non garanti). */
+    public List<OffreSummaryResponse> resumesVisibles(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return List.of();
+        RechercheParams params = new RechercheParams();
+        params.setIdsOffres(ids);
+        params.setPage(0);
+        params.setTaille(ids.size());
+        return offreRepository.search(params).stream().map(this::toSummary).toList();
+    }
+
+    /** Offres visibles les plus récentes d'une catégorie (sous-catégories comprises). */
+    public List<OffreSummaryResponse> recentesDeCategorie(Long idCategorie, int taille) {
+        RechercheParams params = new RechercheParams();
+        params.setIdCategorie(idCategorie);
+        params.setTri("DATE_DESC");
+        params.setPage(0);
+        params.setTaille(taille);
+        return offreRepository.search(params).stream().map(this::toSummary).toList();
+    }
+
+    /** Offres visibles les plus récentes d'un espace. */
+    public List<OffreSummaryResponse> recentesDeEspace(Long idEspace, int taille) {
+        RechercheParams params = new RechercheParams();
+        params.setIdEspace(idEspace);
+        params.setTri("DATE_DESC");
+        params.setPage(0);
+        params.setTaille(taille);
+        return offreRepository.search(params).stream().map(this::toSummary).toList();
+    }
+
     private OffreSummaryResponse toSummary(Offre o) {
         OffreSummaryResponse r = new OffreSummaryResponse();
         r.setId(o.getId());

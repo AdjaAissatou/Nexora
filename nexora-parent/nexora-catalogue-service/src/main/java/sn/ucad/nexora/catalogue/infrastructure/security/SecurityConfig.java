@@ -30,8 +30,12 @@ public class SecurityConfig {
                                 "/api/v1/offres/recherche",
                                 "/api/v1/offres/{id:\\d+}",
                                 "/api/v1/categories/**",
-                                "/api/v1/lieux-publics/**"
+                                "/api/v1/lieux-publics/**",
+                                "/api/v1/offres/{id:\\d+}/similaires",
+                                "/api/v1/offres/suggestions"
                         ).permitAll()
+                        // Recherche par photo (§11) : publique comme la recherche par mots.
+                        .requestMatchers(HttpMethod.POST, "/api/v1/offres/recherche-photo").permitAll()
                         .requestMatchers(
                                 "/actuator/**",
                                 "/swagger-ui/**",

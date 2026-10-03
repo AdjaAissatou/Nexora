@@ -1550,3 +1550,49 @@ a.nx-matrice-case:hover { outline: 2px solid var(--nx-primary); }
     .nx-verif-tableau th, .nx-verif-tableau td { min-width: 90px; }
     .nx-verif-tableau th { white-space: nowrap; }
 }
+
+/* Recherche par photo (recherche-photo.xhtml, §11) */
+.nx-photo-envoi { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 24px; align-items: center; margin: 24px 0; }
+.nx-photo-apercu { width: 180px; height: 180px; border-radius: 18px; overflow: hidden; background: var(--nx-sand);
+    display: flex; align-items: center; justify-content: center; color: var(--nx-primary); }
+.nx-photo-apercu > div { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.nx-photo-apercu img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.nx-photo-apercu .nx-icon { width: 56px; height: 56px; opacity: .7; }
+.nx-photo-consignes h3 { margin: 0 0 6px; }
+.nx-photo-consignes p { margin: 0 0 12px; color: var(--nx-text-secondary); }
+.nx-photo-comparaison { margin-bottom: 16px; }
+.nx-photo-note { color: var(--nx-text-secondary); font-size: 13px; margin: 18px 0 40px; }
+.nx-offre-grid-large { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1000px) { .nx-offre-grid-large { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) {
+    .nx-photo-envoi { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .nx-offre-grid-large { grid-template-columns: 1fr; }
+}
+/* Badge de ressemblance posé sur la photo d'une carte d'offre */
+.nx-ressemblance { position: absolute; top: 10px; left: 10px; z-index: 1; padding: 4px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; background: rgba(255, 255, 255, .92); color: var(--nx-primary);
+    box-shadow: 0 4px 12px rgba(7, 59, 53, .15); }
+.nx-ressemblance.forte { background: var(--nx-grad-gold); color: var(--nx-forest); }
+/* Lien « par photo » à côté des barres de recherche */
+.nx-lien-photo { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--nx-primary); text-decoration: none; }
+.nx-lien-photo .nx-icon { width: 18px; height: 18px; }
+.nx-lien-photo:hover { color: var(--nx-forest); text-decoration: underline; }
+
+.nx-similaires { margin: 10px 0 60px; }
+.nx-similaires h2 { margin: 0; font-size: 24px; }
+.nx-pastille-photo { display: inline-flex; align-items: center; gap: 6px; }
+.nx-pastille-photo .nx-icon { width: 16px; height: 16px; }
+/* Bouton d'envoi PrimeFaces habillé aux couleurs de Nexora (recherche par photo). Les règles du
+   thème PrimeFaces étant très spécifiques, celles-ci sont préfixées par l'identifiant du formulaire. */
+#photo .ui-fileupload, #photo .ui-fileupload .ui-fileupload-buttonbar, #photo .ui-fileupload .ui-fileupload-content {
+    border: 0 !important; background: none !important; padding: 0 !important; min-height: 0;
+}
+#photo .ui-fileupload .ui-fileupload-content .ui-messages-error { margin-top: 10px; border-radius: 12px; }
+#photo .ui-fileupload .ui-fileupload-choose {
+    display: inline-flex !important; align-items: center; gap: 10px; width: auto !important;
+    background: var(--nx-grad-primary) !important; border: 0 !important; border-radius: 999px !important;
+    padding: 12px 24px !important; color: #fff !important; font-weight: 700; box-shadow: 0 8px 20px rgba(7, 59, 53, .18);
+}
+#photo .ui-fileupload .ui-fileupload-choose:hover { box-shadow: var(--nx-glow-gold); transform: translateY(-1px); }
+#photo .ui-fileupload .ui-fileupload-choose .ui-button-icon-left { position: static !important; margin: 0 !important; }
+#photo .ui-fileupload .ui-fileupload-choose .ui-button-text { display: inline !important; padding: 0 !important; }

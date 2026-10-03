@@ -1,0 +1,79 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui">
+<ui:define name="titre">Rechercher par photo — Nexora</ui:define>
+<ui:define name="content">
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Rechercher par photo</h1>
+            <p>Prenez en photo un article, ou choisissez une image : Nexora vous montre les articles qui lui ressemblent, dans toutes les boutiques.</p>
+        </div>
+    </section>
+
+    <div class="nx-container">
+        <h:form id="photo" enctype="multipart/form-data">
+            <div class="nx-card nx-photo-envoi">
+                <div class="nx-photo-apercu">
+                    <h:panelGroup id="apercu" layout="block">
+                        <ui:fragment rendered="#{not empty recherchePhotoBean.apercu}">
+                            <img src="#{recherchePhotoBean.apercu}" alt="Votre photo" />
+                        </ui:fragment>
+                        <ui:fragment rendered="#{empty recherchePhotoBean.apercu}">
+                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>
+                            </svg>
+                        </ui:fragment>
+                    </h:panelGroup>
+                </div>
+                <div class="nx-photo-consignes">
+                    <h3>Votre photo</h3>
+                    <p>Cadrez l'article en entier, de préférence sur un fond simple. JPG, PNG ou WebP, 10 Mo au plus.</p>
+                    <p:fileUpload id="fichier" mode="advanced" auto="true" dragDrop="true" multiple="false"
+                                  accept="image/*" listener="#{recherchePhotoBean.envoyer}" update="@form:apercu @form:resultats"
+                                  label="Choisir ou prendre une photo" chooseIcon="pi pi-camera"
+                                  invalidFileMessage="Format non pris en charge : JPG, PNG ou WebP.">
+                        <p:validateFile sizeLimit="10485760" allowTypes="/(\.|\/)(jpe?g|png|webp|gif|bmp)$/i" />
+                    </p:fileUpload>
+                </div>
+            </div>
+
+            <h:panelGroup id="resultats" layout="block">
+                <ui:fragment rendered="#{not empty recherchePhotoBean.erreur}">
+                    <div class="nx-alert nx-alert-error">#{recherchePhotoBean.erreur}</div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{recherchePhotoBean.aucunResultat}">
+                    <div class="nx-empty">
+                        <p><strong>Aucun article ne ressemble à cette photo.</strong></p>
+                        <p>Essayez une photo plus nette, où l'article est seul, ou faites une
+                            <h:link outcome="/recherche" value="recherche par mots" />.</p>
+                    </div>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{not empty recherchePhotoBean.resultats}">
+                    <div class="nx-results-header">
+                        <h2>Articles qui ressemblent à votre photo</h2>
+                        <span class="nx-results-count">#{recherchePhotoBean.resultats.size()} résultat(s)</span>
+                    </div>
+                    <ui:fragment rendered="#{not empty recherchePhotoBean.comparaison}">
+                        <div class="nx-alert nx-alert-info nx-photo-comparaison">#{recherchePhotoBean.comparaison}</div>
+                    </ui:fragment>
+                    <div class="nx-offre-grid nx-offre-grid-large">
+                        <ui:repeat var="r" value="#{recherchePhotoBean.resultats}">
+                            <ui:include src="/WEB-INF/includes/offre-carte.xhtml">
+                                <ui:param name="o" value="#{r.offre()}" />
+                                <ui:param name="ressemblance" value="#{r.ressemblance()}" />
+                            </ui:include>
+                        </ui:repeat>
+                    </div>
+                    <p class="nx-photo-note">Les résultats sont classés du plus ressemblant au moins ressemblant.
+                        La ressemblance porte sur l'apparence de la photo : vérifiez la description de l'article.</p>
+                </ui:fragment>
+            </h:panelGroup>
+        </h:form>
+    </div>
+</ui:define>
+</ui:composition>

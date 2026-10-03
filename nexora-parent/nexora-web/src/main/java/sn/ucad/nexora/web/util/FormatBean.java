@@ -59,6 +59,17 @@ public class FormatBean implements Serializable {
     }
 
     /** `95000.00` → `95 000 FCFA` — pas de décimales, espace fine comme séparateur de milliers. */
+    /**
+     * Ressemblance d'une photo (cosinus de 0 à 1, §11), en mots plutôt qu'en pourcentage : le score
+     * classe les résultats mais n'est pas une probabilité.
+     */
+    public String ressemblance(Double score) {
+        if (score == null) return "";
+        if (score >= 0.6) return "Très ressemblant";
+        if (score >= 0.45) return "Ressemblant";
+        return "Proche";
+    }
+
     public String prix(BigDecimal montant) {
         if (montant == null) return "";
         return PRIX_FORMAT.format(montant) + " FCFA";

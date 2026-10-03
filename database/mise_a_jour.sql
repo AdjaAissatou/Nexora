@@ -88,6 +88,7 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 03_professional/08_moderation.sql
 \i 03_professional/09_horaires.sql
 \i 05_search/07_moderation_avis_signalements.sql
+\i 04_catalogue/17_image_vecteur.sql
 
 \echo '== Données de référence : règles de vérification, permissions, paramètres'
 \i 09_seed/21_verification.sql

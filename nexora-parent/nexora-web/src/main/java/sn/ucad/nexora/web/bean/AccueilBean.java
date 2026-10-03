@@ -45,7 +45,14 @@ public class AccueilBean implements Serializable {
     @Inject
     private transient CatalogueApiClient catalogueApiClient;
 
+    @Inject
+    private transient sn.ucad.nexora.web.client.RechercheApiClient rechercheApiClient;
+
+    @Inject
+    private sn.ucad.nexora.web.session.SessionBean session;
+
     private ChiffresPublicsResponse chiffres;
+    private List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> suggestions;
     private List<EspaceVitrine> espaces = List.of();
 
     @PostConstruct
@@ -70,6 +77,29 @@ public class AccueilBean implements Serializable {
         } catch (ApiException e) {
             LOG.warn("Espaces de l'accueil indisponibles : {}", e.getMessage());
         }
+    }
+
+    /**
+     * « Vous pourriez aussi aimer » (§11), pour un visiteur connecté : articles voisins de ses
+     * dernières consultations et de ses favoris. Vide pour un visiteur anonyme ou sans historique.
+     */
+    public List<sn.ucad.nexora.web.dto.catalogue.RechercheVisuelleDtos.Resultat> getSuggestions() {
+        if (suggestions != null) return suggestions;
+        suggestions = List.of();
+        if (!session.isConnecte()) return suggestions;
+        java.util.LinkedHashSet<Long> depart = new java.util.LinkedHashSet<>();
+        try {
+            rechercheApiClient.listerHistorique(session.getAccessToken()).stream()
+                    .map(sn.ucad.nexora.web.dto.recherche.HistoriqueConsultationResponse::offreId)
+                    .filter(java.util.Objects::nonNull).limit(5).forEach(depart::add);
+            rechercheApiClient.listerFavoris(session.getAccessToken()).stream()
+                    .map(sn.ucad.nexora.web.dto.recherche.FavoriResponse::offreId)
+                    .filter(java.util.Objects::nonNull).limit(5).forEach(depart::add);
+        } catch (ApiException e) {
+            LOG.warn("Historique indisponible pour les suggestions : {}", e.getMessage());
+        }
+        suggestions = catalogueApiClient.suggestions(new ArrayList<>(depart), 4);
+        return suggestions;
     }
 
     public ChiffresPublicsResponse getChiffres() {
