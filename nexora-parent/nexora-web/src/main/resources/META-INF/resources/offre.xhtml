@@ -88,6 +88,49 @@
                         </ui:fragment>
                     </div>
 
+                    <ui:fragment rendered="#{!empty offreDetailBean.offre.caracteristiques or offreDetailBean.offre.produit != null}">
+                        <div class="nx-caracteristiques">
+                            <h3>Caractéristiques</h3>
+                            <dl>
+                                <ui:fragment rendered="#{!empty offreDetailBean.offre.produit.marque}">
+                                    <dt>Marque</dt>
+                                    <dd>#{offreDetailBean.offre.produit.marque}#{empty offreDetailBean.offre.produit.modele ? '' : ' — '.concat(offreDetailBean.offre.produit.modele)}</dd>
+                                </ui:fragment>
+                                <ui:fragment rendered="#{offreDetailBean.offre.produit != null}">
+                                    <dt>État</dt>
+                                    <dd>#{offreDetailBean.offre.produit.neuf ? 'Neuf' : 'Occasion'}</dd>
+                                </ui:fragment>
+                                <ui:fragment rendered="#{!empty offreDetailBean.offre.produit.garantie}">
+                                    <dt>Garantie</dt>
+                                    <dd>#{offreDetailBean.offre.produit.garantie}</dd>
+                                </ui:fragment>
+                                <ui:repeat value="#{offreDetailBean.offre.caracteristiques}" var="c">
+                                    <dt>#{c.nom}</dt>
+                                    <dd>
+                                        <ui:fragment rendered="#{c.multiple}">
+                                            <div class="nx-chips">
+                                                <ui:repeat value="#{c.valeurs}" var="v">
+                                                    <span class="nx-chip #{v.epuise ? 'nx-chip-barree' : ''}" title="#{v.epuise ? 'Épuisé pour le moment' : ''}">
+                                                        <ui:fragment rendered="#{v.couleur != null}">
+                                                            <span class="nx-teinte" style="background:#{v.couleur};"></span>
+                                                        </ui:fragment>
+                                                        #{v.libelle}
+                                                    </span>
+                                                </ui:repeat>
+                                            </div>
+                                            <ui:fragment rendered="#{c.avecEpuises}">
+                                                <small class="nx-aide">Barré : épuisé pour le moment.</small>
+                                            </ui:fragment>
+                                        </ui:fragment>
+                                        <ui:fragment rendered="#{not c.multiple}">
+                                            <ui:repeat value="#{c.valeurs}" var="v" varStatus="st">#{v.libelle}#{st.last ? '' : ', '}</ui:repeat>#{c.unite != null ? ' '.concat(c.unite) : ''}
+                                        </ui:fragment>
+                                    </dd>
+                                </ui:repeat>
+                            </dl>
+                        </div>
+                    </ui:fragment>
+
                     <ui:fragment rendered="#{offreDetailBean.offre.localisation != null}">
                         <div style="margin-top:26px; padding-top:20px; border-top:1px solid var(--nx-border);">
                             <h3 style="font-size:15px; font-weight:800; margin-bottom:6px; display:flex; align-items:center; gap:6px;">

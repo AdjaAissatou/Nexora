@@ -16,6 +16,9 @@ CREATE TABLE offre_attribut (
 
     id_valeur BIGINT,
 
+    -- Taille, couleur… proposée mais momentanément épuisée : affichée barrée, non commandable
+    epuise BOOLEAN NOT NULL DEFAULT FALSE,
+
     CONSTRAINT fk_offreattribut_offre
         FOREIGN KEY(id_offre)
         REFERENCES offre(id_offre)

@@ -100,7 +100,7 @@
                             <h3 style="margin-top:20px;">Caractéristiques</h3>
                             <ui:repeat value="#{creerOffreBean.autresAttributs}" var="a">
                                 <div class="nx-field">
-                                    <label>#{a.nom}#{a.obligatoire ? ' *' : ''}</label>
+                                    <label>#{a.nom}#{a.obligatoire ? ' *' : ''}#{a.unite != null ? ' ('.concat(a.unite).concat(')') : ''}</label>
 
                                     <h:selectOneMenu rendered="#{a.typeChamp == 'LISTE'}"
                                                       value="#{creerOffreBean.valeursListe[a.id]}" styleClass="nx-select">
@@ -111,7 +111,39 @@
                                     <h:inputText rendered="#{a.typeChamp == 'NOMBRE'}"
                                                  value="#{creerOffreBean.valeursNombre[a.id]}" styleClass="nx-input" />
 
-                                    <h:inputText rendered="#{a.typeChamp != 'LISTE' and a.typeChamp != 'NOMBRE'}"
+                                    <ui:fragment rendered="#{a.typeChamp == 'MULTI_LISTE'}">
+                                        <div class="nx-chips">
+                                            <ui:repeat value="#{a.valeurs}" var="v">
+                                                <label class="nx-chip">
+                                                    <h:selectBooleanCheckbox value="#{creerOffreBean.coches[v.id]}" />
+                                                    <ui:fragment rendered="#{v.couleur != null}">
+                                                        <span class="nx-teinte" style="background:#{v.couleur};"></span>
+                                                    </ui:fragment>
+                                                    #{v.valeur}
+                                                </label>
+                                            </ui:repeat>
+                                        </div>
+                                        <details class="nx-epuises">
+                                            <summary>Marquer comme épuisé (affiché barré, non disponible)</summary>
+                                            <div class="nx-chips">
+                                                <ui:repeat value="#{a.valeurs}" var="v">
+                                                    <label class="nx-chip nx-chip-epuise">
+                                                        <h:selectBooleanCheckbox value="#{creerOffreBean.epuises[v.id]}" />
+                                                        #{v.valeur}
+                                                    </label>
+                                                </ui:repeat>
+                                            </div>
+                                        </details>
+                                    </ui:fragment>
+
+                                    <h:selectOneMenu rendered="#{a.typeChamp == 'BOOLEAN'}"
+                                                      value="#{creerOffreBean.valeursTexte[a.id]}" styleClass="nx-select">
+                                        <f:selectItem itemLabel="Non précisé" itemValue="" />
+                                        <f:selectItem itemLabel="Oui" itemValue="true" />
+                                        <f:selectItem itemLabel="Non" itemValue="false" />
+                                    </h:selectOneMenu>
+
+                                    <h:inputText rendered="#{a.typeChamp == 'TEXTE' or a.typeChamp == 'DATE'}"
                                                  value="#{creerOffreBean.valeursTexte[a.id]}" styleClass="nx-input" />
                                 </div>
                             </ui:repeat>

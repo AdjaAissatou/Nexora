@@ -155,6 +155,7 @@ SET client_encoding = 'UTF8';
 \i 09_seed/21_verification.sql
 \i 09_seed/24_rbac_permissions.sql
 \i 09_seed/27_parametres.sql
+\i 09_seed/28_caracteristiques.sql
 
 -------------------------------------------------------
 -- VUES

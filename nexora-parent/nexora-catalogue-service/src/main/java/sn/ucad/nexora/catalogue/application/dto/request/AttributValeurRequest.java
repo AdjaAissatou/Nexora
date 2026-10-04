@@ -9,6 +9,8 @@ public class AttributValeurRequest {
     private BigDecimal valeurNombre;
     private String valeurDate;
     private Long idValeur;
+    /** Valeur proposée mais momentanément épuisée (taille, couleur…). */
+    private boolean epuise;
 
     public Long getIdAttribut() { return idAttribut; }
     public void setIdAttribut(Long idAttribut) { this.idAttribut = idAttribut; }
@@ -20,4 +22,6 @@ public class AttributValeurRequest {
     public void setValeurDate(String valeurDate) { this.valeurDate = valeurDate; }
     public Long getIdValeur() { return idValeur; }
     public void setIdValeur(Long idValeur) { this.idValeur = idValeur; }
+    public boolean isEpuise() { return epuise; }
+    public void setEpuise(boolean epuise) { this.epuise = epuise; }
 }

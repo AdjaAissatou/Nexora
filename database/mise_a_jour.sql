@@ -93,17 +93,20 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 03_professional/09_horaires.sql
 \i 05_search/07_moderation_avis_signalements.sql
 \i 04_catalogue/17_image_vecteur.sql
+\i 11_migrations/03_couleurs_epuises.sql
 
 \echo '== Données de référence : règles de vérification, permissions, paramètres'
 \i 09_seed/21_verification.sql
 \i 09_seed/24_rbac_permissions.sql
 \i 09_seed/27_parametres.sql
+\i 09_seed/28_caracteristiques.sql
 
-\echo '== Démonstration : comptes d''administration et agent, avis, horaires'
+\echo '== Démonstration : comptes d''administration et agent, avis, horaires, caractéristiques des articles'
 \i 09_seed/22_demo_verification.sql
 \i 09_seed/23_demo_administration.sql
 \i 09_seed/25_demo_avis.sql
 \i 09_seed/26_demo_horaires.sql
+\i 09_seed/29_demo_caracteristiques.sql
 
 \echo '== Accents abîmés par un ancien passage en WIN1252 (réparés s''il y en a)'
 \i 11_migrations/02_reparer_accents.sql

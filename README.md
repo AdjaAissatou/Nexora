@@ -89,7 +89,9 @@ Le script est rejouable sans risque et fonctionne pour toute base installée dep
 Il répare aussi les accents abîmés par un ancien passage de script sous Windows (« journÃ©e »
 au lieu de « journée ») : tous les scripts imposent désormais l'encodage UTF-8.
 Il ajoute ce qui manque : géographie, catalogue détaillé, lieux publics, vérification des
-espaces, modération, horaires, permissions, paramètres et comptes de démonstration.
+espaces, modération, horaires, permissions, paramètres, caractéristiques des articles
+(tailles, couleurs, matière…) et comptes de démonstration. Après les packs de démonstration
+locaux, rejouez `09_seed/29_demo_caracteristiques.sql` pour renseigner leurs caractéristiques.
 
 ### Endpoints catalogue-service (port 8084)
 

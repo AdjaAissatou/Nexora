@@ -1276,6 +1276,40 @@ Après une déconnexion, le bouton « Retour » du navigateur ne doit rien réaf
 Vérifié dans le navigateur, pour un professionnel et pour le super administrateur : après la
 déconnexion, trois « Retour » successifs n'affichent que des pages publiques ou la connexion.
 
+## 14. ✅ Caractéristiques des articles (tailles, couleurs, matière…)
+
+Ce qu'un client veut savoir avant de se déplacer : quelles tailles et quelles couleurs sont
+disponibles, en quel tissu, quelles pointures, combien de stockage pour un téléphone, quelle
+contenance pour un produit alimentaire. Le modèle reprend celui de DressIT (branche
+`dressit-plateforme-vente`) : tailles et couleurs en pastilles à cocher, une pastille de couleur
+réelle, et des valeurs « épuisées » qui restent affichées, barrées.
+
+**Modèle** (tables existantes `attribut`, `valeur_attribut_possible`, `offre_attribut`) :
+- Les caractéristiques sont **héritées** : celles de « Mode et textile » (couleurs, matière,
+  fabrication, entretien) valent pour toutes ses sous-catégories, celles de « Vêtements homme »
+  (tailles, coupe, manches) s'y ajoutent, puis « Col » pour les chemises. Le formulaire et la fiche
+  les présentent de la catégorie la plus générale à la plus précise.
+- `valeur_attribut_possible.code_couleur` : pastille `#RRGGBB` d'une couleur.
+- `offre_attribut.epuise` : valeur proposée mais momentanément épuisée.
+- Un choix multiple (`MULTI_LISTE`) donne une ligne `offre_attribut` par valeur cochée.
+- Référentiel : `09_seed/28_caracteristiques.sql` (mode, chaussures, enfant, téléphonie,
+  informatique, électroménager, alimentation) ; colonnes : `11_migrations/03_couleurs_epuises.sql`.
+
+**Fiche article** : section « Caractéristiques » (marque et modèle, état neuf ou occasion,
+garantie, puis chaque caractéristique ; tailles et couleurs en pastilles, épuisées barrées).
+`GET /api/v1/offres/{id}` renvoie `caracteristiques: [{nom, typeChamp, unite, valeurs:
+[{libelle, couleur, epuise}]}]`.
+
+**Formulaire de création et de modification** : pastilles à cocher pour les choix multiples,
+avec une ligne repliable « Marquer comme épuisé » ; Oui / Non pour les caractéristiques
+booléennes ; l'unité (W, L, Go, mois, pouces) est rappelée dans le libellé.
+
+**Démonstration** : `09_seed/29_demo_caracteristiques.sql` range dans la bonne catégorie les
+offres de démonstration classées trop haut (« Commerce ») ou dans la réparation alors qu'elles
+sont vendues, puis renseigne leurs caractéristiques d'après leur titre (une chemise « en lin
+blanche » : Blanc, Lin…). Il fonctionne aussi pour les offres des packs locaux ; il est lancé par
+`demo.sql` et `mise_a_jour.sql`, et peut être rejoué après les packs.
+
 ---
-*Dernière mise à jour : session du 03/10/2026, recherche par photo, articles similaires,
-« Vous pourriez aussi aimer » et messages d'erreur explicites.*
+*Dernière mise à jour : session du 04/10/2026, caractéristiques des articles (tailles,
+couleurs, matière…), inspirées de DressIT.*

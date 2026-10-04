@@ -8,4 +8,5 @@ public record AttributValeurRequest(
         String valeurTexte,
         BigDecimal valeurNombre,
         String valeurDate,
-        Long idValeur) {}
+        Long idValeur,
+        boolean epuise) {}

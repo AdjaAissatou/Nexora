@@ -146,9 +146,9 @@ public class CreateOffreService implements CreateOffreUseCase {
             if (vide) continue;
 
             Query q = em.createNativeQuery("""
-                    INSERT INTO offre_attribut (id_offre, id_attribut, valeur_texte, valeur_nombre, valeur_date, id_valeur)
+                    INSERT INTO offre_attribut (id_offre, id_attribut, valeur_texte, valeur_nombre, valeur_date, id_valeur, epuise)
                     VALUES (:idOffre, :idAttribut, :valeurTexte, :valeurNombre,
-                            CAST(:valeurDate AS DATE), :idValeur)
+                            CAST(:valeurDate AS DATE), :idValeur, :epuise)
                     """);
             q.setParameter("idOffre", idOffre);
             q.setParameter("idAttribut", a.getIdAttribut());
@@ -156,6 +156,7 @@ public class CreateOffreService implements CreateOffreUseCase {
             q.setParameter("valeurNombre", a.getValeurNombre());
             q.setParameter("valeurDate", a.getValeurDate());
             q.setParameter("idValeur", a.getIdValeur());
+            q.setParameter("epuise", a.isEpuise());
             q.executeUpdate();
         }
     }

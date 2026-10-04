@@ -45,7 +45,8 @@ public record OffreDetailResponse(
         String imagePrincipale,
         Produit produit,
         Service service,
-        List<String> tags) {
+        List<String> tags,
+        List<Caracteristique> caracteristiques) {
 
     public boolean enPromotion() {
         return promotion != null;
@@ -71,6 +72,21 @@ public record OffreDetailResponse(
                     .orElse("");
         }
     }
+
+    /** Caractéristique renseignée : « Tailles disponibles » → S, M, L… */
+    public record Caracteristique(String nom, String typeChamp, String unite, List<Valeur> valeurs) {
+
+        public boolean multiple() {
+            return "MULTI_LISTE".equals(typeChamp);
+        }
+
+        /** Au moins une valeur momentanément épuisée (affichée barrée). */
+        public boolean avecEpuises() {
+            return valeurs != null && valeurs.stream().anyMatch(Valeur::epuise);
+        }
+    }
+
+    public record Valeur(String libelle, String couleur, boolean epuise) {}
 
     public record Promotion(String nom, String typeReduction, BigDecimal valeur, LocalDateTime dateFin) {}
 

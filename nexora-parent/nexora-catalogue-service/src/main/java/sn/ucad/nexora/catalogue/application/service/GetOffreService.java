@@ -15,9 +15,12 @@ import sn.ucad.nexora.catalogue.domain.repository.OffreRepository;
 public class GetOffreService implements GetOffreUseCase {
 
     private final OffreRepository offreRepository;
+    private final sn.ucad.nexora.catalogue.infrastructure.persistence.CaracteristiquesRepository caracteristiques;
 
-    public GetOffreService(OffreRepository offreRepository) {
+    public GetOffreService(OffreRepository offreRepository,
+                           sn.ucad.nexora.catalogue.infrastructure.persistence.CaracteristiquesRepository caracteristiques) {
         this.offreRepository = offreRepository;
+        this.caracteristiques = caracteristiques;
     }
 
     @Override
@@ -126,6 +129,9 @@ public class GetOffreService implements GetOffreUseCase {
 
         // Tags
         r.setTags(o.getTags());
+
+        // Caractéristiques (tailles, couleurs, matière…)
+        r.setCaracteristiques(caracteristiques.deOffre(o.getId()));
 
         return r;
     }

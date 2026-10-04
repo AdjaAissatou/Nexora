@@ -1596,3 +1596,26 @@ a.nx-matrice-case:hover { outline: 2px solid var(--nx-primary); }
 #photo .ui-fileupload .ui-fileupload-choose:hover { box-shadow: var(--nx-glow-gold); transform: translateY(-1px); }
 #photo .ui-fileupload .ui-fileupload-choose .ui-button-icon-left { position: static !important; margin: 0 !important; }
 #photo .ui-fileupload .ui-fileupload-choose .ui-button-text { display: inline !important; padding: 0 !important; }
+
+/* ===== Caractéristiques d'un article (tailles, couleurs, matière…) ===== */
+.nx-caracteristiques { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--nx-border); }
+.nx-caracteristiques h3 { font-size: 15px; font-weight: 800; margin-bottom: 10px; }
+.nx-caracteristiques dl { display: grid; grid-template-columns: minmax(110px, max-content) 1fr; gap: 10px 18px; margin: 0; }
+.nx-caracteristiques dt { font-weight: 700; color: var(--nx-text-secondary); font-size: 14px; padding-top: 4px; }
+.nx-caracteristiques dd { margin: 0; font-size: 14px; padding-top: 4px; }
+.nx-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.nx-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border: 1px solid var(--nx-border);
+           border-radius: 999px; background: var(--nx-surface); font-size: 13px; font-weight: 600; cursor: default; }
+label.nx-chip { cursor: pointer; }
+label.nx-chip:has(input:checked) { border-color: var(--nx-gold-deep); background: var(--nx-gold-soft); }
+label.nx-chip-epuise:has(input:checked) { border-color: var(--nx-terracotta); background: #FBE7DE; color: var(--nx-terracotta); }
+.nx-chip input { margin: 0; accent-color: var(--nx-primary); }
+.nx-chip-barree { text-decoration: line-through; color: var(--nx-text-light); background: transparent; }
+.nx-teinte { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, 0.18); flex: none; }
+.nx-epuises { margin-top: 10px; }
+.nx-epuises summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--nx-terracotta); margin-bottom: 8px; }
+.nx-aide { display: block; margin-top: 6px; color: var(--nx-text-light); font-size: 12px; }
+@media (max-width: 600px) {
+    .nx-caracteristiques dl { grid-template-columns: 1fr; gap: 2px; }
+    .nx-caracteristiques dd { margin-bottom: 8px; }
+}

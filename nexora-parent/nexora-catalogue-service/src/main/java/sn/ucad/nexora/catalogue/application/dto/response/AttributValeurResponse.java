@@ -9,6 +9,7 @@ public class AttributValeurResponse {
     private BigDecimal valeurNombre;
     private String valeurDate;
     private Long idValeur;
+    private boolean epuise;
 
     public Long getIdAttribut() { return idAttribut; }
     public void setIdAttribut(Long v) { idAttribut = v; }
@@ -20,4 +21,6 @@ public class AttributValeurResponse {
     public void setValeurDate(String v) { valeurDate = v; }
     public Long getIdValeur() { return idValeur; }
     public void setIdValeur(Long v) { idValeur = v; }
+    public boolean isEpuise() { return epuise; }
+    public void setEpuise(boolean v) { epuise = v; }
 }

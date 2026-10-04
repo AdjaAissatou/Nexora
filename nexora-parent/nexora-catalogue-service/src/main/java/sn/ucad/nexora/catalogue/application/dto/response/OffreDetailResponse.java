@@ -68,6 +68,9 @@ public class OffreDetailResponse {
     // ============ TAGS ============
     private List<String> tags;
 
+    // Caractéristiques renseignées (tailles, couleurs, matière…), de la plus générale à la plus précise
+    private List<Caracteristique> caracteristiques;
+
     // ============ GETTERS / SETTERS ============
 
     public Long getId() { return id; }
@@ -148,6 +151,46 @@ public class OffreDetailResponse {
     public void setProduit(ProduitResponse produit) { this.produit = produit; }
     public ServiceResponse getService() { return service; }
     public void setService(ServiceResponse service) { this.service = service; }
+    public List<Caracteristique> getCaracteristiques() { return caracteristiques; }
+    public void setCaracteristiques(List<Caracteristique> caracteristiques) { this.caracteristiques = caracteristiques; }
+
+    /** Une caractéristique et sa ou ses valeurs (plusieurs pour « Tailles disponibles »…). */
+    public static class Caracteristique {
+        private final String nom;
+        private final String typeChamp;
+        private final String unite;
+        private final List<Valeur> valeurs;
+
+        public Caracteristique(String nom, String typeChamp, String unite, List<Valeur> valeurs) {
+            this.nom = nom;
+            this.typeChamp = typeChamp;
+            this.unite = unite;
+            this.valeurs = valeurs;
+        }
+
+        public String getNom() { return nom; }
+        public String getTypeChamp() { return typeChamp; }
+        public String getUnite() { return unite; }
+        public List<Valeur> getValeurs() { return valeurs; }
+    }
+
+    /** Une valeur affichée : « M », « Noir » (avec sa pastille), éventuellement épuisée. */
+    public static class Valeur {
+        private final String libelle;
+        private final String couleur;
+        private final boolean epuise;
+
+        public Valeur(String libelle, String couleur, boolean epuise) {
+            this.libelle = libelle;
+            this.couleur = couleur;
+            this.epuise = epuise;
+        }
+
+        public String getLibelle() { return libelle; }
+        public String getCouleur() { return couleur; }
+        public boolean isEpuise() { return epuise; }
+    }
+
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
 

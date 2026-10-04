@@ -136,7 +136,7 @@ public class GetOffreEditionService implements GetOffreEditionUseCase {
     @SuppressWarnings("unchecked")
     private List<AttributValeurResponse> chargerAttributs(Long idOffre) {
         Query q = em.createNativeQuery("""
-                SELECT id_attribut, valeur_texte, valeur_nombre, CAST(valeur_date AS TEXT), id_valeur
+                SELECT id_attribut, valeur_texte, valeur_nombre, CAST(valeur_date AS TEXT), id_valeur, epuise
                 FROM offre_attribut WHERE id_offre = :id
                 """);
         q.setParameter("id", idOffre);
@@ -148,6 +148,7 @@ public class GetOffreEditionService implements GetOffreEditionUseCase {
             a.setValeurNombre((BigDecimal) row[2]);
             a.setValeurDate((String) row[3]);
             a.setIdValeur(toLong(row[4]));
+            a.setEpuise(Boolean.TRUE.equals(row[5]));
             return a;
         }).toList();
     }

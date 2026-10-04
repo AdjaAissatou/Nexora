@@ -12,6 +12,9 @@ CREATE TABLE valeur_attribut_possible (
 
     actif BOOLEAN DEFAULT TRUE,
 
+    -- Pastille affichée pour une couleur (#RRGGBB), NULL sinon
+    code_couleur VARCHAR(7),
+
     CONSTRAINT fk_valeur_attribut
         FOREIGN KEY(id_attribut)
         REFERENCES attribut(id_attribut)

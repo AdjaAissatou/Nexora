@@ -101,10 +101,16 @@ public class CategorieQueryRepository {
     @SuppressWarnings("unchecked")
     public List<AttributResponse> attributs(Long idCategorie) {
         Query q = em.createNativeQuery("""
-                SELECT id_attribut, nom, code, CAST(type_champ AS TEXT), obligatoire, unite
-                FROM attribut
-                WHERE id_categorie = :idCategorie AND actif = TRUE
-                ORDER BY ordre_affichage, nom
+                WITH RECURSIVE ancetres(id, profondeur) AS (
+                    SELECT CAST(:idCategorie AS BIGINT), 0
+                    UNION ALL
+                    SELECT c.id_categorie_parent, a.profondeur + 1 FROM categorie c JOIN ancetres a ON c.id_categorie = a.id
+                    WHERE c.id_categorie_parent IS NOT NULL
+                )
+                SELECT at.id_attribut, at.nom, at.code, CAST(at.type_champ AS TEXT), at.obligatoire, at.unite
+                FROM attribut at JOIN ancetres an ON an.id = at.id_categorie
+                WHERE at.actif = TRUE
+                ORDER BY an.profondeur DESC, at.ordre_affichage, at.nom
                 """);
         q.setParameter("idCategorie", idCategorie);
         List<Object[]> rows = q.getResultList();
@@ -124,7 +130,7 @@ public class CategorieQueryRepository {
     @SuppressWarnings("unchecked")
     private List<ValeurAttributResponse> valeurs(Long idAttribut) {
         Query q = em.createNativeQuery("""
-                SELECT id_valeur, valeur
+                SELECT id_valeur, valeur, code_couleur
                 FROM valeur_attribut_possible
                 WHERE id_attribut = :idAttribut AND actif = TRUE
                 ORDER BY ordre_affichage
@@ -135,6 +141,7 @@ public class CategorieQueryRepository {
             ValeurAttributResponse v = new ValeurAttributResponse();
             v.setId(toLong(r[0]));
             v.setValeur((String) r[1]);
+            v.setCouleur((String) r[2]);
             return v;
         }).toList();
     }

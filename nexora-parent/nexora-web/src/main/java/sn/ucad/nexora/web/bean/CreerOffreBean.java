@@ -19,6 +19,7 @@ import sn.ucad.nexora.web.client.EspaceApiClient;
 import sn.ucad.nexora.web.config.ImageUploadService;
 import sn.ucad.nexora.web.dto.catalogue.AttributResponse;
 import sn.ucad.nexora.web.dto.catalogue.AttributValeurRequest;
+import sn.ucad.nexora.web.dto.catalogue.ValeurAttributResponse;
 import sn.ucad.nexora.web.dto.catalogue.CategorieResponse;
 import sn.ucad.nexora.web.dto.catalogue.CreateOffreRequest;
 import sn.ucad.nexora.web.dto.catalogue.OffreEditionResponse;
@@ -64,6 +65,10 @@ public class CreerOffreBean implements Serializable {
     private final Map<Long, String> valeursListe = new HashMap<>();
     private final Map<Long, String> valeursTexte = new HashMap<>();
     private final Map<Long, BigDecimal> valeursNombre = new HashMap<>();
+    /** Choix multiples (tailles, couleurs…), indexés par id de valeur proposée. */
+    private final Map<Long, Boolean> coches = new HashMap<>();
+    /** Parmi les valeurs proposées, celles momentanément épuisées (affichées barrées sur la fiche). */
+    private final Map<Long, Boolean> epuises = new HashMap<>();
 
     // Champs communs
     private String titre;
@@ -161,7 +166,11 @@ public class CreerOffreBean implements Serializable {
 
             if (r.attributs() != null) {
                 for (AttributValeurRequest a : r.attributs()) {
-                    if (a.idValeur() != null) valeursListe.put(a.idAttribut(), String.valueOf(a.idValeur()));
+                    if (a.idValeur() != null) {
+                        valeursListe.put(a.idAttribut(), String.valueOf(a.idValeur()));
+                        coches.put(a.idValeur(), true);
+                        if (a.epuise()) epuises.put(a.idValeur(), true);
+                    }
                     else if (a.valeurNombre() != null) valeursNombre.put(a.idAttribut(), a.valeurNombre());
                     else if (a.valeurTexte() != null) valeursTexte.put(a.idAttribut(), a.valeurTexte());
                 }
@@ -272,6 +281,8 @@ public class CreerOffreBean implements Serializable {
         valeursListe.clear();
         valeursTexte.clear();
         valeursNombre.clear();
+        coches.clear();
+        epuises.clear();
     }
 
     private CategorieResponse trouver(List<CategorieResponse> liste, Long id) {
@@ -305,19 +316,28 @@ public class CreerOffreBean implements Serializable {
                         case "LISTE" -> {
                             String v = valeursListe.get(a.id());
                             if (v != null && !v.isBlank()) {
-                                valeurs.add(new AttributValeurRequest(a.id(), null, null, null, Long.valueOf(v)));
+                                valeurs.add(new AttributValeurRequest(a.id(), null, null, null, Long.valueOf(v), false));
+                            }
+                        }
+                        case "MULTI_LISTE" -> {
+                            for (ValeurAttributResponse v : a.valeurs()) {
+                                boolean epuise = Boolean.TRUE.equals(epuises.get(v.id()));
+                                // Une valeur marquée épuisée reste proposée : elle est affichée, barrée.
+                                if (epuise || Boolean.TRUE.equals(coches.get(v.id()))) {
+                                    valeurs.add(new AttributValeurRequest(a.id(), null, null, null, v.id(), epuise));
+                                }
                             }
                         }
                         case "NOMBRE" -> {
                             BigDecimal v = valeursNombre.get(a.id());
                             if (v != null) {
-                                valeurs.add(new AttributValeurRequest(a.id(), null, v, null, null));
+                                valeurs.add(new AttributValeurRequest(a.id(), null, v, null, null, false));
                             }
                         }
                         default -> {
                             String v = valeursTexte.get(a.id());
                             if (v != null && !v.isBlank()) {
-                                valeurs.add(new AttributValeurRequest(a.id(), v, null, null, null));
+                                valeurs.add(new AttributValeurRequest(a.id(), v, null, null, null, false));
                             }
                         }
                     }
@@ -423,6 +443,8 @@ public class CreerOffreBean implements Serializable {
     public Map<Long, String> getValeursListe() { return valeursListe; }
     public Map<Long, String> getValeursTexte() { return valeursTexte; }
     public Map<Long, BigDecimal> getValeursNombre() { return valeursNombre; }
+    public Map<Long, Boolean> getCoches() { return coches; }
+    public Map<Long, Boolean> getEpuises() { return epuises; }
 
     public String getTitre() { return titre; }
     public void setTitre(String v) { titre = v; }

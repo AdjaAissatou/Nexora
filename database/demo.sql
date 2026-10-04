@@ -9,7 +9,8 @@
 --
 -- Utilisation, depuis le dossier database/, APRÈS install.sql ou mise_a_jour.sql :
 --   psql -U postgres -d nexora_marketplace -v ON_ERROR_STOP=1 -f demo.sql
--- Ensuite, pour les photos : les packs locaux (offres_demo_local.sql puis v2).
+-- Ensuite, pour les photos : les packs locaux (offres_demo_local.sql puis v2), puis
+-- 09_seed/29_demo_caracteristiques.sql pour ranger leurs offres et renseigner leurs caractéristiques.
 -- ============================================================================
 
 -- Les scripts sont enregistrés en UTF-8 : sans cette ligne, psql sous Windows les lit
@@ -21,7 +22,8 @@ SET client_encoding = 'UTF8';
 \echo '== Comptes de vérification et du back-office'
 \i 09_seed/22_demo_verification.sql
 \i 09_seed/23_demo_administration.sql
-\echo '== Avis et horaires'
+\echo '== Avis, horaires et caractéristiques des articles'
 \i 09_seed/25_demo_avis.sql
 \i 09_seed/26_demo_horaires.sql
+\i 09_seed/29_demo_caracteristiques.sql
 \echo '== Démonstration installée'
