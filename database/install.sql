@@ -168,6 +168,9 @@ SET client_encoding = 'UTF8';
 \i 10_views/05_statistiques.sql
 \i 00_init/04_indexes.sql
 
+\echo '== Droits du compte des services (nexora_user) sur toutes les tables'
+\i 11_migrations/04_droits_nexora_user.sql
+
 \echo '========================================='
 \echo ' INSTALLATION NEXORA TERMINEE'
 \echo '========================================='
