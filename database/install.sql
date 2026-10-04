@@ -76,6 +76,7 @@ SET client_encoding = 'UTF8';
 \i 04_catalogue/15_categorie_type_espace.sql
 \i 04_catalogue/16_offre_espace_cascade.sql
 \i 04_catalogue/17_image_vecteur.sql
+\i 04_catalogue/18_synonyme_recherche.sql
 \i 03_professional/08_moderation.sql
 \i 03_professional/09_horaires.sql
 
@@ -156,6 +157,7 @@ SET client_encoding = 'UTF8';
 \i 09_seed/24_rbac_permissions.sql
 \i 09_seed/27_parametres.sql
 \i 09_seed/28_caracteristiques.sql
+\i 09_seed/30_synonymes_recherche.sql
 
 -------------------------------------------------------
 -- VUES

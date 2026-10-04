@@ -1342,6 +1342,27 @@ API : `GET /api/v1/offres/recherche?lat=&lng=&rayonKm=` (rayon 2 km par défaut,
 tri `DISTANCE`, appliqué d'office autour d'un point) ; chaque résultat porte `distanceKm`.
 `GET /api/v1/lieux-publics/{id}`. La recherche de lieux ignore les accents.
 
+## 16. ✅ Recherche par mots tolérante (« plombier » trouve « Débouchage canalisation »)
+
+Avant, le texte saisi devait figurer tel quel dans le titre, la description, la catégorie ou la
+commune : « plombier » ne trouvait rien, aucune offre ne contenant ce mot. Désormais :
+- **Partout** : titre, description, catégorie **et ses catégories parentes**, type d'offre,
+  **nom et type de l'espace**, tags, commune, quartier, département.
+- **Sans accents ni majuscules** : « electricien » = « Électricien ».
+- **Par racine** : « plombier » → « plomb », qui trouve « plomberie » ; « canalisations » trouve
+  « canalisation » (`TexteRecherche`, terminaisons -ier, -erie, -eur, -euse, -ation, pluriels…).
+  Mots vides ignorés (« le », « de », « pour »…).
+- **Synonymes** (table `synonyme_recherche`, modifiable) : un mot que les clients tapent →
+  ce qu'il couvre (plombier → canalisation, sanitaire, chauffe-eau ; frigo → réfrigérateur ;
+  taxi → VTC, chauffeur ; coiffeur → coiffure, tresse…). Un seul sens, formes entières, sans mots
+  trop larges (« mobile » trouverait « mobilier »).
+- Plusieurs mots : **tous** doivent être trouvés (« chemise lin » → les chemises en lin).
+- **Ordre** : mot trouvé dans le titre d'abord, puis synonyme dans le titre, puis ailleurs.
+
+Données : `04_catalogue/18_synonyme_recherche.sql`, `09_seed/30_synonymes_recherche.sql`. Les offres
+de démonstration rangées dans « Services » ou « Transport » (racine) vont dans Plomberie,
+Menuiserie bois, Livraison colis, VTC, Location avec chauffeur (`29_demo_caracteristiques.sql`).
+
 ---
 *Dernière mise à jour : session du 04/10/2026, caractéristiques des articles (inspirées de
-DressIT), page Explorer et recherche autour d'un lieu.*
+DressIT), page Explorer, recherche autour d'un lieu, recherche par mots tolérante.*

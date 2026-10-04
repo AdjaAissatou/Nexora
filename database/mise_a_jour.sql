@@ -93,6 +93,7 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 03_professional/09_horaires.sql
 \i 05_search/07_moderation_avis_signalements.sql
 \i 04_catalogue/17_image_vecteur.sql
+\i 04_catalogue/18_synonyme_recherche.sql
 \i 11_migrations/03_couleurs_epuises.sql
 
 \echo '== Données de référence : règles de vérification, permissions, paramètres'
@@ -100,6 +101,7 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 09_seed/24_rbac_permissions.sql
 \i 09_seed/27_parametres.sql
 \i 09_seed/28_caracteristiques.sql
+\i 09_seed/30_synonymes_recherche.sql
 
 \echo '== Démonstration : comptes d''administration et agent, avis, horaires, caractéristiques des articles'
 \i 09_seed/22_demo_verification.sql

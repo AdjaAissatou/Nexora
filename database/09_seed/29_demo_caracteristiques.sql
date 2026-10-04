@@ -29,7 +29,8 @@ BEGIN
     IF cat IS NULL OR typ IS NULL THEN RETURN; END IF;
     UPDATE offre o SET id_categorie = cat, id_type_offre = typ
     WHERE o.titre ~* motif
-      AND pg_temp.chemin(o.id_categorie) IN ('Commerce', 'Artisanat et réparation > Réparation > Électroménager');
+      AND pg_temp.chemin(o.id_categorie) IN ('Commerce', 'Services', 'Transport',
+                                              'Artisanat et réparation > Réparation > Électroménager');
 END $$ LANGUAGE plpgsql;
 
 -- Valeurs proposées (LISTE, MULTI_LISTE) ; « epuises » : celles affichées barrées.
@@ -58,10 +59,16 @@ BEGIN
 END $$ LANGUAGE plpgsql;
 
 -- ---------------------------------------------------------------------------
--- 1. Offres rangées trop haut (« Commerce ») ou dans la réparation alors qu'elles sont vendues
+-- 1. Offres rangées trop haut (« Commerce », « Services », « Transport ») ou dans la réparation
+--    alors qu'elles sont vendues
 -- ---------------------------------------------------------------------------
 DO $$
 BEGIN
+    PERFORM pg_temp.ranger('plomberie|sanitaire|canalisation|chauffe-eau', 'Bâtiment et construction > Plomberie', 'Plomberie');
+    PERFORM pg_temp.ranger('meuble|mobilier|portes et fenêtres', 'Bâtiment et construction > Menuiserie > Menuiserie bois', 'Menuiserie bois');
+    PERFORM pg_temp.ranger('livraison|colis', 'Transport > Livraison > Livraison colis', 'Livraison colis');
+    PERFORM pg_temp.ranger('vtc|course', 'Transport > Transport urbain > VTC', 'VTC');
+    PERFORM pg_temp.ranger('chauffeur', 'Transport > Location de véhicule', 'Location avec chauffeur');
     PERFORM pg_temp.ranger('chemise', 'Mode et textile > Vêtements homme > Chemises', 'Chemises homme');
     PERFORM pg_temp.ranger('boubou|tunique', 'Mode et textile > Vêtements homme > Boubous', 'Boubous homme');
     PERFORM pg_temp.ranger('pantalon', 'Mode et textile > Vêtements homme > Pantalons', 'Pantalons homme');

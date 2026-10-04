@@ -120,6 +120,70 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 + COS(RADIANS(CAST(:lat AS DOUBLE PRECISION))) * COS(RADIANS(CAST(a.latitude AS DOUBLE PRECISION)))
                   * POWER(SIN(RADIANS(CAST(a.longitude AS DOUBLE PRECISION) - CAST(:lng AS DOUBLE PRECISION)) / 2), 2))))""";
     private static final double RAYON_DEFAUT_KM = 2;
+
+    /** Tout le texte d'une offre où chercher, sans accents ni majuscules. */
+    private static final String DOCUMENT = "translate(lower(concat_ws(' ', o.titre, o.description, c.nom, cp.nom, cgp.nom, "
+            + "to2.libelle, ep.nom, te.nom, a.commune, a.quartier, a.departement, "
+            + "(SELECT string_agg(tg.nom, ' ') FROM offre_tag ot JOIN tag tg ON tg.id_tag = ot.id_tag WHERE ot.id_offre = o.id_offre))), "
+            + "'" + TexteRecherche.ACCENTS + "', '" + TexteRecherche.SANS_ACCENTS + "')";
+    private static final String TITRE = "translate(lower(o.titre), '" + TexteRecherche.ACCENTS + "', '"
+            + TexteRecherche.SANS_ACCENTS + "')";
+
+    /**
+     * Pour chaque mot saisi, ses formes acceptées : sa racine (« plomb ») et ses synonymes entiers
+     * (« canalisation », « chauffe-eau »…). Un mot sans racine utile garde sa forme entière.
+     */
+    private List<List<String>> termes(String q) {
+        List<List<String>> termes = new java.util.ArrayList<>();
+        if (q == null || q.isBlank()) return termes;
+        Map<String, List<String>> synonymes = synonymes();
+        for (String mot : TexteRecherche.mots(q)) {
+            java.util.LinkedHashSet<String> formes = new java.util.LinkedHashSet<>();
+            String racine = TexteRecherche.racine(mot);
+            formes.add(racine);
+            for (String equivalent : synonymes.getOrDefault(racine, List.of())) {
+                formes.add(equivalent); // forme entière : la racine de « chauffeur » trouverait « chauffe-eau »
+            }
+            termes.add(new java.util.ArrayList<>(formes));
+        }
+        return termes;
+    }
+
+    /**
+     * Synonymes indexés par la racine du terme (relus à chaque recherche : table courte). Un seul
+     * sens : « plombier » → « canalisation », pas l'inverse, qui élargirait trop la recherche.
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, List<String>> synonymes() {
+        Map<String, List<String>> parRacine = new java.util.HashMap<>();
+        // Table absente (base pas encore mise à jour) : recherche sans synonymes, sans erreur SQL
+        Object table = em.createNativeQuery("SELECT CAST(to_regclass('synonyme_recherche') AS TEXT)").getSingleResult();
+        if (table == null) return parRacine;
+        List<Object[]> lignes = em.createNativeQuery("SELECT terme, equivalent FROM synonyme_recherche").getResultList();
+        for (Object[] l : lignes) {
+            String terme = TexteRecherche.normaliser((String) l[0]).trim();
+            String equivalent = TexteRecherche.normaliser((String) l[1]).trim();
+            parRacine.computeIfAbsent(TexteRecherche.racine(terme), k -> new java.util.ArrayList<>()).add(equivalent);
+        }
+        return parRacine;
+    }
+
+    /** Score : 3 par mot trouvé dans le titre (forme saisie), 2 par synonyme dans le titre, 1 ailleurs. */
+    private String pertinence(List<List<String>> termes, Map<String, Object> paramMap) {
+        List<String> parties = new java.util.ArrayList<>();
+        for (int t = 0; t < termes.size(); t++) {
+            List<String> formes = termes.get(t);
+            for (int v = 0; v < formes.size(); v++) {
+                paramMap.put("t" + t + "_" + v, "%" + formes.get(v) + "%");
+            }
+            List<String> synonymes = new java.util.ArrayList<>();
+            for (int v = 1; v < formes.size(); v++) synonymes.add(TITRE + " LIKE :t" + t + "_" + v);
+            parties.add("(CASE WHEN " + TITRE + " LIKE :t" + t + "_0 THEN 3"
+                    + (synonymes.isEmpty() ? "" : " WHEN " + String.join(" OR ", synonymes) + " THEN 2")
+                    + " ELSE 1 END)");
+        }
+        return String.join(" + ", parties);
+    }
     private static final double RAYON_MAX_KM = 50;
 
     @Override
@@ -169,13 +233,17 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 CASE WHEN NOT ep.ouvert THEN FALSE
                      ELSE espace_ouvert_a(ep.id_espace, CAST(NOW() AT TIME ZONE 'Africa/Dakar' AS TIMESTAMP)) END AS espace_ouvert_maintenant,
                 -- Distance au point de recherche, en km (NULL hors recherche autour d'un point)
-                %s AS distance_km
+                %s AS distance_km,
+                -- Pertinence du texte saisi : mots trouvés dans le titre d'abord (0 sans texte)
+                %p AS pertinence_texte
 
             FROM offre o
             JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
             JOIN categorie c ON c.id_categorie = o.id_categorie
             JOIN type_espace te ON te.id_type_espace = ep.id_type_espace
             JOIN type_offre to2 ON to2.id_type_offre = o.id_type_offre
+            LEFT JOIN categorie cp ON cp.id_categorie = c.id_categorie_parent
+            LEFT JOIN categorie cgp ON cgp.id_categorie = cp.id_categorie_parent
             LEFT JOIN adresse a ON a.id_espace = ep.id_espace AND a.principale = TRUE
             LEFT JOIN (
                 SELECT id_offre, id_espace,
@@ -190,13 +258,16 @@ public class OffreRepositoryAdapter implements OffreRepository {
         String distance = params.isAutourDunPoint() ? DISTANCE_KM : "CAST(NULL AS DOUBLE PRECISION)";
         int marque = sql.indexOf("%s AS distance_km");
         sql.replace(marque, marque + 2, distance);
+        Map<String, Object> paramMap = new LinkedHashMap<>();
+        List<List<String>> termes = termes(params.getQ());
+        String pertinence = termes.isEmpty() ? "0" : pertinence(termes, paramMap);
+        marque = sql.indexOf("%p AS pertinence_texte");
+        sql.replace(marque, marque + 2, pertinence);
 
         // Recherche publique : seulement ce qui est visible. Gestion : tout ce que le professionnel possède.
         sql.append(params.isGestion()
                 ? " WHERE CAST(o.statut AS TEXT) <> 'SUPPRIME' "
                 : " WHERE CAST(o.statut AS TEXT) = 'PUBLIE' AND ep.ouvert = TRUE AND CAST(ep.statut AS TEXT) = 'ACTIF' ");
-
-        Map<String, Object> paramMap = new LinkedHashMap<>();
 
         if (params.getIdsOffres() != null) {
             if (params.getIdsOffres().isEmpty()) return List.of();
@@ -204,18 +275,14 @@ public class OffreRepositoryAdapter implements OffreRepository {
             paramMap.put("idsOffres", params.getIdsOffres());
         }
 
-        // Filtre texte libre
-        if (params.getQ() != null && !params.getQ().isBlank()) {
-            sql.append("""
-                AND (
-                    o.titre ILIKE :q
-                    OR o.description ILIKE :q
-                    OR c.nom ILIKE :q
-                    OR a.commune ILIKE :q
-                    OR a.quartier ILIKE :q
-                )
-                """);
-            paramMap.put("q", "%" + params.getQ().trim() + "%");
+        // Texte libre : chaque mot (ou sa racine, ou un synonyme) doit figurer quelque part dans
+        // l'offre, son espace, ses catégories ou ses tags, accents ignorés (§16).
+        for (int t = 0; t < termes.size(); t++) {
+            List<String> conditions = new java.util.ArrayList<>();
+            for (int v = 0; v < termes.get(t).size(); v++) {
+                conditions.add(DOCUMENT + " LIKE :t" + t + "_" + v);
+            }
+            sql.append(" AND (").append(String.join(" OR ", conditions)).append(") ");
         }
 
         if (params.getCategorie() != null && !params.getCategorie().isBlank()) {
@@ -339,8 +406,8 @@ public class OffreRepositoryAdapter implements OffreRepository {
             case "PRIX_DESC"  -> " ORDER BY prix DESC NULLS LAST ";
             case "DATE_DESC"  -> " ORDER BY date_publication DESC NULLS LAST ";
             case "NOTE"       -> " ORDER BY espace_note DESC NULLS LAST ";
-            case "DISTANCE"   -> " ORDER BY distance_km ASC NULLS LAST, score_pertinence DESC ";
-            default           -> " ORDER BY score_pertinence DESC, vue_count DESC ";
+            case "DISTANCE"   -> " ORDER BY distance_km ASC NULLS LAST, pertinence_texte DESC, score_pertinence DESC ";
+            default           -> " ORDER BY pertinence_texte DESC, score_pertinence DESC, vue_count DESC ";
         };
     }
 
