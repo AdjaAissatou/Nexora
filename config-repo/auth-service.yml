@@ -12,7 +12,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate      # La BDD est gérée par les scripts SQL : Hibernate vérifie, ne modifie jamais
     show-sql: true
     properties:
       hibernate:
