@@ -1663,3 +1663,35 @@ label.nx-chip-epuise:has(input:checked) { border-color: var(--nx-terracotta); ba
     .nx-explorer-map { height: 320px; }
     .nx-rayons { grid-template-columns: 1fr; }
 }
+
+/* ===== Tris et filtres de recherche (§17) ===== */
+.nx-tris { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 14px; }
+.nx-tris > span { font-size: 13px; font-weight: 700; color: var(--nx-text-secondary); margin-right: 4px; }
+.nx-tri { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--nx-border); background: var(--nx-surface);
+          font-size: 13px; font-weight: 600; color: var(--nx-text); text-decoration: none; }
+.nx-tri:hover { border-color: var(--nx-gold-deep); }
+.nx-tri.actif { background: var(--nx-primary); border-color: var(--nx-primary); color: #fff; }
+.nx-affiner .nx-pastille { font-size: 12.5px; }
+.nx-filtres-titre { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; }
+.nx-filtres-titre::-webkit-details-marker { display: none; }
+.nx-filtres-titre h3 { margin: 0; }
+.nx-filtres-repliables[open] > .nx-filtres-titre { margin-bottom: 12px; }
+.nx-prix-bornes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.nx-chips-compacts { gap: 6px; }
+.nx-chips-compacts .nx-chip { padding: 4px 10px; font-size: 12.5px; }
+.nx-chip-compte { color: var(--nx-text-light); font-weight: 500; font-size: 11px; }
+.nx-cases { display: flex; flex-direction: column; gap: 6px; }
+.nx-autour-de-moi { margin-bottom: 14px; }
+.nx-ventes { font-size: 12px; font-weight: 700; color: var(--nx-terracotta); }
+@media (min-width: 901px) {
+    .nx-filtres-titre { pointer-events: none; }
+}
+@media (max-width: 900px) {
+    .nx-filtres-titre::after { content: "▾"; margin-left: auto; color: var(--nx-text-secondary); }
+    .nx-filtres-repliables[open] > .nx-filtres-titre::after { content: "▴"; }
+    .nx-tris { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+    .nx-tri, .nx-affiner .nx-pastille { white-space: nowrap; flex: none; }
+}
+/* La colonne des résultats ne doit jamais s'élargir à cause d'un contenu large (carte, barre de tri). */
+.nx-search-layout > * { min-width: 0; }
+.nx-tris > span { white-space: nowrap; }

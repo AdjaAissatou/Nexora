@@ -52,6 +52,7 @@
             <ui:fragment rendered="#{o.espaceOuvertMaintenant eq true}"><span class="nx-ouverture ouvert">Ouvert</span></ui:fragment>
             <ui:fragment rendered="#{o.espaceOuvertMaintenant eq false}"><span class="nx-ouverture">Fermé</span></ui:fragment>
             <ui:fragment rendered="#{o.enPromotion}"><span class="nx-badge nx-badge-promo">Promo</span></ui:fragment>
+            <ui:fragment rendered="#{o.nombreVentes gt 0}"><span class="nx-ventes">#{o.nombreVentes} vendu(s)</span></ui:fragment>
         </span>
     </div>
 </h:link>

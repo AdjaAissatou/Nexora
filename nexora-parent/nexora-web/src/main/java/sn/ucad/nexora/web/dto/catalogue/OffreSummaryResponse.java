@@ -33,7 +33,9 @@ public record OffreSummaryResponse(
         /** Ouvert en ce moment ; null si l'espace n'a pas renseigné ses horaires (§10). */
         Boolean espaceOuvertMaintenant,
         /** Distance au lieu recherché (km) ; null hors recherche autour d'un lieu. */
-        Double distanceKm) {
+        Double distanceKm,
+        /** Quantité vendue (commandes non annulées). */
+        long nombreVentes) {
 
     public boolean suspendue() {
         return "SUSPENDU".equals(statut);

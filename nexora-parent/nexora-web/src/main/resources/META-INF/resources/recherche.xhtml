@@ -39,20 +39,93 @@
         <div class="nx-search-layout">
 
             <h:form id="filtres">
-                <div class="nx-filters-card">
-                    <h3>Filtrer</h3>
+                <details class="nx-filters-card nx-filtres-repliables" open="open">
+                    <summary class="nx-filtres-titre">
+                        <h3>Filtrer</h3>
+                        <ui:fragment rendered="#{rechercheBean.nombreFiltres gt 0}">
+                            <span class="nx-compte">#{rechercheBean.nombreFiltres}</span>
+                        </ui:fragment>
+                    </summary>
 
                     <div class="nx-field">
                         <label for="filtres:q">Recherche</label>
-                        <h:inputText id="q" value="#{rechercheBean.q}" placeholder="Nom, quartier, service…" styleClass="nx-input" />
+                        <h:inputText id="q" value="#{rechercheBean.q}" placeholder="Article, métier, commerce, lieu…" styleClass="nx-input" />
                     </div>
+
+                    <!-- Autour de moi : position donnée par le navigateur -->
+                    <h:inputHidden id="maLat" value="#{rechercheBean.maLat}" />
+                    <h:inputHidden id="maLng" value="#{rechercheBean.maLng}" />
+                    <h:commandButton id="autourDeMoi" action="#{rechercheBean.autourDeMoi}" style="display:none;" />
+                    <ui:fragment rendered="#{!rechercheBean.positionActive}">
+                        <button type="button" class="nx-button nx-button-outline-dark nx-button-block nx-autour-de-moi" onclick="nexoraAutourDeMoi()">
+                            <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/></svg>
+                            Autour de moi
+                        </button>
+                    </ui:fragment>
+                    <p id="nx-position-erreur" class="nx-aide" style="display:none;"></p>
 
                     <div class="nx-field">
                         <label for="filtres:categorie">Catégorie</label>
                         <h:selectOneMenu id="categorie" value="#{rechercheBean.idCategorie}" styleClass="nx-select">
                             <f:selectItem itemLabel="Toutes les catégories" itemValue="#{null}" />
-                            <f:selectItems value="#{rechercheBean.categoriesRacines}" var="c" itemLabel="#{c.nom}" itemValue="#{c.id}" />
+                            <f:selectItems value="#{rechercheBean.categoriesChoix}" var="c" itemLabel="#{c.nom}" itemValue="#{c.id}" />
                             <f:converter converterId="jakarta.faces.Long" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="filtres:nature">Produits ou services</label>
+                        <h:selectOneMenu id="nature" value="#{rechercheBean.nature}" styleClass="nx-select">
+                            <f:selectItem itemLabel="Tout" itemValue="" />
+                            <f:selectItem itemLabel="Produits" itemValue="PRODUIT" />
+                            <f:selectItem itemLabel="Services" itemValue="SERVICE" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="nx-field">
+                        <label>Prix (FCFA)</label>
+                        <div class="nx-prix-bornes">
+                            <h:inputText id="prixMin" value="#{rechercheBean.prixMin}" styleClass="nx-input"
+                                         placeholder="#{rechercheBean.facettes.prixMin() != null ? 'Min '.concat(format.prix(rechercheBean.facettes.prixMin())) : 'Min'}"
+                                         converterMessage="Le prix minimum doit être un nombre." />
+                            <h:inputText id="prixMax" value="#{rechercheBean.prixMax}" styleClass="nx-input"
+                                         placeholder="#{rechercheBean.facettes.prixMax() != null ? 'Max '.concat(format.prix(rechercheBean.facettes.prixMax())) : 'Max'}"
+                                         converterMessage="Le prix maximum doit être un nombre." />
+                        </div>
+                    </div>
+
+                    <!-- Caractéristiques présentes dans les résultats : tailles, couleurs, matière… -->
+                    <ui:repeat var="fc" value="#{rechercheBean.facettes.caracteristiques()}">
+                        <div class="nx-field">
+                            <label>#{fc.nom()}</label>
+                            <div class="nx-chips nx-chips-compacts">
+                                <ui:repeat var="v" value="#{fc.valeurs()}">
+                                    <label class="nx-chip">
+                                        <h:selectBooleanCheckbox value="#{rechercheBean.coches[v.id()]}" />
+                                        <ui:fragment rendered="#{v.couleur() != null}"><span class="nx-teinte" style="background:#{v.couleur()};"></span></ui:fragment>
+                                        #{v.libelle()} <span class="nx-chip-compte">#{v.nombre()}</span>
+                                    </label>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                    </ui:repeat>
+
+                    <div class="nx-field">
+                        <label for="filtres:noteMin">Note de l'espace</label>
+                        <h:selectOneMenu id="noteMin" value="#{rechercheBean.noteMin}" styleClass="nx-select">
+                            <f:selectItem itemLabel="Toutes les notes" itemValue="" />
+                            <f:selectItem itemLabel="4,5 ★ et plus" itemValue="4.5" />
+                            <f:selectItem itemLabel="4 ★ et plus" itemValue="4" />
+                            <f:selectItem itemLabel="3 ★ et plus" itemValue="3" />
+                        </h:selectOneMenu>
+                    </div>
+
+                    <div class="nx-field">
+                        <label for="filtres:etat">État</label>
+                        <h:selectOneMenu id="etat" value="#{rechercheBean.etat}" styleClass="nx-select">
+                            <f:selectItem itemLabel="Neuf ou occasion" itemValue="" />
+                            <f:selectItem itemLabel="Neuf" itemValue="NEUF" />
+                            <f:selectItem itemLabel="Occasion" itemValue="OCCASION" />
                         </h:selectOneMenu>
                     </div>
 
@@ -65,51 +138,69 @@
                     </div>
 
                     <div class="nx-field">
-                        <label for="filtres:commune">Commune / ville</label>
-                        <h:inputText id="commune" value="#{rechercheBean.commune}" placeholder="Dakar, Thiès, Saly…" styleClass="nx-input" />
+                        <label for="filtres:commune">Commune / quartier</label>
+                        <h:inputText id="commune" value="#{rechercheBean.commune}" placeholder="Plateau, Médina, Thiès…" styleClass="nx-input" />
                     </div>
 
-                    <div class="nx-field">
-                        <label for="filtres:prixMax">Prix maximum (FCFA)</label>
-                        <h:inputText id="prixMax" value="#{rechercheBean.prixMax}" styleClass="nx-input" />
-                    </div>
-
-                    <div class="nx-field">
-                        <label class="nx-field-check">
-                            <h:selectBooleanCheckbox value="#{rechercheBean.verifieUniquement}" />
-                            Espaces vérifiés uniquement
-                        </label>
-                    </div>
-
-                    <div class="nx-field">
-                        <label class="nx-field-check">
-                            <h:selectBooleanCheckbox id="ouvertMaintenant" value="#{rechercheBean.ouvertMaintenant}" />
-                            Ouverts maintenant
-                        </label>
-                    </div>
-
-                    <div class="nx-field">
-                        <label for="filtres:tri">Trier par</label>
-                        <h:selectOneMenu id="tri" value="#{rechercheBean.tri}" styleClass="nx-select">
-                            <f:selectItem itemLabel="Pertinence" itemValue="PERTINENCE" />
-                            <f:selectItem itemLabel="Prix croissant" itemValue="PRIX_ASC" />
-                            <f:selectItem itemLabel="Prix décroissant" itemValue="PRIX_DESC" />
-                            <f:selectItem itemLabel="Plus récents" itemValue="DATE_DESC" />
-                            <f:selectItem itemLabel="Mieux notés" itemValue="NOTE" />
-                        </h:selectOneMenu>
+                    <div class="nx-field nx-cases">
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.promo}" /> En promotion</label>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.negociable}" /> Prix négociable</label>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.domicile}" /> Intervention à domicile</label>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox id="ouvertMaintenant" value="#{rechercheBean.ouvertMaintenant}" /> Ouverts maintenant</label>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.verifieUniquement}" /> Espaces vérifiés uniquement</label>
                     </div>
 
                     <h:commandButton value="Appliquer" action="#{rechercheBean.rechercher}" styleClass="nx-button nx-button-primary nx-button-block" />
                     <h:commandButton value="Réinitialiser" action="#{rechercheBean.reinitialiser}"
                                       styleClass="nx-button nx-button-outline-dark nx-button-block" style="margin-top:8px;" />
-                </div>
+                </details>
             </h:form>
 
             <div>
                 <div class="nx-results-header">
-                    <h2>#{rechercheBean.lieuChoisi != null ? 'Commerces autour de '.concat(rechercheBean.lieuChoisi.nom) : 'Résultats de recherche'}</h2>
+                    <h2>#{rechercheBean.positionActive ? 'Autour de vous' : (rechercheBean.lieuChoisi != null ? 'Commerces autour de '.concat(rechercheBean.lieuChoisi.nom) : 'Résultats de recherche')}</h2>
                     <span class="nx-results-count">#{rechercheBean.total} résultat(s)</span>
                 </div>
+
+                <!-- Tris (§17) : « Plus proches » demande la position quand il n'y a ni lieu ni position -->
+                <h:form id="tris">
+                    <div class="nx-tris" role="group" aria-label="Trier les résultats">
+                        <span>Trier :</span>
+                        <ui:repeat var="t" value="#{rechercheBean.tris}">
+                            <ui:fragment rendered="#{t.code() != 'DISTANCE' or rechercheBean.autourDunPoint}">
+                                <h:commandLink action="#{rechercheBean.choisirTri(t.code())}" value="#{t.libelle()}"
+                                               styleClass="nx-tri #{rechercheBean.tri == t.code() ? 'actif' : ''}" />
+                            </ui:fragment>
+                            <ui:fragment rendered="#{t.code() == 'DISTANCE' and !rechercheBean.autourDunPoint}">
+                                <a href="#" class="nx-tri" onclick="nexoraAutourDeMoi(); return false;">#{t.libelle()}</a>
+                            </ui:fragment>
+                        </ui:repeat>
+                    </div>
+
+                    <ui:fragment rendered="#{rechercheBean.facettes.categories().size() gt 1}">
+                        <div class="nx-tris nx-affiner">
+                            <span>Affiner :</span>
+                            <ui:repeat var="fc" value="#{rechercheBean.facettes.categories()}">
+                                <h:commandLink action="#{rechercheBean.affinerCategorie(fc.id())}" styleClass="nx-pastille">
+                                    #{fc.nom()} <span class="nx-compte">#{fc.nombre()}</span>
+                                </h:commandLink>
+                            </ui:repeat>
+                        </div>
+                    </ui:fragment>
+
+                    <ui:fragment rendered="#{rechercheBean.positionActive}">
+                        <div class="nx-card nx-lieu-choisi">
+                            <div class="nx-lieu-rayons" style="margin-top:0;">
+                                <span>Autour de vous, à moins de</span>
+                                <ui:repeat var="r" value="#{rechercheBean.rayons}">
+                                    <h:commandLink action="#{rechercheBean.choisirRayon(r)}" value="#{rechercheBean.libelleRayon(r)}"
+                                                   styleClass="nx-pastille #{r == rechercheBean.rayonKm ? 'active' : ''}" />
+                                </ui:repeat>
+                            </div>
+                            <h:commandLink action="#{rechercheBean.quitterPosition}" styleClass="nx-lien-discret" value="Ne plus utiliser ma position" />
+                        </div>
+                    </ui:fragment>
+                </h:form>
 
                 <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
 
@@ -197,12 +288,12 @@
                                 <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>
                             </svg>
                         </div>
-                        <ui:fragment rendered="#{rechercheBean.lieuChoisi == null}">
+                        <ui:fragment rendered="#{!rechercheBean.autourDunPoint}">
                             <p><strong>Aucun résultat pour cette recherche.</strong></p>
                             <p>Essayez un autre mot-clé, une autre catégorie ou élargissez la zone géographique.</p>
                         </ui:fragment>
-                        <ui:fragment rendered="#{rechercheBean.lieuChoisi != null}">
-                            <p><strong>Aucun commerce sur Nexora à moins de #{rechercheBean.libelleRayon(rechercheBean.rayonKm)} de ce lieu.</strong></p>
+                        <ui:fragment rendered="#{rechercheBean.autourDunPoint}">
+                            <p><strong>Aucun résultat à moins de #{rechercheBean.libelleRayon(rechercheBean.rayonKm)} #{rechercheBean.positionActive ? 'de vous' : 'de ce lieu'}.</strong></p>
                             <p>Élargissez la zone ci-dessus (jusqu'à 5 km) ou retirez des filtres.</p>
                         </ui:fragment>
                     </div>
@@ -229,5 +320,33 @@
         </div>
     </div>
 
+    <script>
+        // « Autour de moi » : la position reste dans le navigateur jusqu'à l'envoi du formulaire de recherche.
+        function nexoraAutourDeMoi() {
+            var erreur = document.getElementById('nx-position-erreur');
+            function afficher(message) {
+                if (erreur) { erreur.textContent = message; erreur.style.display = 'block'; }
+                alert(message);
+            }
+            if (!navigator.geolocation) {
+                afficher("Votre navigateur ne sait pas donner votre position. Choisissez un quartier ou un lieu (ex. « Sandaga »).");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(function (p) {
+                document.getElementById('filtres:maLat').value = p.coords.latitude.toFixed(6);
+                document.getElementById('filtres:maLng').value = p.coords.longitude.toFixed(6);
+                document.getElementById('filtres:autourDeMoi').click();
+            }, function (e) {
+                afficher(e.code === 1
+                    ? "Vous avez refusé de partager votre position. Autorisez-la dans le navigateur, ou cherchez un quartier ou un lieu (ex. « Sandaga »)."
+                    : "Votre position n'a pas pu être trouvée. Réessayez, ou cherchez un quartier ou un lieu.");
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+        }
+        // Sur téléphone, les filtres sont repliés pour laisser voir les résultats.
+        if (window.matchMedia('(max-width: 900px)').matches) {
+            var f = document.querySelector('.nx-filtres-repliables');
+            if (f) f.removeAttribute('open');
+        }
+    </script>
 </ui:define>
 </ui:composition>

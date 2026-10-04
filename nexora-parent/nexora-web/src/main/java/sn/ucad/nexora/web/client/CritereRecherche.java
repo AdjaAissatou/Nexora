@@ -27,14 +27,31 @@ public record CritereRecherche(
         /** Autour d'un point (lieu public) : latitude, longitude et rayon en km. */
         BigDecimal lat,
         BigDecimal lng,
-        Double rayonKm) {
+        Double rayonKm,
+        /** Filtres avancés (§17) : note minimale, neuf/occasion, négociable, à domicile, caractéristiques. */
+        BigDecimal noteMin,
+        Boolean neuf,
+        Boolean negociable,
+        Boolean domicile,
+        java.util.List<Long> valeurs) {
+
+    public CritereRecherche(String q, String categorie, Long idCategorie, String typeEspace, String commune,
+                            String region, Long idEspace, BigDecimal prixMin, BigDecimal prixMax,
+                            Boolean estProduit, Boolean avecPromotion, Boolean espaceVerifie,
+                            Boolean ouvertMaintenant, String tri, int page, int taille,
+                            BigDecimal lat, BigDecimal lng, Double rayonKm) {
+        this(q, categorie, idCategorie, typeEspace, commune, region, idEspace, prixMin, prixMax, estProduit,
+                avecPromotion, espaceVerifie, ouvertMaintenant, tri, page, taille, lat, lng, rayonKm,
+                null, null, null, null, null);
+    }
 
     public CritereRecherche(String q, String categorie, Long idCategorie, String typeEspace, String commune,
                             String region, Long idEspace, BigDecimal prixMin, BigDecimal prixMax,
                             Boolean estProduit, Boolean avecPromotion, Boolean espaceVerifie,
                             Boolean ouvertMaintenant, String tri, int page, int taille) {
         this(q, categorie, idCategorie, typeEspace, commune, region, idEspace, prixMin, prixMax, estProduit,
-                avecPromotion, espaceVerifie, ouvertMaintenant, tri, page, taille, null, null, null);
+                avecPromotion, espaceVerifie, ouvertMaintenant, tri, page, taille, null, null, null,
+                null, null, null, null, null);
     }
 
     public static CritereRecherche vide() {

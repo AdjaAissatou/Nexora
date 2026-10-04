@@ -1363,6 +1363,32 @@ Données : `04_catalogue/18_synonyme_recherche.sql`, `09_seed/30_synonymes_reche
 de démonstration rangées dans « Services » ou « Transport » (racine) vont dans Plomberie,
 Menuiserie bois, Livraison colis, VTC, Location avec chauffeur (`29_demo_caracteristiques.sql`).
 
+## 17. ✅ Tris et filtres de recherche
+
+**Tris** (barre au-dessus des résultats) : Pertinence · **Plus proches** · **Moins chers** ·
+**Plus vendus** · Mieux notés · Nouveautés · Meilleures remises · Plus chers.
+- *Plus proches* : autour du lieu reconnu (« Sandaga ») ou de **votre position** ; sans l'un ni
+  l'autre, le bouton demande la position au navigateur.
+- *Plus vendus* : quantité vendue (commandes non annulées ni remboursées), puis favoris, puis
+  consultations ; tant qu'il n'y a pas de ventes, c'est la popularité qui classe. La carte d'un
+  article affiche « N vendu(s) » dès la première vente.
+- *Meilleures remises* : écart entre le prix barré et le prix.
+
+**Filtres** : texte ; **Autour de moi** (position du navigateur, rayon 500 m à 5 km, « Ne plus
+utiliser ma position ») ; catégorie, et **Affiner** par les sous-catégories présentes dans les
+résultats ; produits ou services ; **prix minimum et maximum** (fourchette des résultats en
+indication) ; **caractéristiques** présentes dans les résultats, avec leurs comptes (tailles,
+couleurs avec pastille, matière, pointures…) — plusieurs valeurs d'une même caractéristique =
+l'une ou l'autre, plusieurs caractéristiques = toutes ; une taille ou couleur **épuisée ne compte
+pas** ; **note minimale** de l'espace ; **neuf ou occasion** ; en promotion (promotion en cours
+ou prix barré) ; prix négociable ; intervention à domicile ; ouverts maintenant ; espaces vérifiés.
+Sur téléphone, les filtres sont repliés (avec le nombre de filtres actifs) et les tris défilent.
+
+API : `GET /api/v1/offres/recherche` accepte `noteMin`, `neuf`, `negociable`, `domicile`,
+`valeurs` (id de valeurs, répétable) et les tris `POPULARITE`, `REMISE` ; chaque résultat porte
+`nombreVentes`. `GET /api/v1/offres/recherche/facettes` (mêmes paramètres) : catégories et
+valeurs de caractéristiques présentes dans les résultats, avec leurs comptes, et la fourchette de prix.
+
 ---
-*Dernière mise à jour : session du 04/10/2026, caractéristiques des articles (inspirées de
-DressIT), page Explorer, recherche autour d'un lieu, recherche par mots tolérante.*
+*Dernière mise à jour : session du 04/10/2026, caractéristiques des articles, page Explorer,
+recherche autour d'un lieu, recherche tolérante, tris et filtres de recherche.*

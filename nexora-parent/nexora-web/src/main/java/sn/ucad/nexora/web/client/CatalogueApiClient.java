@@ -46,33 +46,55 @@ public class CatalogueApiClient {
         }
     }
 
+    /** Paramètres de recherche communs à la recherche et à ses facettes. */
+    private static org.springframework.web.util.UriBuilder critere(org.springframework.web.util.UriBuilder uriBuilder, CritereRecherche c) {
+        return uriBuilder
+                .queryParamIfPresent("q", java.util.Optional.ofNullable(vide(c.q())))
+                .queryParamIfPresent("categorie", java.util.Optional.ofNullable(vide(c.categorie())))
+                .queryParamIfPresent("idCategorie", java.util.Optional.ofNullable(c.idCategorie()))
+                .queryParamIfPresent("typeEspace", java.util.Optional.ofNullable(vide(c.typeEspace())))
+                .queryParamIfPresent("commune", java.util.Optional.ofNullable(vide(c.commune())))
+                .queryParamIfPresent("region", java.util.Optional.ofNullable(vide(c.region())))
+                .queryParamIfPresent("idEspace", java.util.Optional.ofNullable(c.idEspace()))
+                .queryParamIfPresent("prixMin", java.util.Optional.ofNullable(c.prixMin()))
+                .queryParamIfPresent("prixMax", java.util.Optional.ofNullable(c.prixMax()))
+                .queryParamIfPresent("estProduit", java.util.Optional.ofNullable(c.estProduit()))
+                .queryParamIfPresent("avecPromotion", java.util.Optional.ofNullable(c.avecPromotion()))
+                .queryParamIfPresent("espaceVerifie", java.util.Optional.ofNullable(c.espaceVerifie()))
+                .queryParamIfPresent("ouvertMaintenant", java.util.Optional.ofNullable(c.ouvertMaintenant()))
+                .queryParamIfPresent("lat", java.util.Optional.ofNullable(c.lat()))
+                .queryParamIfPresent("lng", java.util.Optional.ofNullable(c.lng()))
+                .queryParamIfPresent("rayonKm", java.util.Optional.ofNullable(c.rayonKm()))
+                .queryParamIfPresent("noteMin", java.util.Optional.ofNullable(c.noteMin()))
+                .queryParamIfPresent("neuf", java.util.Optional.ofNullable(c.neuf()))
+                .queryParamIfPresent("negociable", java.util.Optional.ofNullable(c.negociable()))
+                .queryParamIfPresent("domicile", java.util.Optional.ofNullable(c.domicile()))
+                .queryParam("valeurs", c.valeurs() == null ? new Object[0] : c.valeurs().toArray())
+                .queryParam("tri", c.tri() == null ? "PERTINENCE" : c.tri())
+                .queryParam("page", c.page())
+                .queryParam("taille", c.taille());
+    }
+
+    /** Catégories et caractéristiques (tailles, couleurs…) présentes dans les résultats (§17). */
+    public sn.ucad.nexora.web.dto.catalogue.FacettesResponse facettes(CritereRecherche c) {
+        try {
+            return client.get()
+                    .uri(uriBuilder -> critere(uriBuilder.path("/api/v1/offres/recherche/facettes"), c).build())
+                    .retrieve()
+                    .body(sn.ucad.nexora.web.dto.catalogue.FacettesResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
     public OffrePageResponse rechercher(CritereRecherche c) {
         LOG.info("Requête GET {}/api/v1/offres/recherche ({})", baseUrl, c);
         try {
             return client
                     .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/api/v1/offres/recherche")
-                            .queryParamIfPresent("q", java.util.Optional.ofNullable(vide(c.q())))
-                            .queryParamIfPresent("categorie", java.util.Optional.ofNullable(vide(c.categorie())))
-                            .queryParamIfPresent("idCategorie", java.util.Optional.ofNullable(c.idCategorie()))
-                            .queryParamIfPresent("typeEspace", java.util.Optional.ofNullable(vide(c.typeEspace())))
-                            .queryParamIfPresent("commune", java.util.Optional.ofNullable(vide(c.commune())))
-                            .queryParamIfPresent("region", java.util.Optional.ofNullable(vide(c.region())))
-                            .queryParamIfPresent("idEspace", java.util.Optional.ofNullable(c.idEspace()))
-                            .queryParamIfPresent("prixMin", java.util.Optional.ofNullable(c.prixMin()))
-                            .queryParamIfPresent("prixMax", java.util.Optional.ofNullable(c.prixMax()))
-                            .queryParamIfPresent("estProduit", java.util.Optional.ofNullable(c.estProduit()))
-                            .queryParamIfPresent("avecPromotion", java.util.Optional.ofNullable(c.avecPromotion()))
-                            .queryParamIfPresent("espaceVerifie", java.util.Optional.ofNullable(c.espaceVerifie()))
-                            .queryParamIfPresent("ouvertMaintenant", java.util.Optional.ofNullable(c.ouvertMaintenant()))
-                            .queryParamIfPresent("lat", java.util.Optional.ofNullable(c.lat()))
-                            .queryParamIfPresent("lng", java.util.Optional.ofNullable(c.lng()))
-                            .queryParamIfPresent("rayonKm", java.util.Optional.ofNullable(c.rayonKm()))
-                            .queryParam("tri", c.tri() == null ? "PERTINENCE" : c.tri())
-                            .queryParam("page", c.page())
-                            .queryParam("taille", c.taille())
-                            .build())
+                    .uri(uriBuilder -> critere(uriBuilder.path("/api/v1/offres/recherche"), c).build())
                     .retrieve()
                     .body(OffrePageResponse.class);
         } catch (RestClientResponseException e) {

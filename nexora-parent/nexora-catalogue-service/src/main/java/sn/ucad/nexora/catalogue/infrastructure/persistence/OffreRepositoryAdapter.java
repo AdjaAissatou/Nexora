@@ -168,6 +168,20 @@ public class OffreRepositoryAdapter implements OffreRepository {
         return parRacine;
     }
 
+    /** Valeurs choisies regroupées par caractéristique (OU dans un groupe, ET entre groupes). */
+    @SuppressWarnings("unchecked")
+    private List<List<Long>> valeursParAttribut(List<Long> valeurs) {
+        if (valeurs == null || valeurs.isEmpty()) return List.of();
+        List<Object[]> lignes = em.createNativeQuery(
+                "SELECT id_attribut, id_valeur FROM valeur_attribut_possible WHERE id_valeur IN (:ids) ORDER BY id_attribut")
+                .setParameter("ids", valeurs).getResultList();
+        Map<Long, List<Long>> groupes = new LinkedHashMap<>();
+        for (Object[] l : lignes) {
+            groupes.computeIfAbsent(((Number) l[0]).longValue(), k -> new java.util.ArrayList<>()).add(((Number) l[1]).longValue());
+        }
+        return new java.util.ArrayList<>(groupes.values());
+    }
+
     /** Score : 3 par mot trouvé dans le titre (forme saisie), 2 par synonyme dans le titre, 1 ailleurs. */
     private String pertinence(List<List<String>> termes, Map<String, Object> paramMap) {
         List<String> parties = new java.util.ArrayList<>();
@@ -235,7 +249,12 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 -- Distance au point de recherche, en km (NULL hors recherche autour d'un point)
                 %s AS distance_km,
                 -- Pertinence du texte saisi : mots trouvés dans le titre d'abord (0 sans texte)
-                %p AS pertinence_texte
+                %p AS pertinence_texte,
+                -- Popularité (§17) : quantité vendue hors commandes annulées, puis favoris
+                (SELECT COALESCE(SUM(lc.quantite), 0) FROM ligne_commande lc
+                 JOIN sous_commande sc ON sc.id_sous_commande = lc.id_sous_commande
+                 WHERE lc.id_offre = o.id_offre AND CAST(sc.statut AS TEXT) NOT IN ('ANNULEE', 'REMBOURSEE')) AS ventes,
+                (SELECT COUNT(*) FROM favori f WHERE f.id_offre = o.id_offre) AS favoris
 
             FROM offre o
             JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
@@ -340,7 +359,35 @@ public class OffreRepositoryAdapter implements OffreRepository {
         }
 
         if (Boolean.TRUE.equals(params.getAvecPromotion())) {
-            sql.append(" AND p.promotion_nom IS NOT NULL ");
+            // Promotion en cours, ou prix barré (ancien prix supérieur)
+            sql.append(" AND (p.promotion_nom IS NOT NULL OR o.ancien_prix > o.prix) ");
+        }
+
+        if (params.getNoteMin() != null) {
+            sql.append(" AND ep.note_moyenne >= :noteMin ");
+            paramMap.put("noteMin", params.getNoteMin());
+        }
+
+        if (params.getNeuf() != null) {
+            sql.append(" AND EXISTS (SELECT 1 FROM produit pn WHERE pn.id_offre = o.id_offre AND pn.neuf IS NOT DISTINCT FROM :neuf) ");
+            paramMap.put("neuf", params.getNeuf());
+        }
+
+        if (Boolean.TRUE.equals(params.getNegociable())) {
+            sql.append(" AND o.negociable = TRUE ");
+        }
+
+        if (Boolean.TRUE.equals(params.getDomicile())) {
+            sql.append(" AND EXISTS (SELECT 1 FROM service sd WHERE sd.id_offre = o.id_offre AND sd.intervention_domicile = TRUE) ");
+        }
+
+        // Caractéristiques : une valeur au moins par caractéristique choisie (M ou L, et Noir), non épuisée
+        int groupe = 0;
+        for (List<Long> ids : valeursParAttribut(params.getValeurs())) {
+            sql.append(" AND EXISTS (SELECT 1 FROM offre_attribut oav WHERE oav.id_offre = o.id_offre AND oav.epuise = FALSE"
+                    + " AND oav.id_valeur IN (:valeurs").append(groupe).append(")) ");
+            paramMap.put("valeurs" + groupe, ids);
+            groupe++;
         }
 
         if (Boolean.TRUE.equals(params.getOuvertMaintenant())) {
@@ -406,6 +453,8 @@ public class OffreRepositoryAdapter implements OffreRepository {
             case "PRIX_DESC"  -> " ORDER BY prix DESC NULLS LAST ";
             case "DATE_DESC"  -> " ORDER BY date_publication DESC NULLS LAST ";
             case "NOTE"       -> " ORDER BY espace_note DESC NULLS LAST ";
+            case "POPULARITE" -> " ORDER BY ventes DESC, favoris DESC, vue_count DESC NULLS LAST, espace_note DESC NULLS LAST ";
+            case "REMISE"     -> " ORDER BY CASE WHEN ancien_prix > prix THEN (ancien_prix - prix) / ancien_prix ELSE 0 END DESC, prix ASC ";
             case "DISTANCE"   -> " ORDER BY distance_km ASC NULLS LAST, pertinence_texte DESC, score_pertinence DESC ";
             default           -> " ORDER BY pertinence_texte DESC, score_pertinence DESC, vue_count DESC ";
         };
@@ -507,9 +556,12 @@ public class OffreRepositoryAdapter implements OffreRepository {
         if (r.length > 65) {
             o.setEspaceOuvertMaintenant(r[65] == null ? null : toBool(r[65]));
         }
-        // Puis distance_km (index 66)
+        // Puis distance_km (index 66), pertinence_texte (67), ventes (68), favoris (69)
         if (r.length > 66 && r[66] != null) {
             o.setDistanceKm(Math.round(((Number) r[66]).doubleValue() * 100) / 100.0);
+        }
+        if (r.length > 68 && r[68] != null) {
+            o.setNombreVentes(((Number) r[68]).longValue());
         }
         return o;
     }

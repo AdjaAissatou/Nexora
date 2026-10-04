@@ -42,8 +42,15 @@ public class RechercheParams {
     private java.math.BigDecimal lat;
     private java.math.BigDecimal lng;
     private Double rayonKm;
+    /** Filtres avancés (§17) : note minimale de l'espace, état, prix négociable, intervention à domicile. */
+    private java.math.BigDecimal noteMin;
+    private Boolean neuf;
+    private Boolean negociable;
+    private Boolean domicile;
+    /** Valeurs de caractéristiques exigées (taille M, couleur Noir…) : id_valeur, non épuisées. */
+    private java.util.List<Long> valeurs;
 
-    /** Tri : PERTINENCE, PRIX_ASC, PRIX_DESC, DATE_DESC, NOTE, DISTANCE */
+    /** Tri : PERTINENCE, PRIX_ASC, PRIX_DESC, DATE_DESC, NOTE, DISTANCE, POPULARITE, REMISE */
     private String tri;
 
     /** Pagination */
@@ -102,4 +109,14 @@ public class RechercheParams {
     public Double getRayonKm() { return rayonKm; }
     public void setRayonKm(Double rayonKm) { this.rayonKm = rayonKm; }
     public boolean isAutourDunPoint() { return lat != null && lng != null; }
+    public java.math.BigDecimal getNoteMin() { return noteMin; }
+    public void setNoteMin(java.math.BigDecimal noteMin) { this.noteMin = noteMin; }
+    public Boolean getNeuf() { return neuf; }
+    public void setNeuf(Boolean neuf) { this.neuf = neuf; }
+    public Boolean getNegociable() { return negociable; }
+    public void setNegociable(Boolean negociable) { this.negociable = negociable; }
+    public Boolean getDomicile() { return domicile; }
+    public void setDomicile(Boolean domicile) { this.domicile = domicile; }
+    public java.util.List<Long> getValeurs() { return valeurs; }
+    public void setValeurs(java.util.List<Long> valeurs) { this.valeurs = valeurs; }
 }

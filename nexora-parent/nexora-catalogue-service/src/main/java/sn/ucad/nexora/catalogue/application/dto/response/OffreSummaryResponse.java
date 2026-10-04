@@ -23,6 +23,8 @@ public class OffreSummaryResponse {
     private Boolean espaceOuvertMaintenant;
     /** Distance au point de recherche (km), null hors recherche autour d'un point. */
     private Double distanceKm;
+    /** Quantité vendue (commandes non annulées) : « 12 vendus ». */
+    private long nombreVentes;
 
     // Espace
     private Long espaceId;
@@ -103,4 +105,6 @@ public class OffreSummaryResponse {
     public void setMotifModeration(String motifModeration) { this.motifModeration = motifModeration; }
     public Double getDistanceKm() { return distanceKm; }
     public void setDistanceKm(Double distanceKm) { this.distanceKm = distanceKm; }
+    public long getNombreVentes() { return nombreVentes; }
+    public void setNombreVentes(long nombreVentes) { this.nombreVentes = nombreVentes; }
 }

@@ -186,7 +186,22 @@ public class OffreController {
             @Parameter(description = "Rayon autour du point, en km (2 par défaut, 50 au plus)")
             @RequestParam(required = false) Double rayonKm,
 
-            @Parameter(description = "Tri : PERTINENCE | PRIX_ASC | PRIX_DESC | DATE_DESC | NOTE | DISTANCE")
+            @Parameter(description = "Note minimale de l'espace (sur 5)")
+            @RequestParam(required = false) BigDecimal noteMin,
+
+            @Parameter(description = "true = neuf, false = occasion (produits)")
+            @RequestParam(required = false) Boolean neuf,
+
+            @Parameter(description = "Uniquement les prix négociables")
+            @RequestParam(required = false) Boolean negociable,
+
+            @Parameter(description = "Uniquement les services avec intervention à domicile")
+            @RequestParam(required = false) Boolean domicile,
+
+            @Parameter(description = "Valeurs de caractéristiques exigées (id_valeur : taille, couleur…), non épuisées")
+            @RequestParam(required = false) java.util.List<Long> valeurs,
+
+            @Parameter(description = "Tri : PERTINENCE | PRIX_ASC | PRIX_DESC | DATE_DESC | NOTE | DISTANCE | POPULARITE | REMISE")
             @RequestParam(defaultValue = "PERTINENCE") String tri,
 
             @Parameter(description = "Numéro de page (0-based)")
@@ -212,6 +227,11 @@ public class OffreController {
         request.setLat(lat);
         request.setLng(lng);
         request.setRayonKm(rayonKm);
+        request.setNoteMin(noteMin);
+        request.setNeuf(neuf);
+        request.setNegociable(negociable);
+        request.setDomicile(domicile);
+        request.setValeurs(valeurs);
         request.setTri(tri);
         request.setPage(page);
         request.setTaille(Math.min(taille, 100));

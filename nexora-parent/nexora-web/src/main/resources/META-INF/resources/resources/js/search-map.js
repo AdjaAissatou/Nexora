@@ -6,6 +6,7 @@
  */
 (function () {
     function couleurMarqueur(categorie) {
+        if (categorie === 'POSITION') return '#1F5FBF';
         return categorie === 'OFFRE' || categorie === 'ESPACE' ? '#1f5f4a' : '#b3562f';
     }
 

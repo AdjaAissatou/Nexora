@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 "/api/v1/categories/**",
                                 "/api/v1/lieux-publics/**",
                                 "/api/v1/explorer",
+                                "/api/v1/offres/recherche/facettes",
                                 "/api/v1/offres/{id:\\d+}/similaires",
                                 "/api/v1/offres/suggestions"
                         ).permitAll()

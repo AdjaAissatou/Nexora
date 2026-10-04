@@ -46,8 +46,27 @@ public class RechercherOffresService implements RechercherOffresUseCase {
 
     @Override
     public OffrePageResponse rechercher(OffreSearchRequest request) {
+        RechercheParams params = versParams(request);
 
-        // Construire les paramètres de recherche domaine
+        // Appel du repository
+        List<Offre> offres = offreRepository.search(params);
+        return page(request, offres);
+    }
+
+    /**
+     * Identifiants des offres correspondant à une recherche, sans tenir compte des caractéristiques
+     * choisies : sert aux facettes (§17), qui doivent proposer toutes les tailles, couleurs… possibles.
+     */
+    public List<Long> idsCorrespondants(OffreSearchRequest request, int max) {
+        RechercheParams params = versParams(request);
+        params.setValeurs(null);
+        params.setTri("PERTINENCE");
+        params.setPage(0);
+        params.setTaille(max);
+        return offreRepository.search(params).stream().map(Offre::getId).toList();
+    }
+
+    private RechercheParams versParams(OffreSearchRequest request) {
         RechercheParams params = new RechercheParams();
         params.setQ(request.getQ());
         params.setCategorie(request.getCategorie());
@@ -65,13 +84,18 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         params.setLat(request.getLat());
         params.setLng(request.getLng());
         params.setRayonKm(request.getRayonKm());
+        params.setNoteMin(request.getNoteMin());
+        params.setNeuf(request.getNeuf());
+        params.setNegociable(request.getNegociable());
+        params.setDomicile(request.getDomicile());
+        params.setValeurs(request.getValeurs());
         params.setTri(request.getTri());
         params.setPage(request.getPage());
         params.setTaille(request.getTaille());
+        return params;
+    }
 
-        // Appel du repository
-        List<Offre> offres = offreRepository.search(params);
-
+    private OffrePageResponse page(OffreSearchRequest request, List<Offre> offres) {
         // Mapper vers DTO résumé
         List<OffreSummaryResponse> items = offres.stream()
                 .map(this::toSummary)
@@ -127,6 +151,7 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         r.setMotifModeration(o.getMotifModeration());
         r.setEspaceOuvertMaintenant(o.getEspaceOuvertMaintenant());
         r.setDistanceKm(o.getDistanceKm());
+        r.setNombreVentes(o.getNombreVentes());
         r.setEspaceId(o.getEspaceId());
         r.setEspaceNom(o.getEspaceNom());
         r.setEspaceLogo(o.getEspaceLogo());

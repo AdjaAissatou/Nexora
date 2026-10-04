@@ -102,6 +102,7 @@ POST /api/v1/offres/recherche-photo          (multipart, champ « photo »)
 GET  /api/v1/offres/{id}/similaires          (le même genre d'article dans d'autres espaces)
 GET  /api/v1/offres/recherche?lat=..&lng=..&rayonKm=1   (autour d'un lieu, tri par distance)
 GET  /api/v1/explorer                       (page Explorer : rayons, quartiers, lieux, carte)
+GET  /api/v1/offres/recherche/facettes      (tailles, couleurs, catégories présentes dans les résultats)
 GET  /api/v1/lieux-publics/{id}
 GET  /api/v1/offres/suggestions?offres=1,2   (vous pourriez aussi aimer)
 ```
