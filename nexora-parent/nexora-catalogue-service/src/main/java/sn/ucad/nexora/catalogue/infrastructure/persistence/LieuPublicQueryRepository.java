@@ -28,7 +28,9 @@ public class LieuPublicQueryRepository {
                        latitude, longitude, description
                 FROM lieu_public
                 WHERE actif = TRUE
-                  AND (CAST(:q AS TEXT) IS NULL OR nom ILIKE '%' || CAST(:q AS TEXT) || '%')
+                  -- Sans accents : « tilene » trouve « Marché Tilène »
+                  AND (CAST(:q AS TEXT) IS NULL OR translate(lower(nom), :accents, :sans)
+                       LIKE '%' || translate(lower(CAST(:q AS TEXT)), :accents, :sans) || '%')
                   AND (CAST(:commune AS TEXT) IS NULL OR commune ILIKE CAST(:commune AS TEXT))
                   AND (CAST(:typeLieu AS TEXT) IS NULL OR type_lieu = CAST(:typeLieu AS TEXT))
                 ORDER BY nom
@@ -38,9 +40,24 @@ public class LieuPublicQueryRepository {
         query.setParameter("commune", vide(commune));
         query.setParameter("typeLieu", vide(typeLieu));
         query.setParameter("limite", limite);
+        query.setParameter("accents", ACCENTS);
+        query.setParameter("sans", SANS_ACCENTS);
         List<Object[]> rows = query.getResultList();
         return rows.stream().map(this::mapper).toList();
     }
+
+    @SuppressWarnings("unchecked")
+    public java.util.Optional<LieuPublicResponse> parId(Long id) {
+        List<Object[]> rows = em.createNativeQuery("""
+                SELECT id_lieu, nom, type_lieu, region, departement, commune, adresse_complete,
+                       latitude, longitude, description
+                FROM lieu_public WHERE id_lieu = :id AND actif = TRUE
+                """).setParameter("id", id).getResultList();
+        return rows.stream().findFirst().map(this::mapper);
+    }
+
+    private static final String ACCENTS = "éèêëàâäîïôöûüùçœ";
+    private static final String SANS_ACCENTS = "eeeeaaaiioouuuco";
 
     private String vide(String s) {
         return s == null || s.isBlank() ? null : s.trim();

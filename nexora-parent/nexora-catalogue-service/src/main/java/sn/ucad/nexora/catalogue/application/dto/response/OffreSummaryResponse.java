@@ -21,6 +21,8 @@ public class OffreSummaryResponse {
     private String motifModeration;
     /** Ouvert en ce moment : null si l'espace n'a pas renseigné ses horaires (§10). */
     private Boolean espaceOuvertMaintenant;
+    /** Distance au point de recherche (km), null hors recherche autour d'un point. */
+    private Double distanceKm;
 
     // Espace
     private Long espaceId;
@@ -99,4 +101,6 @@ public class OffreSummaryResponse {
     public void setEspaceOuvertMaintenant(Boolean v) { this.espaceOuvertMaintenant = v; }
     public String getMotifModeration() { return motifModeration; }
     public void setMotifModeration(String motifModeration) { this.motifModeration = motifModeration; }
+    public Double getDistanceKm() { return distanceKm; }
+    public void setDistanceKm(Double distanceKm) { this.distanceKm = distanceKm; }
 }

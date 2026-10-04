@@ -30,6 +30,10 @@ public class OffreSearchRequest {
     private Boolean espaceVerifie;
     /** Uniquement les espaces ouverts en ce moment (horaires renseignés, heure de Dakar, §10). */
     private Boolean ouvertMaintenant;
+    /** Autour d'un point : latitude, longitude, rayon en km. */
+    private BigDecimal lat;
+    private BigDecimal lng;
+    private Double rayonKm;
 
     /** PERTINENCE | PRIX_ASC | PRIX_DESC | DATE_DESC | NOTE */
     private String tri = "PERTINENCE";
@@ -64,6 +68,12 @@ public class OffreSearchRequest {
     public void setAvecPromotion(Boolean avecPromotion) { this.avecPromotion = avecPromotion; }
     public Boolean getOuvertMaintenant() { return ouvertMaintenant; }
     public void setOuvertMaintenant(Boolean ouvertMaintenant) { this.ouvertMaintenant = ouvertMaintenant; }
+    public BigDecimal getLat() { return lat; }
+    public void setLat(BigDecimal lat) { this.lat = lat; }
+    public BigDecimal getLng() { return lng; }
+    public void setLng(BigDecimal lng) { this.lng = lng; }
+    public Double getRayonKm() { return rayonKm; }
+    public void setRayonKm(Double rayonKm) { this.rayonKm = rayonKm; }
     public Boolean getEspaceVerifie() { return espaceVerifie; }
     public void setEspaceVerifie(Boolean espaceVerifie) { this.espaceVerifie = espaceVerifie; }
     public String getTri() { return tri; }

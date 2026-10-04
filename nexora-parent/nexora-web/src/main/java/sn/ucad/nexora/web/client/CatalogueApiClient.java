@@ -66,6 +66,9 @@ public class CatalogueApiClient {
                             .queryParamIfPresent("avecPromotion", java.util.Optional.ofNullable(c.avecPromotion()))
                             .queryParamIfPresent("espaceVerifie", java.util.Optional.ofNullable(c.espaceVerifie()))
                             .queryParamIfPresent("ouvertMaintenant", java.util.Optional.ofNullable(c.ouvertMaintenant()))
+                            .queryParamIfPresent("lat", java.util.Optional.ofNullable(c.lat()))
+                            .queryParamIfPresent("lng", java.util.Optional.ofNullable(c.lng()))
+                            .queryParamIfPresent("rayonKm", java.util.Optional.ofNullable(c.rayonKm()))
                             .queryParam("tri", c.tri() == null ? "PERTINENCE" : c.tri())
                             .queryParam("page", c.page())
                             .queryParam("taille", c.taille())
@@ -254,6 +257,33 @@ public class CatalogueApiClient {
         } catch (Exception e) {
             LOG.warn("Articles similaires indisponibles pour l'offre {} : {}", idOffre, e.getMessage());
             return List.of();
+        }
+    }
+
+    /** Un lieu public par son identifiant ; vide s'il n'existe pas (ou plus). */
+    public java.util.Optional<LieuPublicResponse> lieuPublic(Long id) {
+        LOG.info("Requête GET {}/api/v1/lieux-publics/{}", baseUrl, id);
+        try {
+            return java.util.Optional.ofNullable(client.get().uri("/api/v1/lieux-publics/{id}", id)
+                    .retrieve().body(LieuPublicResponse.class));
+        } catch (RestClientResponseException e) {
+            if (e.getStatusCode().value() == 404) return java.util.Optional.empty();
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
+
+    /** Vue d'ensemble de la page « Explorer ». */
+    public sn.ucad.nexora.web.dto.catalogue.ExplorerResponse explorer() {
+        LOG.info("Requête GET {}/api/v1/explorer", baseUrl);
+        try {
+            return client.get().uri("/api/v1/explorer").retrieve()
+                    .body(sn.ucad.nexora.web.dto.catalogue.ExplorerResponse.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
         }
     }
 

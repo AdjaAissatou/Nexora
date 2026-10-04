@@ -116,6 +116,36 @@ public class FormatBean implements Serializable {
     }
 
     /** Lien "obtenir l'itinéraire" vers Google Maps — aucune clé d'API requise, s'ouvre dans l'appli Maps du visiteur. */
+    /** « à 350 m », « à 2,1 km » ; vide sans distance. */
+    public String distance(Double km) {
+        if (km == null) return "";
+        if (km < 1) return "à " + Math.max(10, Math.round(km * 100) * 10) + " m";
+        return "à " + String.format(Locale.FRANCE, "%.1f", km) + " km";
+    }
+
+    /** Libellé d'un type de lieu public : MARCHE → « Marché ». */
+    public String typeLieu(String type) {
+        if (type == null) return "";
+        return switch (type) {
+            case "MARCHE" -> "Marché";
+            case "HOPITAL" -> "Hôpital";
+            case "ADMINISTRATION" -> "Administration";
+            case "MOSQUEE" -> "Mosquée";
+            case "MONUMENT" -> "Monument";
+            case "GARE_ROUTIERE" -> "Gare routière";
+            case "EGLISE" -> "Église";
+            case "AEROPORT" -> "Aéroport";
+            case "UNIVERSITE" -> "Université";
+            case "PHARMACIE" -> "Pharmacie";
+            case "PLAGE" -> "Plage";
+            case "GARE" -> "Gare";
+            case "BANQUE" -> "Banque";
+            case "STADE" -> "Stade";
+            case "PORT" -> "Port";
+            default -> type.charAt(0) + type.substring(1).toLowerCase(Locale.ROOT).replace('_', ' ');
+        };
+    }
+
     public String lienItineraire(BigDecimal latitude, BigDecimal longitude) {
         if (latitude == null || longitude == null) return "";
         return String.format(Locale.ROOT, "https://www.google.com/maps/dir/?api=1&destination=%s,%s", latitude, longitude);

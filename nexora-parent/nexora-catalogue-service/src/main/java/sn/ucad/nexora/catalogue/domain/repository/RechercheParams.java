@@ -38,7 +38,12 @@ public class RechercheParams {
     private Boolean espaceVerifie;
     private Boolean ouvertMaintenant;
 
-    /** Tri : PERTINENCE, PRIX_ASC, PRIX_DESC, DATE_DESC, NOTE */
+    /** Autour d'un point (lieu public, position) : rayon en km ; distance calculée pour chaque offre. */
+    private java.math.BigDecimal lat;
+    private java.math.BigDecimal lng;
+    private Double rayonKm;
+
+    /** Tri : PERTINENCE, PRIX_ASC, PRIX_DESC, DATE_DESC, NOTE, DISTANCE */
     private String tri;
 
     /** Pagination */
@@ -90,4 +95,11 @@ public class RechercheParams {
     public void setIdsOffres(java.util.List<Long> idsOffres) { this.idsOffres = idsOffres; }
     public Boolean getOuvertMaintenant() { return ouvertMaintenant; }
     public void setOuvertMaintenant(Boolean ouvertMaintenant) { this.ouvertMaintenant = ouvertMaintenant; }
+    public java.math.BigDecimal getLat() { return lat; }
+    public void setLat(java.math.BigDecimal lat) { this.lat = lat; }
+    public java.math.BigDecimal getLng() { return lng; }
+    public void setLng(java.math.BigDecimal lng) { this.lng = lng; }
+    public Double getRayonKm() { return rayonKm; }
+    public void setRayonKm(Double rayonKm) { this.rayonKm = rayonKm; }
+    public boolean isAutourDunPoint() { return lat != null && lng != null; }
 }

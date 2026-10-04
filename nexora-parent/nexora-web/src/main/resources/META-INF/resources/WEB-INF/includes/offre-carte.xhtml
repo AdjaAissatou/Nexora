@@ -47,7 +47,7 @@
                 <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/>
                 </svg>
-                #{o.localisationCourte}
+                #{o.localisationCourte}<ui:fragment rendered="#{o.distanceKm != null}"><span class="nx-distance"> · #{format.distance(o.distanceKm)}</span></ui:fragment>
             </span>
             <ui:fragment rendered="#{o.espaceOuvertMaintenant eq true}"><span class="nx-ouverture ouvert">Ouvert</span></ui:fragment>
             <ui:fragment rendered="#{o.espaceOuvertMaintenant eq false}"><span class="nx-ouverture">Fermé</span></ui:fragment>

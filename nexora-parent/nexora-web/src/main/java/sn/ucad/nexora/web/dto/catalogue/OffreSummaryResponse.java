@@ -31,7 +31,9 @@ public record OffreSummaryResponse(
         String statut,
         String motifModeration,
         /** Ouvert en ce moment ; null si l'espace n'a pas renseigné ses horaires (§10). */
-        Boolean espaceOuvertMaintenant) {
+        Boolean espaceOuvertMaintenant,
+        /** Distance au lieu recherché (km) ; null hors recherche autour d'un lieu. */
+        Double distanceKm) {
 
     public boolean suspendue() {
         return "SUSPENDU".equals(statut);

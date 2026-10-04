@@ -54,6 +54,22 @@ public class RechercheBean implements Serializable {
     private List<CategorieResponse> categoriesRacines;
     private List<LieuPublicResponse> lieuxPublics = List.of();
 
+    /*
+     * Recherche autour d'un lieu (§15) : « sandaga » désigne le Marché Sandaga, pas un article.
+     * On affiche alors le lieu (itinéraire) et les commerces autour, du plus proche au plus loin.
+     */
+    /** Lieu demandé par l'adresse (/recherche?lieu=12), depuis la page Explorer par exemple. */
+    private Long lieu;
+    /** Texte saisi au moment où le lieu a été choisi : s'il change, le lieu est oublié. */
+    private String texteAuChoixDuLieu;
+    private LieuPublicResponse lieuChoisi;
+    /** Texte qui a fait reconnaître le lieu : une autre saisie annule le lieu. */
+    private String texteDuLieu;
+    /** Texte pour lequel l'utilisateur a préféré chercher dans les articles plutôt qu'autour du lieu. */
+    private String texteSansLieu;
+    private double rayonKm = 1;
+    public static final List<Double> RAYONS_KM = List.of(0.5, 1.0, 2.0, 5.0);
+
     @PostConstruct
     public void charger() {
         try {
@@ -64,6 +80,7 @@ public class RechercheBean implements Serializable {
     }
 
     public void chargerDepuisParametres() {
+        texteAuChoixDuLieu = normaliser(q);
         rechercher();
     }
 
@@ -93,6 +110,10 @@ public class RechercheBean implements Serializable {
 
     public void reinitialiser() {
         q = null;
+        lieu = null;
+        lieuChoisi = null;
+        texteDuLieu = null;
+        texteSansLieu = null;
         typeEspace = null;
         idCategorie = null;
         commune = null;
@@ -105,10 +126,13 @@ public class RechercheBean implements Serializable {
 
     private void executer() {
         erreur = null;
+        determinerLieu();
         try {
+            boolean autour = lieuChoisi != null && lieuChoisi.latitude() != null && lieuChoisi.longitude() != null;
             resultats = catalogueApiClient.rechercher(new CritereRecherche(
-                    q, null, idCategorie, typeEspace, commune, null, null, null, prixMax, null, null,
-                    verifieUniquement ? Boolean.TRUE : null, ouvertMaintenant ? Boolean.TRUE : null, tri, page, TAILLE_PAGE));
+                    autour ? null : q, null, idCategorie, typeEspace, autour ? null : commune, null, null, null, prixMax, null, null,
+                    verifieUniquement ? Boolean.TRUE : null, ouvertMaintenant ? Boolean.TRUE : null, tri, page, TAILLE_PAGE,
+                    autour ? lieuChoisi.latitude() : null, autour ? lieuChoisi.longitude() : null, autour ? rayonKm : null));
         } catch (ApiException e) {
             resultats = OffrePageResponse.vide();
             erreur = e.getMessage();
@@ -120,15 +144,109 @@ public class RechercheBean implements Serializable {
         chargerLieuxPublics();
     }
 
+    /** Lieu désigné par l'adresse ou reconnu dans le texte saisi (« sandaga » → Marché Sandaga). */
+    private void determinerLieu() {
+        String texte = normaliser(q);
+        if (lieu != null && !texte.equals(texteAuChoixDuLieu)) lieu = null;
+        if (lieu != null) {
+            if (lieuChoisi == null || !lieu.equals(lieuChoisi.id())) {
+                try {
+                    lieuChoisi = catalogueApiClient.lieuPublic(lieu).orElse(null);
+                } catch (ApiException e) {
+                    lieuChoisi = null;
+                }
+                texteDuLieu = null;
+            }
+            return;
+        }
+        if (lieuChoisi != null && texteDuLieu != null && texteDuLieu.equals(texte)) return;
+        lieuChoisi = null;
+        texteDuLieu = null;
+        if (texte.length() < 3 || texte.equals(texteSansLieu)) return;
+        try {
+            for (LieuPublicResponse l : catalogueApiClient.rechercherLieuxPublics(q, null, 5)) {
+                if (normaliser(l.nom()).contains(texte)) {
+                    lieuChoisi = l;
+                    texteDuLieu = texte;
+                    return;
+                }
+            }
+        } catch (ApiException e) {
+            // Sans lieu reconnu, la recherche reste une recherche de texte.
+        }
+    }
+
+    private static String normaliser(String s) {
+        if (s == null) return "";
+        return java.text.Normalizer.normalize(s.trim().toLowerCase(Locale.ROOT), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+    }
+
+    /** Un autre lieu de la liste (« Marché Sandaga » au lieu de « Gare de Sandaga »). */
+    public void choisirLieu(Long idLieu) {
+        lieu = idLieu;
+        texteAuChoixDuLieu = normaliser(q);
+        rechercher();
+    }
+
+    /** « Chercher plutôt le mot dans les articles » : on oublie le lieu pour ce texte. */
+    public void chercherDansLesArticles() {
+        lieu = null;
+        lieuChoisi = null;
+        texteDuLieu = null;
+        texteSansLieu = normaliser(q);
+        rechercher();
+    }
+
+    public void choisirRayon(double rayon) {
+        rayonKm = rayon;
+        rechercher();
+    }
+
+    public LieuPublicResponse getLieuChoisi() {
+        return lieuChoisi;
+    }
+
+    /** Autres lieux trouvés pour le même texte (pour changer de lieu). */
+    public List<LieuPublicResponse> getAutresLieux() {
+        if (lieuChoisi == null) return List.of();
+        return lieuxPublics.stream().filter(l -> !l.id().equals(lieuChoisi.id())).toList();
+    }
+
+    public List<Double> getRayons() {
+        return RAYONS_KM;
+    }
+
+    public double getRayonKm() {
+        return rayonKm;
+    }
+
+    public String libelleRayon(double rayon) {
+        return rayon < 1 ? Math.round(rayon * 1000) + " m" : (rayon == Math.floor(rayon) ? (long) rayon + " km" : rayon + " km");
+    }
+
+    public Long getLieu() {
+        return lieu;
+    }
+
+    public void setLieu(Long lieu) {
+        this.lieu = lieu;
+    }
+
     private void chargerLieuxPublics() {
         if ((q == null || q.isBlank()) && (commune == null || commune.isBlank())) {
-            lieuxPublics = List.of();
+            lieuxPublics = lieuChoisi == null ? List.of() : List.of(lieuChoisi);
             return;
         }
         try {
-            lieuxPublics = catalogueApiClient.rechercherLieuxPublics(q, commune, 20);
+            lieuxPublics = catalogueApiClient.rechercherLieuxPublics(q, lieuChoisi != null ? null : commune, 20);
         } catch (ApiException e) {
             lieuxPublics = List.of();
+        }
+        if (lieuChoisi != null && lieuxPublics.stream().noneMatch(l -> l.id().equals(lieuChoisi.id()))) {
+            List<LieuPublicResponse> avecLieu = new ArrayList<>(lieuxPublics);
+            avecLieu.add(0, lieuChoisi);
+            lieuxPublics = avecLieu;
         }
     }
 
@@ -173,8 +291,15 @@ public class RechercheBean implements Serializable {
         }
     }
 
+    /** Rayon de recherche à tracer autour du lieu ; « null » hors recherche autour d'un lieu. */
+    public String getCercleCarteJson() {
+        if (lieuChoisi == null || lieuChoisi.latitude() == null || lieuChoisi.longitude() == null) return "null";
+        return String.format(Locale.ROOT, "{\"lat\":%s,\"lng\":%s,\"rayonKm\":%s}",
+                lieuChoisi.latitude(), lieuChoisi.longitude(), rayonKm);
+    }
+
     public boolean isCarteVisible() {
-        return !pointsCarte().isEmpty();
+        return lieuChoisi != null || !pointsCarte().isEmpty();
     }
 
     public List<OffreSummaryResponse> getContenu() {

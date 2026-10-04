@@ -113,6 +113,15 @@ public class OffreRepositoryAdapter implements OffreRepository {
 
     // ===================== search =====================
 
+    /** Distance à vol d'oiseau (haversine, km) entre l'adresse de l'espace et le point recherché. */
+    private static final String DISTANCE_KM = """
+            (6371 * 2 * ASIN(SQRT(
+                POWER(SIN(RADIANS(CAST(a.latitude AS DOUBLE PRECISION) - CAST(:lat AS DOUBLE PRECISION)) / 2), 2)
+                + COS(RADIANS(CAST(:lat AS DOUBLE PRECISION))) * COS(RADIANS(CAST(a.latitude AS DOUBLE PRECISION)))
+                  * POWER(SIN(RADIANS(CAST(a.longitude AS DOUBLE PRECISION) - CAST(:lng AS DOUBLE PRECISION)) / 2), 2))))""";
+    private static final double RAYON_DEFAUT_KM = 2;
+    private static final double RAYON_MAX_KM = 50;
+
     @Override
     public List<Offre> search(RechercheParams params) {
         StringBuilder sql = new StringBuilder("""
@@ -158,7 +167,9 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 o.motif_moderation,
                 -- État d'ouverture de l'espace à l'heure de Dakar (NULL sans horaires, §10) ; faux s'il est fermé par le pro
                 CASE WHEN NOT ep.ouvert THEN FALSE
-                     ELSE espace_ouvert_a(ep.id_espace, CAST(NOW() AT TIME ZONE 'Africa/Dakar' AS TIMESTAMP)) END AS espace_ouvert_maintenant
+                     ELSE espace_ouvert_a(ep.id_espace, CAST(NOW() AT TIME ZONE 'Africa/Dakar' AS TIMESTAMP)) END AS espace_ouvert_maintenant,
+                -- Distance au point de recherche, en km (NULL hors recherche autour d'un point)
+                %s AS distance_km
 
             FROM offre o
             JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
@@ -176,6 +187,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
             ) p ON (p.id_offre = o.id_offre OR p.id_espace = ep.id_espace)
             LEFT JOIN image img ON img.id_offre = o.id_offre AND img.principale = TRUE
             """);
+        String distance = params.isAutourDunPoint() ? DISTANCE_KM : "CAST(NULL AS DOUBLE PRECISION)";
+        int marque = sql.indexOf("%s AS distance_km");
+        sql.replace(marque, marque + 2, distance);
+
         // Recherche publique : seulement ce qui est visible. Gestion : tout ce que le professionnel possède.
         sql.append(params.isGestion()
                 ? " WHERE CAST(o.statut AS TEXT) <> 'SUPPRIME' "
@@ -277,12 +292,22 @@ public class OffreRepositoryAdapter implements OffreRepository {
             }
         }
 
+        if (params.isAutourDunPoint()) {
+            sql.append(" AND a.latitude IS NOT NULL AND a.longitude IS NOT NULL AND ").append(DISTANCE_KM).append(" <= :rayonKm ");
+            paramMap.put("lat", params.getLat());
+            paramMap.put("lng", params.getLng());
+            double rayon = params.getRayonKm() == null ? RAYON_DEFAUT_KM : params.getRayonKm();
+            paramMap.put("rayonKm", Math.max(0.1, Math.min(rayon, RAYON_MAX_KM)));
+        }
+
         // Tie-breaker fixe pour DISTINCT ON (id_offre obligatoire en tête d'ORDER BY ici) :
         // le tri réellement demandé par l'utilisateur est appliqué dans la requête englobante,
         // car un ORDER BY secondaire à cet endroit serait ignoré (DISTINCT ON impose id_offre en clé primaire de tri).
         sql.append(" ORDER BY o.id_offre ");
 
-        String requeteFinale = "SELECT * FROM (" + sql + ") base " + buildOrderBy(params.getTri())
+        String tri = params.isAutourDunPoint() && (params.getTri() == null || "PERTINENCE".equalsIgnoreCase(params.getTri()))
+                ? "DISTANCE" : params.getTri();
+        String requeteFinale = "SELECT * FROM (" + sql + ") base " + buildOrderBy(tri)
                 + " LIMIT :taille OFFSET :offset ";
 
         paramMap.put("taille", params.getTaille());
@@ -314,6 +339,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
             case "PRIX_DESC"  -> " ORDER BY prix DESC NULLS LAST ";
             case "DATE_DESC"  -> " ORDER BY date_publication DESC NULLS LAST ";
             case "NOTE"       -> " ORDER BY espace_note DESC NULLS LAST ";
+            case "DISTANCE"   -> " ORDER BY distance_km ASC NULLS LAST, score_pertinence DESC ";
             default           -> " ORDER BY score_pertinence DESC, vue_count DESC ";
         };
     }
@@ -413,6 +439,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
         // Puis espace_ouvert_maintenant (index 65)
         if (r.length > 65) {
             o.setEspaceOuvertMaintenant(r[65] == null ? null : toBool(r[65]));
+        }
+        // Puis distance_km (index 66)
+        if (r.length > 66 && r[66] != null) {
+            o.setDistanceKm(Math.round(((Number) r[66]).doubleValue() * 100) / 100.0);
         }
         return o;
     }

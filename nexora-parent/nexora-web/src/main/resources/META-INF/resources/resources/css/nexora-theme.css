@@ -1619,3 +1619,47 @@ label.nx-chip-epuise:has(input:checked) { border-color: var(--nx-terracotta); ba
     .nx-caracteristiques dl { grid-template-columns: 1fr; gap: 2px; }
     .nx-caracteristiques dd { margin-bottom: 8px; }
 }
+
+/* ===== Recherche autour d'un lieu (Sandaga…) ===== */
+.nx-lieu-choisi { margin-bottom: 20px; }
+.nx-lieu-choisi-tete { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.nx-lieu-choisi-tete h3 { margin: 6px 0 4px; font-size: 1.35rem; }
+.nx-lieu-choisi-adresse { color: var(--nx-text-secondary); margin: 0; }
+.nx-lieu-choisi-description { margin: 8px 0 0; font-size: 14px; line-height: 1.6; }
+.nx-lieu-rayons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.nx-lieu-rayons > span { font-size: 13px; font-weight: 600; color: var(--nx-text-secondary); margin-right: 4px; }
+.nx-lien-discret { display: inline-block; margin-top: 12px; font-size: 13px; color: var(--nx-text-secondary); text-decoration: underline; }
+.nx-distance { color: var(--nx-primary); font-weight: 700; }
+
+/* ===== Page Explorer (§15) ===== */
+.nx-explorer-chiffres { margin-top: 10px; font-size: 15px; }
+.nx-explorer-sommaire { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.nx-explorer { padding-bottom: 40px; }
+.nx-explorer-section { margin-top: 40px; scroll-margin-top: 90px; }
+.nx-explorer-section h2 { margin: 0 0 4px; }
+.nx-explorer-intro { color: var(--nx-text-secondary); margin: 0 0 16px; }
+.nx-explorer-titre { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.nx-rayons { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.nx-rayon { background: var(--nx-surface); border: 1px solid var(--nx-border); border-radius: 18px; padding: 16px; }
+.nx-rayon-tete { display: flex; align-items: center; gap: 12px; color: var(--nx-text); text-decoration: none; }
+.nx-rayon-tete strong { display: block; font-size: 16px; }
+.nx-rayon-tete small { color: var(--nx-text-secondary); }
+.nx-rayon-initiale { width: 44px; height: 44px; border-radius: 14px; color: #fff; font-weight: 800; font-size: 20px;
+                     display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.nx-rayon-sous { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.nx-rayon-sous .nx-pastille { font-size: 12.5px; }
+.nx-compte { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 999px; background: var(--nx-gold-soft);
+             color: var(--nx-text); font-size: 11px; font-weight: 700; }
+.nx-explorer-cartes { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.nx-explorer-carte { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 16px; text-decoration: none;
+                     background: var(--nx-surface); border: 1px solid var(--nx-border); color: var(--nx-text); transition: border-color .15s, transform .15s; }
+.nx-explorer-carte:hover { border-color: var(--nx-gold-deep); transform: translateY(-2px); }
+.nx-explorer-carte strong { font-size: 15px; }
+.nx-explorer-carte small { color: var(--nx-text-light); }
+.nx-explorer-carte > span:last-child { color: var(--nx-primary); font-weight: 600; font-size: 13px; }
+.nx-explorer-lieu .nx-badge { align-self: flex-start; }
+.nx-explorer-map { height: 420px; }
+@media (max-width: 600px) {
+    .nx-explorer-map { height: 320px; }
+    .nx-rayons { grid-template-columns: 1fr; }
+}

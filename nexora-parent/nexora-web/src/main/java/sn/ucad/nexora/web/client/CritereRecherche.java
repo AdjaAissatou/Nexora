@@ -23,7 +23,19 @@ public record CritereRecherche(
         Boolean ouvertMaintenant,
         String tri,
         int page,
-        int taille) {
+        int taille,
+        /** Autour d'un point (lieu public) : latitude, longitude et rayon en km. */
+        BigDecimal lat,
+        BigDecimal lng,
+        Double rayonKm) {
+
+    public CritereRecherche(String q, String categorie, Long idCategorie, String typeEspace, String commune,
+                            String region, Long idEspace, BigDecimal prixMin, BigDecimal prixMax,
+                            Boolean estProduit, Boolean avecPromotion, Boolean espaceVerifie,
+                            Boolean ouvertMaintenant, String tri, int page, int taille) {
+        this(q, categorie, idCategorie, typeEspace, commune, region, idEspace, prixMin, prixMax, estProduit,
+                avecPromotion, espaceVerifie, ouvertMaintenant, tri, page, taille, null, null, null);
+    }
 
     public static CritereRecherche vide() {
         return new CritereRecherche(null, null, null, null, null, null, null, null, null, null, null, null, null, "PERTINENCE", 0, 12);

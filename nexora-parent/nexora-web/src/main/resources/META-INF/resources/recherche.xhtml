@@ -11,6 +11,9 @@
     </f:viewParam>
     <f:viewParam name="commune" value="#{rechercheBean.commune}" />
     <f:viewParam name="ouvert" value="#{rechercheBean.ouvertMaintenant}" />
+    <f:viewParam name="lieu" value="#{rechercheBean.lieu}">
+        <f:converter converterId="jakarta.faces.Long" />
+    </f:viewParam>
     <f:viewAction action="#{rechercheBean.chargerDepuisParametres}" />
 </f:metadata>
 <ui:define name="titre">Rechercher — Nexora</ui:define>
@@ -23,8 +26,8 @@
 
     <section class="nx-page-header">
         <div class="nx-container">
-            <h1>Explorez les espaces professionnels</h1>
-            <p>Filtrez par catégorie, localisation ou budget pour trouver le bon professionnel.
+            <h1>Rechercher</h1>
+            <p>Un article, un service, un commerce ou un lieu (« Sandaga », « gare Petersen ») : filtrez par catégorie, quartier ou budget.
                 <h:link outcome="/recherche-photo" styleClass="nx-lien-photo" style="margin-left:6px;">
                     <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
                     Ou rechercher par photo
@@ -104,11 +107,55 @@
 
             <div>
                 <div class="nx-results-header">
-                    <h2>Résultats de recherche</h2>
+                    <h2>#{rechercheBean.lieuChoisi != null ? 'Commerces autour de '.concat(rechercheBean.lieuChoisi.nom) : 'Résultats de recherche'}</h2>
                     <span class="nx-results-count">#{rechercheBean.total} résultat(s)</span>
                 </div>
 
                 <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+
+                <ui:fragment rendered="#{rechercheBean.lieuChoisi != null}">
+                    <div class="nx-card nx-lieu-choisi">
+                        <div class="nx-lieu-choisi-tete">
+                            <div>
+                                <span class="nx-badge nx-badge-neutre">#{format.typeLieu(rechercheBean.lieuChoisi.typeLieu)}</span>
+                                <h3>#{rechercheBean.lieuChoisi.nom}</h3>
+                                <p class="nx-lieu-choisi-adresse">
+                                    #{empty rechercheBean.lieuChoisi.adresseComplete ? '' : rechercheBean.lieuChoisi.adresseComplete.concat(' — ')}#{rechercheBean.lieuChoisi.commune}#{empty rechercheBean.lieuChoisi.region ? '' : ', '.concat(rechercheBean.lieuChoisi.region)}
+                                </p>
+                                <ui:fragment rendered="#{!empty rechercheBean.lieuChoisi.description}">
+                                    <p class="nx-lieu-choisi-description">#{rechercheBean.lieuChoisi.description}</p>
+                                </ui:fragment>
+                            </div>
+                            <h:outputLink value="#{format.lienItineraire(rechercheBean.lieuChoisi.latitude, rechercheBean.lieuChoisi.longitude)}"
+                                          target="_blank" styleClass="nx-button nx-button-primary">
+                                <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+                                Itinéraire jusqu'au lieu
+                            </h:outputLink>
+                        </div>
+                        <h:form id="lieuOptions">
+                            <div class="nx-lieu-rayons">
+                                <span>Commerces à moins de</span>
+                                <ui:repeat var="r" value="#{rechercheBean.rayons}">
+                                    <h:commandLink action="#{rechercheBean.choisirRayon(r)}" value="#{rechercheBean.libelleRayon(r)}"
+                                                   styleClass="nx-pastille #{r == rechercheBean.rayonKm ? 'active' : ''}" />
+                                </ui:repeat>
+                            </div>
+                            <ui:fragment rendered="#{!empty rechercheBean.autresLieux}">
+                                <div class="nx-lieu-rayons">
+                                    <span>Vous cherchiez plutôt</span>
+                                    <ui:repeat var="l" value="#{rechercheBean.autresLieux}">
+                                        <h:commandLink action="#{rechercheBean.choisirLieu(l.id)}" value="#{l.nom}" styleClass="nx-pastille" />
+                                    </ui:repeat>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{!empty rechercheBean.q}">
+                                <h:commandLink action="#{rechercheBean.chercherDansLesArticles}" styleClass="nx-lien-discret">
+                                    Chercher « #{rechercheBean.q} » dans les articles plutôt
+                                </h:commandLink>
+                            </ui:fragment>
+                        </h:form>
+                    </div>
+                </ui:fragment>
 
                 <ui:fragment rendered="#{rechercheBean.carteVisible}">
                     <div class="nx-card" style="margin-bottom:20px; padding:0; overflow:hidden;">
@@ -118,13 +165,13 @@
                         document.addEventListener('DOMContentLoaded', function () {
                             var points = #{rechercheBean.pointsCarteJson};
                             if (window.nexoraInitSearchMap) {
-                                window.nexoraInitSearchMap('nx-search-map', points);
+                                window.nexoraInitSearchMap('nx-search-map', points, { cercle: #{rechercheBean.cercleCarteJson} });
                             }
                         });
                     </script>
                 </ui:fragment>
 
-                <ui:fragment rendered="#{!empty rechercheBean.lieuxPublics}">
+                <ui:fragment rendered="#{rechercheBean.lieuChoisi == null and !empty rechercheBean.lieuxPublics}">
                     <div class="nx-card" style="margin-bottom:20px;">
                         <h3 style="margin-top:0;">Lieux publics</h3>
                         <div class="nx-lieu-public-liste">
@@ -150,8 +197,14 @@
                                 <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>
                             </svg>
                         </div>
-                        <p><strong>Aucun résultat pour cette recherche.</strong></p>
-                        <p>Essayez un autre mot-clé, une autre catégorie ou élargissez la zone géographique.</p>
+                        <ui:fragment rendered="#{rechercheBean.lieuChoisi == null}">
+                            <p><strong>Aucun résultat pour cette recherche.</strong></p>
+                            <p>Essayez un autre mot-clé, une autre catégorie ou élargissez la zone géographique.</p>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{rechercheBean.lieuChoisi != null}">
+                            <p><strong>Aucun commerce sur Nexora à moins de #{rechercheBean.libelleRayon(rechercheBean.rayonKm)} de ce lieu.</strong></p>
+                            <p>Élargissez la zone ci-dessus (jusqu'à 5 km) ou retirez des filtres.</p>
+                        </ui:fragment>
                     </div>
                 </ui:fragment>
 

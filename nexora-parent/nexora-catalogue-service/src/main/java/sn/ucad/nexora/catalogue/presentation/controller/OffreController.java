@@ -177,7 +177,16 @@ public class OffreController {
             @Parameter(description = "Uniquement les espaces ouverts en ce moment (heure de Dakar)")
             @RequestParam(required = false) Boolean ouvertMaintenant,
 
-            @Parameter(description = "Tri : PERTINENCE | PRIX_ASC | PRIX_DESC | DATE_DESC | NOTE")
+            @Parameter(description = "Autour d'un point (avec lng) : latitude")
+            @RequestParam(required = false) BigDecimal lat,
+
+            @Parameter(description = "Autour d'un point (avec lat) : longitude")
+            @RequestParam(required = false) BigDecimal lng,
+
+            @Parameter(description = "Rayon autour du point, en km (2 par défaut, 50 au plus)")
+            @RequestParam(required = false) Double rayonKm,
+
+            @Parameter(description = "Tri : PERTINENCE | PRIX_ASC | PRIX_DESC | DATE_DESC | NOTE | DISTANCE")
             @RequestParam(defaultValue = "PERTINENCE") String tri,
 
             @Parameter(description = "Numéro de page (0-based)")
@@ -200,6 +209,9 @@ public class OffreController {
         request.setAvecPromotion(avecPromotion);
         request.setEspaceVerifie(espaceVerifie);
         request.setOuvertMaintenant(ouvertMaintenant);
+        request.setLat(lat);
+        request.setLng(lng);
+        request.setRayonKm(rayonKm);
         request.setTri(tri);
         request.setPage(page);
         request.setTaille(Math.min(taille, 100));

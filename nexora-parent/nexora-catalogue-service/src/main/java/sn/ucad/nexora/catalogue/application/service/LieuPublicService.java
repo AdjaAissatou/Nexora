@@ -21,4 +21,9 @@ public class LieuPublicService implements LieuPublicUseCase {
         int limiteBornee = Math.min(Math.max(limite, 1), 100);
         return repository.rechercher(q, commune, typeLieu, limiteBornee);
     }
+
+    @Override
+    public java.util.Optional<LieuPublicResponse> parId(Long id) {
+        return repository.parId(id);
+    }
 }

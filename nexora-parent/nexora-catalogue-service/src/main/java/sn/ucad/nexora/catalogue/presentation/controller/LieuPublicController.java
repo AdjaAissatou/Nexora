@@ -33,4 +33,10 @@ public class LieuPublicController {
             @RequestParam(defaultValue = "20") int limite) {
         return ResponseEntity.ok(lieuxPublics.rechercher(q, commune, type, limite));
     }
+
+    @GetMapping("/{id:\\d+}")
+    @Operation(summary = "Un lieu public")
+    public ResponseEntity<LieuPublicResponse> parId(@PathVariable Long id) {
+        return lieuxPublics.parId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
 }

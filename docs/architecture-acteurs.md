@@ -1310,6 +1310,38 @@ sont vendues, puis renseigne leurs caractéristiques d'après leur titre (une ch
 blanche » : Blanc, Lin…). Il fonctionne aussi pour les offres des packs locaux ; il est lancé par
 `demo.sql` et `mise_a_jour.sql`, et peut être rejoué après les packs.
 
+## 15. ✅ Page Explorer et recherche autour d'un lieu
+
+**Explorer et Rechercher sont deux pages différentes.** La recherche répond à une question
+précise (« chemise », « Sandaga ») ; Explorer sert à se promener sans savoir exactement ce qu'on
+cherche. Menu : Accueil · Explorer · Rechercher.
+
+**Page Explorer** (`explorer.xhtml`, `GET /api/v1/explorer` de catalogue-service, public) :
+- **Rayons** : chaque catégorie racine ayant des articles visibles, son nombre d'articles et
+  ses sous-catégories, chacune avec son compte (lien vers la recherche filtrée) ;
+- **Par quartier** : nombre d'espaces et d'articles par commune ;
+- **Autour des lieux connus** : marchés d'abord, puis gares, hôpitaux… ayant des commerces à
+  moins de 1,5 km (lien vers la recherche autour du lieu) ;
+- **Carte** : tous les espaces (vert) et ces lieux (orange) ;
+- **Nouveautés**, **Promotions en cours**, **Ouvert en ce moment**.
+Seules les offres visibles du public sont comptées (publiées, disponibles, espace actif et ouvert).
+
+**Recherche autour d'un lieu** : quand le texte saisi désigne un lieu public (« sandaga »,
+« tilene » sans accent → Marché Tilène), la recherche ne cherche plus ce mot dans les articles
+(ce qui ramenait des produits sans rapport) : elle affiche
+- la fiche du lieu (type, adresse, description) et le bouton **Itinéraire jusqu'au lieu** ;
+- les commerces autour, **du plus proche au plus loin**, avec la distance sur chaque article
+  (« à 350 m ») ; rayon au choix : 500 m, 1 km (par défaut), 2 km, 5 km ;
+- la carte avec le cercle de la zone ;
+- « Vous cherchiez plutôt » : les autres lieux trouvés ; « Chercher « … » dans les articles
+  plutôt » : revenir à la recherche de texte.
+Les autres filtres (catégorie, type d'espace, prix, ouvert maintenant) restent utilisables.
+Lien direct : `/recherche.xhtml?lieu={id}`.
+
+API : `GET /api/v1/offres/recherche?lat=&lng=&rayonKm=` (rayon 2 km par défaut, 50 au plus ;
+tri `DISTANCE`, appliqué d'office autour d'un point) ; chaque résultat porte `distanceKm`.
+`GET /api/v1/lieux-publics/{id}`. La recherche de lieux ignore les accents.
+
 ---
-*Dernière mise à jour : session du 04/10/2026, caractéristiques des articles (tailles,
-couleurs, matière…), inspirées de DressIT.*
+*Dernière mise à jour : session du 04/10/2026, caractéristiques des articles (inspirées de
+DressIT), page Explorer et recherche autour d'un lieu.*

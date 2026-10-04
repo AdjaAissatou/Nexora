@@ -31,6 +31,8 @@ public class Offre {
     private String statut;
     private String motifModeration;
     private Boolean espaceOuvertMaintenant;
+    /** Distance au point de recherche (km), quand la recherche est faite autour d'un point. */
+    private Double distanceKm;
 
     private LocalDateTime dateCreation;
     private LocalDateTime dateModification;
@@ -128,6 +130,8 @@ public class Offre {
     public void setStatut(String statut) { this.statut = statut; }
     public Boolean getEspaceOuvertMaintenant() { return espaceOuvertMaintenant; }
     public void setEspaceOuvertMaintenant(Boolean v) { this.espaceOuvertMaintenant = v; }
+    public Double getDistanceKm() { return distanceKm; }
+    public void setDistanceKm(Double v) { this.distanceKm = v; }
     public String getMotifModeration() { return motifModeration; }
     public void setMotifModeration(String motifModeration) { this.motifModeration = motifModeration; }
 

@@ -1,0 +1,161 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:define name="titre">Explorer — Nexora</ui:define>
+<ui:define name="head-extra">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</ui:define>
+<ui:define name="content">
+    <h:outputScript library="js" name="search-map.js" target="head" />
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Explorer Nexora</h1>
+            <p>Promenez-vous dans ce que proposent les commerces et professionnels : par rayon, par quartier,
+                autour des lieux que vous connaissez ou sur la carte.</p>
+            <p class="nx-explorer-chiffres">
+                <strong>#{explorerBean.nombreOffres}</strong> articles et services ·
+                <strong>#{explorerBean.nombreEspaces}</strong> espaces ·
+                <strong>#{explorerBean.vue.quartiers().size()}</strong> quartiers
+            </p>
+            <nav class="nx-explorer-sommaire" aria-label="Sommaire">
+                <a href="#rayons" class="nx-pastille">Rayons</a>
+                <a href="#quartiers" class="nx-pastille">Quartiers</a>
+                <a href="#lieux" class="nx-pastille">Autour des lieux</a>
+                <a href="#carte" class="nx-pastille">Carte</a>
+                <a href="#nouveautes" class="nx-pastille">Nouveautés</a>
+                <ui:fragment rendered="#{!empty explorerBean.promotions}"><a href="#promotions" class="nx-pastille">Promotions</a></ui:fragment>
+                <ui:fragment rendered="#{!empty explorerBean.ouverts}"><a href="#ouverts" class="nx-pastille">Ouvert maintenant</a></ui:fragment>
+            </nav>
+        </div>
+    </section>
+
+    <div class="nx-container nx-explorer">
+
+        <h:messages errorClass="nx-alert nx-alert-error" warnClass="nx-alert nx-alert-warn" infoClass="nx-alert nx-alert-info" layout="table" />
+
+        <!-- Rayons : catégories ayant des articles, avec leurs sous-catégories -->
+        <section id="rayons" class="nx-explorer-section">
+            <h2>Les rayons</h2>
+            <p class="nx-explorer-intro">Chaque rayon et ce qu'il contient, du plus fourni au plus petit.</p>
+            <div class="nx-rayons">
+                <ui:repeat var="c" value="#{explorerBean.vue.categories()}" varStatus="st">
+                    <div class="nx-rayon">
+                        <h:link outcome="/recherche" styleClass="nx-rayon-tete">
+                            <f:param name="idCategorie" value="#{c.id()}" />
+                            <span class="nx-rayon-initiale" style="background:#{explorerBean.couleur(c, st.index)};">#{c.initiale()}</span>
+                            <span>
+                                <strong>#{c.nom()}</strong>
+                                <small>#{c.nombreOffres()} article(s)</small>
+                            </span>
+                        </h:link>
+                        <ui:fragment rendered="#{!empty c.sousCategories()}">
+                            <div class="nx-rayon-sous">
+                                <ui:repeat var="s" value="#{c.sousCategories()}">
+                                    <h:link outcome="/recherche" styleClass="nx-pastille">
+                                        <f:param name="idCategorie" value="#{s.id()}" />
+                                        #{s.nom()} <span class="nx-compte">#{s.nombreOffres()}</span>
+                                    </h:link>
+                                </ui:repeat>
+                            </div>
+                        </ui:fragment>
+                    </div>
+                </ui:repeat>
+            </div>
+        </section>
+
+        <!-- Quartiers -->
+        <section id="quartiers" class="nx-explorer-section">
+            <h2>Par quartier</h2>
+            <p class="nx-explorer-intro">Ce qu'on trouve près de chez vous ou là où vous allez.</p>
+            <div class="nx-explorer-cartes">
+                <ui:repeat var="q" value="#{explorerBean.vue.quartiers()}">
+                    <h:link outcome="/recherche" styleClass="nx-explorer-carte">
+                        <f:param name="commune" value="#{q.commune()}" />
+                        <strong>#{q.commune()}</strong>
+                        <small>#{q.region()}</small>
+                        <span>#{q.nombreEspaces()} espace(s) · #{q.nombreOffres()} article(s)</span>
+                    </h:link>
+                </ui:repeat>
+            </div>
+        </section>
+
+        <!-- Lieux publics -->
+        <section id="lieux" class="nx-explorer-section">
+            <h2>Autour des lieux connus</h2>
+            <p class="nx-explorer-intro">Marchés, gares, hôpitaux… : les commerces à deux pas, avec l'itinéraire.</p>
+            <div class="nx-explorer-cartes">
+                <ui:repeat var="l" value="#{explorerBean.vue.lieux()}">
+                    <h:link outcome="/recherche" styleClass="nx-explorer-carte nx-explorer-lieu">
+                        <f:param name="lieu" value="#{l.id()}" />
+                        <span class="nx-badge nx-badge-neutre">#{format.typeLieu(l.typeLieu())}</span>
+                        <strong>#{l.nom()}</strong>
+                        <small>#{l.commune()}</small>
+                        <span>#{l.nombreEspaces()} commerce(s) à moins de #{format.distance(l.rayonKm()).replace('à ', '')}</span>
+                    </h:link>
+                </ui:repeat>
+            </div>
+        </section>
+
+        <!-- Carte -->
+        <section id="carte" class="nx-explorer-section">
+            <h2>Sur la carte</h2>
+            <p class="nx-explorer-intro">En vert, les espaces ; en orange, les lieux connus. Touchez un point pour y aller.</p>
+            <div class="nx-card" style="padding:0; overflow:hidden;">
+                <div id="nx-explorer-map" class="nx-search-map nx-explorer-map"></div>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    if (window.nexoraInitSearchMap) {
+                        window.nexoraInitSearchMap('nx-explorer-map', #{explorerBean.pointsCarteJson});
+                    }
+                });
+            </script>
+        </section>
+
+        <section id="nouveautes" class="nx-explorer-section">
+            <div class="nx-explorer-titre">
+                <h2>Nouveautés</h2>
+                <h:link outcome="/recherche" value="Tout voir →" styleClass="nx-see-all" />
+            </div>
+            <div class="nx-offre-grid">
+                <ui:repeat var="o" value="#{explorerBean.nouveautes}">
+                    <ui:include src="/WEB-INF/includes/offre-carte.xhtml"><ui:param name="o" value="#{o}" /></ui:include>
+                </ui:repeat>
+            </div>
+        </section>
+
+        <ui:fragment rendered="#{!empty explorerBean.promotions}">
+            <section id="promotions" class="nx-explorer-section">
+                <h2>Promotions en cours</h2>
+                <div class="nx-offre-grid">
+                    <ui:repeat var="o" value="#{explorerBean.promotions}">
+                        <ui:include src="/WEB-INF/includes/offre-carte.xhtml"><ui:param name="o" value="#{o}" /></ui:include>
+                    </ui:repeat>
+                </div>
+            </section>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{!empty explorerBean.ouverts}">
+            <section id="ouverts" class="nx-explorer-section">
+                <div class="nx-explorer-titre">
+                    <h2>Ouvert en ce moment</h2>
+                    <h:link outcome="/recherche" value="Tout voir →" styleClass="nx-see-all">
+                        <f:param name="ouvert" value="true" />
+                    </h:link>
+                </div>
+                <div class="nx-offre-grid">
+                    <ui:repeat var="o" value="#{explorerBean.ouverts}">
+                        <ui:include src="/WEB-INF/includes/offre-carte.xhtml"><ui:param name="o" value="#{o}" /></ui:include>
+                    </ui:repeat>
+                </div>
+            </section>
+        </ui:fragment>
+
+    </div>
+</ui:define>
+</ui:composition>

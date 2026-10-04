@@ -1,14 +1,15 @@
 /**
  * Carte de recherche (Leaflet + OpenStreetMap, sans clé d'API) : affiche
  * simultanément toutes les offres et lieux publics géolocalisés d'une
- * recherche, avec un marqueur distinct pour les lieux publics.
+ * recherche, avec un marqueur distinct pour les lieux publics. Option « cercle » :
+ * le rayon de recherche autour d'un lieu ({lat, lng, rayonKm}).
  */
 (function () {
     function couleurMarqueur(categorie) {
-        return categorie === 'OFFRE' ? '#1f5f4a' : '#b3562f';
+        return categorie === 'OFFRE' || categorie === 'ESPACE' ? '#1f5f4a' : '#b3562f';
     }
 
-    function initCarte(containerId, points) {
+    function initCarte(containerId, points, options) {
         var el = document.getElementById(containerId);
         if (!el || typeof L === 'undefined') return;
         if (!points || points.length === 0) return;
@@ -30,16 +31,27 @@
             }).addTo(carte);
 
             var popup = '<strong>' + escapeHtml(p.nom) + '</strong>';
-            if (p.categorie && p.categorie !== 'OFFRE') {
-                popup += '<br/><span style="color:#8a7f6f;font-size:12px;">' + escapeHtml(p.categorie) + '</span>';
+            var precision = p.detail || (p.categorie !== 'OFFRE' ? p.categorie : null);
+            if (precision) {
+                popup += '<br/><span style="color:#8a7f6f;font-size:12px;">' + escapeHtml(precision) + '</span>';
             }
             if (p.href) {
-                var label = p.categorie === 'OFFRE' ? 'Voir l\'offre' : 'Itinéraire';
-                popup += '<br/><a href="' + p.href + '" target="_blank" rel="noopener">' + label + '</a>';
+                var label = p.lien || (p.categorie === 'OFFRE' ? 'Voir l\'offre' : 'Itinéraire');
+                var externe = /^https?:/.test(p.href) ? ' target="_blank" rel="noopener"' : '';
+                popup += '<br/><a href="' + p.href + '"' + externe + '>' + escapeHtml(label) + '</a>';
             }
             marqueur.bindPopup(popup);
             bounds.push([p.lat, p.lng]);
         });
+
+        var cercle = options && options.cercle;
+        if (cercle) {
+            var zone = L.circle([cercle.lat, cercle.lng], {
+                radius: cercle.rayonKm * 1000, color: '#b3562f', weight: 1.5, fillOpacity: 0.06, dashArray: '5 5'
+            }).addTo(carte);
+            carte.fitBounds(zone.getBounds().pad(0.05));
+            return;
+        }
 
         if (bounds.length === 1) {
             carte.setView(bounds[0], 13);
