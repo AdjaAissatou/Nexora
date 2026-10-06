@@ -26,4 +26,12 @@ public class ExplorerController {
     public ResponseEntity<ExplorerResponse> explorer() {
         return ResponseEntity.ok(explorer.explorer());
     }
+
+    @GetMapping("/espaces")
+    @Operation(summary = "Espaces dont le nom correspond au texte (sans accents ni espaces), même sans offre")
+    public ResponseEntity<java.util.List<sn.ucad.nexora.catalogue.application.dto.response.EspaceTrouveResponse>> espaces(
+            @org.springframework.web.bind.annotation.RequestParam String q,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "6") int limite) {
+        return ResponseEntity.ok(explorer.espacesParNom(q, Math.max(1, Math.min(limite, 20))));
+    }
 }

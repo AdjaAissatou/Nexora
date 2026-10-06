@@ -296,6 +296,18 @@ public class CatalogueApiClient {
         }
     }
 
+    /** Espaces dont le nom correspond au texte (« adjashop » → Adja Shop), même sans offre. */
+    public List<sn.ucad.nexora.web.dto.catalogue.EspaceTrouveResponse> espacesParNom(String q) {
+        try {
+            return client.get().uri(u -> u.path("/api/v1/explorer/espaces").queryParam("q", q).queryParam("limite", 6).build())
+                    .retrieve().body(new org.springframework.core.ParameterizedTypeReference<
+                            List<sn.ucad.nexora.web.dto.catalogue.EspaceTrouveResponse>>() {});
+        } catch (Exception e) {
+            LOG.warn("Recherche d'espaces indisponible : {}", e.getMessage());
+            return List.of();
+        }
+    }
+
     /** Vue d'ensemble de la page « Explorer ». */
     public sn.ucad.nexora.web.dto.catalogue.ExplorerResponse explorer() {
         LOG.info("Requête GET {}/api/v1/explorer", baseUrl);

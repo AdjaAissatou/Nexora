@@ -201,7 +201,19 @@ public class OffreRepositoryAdapter implements OffreRepository {
     private static final double RAYON_MAX_KM = 50;
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Offre> search(RechercheParams params) {
+        return (List<Offre>) executer(params, false);
+    }
+
+    /** Nombre total d'offres correspondant à la recherche (toutes pages confondues). */
+    @Override
+    public long count(RechercheParams params) {
+        return (Long) executer(params, true);
+    }
+
+    /** Construit la recherche ; {@code compter} : renvoie le nombre de résultats au lieu de la page. */
+    private Object executer(RechercheParams params, boolean compter) {
         StringBuilder sql = new StringBuilder("""
             SELECT DISTINCT ON (o.id_offre)
                 o.id_offre, o.id_espace, o.id_type_offre, o.id_categorie,
@@ -300,6 +312,8 @@ public class OffreRepositoryAdapter implements OffreRepository {
             List<String> conditions = new java.util.ArrayList<>();
             for (int v = 0; v < termes.get(t).size(); v++) {
                 conditions.add(DOCUMENT + " LIKE :t" + t + "_" + v);
+                // « adjashop » trouve « Adja Shop » : même texte, espaces retirés
+                if (v == 0) conditions.add("replace(" + DOCUMENT + ", ' ', '') LIKE :t" + t + "_0");
             }
             sql.append(" AND (").append(String.join(" OR ", conditions)).append(") ");
         }
@@ -418,6 +432,12 @@ public class OffreRepositoryAdapter implements OffreRepository {
         // le tri réellement demandé par l'utilisateur est appliqué dans la requête englobante,
         // car un ORDER BY secondaire à cet endroit serait ignoré (DISTINCT ON impose id_offre en clé primaire de tri).
         sql.append(" ORDER BY o.id_offre ");
+
+        if (compter) {
+            Query c = em.createNativeQuery("SELECT COUNT(*) FROM (" + sql + ") base");
+            paramMap.forEach(c::setParameter);
+            return ((Number) c.getSingleResult()).longValue();
+        }
 
         String tri = params.isAutourDunPoint() && (params.getTri() == null || "PERTINENCE".equalsIgnoreCase(params.getTri()))
                 ? "DISTANCE" : params.getTri();

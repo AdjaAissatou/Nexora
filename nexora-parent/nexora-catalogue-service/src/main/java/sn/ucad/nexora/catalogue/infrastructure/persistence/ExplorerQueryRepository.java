@@ -136,4 +136,38 @@ public class ExplorerQueryRepository {
         return lignes.stream().map(l -> new EspaceSurCarte(((Number) l[0]).longValue(), (String) l[1], (String) l[2],
                 (String) l[3], (BigDecimal) l[4], (BigDecimal) l[5], ((Number) l[6]).longValue())).toList();
     }
+
+    /**
+     * Espaces actifs dont le nom (ou le slogan) contient le texte, sans tenir compte des accents,
+     * des majuscules ni des espaces : « adjashop » trouve « Adja Shop ».
+     */
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public List<sn.ucad.nexora.catalogue.application.dto.response.EspaceTrouveResponse> espacesParNom(String texte, int limite) {
+        String q = TexteRecherche.normaliser(texte).replaceAll("[^a-z0-9]", "");
+        if (q.length() < 2) return List.of();
+        String nom = "replace(replace(translate(lower(%s), :accents, :sans), ' ', ''), '-', '')";
+        List<Object[]> lignes = em.createNativeQuery("""
+                SELECT ep.id_espace, ep.nom, ep.slogan, ep.logo, te.nom, a.commune, a.quartier, ep.verifie, ep.certifie,
+                       ep.note_moyenne, ep.nombre_avis,
+                       (SELECT COUNT(*) FROM offre o WHERE o.id_espace = ep.id_espace
+                          AND CAST(o.statut AS TEXT) = 'PUBLIE' AND o.disponible = TRUE),
+                       CASE WHEN NOT ep.ouvert THEN FALSE
+                            ELSE espace_ouvert_a(ep.id_espace, CAST(NOW() AT TIME ZONE 'Africa/Dakar' AS TIMESTAMP)) END
+                FROM espace_professionnel ep
+                JOIN type_espace te ON te.id_type_espace = ep.id_type_espace
+                LEFT JOIN adresse a ON a.id_espace = ep.id_espace AND a.principale = TRUE
+                WHERE CAST(ep.statut AS TEXT) = 'ACTIF'
+                  AND (%s LIKE :q OR %s LIKE :q)
+                ORDER BY (%s LIKE :debut) DESC, ep.verifie DESC, ep.note_moyenne DESC NULLS LAST, ep.nom
+                LIMIT :limite""".formatted(nom.formatted("ep.nom"), nom.formatted("COALESCE(ep.slogan, '')"), nom.formatted("ep.nom")))
+                .setParameter("accents", TexteRecherche.ACCENTS).setParameter("sans", TexteRecherche.SANS_ACCENTS)
+                .setParameter("q", "%" + q + "%").setParameter("debut", q + "%").setParameter("limite", limite)
+                .getResultList();
+        return lignes.stream().map(l -> new sn.ucad.nexora.catalogue.application.dto.response.EspaceTrouveResponse(
+                ((Number) l[0]).longValue(), (String) l[1], (String) l[2], (String) l[3], (String) l[4], (String) l[5],
+                (String) l[6], Boolean.TRUE.equals(l[7]), Boolean.TRUE.equals(l[8]), (BigDecimal) l[9],
+                l[10] == null ? null : ((Number) l[10]).intValue(), ((Number) l[11]).longValue(),
+                l[12] == null ? null : Boolean.TRUE.equals(l[12]))).toList();
+    }
 }

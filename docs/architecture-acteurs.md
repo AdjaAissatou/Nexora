@@ -1366,6 +1366,11 @@ commune : « plombier » ne trouvait rien, aucune offre ne contenant ce mot. Dé
   taxi → VTC, chauffeur ; coiffeur → coiffure, tresse…). Un seul sens, formes entières, sans mots
   trop larges (« mobile » trouverait « mobilier »).
 - Plusieurs mots : **tous** doivent être trouvés (« chemise lin » → les chemises en lin).
+- **Sans espaces** : « adjashop » trouve « Adja Shop », « sosplomberie » trouve SOS Plomberie.
+- **Les espaces par leur nom** : au-dessus des offres, les espaces dont le nom (ou le slogan)
+  correspond, même sans offre dans la zone ou les filtres choisis (`GET /api/v1/explorer/espaces?q=`).
+- **Le vrai total** : le nombre de résultats compte toutes les pages (avant, la première page se
+  croyait la dernière : on ne voyait que 12 offres). Sans recherche, le tri par défaut s'appelle « Tout ».
 - **Ordre** : mot trouvé dans le titre d'abord, puis synonyme dans le titre, puis ailleurs.
 
 Données : `04_catalogue/18_synonyme_recherche.sql`, `09_seed/30_synonymes_recherche.sql`. Les offres

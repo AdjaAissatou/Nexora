@@ -109,9 +109,9 @@ public class RechercherOffresService implements RechercherOffresUseCase {
                 .map(this::toSummary)
                 .toList();
 
-        // La pagination réelle nécessiterait un count séparé ;
-        // ici on expose le total partiel (suffisant pour les listes de résultats).
-        long total = items.size() + (long) request.getPage() * request.getTaille();
+        // Vrai total (toutes pages) : sans lui, la première page se croyait la dernière
+        long total = offres.size() < request.getTaille() && request.getPage() == 0
+                ? offres.size() : offreRepository.count(versParams(request));
 
         return new OffrePageResponse(items, request.getPage(), request.getTaille(), total);
     }

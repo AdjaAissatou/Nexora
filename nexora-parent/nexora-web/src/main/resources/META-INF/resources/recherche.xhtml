@@ -162,6 +162,27 @@
                     <span class="nx-results-count">#{rechercheBean.total} résultat(s)</span>
                 </div>
 
+                <!-- Espaces trouvés par leur nom (« adjashop »), même sans offre dans la zone ou les filtres -->
+                <ui:fragment rendered="#{!empty rechercheBean.espacesTrouves}">
+                    <div class="nx-espaces-trouves">
+                        <h3>#{rechercheBean.espacesTrouves.size() == 1 ? 'Espace' : 'Espaces'} « #{rechercheBean.q} »</h3>
+                        <div class="nx-espaces-trouves-liste">
+                            <ui:repeat var="e" value="#{rechercheBean.espacesTrouves}">
+                                <h:link outcome="/espace" styleClass="nx-espace-trouve">
+                                    <f:param name="id" value="#{e.id()}" />
+                                    <ui:fragment rendered="#{!empty e.logo()}"><img src="#{e.logo()}" alt="" class="nx-espace-trouve-logo" /></ui:fragment>
+                                    <ui:fragment rendered="#{empty e.logo()}"><span class="nx-espace-trouve-logo">#{e.initiale()}</span></ui:fragment>
+                                    <span class="nx-espace-trouve-texte">
+                                        <strong>#{e.nom()}<ui:fragment rendered="#{e.verifie()}"> <span class="nx-badge nx-badge-verifie">✓ Vérifié</span></ui:fragment></strong>
+                                        <small>#{e.typeEspace()}#{empty e.lieu() ? '' : ' · '.concat(e.lieu())}</small>
+                                        <small>#{e.noteTexte()}#{e.nombreOffres()} offre(s)#{e.ouvertMaintenant() eq true ? ' · Ouvert' : ''}</small>
+                                    </span>
+                                </h:link>
+                            </ui:repeat>
+                        </div>
+                    </div>
+                </ui:fragment>
+
                 <ui:fragment rendered="#{rechercheBean.total gt 0}">
                     <a href="#{rechercheBean.lienDecouvrir}" class="nx-decouvrir-recherche">
                         ✨ Découvrir ces #{rechercheBean.total} offres, une à la fois
@@ -174,7 +195,7 @@
                         <span>Trier :</span>
                         <ui:repeat var="t" value="#{rechercheBean.tris}">
                             <ui:fragment rendered="#{t.code() != 'DISTANCE' or rechercheBean.autourDunPoint}">
-                                <h:commandLink action="#{rechercheBean.choisirTri(t.code())}" value="#{t.libelle()}"
+                                <h:commandLink action="#{rechercheBean.choisirTri(t.code())}" value="#{t.code() == 'PERTINENCE' and !rechercheBean.rechercheEnCours ? 'Tout' : t.libelle()}"
                                                styleClass="nx-tri #{rechercheBean.tri == t.code() ? 'actif' : ''}" />
                             </ui:fragment>
                             <ui:fragment rendered="#{t.code() == 'DISTANCE' and !rechercheBean.autourDunPoint}">

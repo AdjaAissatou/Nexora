@@ -19,6 +19,9 @@ public interface OffreRepository {
      */
     List<Offre> search(RechercheParams params);
 
+    /** Nombre total de résultats de la recherche, toutes pages confondues. */
+    long count(RechercheParams params);
+
     /**
      * Incrémenter le compteur de vues d'une offre.
      */

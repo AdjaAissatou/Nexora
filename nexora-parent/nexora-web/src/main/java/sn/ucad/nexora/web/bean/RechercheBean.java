@@ -60,6 +60,8 @@ public class RechercheBean implements Serializable {
     /** Valeurs de caractéristiques cochées (taille M, couleur Noir…), par id de valeur. */
     private final Map<Long, Boolean> coches = new java.util.HashMap<>();
     private FacettesResponse facettes = FacettesResponse.vide();
+    /** Espaces dont le nom correspond au texte saisi, quels que soient les autres filtres. */
+    private List<sn.ucad.nexora.web.dto.catalogue.EspaceTrouveResponse> espacesTrouves = List.of();
 
     /** « Autour de moi » : position donnée par le navigateur. */
     private BigDecimal maLat;
@@ -282,6 +284,7 @@ public class RechercheBean implements Serializable {
             recherchee = true;
         }
         chargerLieuxPublics();
+        espacesTrouves = q == null || q.isBlank() ? List.of() : catalogueApiClient.espacesParNom(q);
     }
 
     /** Lieu désigné par l'adresse ou reconnu dans le texte saisi (« sandaga » → Marché Sandaga). */
@@ -611,5 +614,9 @@ public class RechercheBean implements Serializable {
     /** Une recherche est en cours : un texte, un lieu ou une position (les filtres seuls ne suffisent pas). */
     public boolean isRechercheEnCours() {
         return (q != null && !q.isBlank()) || lieuChoisi != null || positionActive;
+    }
+
+    public List<sn.ucad.nexora.web.dto.catalogue.EspaceTrouveResponse> getEspacesTrouves() {
+        return espacesTrouves;
     }
 }

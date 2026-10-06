@@ -1705,3 +1705,15 @@ label.nx-chip-epuise:has(input:checked) { border-color: var(--nx-terracotta); ba
                          background: linear-gradient(90deg, #073B35, #C96F4A); color: #fff; text-decoration: none; }
 .nx-explorer-decouvrir span { font-weight: 800; font-size: 17px; }
 .nx-explorer-decouvrir small { opacity: .9; }
+
+/* ===== Espaces trouvés par leur nom ===== */
+.nx-espaces-trouves { margin: 0 0 16px; }
+.nx-espaces-trouves h3 { margin: 0 0 8px; font-size: 15px; }
+.nx-espaces-trouves-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.nx-espace-trouve { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; text-decoration: none;
+                    background: var(--nx-surface); border: 1px solid var(--nx-border); color: var(--nx-text); }
+.nx-espace-trouve:hover { border-color: var(--nx-gold-deep); }
+.nx-espace-trouve-logo { width: 46px; height: 46px; flex: none; border-radius: 50%; object-fit: cover; background: var(--nx-primary);
+                         color: #fff; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+.nx-espace-trouve-texte { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nx-espace-trouve-texte small { color: var(--nx-text-secondary); font-size: 12.5px; }
