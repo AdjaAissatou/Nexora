@@ -159,6 +159,7 @@ SET client_encoding = 'UTF8';
 \i 09_seed/27_parametres.sql
 \i 09_seed/28_caracteristiques.sql
 \i 09_seed/30_synonymes_recherche.sql
+\i 11_migrations/05_choix_multiples.sql
 
 -------------------------------------------------------
 -- VUES

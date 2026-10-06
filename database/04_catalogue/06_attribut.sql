@@ -26,7 +26,12 @@ CREATE TABLE attribut (
 
     actif BOOLEAN DEFAULT TRUE,
 
+    -- Produits seulement (taille, couleur, garantie…), services seulement, ou les deux
+    pour_type VARCHAR(10) NOT NULL DEFAULT 'TOUS',
+
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT ck_attribut_pour_type CHECK (pour_type IN ('TOUS', 'PRODUIT', 'SERVICE')),
 
     CONSTRAINT fk_attribut_categorie
         FOREIGN KEY(id_categorie)

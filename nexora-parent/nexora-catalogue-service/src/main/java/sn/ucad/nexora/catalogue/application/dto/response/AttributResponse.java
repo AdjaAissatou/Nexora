@@ -9,6 +9,8 @@ public class AttributResponse {
     private String typeChamp;
     private boolean obligatoire;
     private String unite;
+    /** TOUS, PRODUIT ou SERVICE : le formulaire n'affiche que ce qui concerne le type d'offre choisi. */
+    private String pourType;
     private List<ValeurAttributResponse> valeurs;
 
     public Long getId() { return id; }
@@ -23,6 +25,8 @@ public class AttributResponse {
     public void setObligatoire(boolean obligatoire) { this.obligatoire = obligatoire; }
     public String getUnite() { return unite; }
     public void setUnite(String unite) { this.unite = unite; }
+    public String getPourType() { return pourType; }
+    public void setPourType(String pourType) { this.pourType = pourType; }
     public List<ValeurAttributResponse> getValeurs() { return valeurs; }
     public void setValeurs(List<ValeurAttributResponse> valeurs) { this.valeurs = valeurs; }
 }

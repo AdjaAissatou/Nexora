@@ -310,8 +310,10 @@ public class CreerOffreBean implements Serializable {
         try {
             List<AttributValeurRequest> valeurs = new ArrayList<>();
             if (attributs != null) {
+                List<AttributResponse> visibles = getAutresAttributs();
                 for (AttributResponse a : attributs) {
                     if ("Marque".equals(a.nom())) continue; // capturé par le champ dédié creerOffreBean.marque
+                    if (!visibles.contains(a)) continue; // caractéristique d'un autre type d'offre
                     switch (a.typeChamp()) {
                         case "LISTE" -> {
                             String v = valeursListe.get(a.id());
@@ -418,7 +420,15 @@ public class CreerOffreBean implements Serializable {
     /** Attributs à afficher dans "Caractéristiques" — Marque en est exclue, elle a son propre champ dans "Détails de l'offre". */
     public List<AttributResponse> getAutresAttributs() {
         if (attributs == null) return List.of();
-        return attributs.stream().filter(a -> !"Marque".equals(a.nom())).toList();
+        // Une fois le type choisi, seules les caractéristiques qui le concernent : un service
+        // (« Câblage réseau ») n'a ni taille, ni couleur, ni garantie de produit.
+        // Avant ce choix, on ne sait pas encore s'il s'agit d'un produit ou d'un service : rien.
+        if (typeOffreId == null) return List.of();
+        String exclu = isTypeOffreService() ? "PRODUIT" : "SERVICE";
+        return attributs.stream()
+                .filter(a -> !"Marque".equals(a.nom()))
+                .filter(a -> !exclu.equals(a.pourType()))
+                .toList();
     }
 
     /** Marques suggérées pour la catégorie choisie (liste vide si aucune définie : le champ Marque reste alors libre). */

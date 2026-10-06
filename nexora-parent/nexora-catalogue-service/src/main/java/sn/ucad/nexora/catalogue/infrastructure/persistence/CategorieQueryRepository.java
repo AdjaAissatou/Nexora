@@ -107,7 +107,7 @@ public class CategorieQueryRepository {
                     SELECT c.id_categorie_parent, a.profondeur + 1 FROM categorie c JOIN ancetres a ON c.id_categorie = a.id
                     WHERE c.id_categorie_parent IS NOT NULL
                 )
-                SELECT at.id_attribut, at.nom, at.code, CAST(at.type_champ AS TEXT), at.obligatoire, at.unite
+                SELECT at.id_attribut, at.nom, at.code, CAST(at.type_champ AS TEXT), at.obligatoire, at.unite, at.pour_type
                 FROM attribut at JOIN ancetres an ON an.id = at.id_categorie
                 WHERE at.actif = TRUE
                 ORDER BY an.profondeur DESC, at.ordre_affichage, at.nom
@@ -122,6 +122,7 @@ public class CategorieQueryRepository {
             a.setTypeChamp((String) r[3]);
             a.setObligatoire((Boolean) r[4]);
             a.setUnite((String) r[5]);
+            a.setPourType((String) r[6]);
             a.setValeurs(valeurs(a.getId()));
             return a;
         }).toList();

@@ -86,7 +86,7 @@
                                     <f:selectItem itemLabel="Choisir…" itemValue="#{null}" />
                                     <f:selectItems value="#{creerOffreBean.typesOffre}" var="t" itemLabel="#{t.libelle}" itemValue="#{t.id}" />
                                     <f:converter converterId="jakarta.faces.Long" />
-                                    <f:ajax listener="#{creerOffreBean.onTypeOffreChange}" render="communBloc" />
+                                    <f:ajax listener="#{creerOffreBean.onTypeOffreChange}" render="attributsBloc communBloc" />
                                 </h:selectOneMenu>
                                 <p style="color:var(--nx-text-secondary); font-size:.9em; margin-top:6px;">
                                     Rien ne correspond ? Choisissez "Autre" en bas de la liste et décrivez librement dans le titre.
@@ -239,10 +239,11 @@
                                         </h:inputText>
                                     </div>
                                     <div class="nx-field">
-                                        <label class="nx-field-check">
-                                            <h:selectBooleanCheckbox value="#{creerOffreBean.neuf}" />
-                                            Article neuf
-                                        </label>
+                                        <label for="creerOffre:etat">État</label>
+                                        <h:selectOneMenu id="etat" value="#{creerOffreBean.neuf}" styleClass="nx-select">
+                                            <f:selectItem itemLabel="Neuf" itemValue="#{true}" />
+                                            <f:selectItem itemLabel="Occasion" itemValue="#{false}" />
+                                        </h:selectOneMenu>
                                     </div>
                                 </div>
                             </ui:fragment>

@@ -10,4 +10,6 @@ public record AttributResponse(
         String typeChamp,
         boolean obligatoire,
         String unite,
+        /** TOUS, PRODUIT ou SERVICE. */
+        String pourType,
         List<ValeurAttributResponse> valeurs) {}

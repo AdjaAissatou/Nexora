@@ -1304,6 +1304,15 @@ garantie, puis chaque caractéristique ; tailles et couleurs en pastilles, épui
 avec une ligne repliable « Marquer comme épuisé » ; Oui / Non pour les caractéristiques
 booléennes ; l'unité (W, L, Go, mois, pouces) est rappelée dans le libellé.
 
+**Produit ou service** (`attribut.pour_type` : TOUS, PRODUIT, SERVICE) : le formulaire n'affiche
+les caractéristiques qu'une fois le type d'offre choisi, et seulement celles qui le concernent — un
+service (« Câblage réseau ») n'a ni taille, ni couleur, ni garantie de produit. Les anciennes listes à
+choix unique (taille, couleur, pointure de « Commerce > Mode »…) sont devenues des choix multiples
+(`11_migrations/05_choix_multiples.sql`), et 65 types d'offre de service enregistrés comme produits
+(câblage, coiffure, réparation, cours, ménage, locations…) sont redevenus des services. L'état d'un
+produit est une seule information : « Neuf » ou « Occasion » dans « Détails de l'offre »
+(la caractéristique « État » qui le doublait est retirée).
+
 **Démonstration** : `09_seed/29_demo_caracteristiques.sql` range dans la bonne catégorie les
 offres de démonstration classées trop haut (« Commerce ») ou dans la réparation alors qu'elles
 sont vendues, puis renseigne leurs caractéristiques d'après leur titre (une chemise « en lin
