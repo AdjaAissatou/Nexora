@@ -293,6 +293,15 @@ public class MonEspaceBean implements Serializable {
         return mesEspaces != null && mesEspaces.size() > 1;
     }
 
+    /** Vues de l'espace et de ses offres : c'est surtout sur les offres que les clients s'arrêtent. */
+    public long getTotalVues() {
+        long vues = espace == null || espace.nombreVues() == null ? 0 : espace.nombreVues();
+        if (mesOffres != null) {
+            for (OffreSummaryResponse o : mesOffres) vues += o.vueCount() == null ? 0 : o.vueCount();
+        }
+        return vues;
+    }
+
     public List<OffreSummaryResponse> getMesOffres() {
         return mesOffres;
     }

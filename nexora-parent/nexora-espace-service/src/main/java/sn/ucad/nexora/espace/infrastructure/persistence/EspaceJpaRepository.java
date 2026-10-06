@@ -11,7 +11,7 @@ public interface EspaceJpaRepository extends JpaRepository<EspaceJpaEntity,Long>
 
     @Modifying
     @Transactional
-    @Query("UPDATE EspaceJpaEntity e SET e.nombreVues = e.nombreVues + 1 WHERE e.id = :id")
+    @Query("UPDATE EspaceJpaEntity e SET e.nombreVues = COALESCE(e.nombreVues, 0) + 1 WHERE e.id = :id")
     void incrementerVues(Long id);
 
     /**

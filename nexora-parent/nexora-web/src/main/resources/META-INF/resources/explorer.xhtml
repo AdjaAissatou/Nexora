@@ -37,6 +37,10 @@
                     <span class="nx-explorer-besoin-icone" aria-hidden="true">🛠️</span>
                     <span><strong>Services</strong><small>Trouver un pro : plombier, coiffure, transport…</small></span>
                 </h:link>
+                <h:link outcome="/lieux" styleClass="nx-explorer-besoin">
+                    <span class="nx-explorer-besoin-icone" aria-hidden="true">📍</span>
+                    <span><strong>Lieux et repères</strong><small>Gorée, marchés, gares, hôpitaux… avec l'itinéraire</small></span>
+                </h:link>
             </div>
             <nav class="nx-explorer-sommaire" aria-label="Sommaire">
                 <a href="#rayons" class="nx-pastille">Rayons</a>
@@ -102,7 +106,10 @@
 
         <!-- Lieux publics -->
         <section id="lieux" class="nx-explorer-section">
-            <h2>Autour des lieux connus</h2>
+            <div class="nx-explorer-titre">
+                <h2>Autour des lieux connus</h2>
+                <h:link outcome="/lieux" value="Tous les lieux et repères →" styleClass="nx-see-all" />
+            </div>
             <p class="nx-explorer-intro">Marchés, gares, hôpitaux… : les commerces à deux pas, avec l'itinéraire.</p>
             <div class="nx-explorer-cartes">
                 <ui:repeat var="l" value="#{explorerBean.vue.lieux()}">

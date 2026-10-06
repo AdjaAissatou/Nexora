@@ -156,6 +156,10 @@ public class FormatBean implements Serializable {
             case "PORT" -> "Port";
             case "QUARTIER" -> "Quartier";
             case "CENTRE_COMMERCIAL" -> "Centre commercial";
+            case "TOURISME" -> "Site touristique";
+            case "MUSEE" -> "Musée";
+            case "CULTURE" -> "Culture";
+            case "PARC" -> "Parc";
             default -> type.charAt(0) + type.substring(1).toLowerCase(Locale.ROOT).replace('_', ' ');
         };
     }

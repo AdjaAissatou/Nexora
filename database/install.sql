@@ -160,7 +160,9 @@ SET client_encoding = 'UTF8';
 \i 09_seed/28_caracteristiques.sql
 \i 09_seed/30_synonymes_recherche.sql
 \i 09_seed/31_lieux_dakar_complements.sql
+\i 09_seed/32_lieux_celebres.sql
 \i 11_migrations/05_choix_multiples.sql
+\i 11_migrations/06_compteurs_espace.sql
 
 -------------------------------------------------------
 -- VUES

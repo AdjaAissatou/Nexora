@@ -25,6 +25,8 @@ public class OffreSummaryResponse {
     private Double distanceKm;
     /** Quantité vendue (commandes non annulées) : « 12 vendus ». */
     private long nombreVentes;
+    /** Nombre de consultations de la fiche (tableau de bord du professionnel). */
+    private Long vueCount;
 
     // Espace
     private Long espaceId;
@@ -107,4 +109,6 @@ public class OffreSummaryResponse {
     public void setDistanceKm(Double distanceKm) { this.distanceKm = distanceKm; }
     public long getNombreVentes() { return nombreVentes; }
     public void setNombreVentes(long nombreVentes) { this.nombreVentes = nombreVentes; }
+    public Long getVueCount() { return vueCount; }
+    public void setVueCount(Long vueCount) { this.vueCount = vueCount; }
 }

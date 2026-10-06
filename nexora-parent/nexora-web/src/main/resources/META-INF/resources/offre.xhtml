@@ -30,10 +30,57 @@
             <div class="nx-detail-layout">
 
                 <div class="nx-detail-main">
-                    <ui:fragment rendered="#{!empty offreDetailBean.offre.imagePrincipale}">
+                    <!-- Une seule photo -->
+                    <ui:fragment rendered="#{!empty offreDetailBean.offre.imagePrincipale and offreDetailBean.offre.images.size() le 1}">
                         <div class="nx-detail-image">
                             <img src="#{offreDetailBean.offre.imagePrincipale}" alt="#{offreDetailBean.offre.titre}" loading="lazy" />
                         </div>
+                    </ui:fragment>
+                    <!-- Plusieurs photos : galerie (flèches, vignettes, glisser au doigt) -->
+                    <ui:fragment rendered="#{offreDetailBean.offre.images.size() gt 1}">
+                        <div class="nx-galerie" id="nx-galerie">
+                            <div class="nx-detail-image nx-galerie-vue">
+                                <div class="nx-galerie-bande">
+                                    <ui:repeat var="url" value="#{offreDetailBean.offre.images}" varStatus="st">
+                                        <img src="#{url}" alt="#{offreDetailBean.offre.titre} — photo #{st.index + 1}" loading="#{st.first ? 'eager' : 'lazy'}" />
+                                    </ui:repeat>
+                                </div>
+                                <button type="button" class="nx-galerie-fleche precedente" aria-label="Photo précédente">‹</button>
+                                <button type="button" class="nx-galerie-fleche suivante" aria-label="Photo suivante">›</button>
+                                <span class="nx-galerie-compteur"><span class="actuelle">1</span> / #{offreDetailBean.offre.images.size()}</span>
+                            </div>
+                            <div class="nx-galerie-vignettes">
+                                <ui:repeat var="url" value="#{offreDetailBean.offre.images}" varStatus="st">
+                                    <button type="button" class="#{st.first ? 'active' : ''}" data-index="#{st.index}" aria-label="Voir la photo #{st.index + 1}">
+                                        <img src="#{url}" alt="" loading="lazy" />
+                                    </button>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                        <script>
+                            (function () {
+                                var g = document.getElementById('nx-galerie'), bande = g.querySelector('.nx-galerie-bande');
+                                var vignettes = g.querySelectorAll('.nx-galerie-vignettes button'), n = vignettes.length;
+                                function aller(i) {
+                                    i = (i + n) % n;
+                                    bande.scrollTo({ left: i * bande.clientWidth, behavior: 'smooth' });
+                                }
+                                function actuelle() { return Math.round(bande.scrollLeft / bande.clientWidth); }
+                                bande.addEventListener('scroll', function () {
+                                    var i = actuelle();
+                                    g.querySelector('.actuelle').textContent = i + 1;
+                                    vignettes.forEach(function (v, k) { v.classList.toggle('active', k === i); });
+                                });
+                                g.querySelector('.precedente').addEventListener('click', function () { aller(actuelle() - 1); });
+                                g.querySelector('.suivante').addEventListener('click', function () { aller(actuelle() + 1); });
+                                vignettes.forEach(function (v) { v.addEventListener('click', function () { aller(+v.dataset.index); }); });
+                                document.addEventListener('keydown', function (e) {
+                                    if (e.target.closest('input, textarea, select')) return;
+                                    if (e.key === 'ArrowLeft') aller(actuelle() - 1);
+                                    if (e.key === 'ArrowRight') aller(actuelle() + 1);
+                                });
+                            })();
+                        </script>
                     </ui:fragment>
 
                     <div class="nx-offre-espace">

@@ -68,7 +68,7 @@
                     <div class="nx-profile-row">
                         <span>
                             <svg class="nx-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="color:#f5b023; width:16px; height:16px; vertical-align:-2px;"><path d="M12 2.5l2.7 6.4 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.9 20.9l1.6-6.8-5.2-4.6 6.9-.6L12 2.5z"/></svg>
-                            <h:outputText value="#{monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText>
+                            <h:outputText value="#{monEspaceBean.espace.noteMoyenne == null ? 0 : monEspaceBean.espace.noteMoyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText>
                         </span>
                         <span>(#{monEspaceBean.espace.nombreAvis} avis)</span>
                     </div>
@@ -128,12 +128,12 @@
                         <div class="nx-apercu-grid">
                             <div class="nx-apercu-stat">
                                 <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-                                <span class="nx-apercu-valeur"><h:outputText value="#{monEspaceBean.espace.nombreVues}"><f:convertNumber groupingUsed="true" /></h:outputText></span>
-                                <span class="nx-apercu-label">vues</span>
+                                <span class="nx-apercu-valeur"><h:outputText value="#{monEspaceBean.totalVues}"><f:convertNumber groupingUsed="true" /></h:outputText></span>
+                                <span class="nx-apercu-label">vues (espace et offres)</span>
                             </div>
                             <div class="nx-apercu-stat">
                                 <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-                                <span class="nx-apercu-valeur"><h:outputText value="#{monEspaceBean.espace.nombreFavoris}"><f:convertNumber groupingUsed="true" /></h:outputText></span>
+                                <span class="nx-apercu-valeur"><h:outputText value="#{monEspaceBean.espace.nombreFavoris == null ? 0 : monEspaceBean.espace.nombreFavoris}"><f:convertNumber groupingUsed="true" /></h:outputText></span>
                                 <span class="nx-apercu-label">favoris</span>
                             </div>
                             <div class="nx-apercu-stat">

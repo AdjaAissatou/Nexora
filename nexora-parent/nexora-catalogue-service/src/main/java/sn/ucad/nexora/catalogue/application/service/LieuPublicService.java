@@ -18,7 +18,7 @@ public class LieuPublicService implements LieuPublicUseCase {
 
     @Override
     public List<LieuPublicResponse> rechercher(String q, String commune, String typeLieu, int limite) {
-        int limiteBornee = Math.min(Math.max(limite, 1), 100);
+        int limiteBornee = Math.min(Math.max(limite, 1), 500);
         return repository.rechercher(q, commune, typeLieu, limiteBornee);
     }
 

@@ -1,0 +1,96 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<!-- Lieux et repères (docs/architecture-acteurs.md §20) : sites célèbres, marchés, quartiers, gares,
+     hôpitaux… avec l'itinéraire et les commerces autour. -->
+<ui:define name="titre">Lieux et repères — Nexora</ui:define>
+<ui:define name="head-extra">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</ui:define>
+<ui:define name="content">
+    <h:outputScript library="js" name="search-map.js" target="head" />
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <h1>Lieux et repères</h1>
+            <p>Les endroits célèbres et utiles du Sénégal — marchés, quartiers, sites à visiter, gares, hôpitaux… —
+                avec l'itinéraire pour s'y rendre et les commerces autour.</p>
+        </div>
+    </section>
+
+    <div class="nx-container nx-lieux">
+        <div class="nx-lieux-outils">
+            <input type="search" id="nx-lieux-texte" class="nx-input" placeholder="Chercher un lieu : Gorée, Colobane, gare, hôpital…"
+                   aria-label="Chercher un lieu" autocomplete="off" />
+            <div class="nx-lieux-familles" role="group" aria-label="Familles de lieux">
+                <button type="button" class="nx-pastille active" data-famille="">Tout</button>
+                <ui:repeat var="f" value="#{lieuxBean.familles}">
+                    <button type="button" class="nx-pastille" data-famille="#{f.code()}">#{f.libelle()}</button>
+                </ui:repeat>
+            </div>
+            <p class="nx-lieux-compte"><span id="nx-lieux-nombre">#{lieuxBean.lieux.size()}</span> lieu(x)</p>
+        </div>
+
+        <div class="nx-card" style="padding:0; overflow:hidden; margin-bottom:20px;">
+            <div id="nx-lieux-carte" class="nx-search-map"></div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (window.nexoraInitSearchMap) window.nexoraInitSearchMap('nx-lieux-carte', #{lieuxBean.pointsCarteJson});
+            });
+        </script>
+
+        <div class="nx-lieux-grille" id="nx-lieux-grille">
+            <ui:repeat var="l" value="#{lieuxBean.lieux}">
+                <article class="nx-lieu" data-famille="#{lieuxBean.famille(l.typeLieu())}"
+                         data-texte="#{l.nom()} #{l.commune()} #{l.region()} #{format.typeLieu(l.typeLieu())} #{l.description()}">
+                    <span class="nx-badge nx-badge-neutre">#{format.typeLieu(l.typeLieu())}</span>
+                    <h3>#{l.nom()}</h3>
+                    <p class="nx-lieu-ou">#{empty l.commune() ? '' : l.commune()}#{empty l.region() or l.region() == l.commune() ? '' : ', '.concat(l.region())}</p>
+                    <ui:fragment rendered="#{!empty l.description()}"><p class="nx-lieu-description">#{l.description()}</p></ui:fragment>
+                    <div class="nx-lieu-actions">
+                        <h:outputLink value="#{format.lienItineraire(l.latitude(), l.longitude())}" target="_blank" styleClass="nx-button nx-button-primary">
+                            🧭 Itinéraire
+                        </h:outputLink>
+                        <h:link outcome="/recherche" styleClass="nx-button nx-button-outline-dark">
+                            <f:param name="lieu" value="#{l.id()}" />
+                            🛍️ Commerces autour
+                        </h:link>
+                    </div>
+                </article>
+            </ui:repeat>
+        </div>
+        <p class="nx-empty" id="nx-lieux-aucun" hidden="hidden">Aucun lieu ne correspond. Essayez un autre mot ou une autre famille.</p>
+    </div>
+
+    <script>
+        (function () {
+            var texte = document.getElementById('nx-lieux-texte'), famille = '';
+            var cartes = document.querySelectorAll('#nx-lieux-grille .nx-lieu');
+            function sansAccents(t) { return (t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+            cartes.forEach(function (c) { c._texte = sansAccents(c.getAttribute('data-texte')); });
+            function filtrer() {
+                var t = sansAccents(texte.value.trim()), n = 0;
+                cartes.forEach(function (c) {
+                    var ok = (!famille || c.getAttribute('data-famille') === famille) &amp;&amp; (!t || c._texte.indexOf(t) >= 0);
+                    c.hidden = !ok;
+                    if (ok) n++;
+                });
+                document.getElementById('nx-lieux-nombre').textContent = n;
+                document.getElementById('nx-lieux-aucun').hidden = n > 0;
+            }
+            texte.addEventListener('input', filtrer);
+            document.querySelectorAll('.nx-lieux-familles button').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    famille = b.getAttribute('data-famille');
+                    document.querySelectorAll('.nx-lieux-familles button').forEach(function (x) { x.classList.toggle('active', x === b); });
+                    filtrer();
+                });
+            });
+        })();
+    </script>
+</ui:define>
+</ui:composition>

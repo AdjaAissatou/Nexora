@@ -325,6 +325,8 @@ public class RechercheBean implements Serializable {
         lieuChoisi = null;
         texteDuLieu = null;
         if (texte.length() < 3 || texte.equals(texteSansLieu)) return;
+        // Le nom d'un espace (« auchan ») l'emporte sur un lieu homonyme : on cherche ses offres
+        if (!catalogueApiClient.espacesParNom(q).isEmpty()) return;
         try {
             for (LieuPublicResponse l : catalogueApiClient.rechercherLieuxPublics(q, null, 5)) {
                 if (normaliser(l.nom()).contains(texte)) {

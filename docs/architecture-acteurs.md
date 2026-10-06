@@ -1499,5 +1499,30 @@ Résultat : aucun souci.
   Mermoz, Sacré-Cœur, Point E…) : « colobane » montre le quartier, l'itinéraire et les commerces
   autour (`09_seed/31_lieux_dakar_complements.sql`, coordonnées approximatives).
 
+## 20. ✅ Lieux et repères, galerie de photos, compteurs de l'espace, filtres de la recherche par photo
+
+**Lieux et repères** (`lieux.xhtml`, lien dans Explorer, la recherche et le pied de page) : tous les
+lieux publics (133), filtrés par famille — À visiter (Gorée, Maison des Esclaves, Musée des
+Civilisations noires, Phare des Mamelles, Pointe des Almadies, Lac Rose…), Marchés et shopping,
+Quartiers, Transports (gares, TER, gare routière, aéroport, port), Santé, Lieux de culte,
+Administrations et services, Sport — et par texte (sans accents), avec la carte. Chaque lieu :
+**🧭 Itinéraire** (Google Maps) et **🛍️ Commerces autour** (recherche autour du lieu).
+Lieux célèbres ajoutés : `09_seed/32_lieux_celebres.sql` (coordonnées approximatives). Un texte qui
+est le nom d'un espace (« auchan ») cherche ses offres plutôt qu'un lieu homonyme.
+
+**Fiche d'une offre** : toutes ses photos — galerie avec flèches, compteur, vignettes, glisser au
+doigt sur téléphone, flèches du clavier (avant : la photo principale seulement).
+
+**Vue d'ensemble de Mon espace** : les compteurs d'un espace créé depuis l'application étaient
+vides (NULL), et « NULL + 1 » restant NULL, les vues ne montaient jamais ; aucun service ne tenait
+le nombre de favoris. Compteurs à 0 dès la création, incrément robuste, et un déclencheur
+`trg_favori_compter` recalcule les favoris d'un espace (ceux de l'espace et de ses offres) à chaque
+favori ajouté ou retiré (`11_migrations/06_compteurs_espace.sql`). La tuile « vues » additionne les
+vues de l'espace et de ses offres.
+
+**Recherche par photo** : tri (les plus ressemblants, moins chers, plus chers, mieux notés) et
+filtres (prix maximum, quartier, très ressemblants, ouverts maintenant, espaces vérifiés),
+appliqués sur place.
+
 ---
 *Dernière mise à jour : session du 06/10/2026, Nexora Découvrir.*

@@ -23,10 +23,11 @@ public class EspaceProfessionnel {
     private String statut;
     private boolean certifie;
     private boolean verifie;
-    private BigDecimal noteMoyenne;
-    private Integer nombreAvis;
-    private Long nombreVues;
-    private Long nombreFavoris;
+    private BigDecimal noteMoyenne = BigDecimal.ZERO;
+    private Integer nombreAvis = 0;
+    /** Compteurs à 0 dès la création : « NULL + 1 » resterait NULL, le compteur ne bougerait jamais. */
+    private Long nombreVues = 0L;
+    private Long nombreFavoris = 0L;
     private LocalDateTime dateCreation;
     private LocalDateTime dateCertification;
     private LocalDateTime dateVerification;

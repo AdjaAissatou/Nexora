@@ -294,7 +294,8 @@
 
                 <ui:fragment rendered="#{rechercheBean.lieuChoisi == null and !empty rechercheBean.lieuxPublics}">
                     <div class="nx-card" style="margin-bottom:20px;">
-                        <h3 style="margin-top:0;">Lieux publics</h3>
+                        <div class="nx-explorer-titre" style="margin-bottom:6px;"><h3 style="margin:0;">Lieux publics</h3>
+                            <h:link outcome="/lieux" value="Tous les lieux et repères →" styleClass="nx-see-all" /></div>
                         <div class="nx-lieu-public-liste">
                             <ui:repeat var="l" value="#{rechercheBean.lieuxPublics}">
                                 <div class="nx-lieu-public-item">

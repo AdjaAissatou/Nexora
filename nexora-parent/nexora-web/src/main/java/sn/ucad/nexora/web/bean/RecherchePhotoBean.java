@@ -91,6 +91,51 @@ public class RecherchePhotoBean implements Serializable {
         return "Des articles très ressemblants sont proposés par " + espaces + " espaces, " + prix + " : comparez avant de vous déplacer.";
     }
 
+    // Filtres des résultats (§11) : appliqués sur place, sans relancer la recherche
+    private String tri = "RESSEMBLANCE";
+    private java.math.BigDecimal prixMax;
+    private String commune;
+    private boolean ouvert;
+    private boolean verifie;
+    private boolean tresRessemblants;
+
+    /** Résultats après filtres et tri. */
+    public List<Resultat> getResultatsFiltres() {
+        if (resultats == null) return List.of();
+        java.util.stream.Stream<Resultat> flux = resultats.stream()
+                .filter(r -> prixMax == null || r.offre().prix() == null || r.offre().prix().compareTo(prixMax) <= 0)
+                .filter(r -> commune == null || commune.isBlank() || commune.equals(r.offre().commune()))
+                .filter(r -> !ouvert || Boolean.TRUE.equals(r.offre().espaceOuvertMaintenant()))
+                .filter(r -> !verifie || r.offre().espaceVerifie())
+                .filter(r -> !tresRessemblants || r.ressemblance() >= MEME_ARTICLE);
+        java.util.Comparator<Resultat> ordre = switch (tri) {
+            case "PRIX_ASC" -> java.util.Comparator.comparing(r -> r.offre().prix(), java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+            case "PRIX_DESC" -> java.util.Comparator.comparing((Resultat r) -> r.offre().prix(), java.util.Comparator.nullsFirst(java.util.Comparator.naturalOrder())).reversed();
+            case "NOTE" -> java.util.Comparator.comparing((Resultat r) -> r.offre().espaceNoteMoyenne(), java.util.Comparator.nullsFirst(java.util.Comparator.naturalOrder())).reversed();
+            default -> java.util.Comparator.comparingDouble(Resultat::ressemblance).reversed();
+        };
+        return flux.sorted(ordre).toList();
+    }
+
+    /** Quartiers des résultats, pour le filtre. */
+    public List<String> getCommunes() {
+        if (resultats == null) return List.of();
+        return resultats.stream().map(r -> r.offre().commune()).filter(c -> c != null && !c.isBlank()).distinct().sorted().toList();
+    }
+
+    public String getTri() { return tri; }
+    public void setTri(String tri) { this.tri = tri == null || tri.isBlank() ? "RESSEMBLANCE" : tri; }
+    public java.math.BigDecimal getPrixMax() { return prixMax; }
+    public void setPrixMax(java.math.BigDecimal prixMax) { this.prixMax = prixMax; }
+    public String getCommune() { return commune; }
+    public void setCommune(String commune) { this.commune = commune; }
+    public boolean isOuvert() { return ouvert; }
+    public void setOuvert(boolean ouvert) { this.ouvert = ouvert; }
+    public boolean isVerifie() { return verifie; }
+    public void setVerifie(boolean verifie) { this.verifie = verifie; }
+    public boolean isTresRessemblants() { return tresRessemblants; }
+    public void setTresRessemblants(boolean tresRessemblants) { this.tresRessemblants = tresRessemblants; }
+
     public boolean isRecherchee() { return resultats != null || erreur != null; }
     public boolean isAucunResultat() { return resultats != null && resultats.isEmpty(); }
     public String getApercu() { return apercu; }

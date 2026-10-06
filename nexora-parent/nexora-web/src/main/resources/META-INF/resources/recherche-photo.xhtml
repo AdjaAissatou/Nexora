@@ -61,15 +61,42 @@
                     <ui:fragment rendered="#{not empty recherchePhotoBean.comparaison}">
                         <div class="nx-alert nx-alert-info nx-photo-comparaison">#{recherchePhotoBean.comparaison}</div>
                     </ui:fragment>
+                    <div class="nx-photo-filtres">
+                        <h:selectOneMenu value="#{recherchePhotoBean.tri}" styleClass="nx-select" title="Trier">
+                            <f:selectItem itemLabel="Les plus ressemblants" itemValue="RESSEMBLANCE" />
+                            <f:selectItem itemLabel="Moins chers" itemValue="PRIX_ASC" />
+                            <f:selectItem itemLabel="Plus chers" itemValue="PRIX_DESC" />
+                            <f:selectItem itemLabel="Mieux notés" itemValue="NOTE" />
+                            <f:ajax render="liste" />
+                        </h:selectOneMenu>
+                        <h:inputText value="#{recherchePhotoBean.prixMax}" styleClass="nx-input" placeholder="Prix max (FCFA)"
+                                     converterMessage="Le prix maximum doit être un nombre.">
+                            <f:ajax event="change" render="liste" />
+                        </h:inputText>
+                        <h:selectOneMenu value="#{recherchePhotoBean.commune}" styleClass="nx-select" title="Quartier">
+                            <f:selectItem itemLabel="Tous les quartiers" itemValue="" />
+                            <f:selectItems value="#{recherchePhotoBean.communes}" />
+                            <f:ajax render="liste" />
+                        </h:selectOneMenu>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{recherchePhotoBean.tresRessemblants}"><f:ajax render="liste" /></h:selectBooleanCheckbox> Très ressemblants</label>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{recherchePhotoBean.ouvert}"><f:ajax render="liste" /></h:selectBooleanCheckbox> Ouverts maintenant</label>
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{recherchePhotoBean.verifie}"><f:ajax render="liste" /></h:selectBooleanCheckbox> Espaces vérifiés</label>
+                    </div>
+                    <h:panelGroup id="liste" layout="block">
+                    <ui:fragment rendered="#{empty recherchePhotoBean.resultatsFiltres}">
+                        <div class="nx-empty"><p><strong>Aucun article avec ces filtres.</strong> Retirez un filtre pour revoir les #{recherchePhotoBean.resultats.size()} résultats.</p></div>
+                    </ui:fragment>
+                    <p class="nx-photo-compte">#{recherchePhotoBean.resultatsFiltres.size()} article(s) affiché(s)</p>
                     <div class="nx-offre-grid nx-offre-grid-large">
-                        <ui:repeat var="r" value="#{recherchePhotoBean.resultats}">
+                        <ui:repeat var="r" value="#{recherchePhotoBean.resultatsFiltres}">
                             <ui:include src="/WEB-INF/includes/offre-carte.xhtml">
                                 <ui:param name="o" value="#{r.offre()}" />
                                 <ui:param name="ressemblance" value="#{r.ressemblance()}" />
                             </ui:include>
                         </ui:repeat>
                     </div>
-                    <p class="nx-photo-note">Les résultats sont classés du plus ressemblant au moins ressemblant.
+                    </h:panelGroup>
+                    <p class="nx-photo-note">Par défaut, les résultats sont classés du plus ressemblant au moins ressemblant.
                         La ressemblance porte sur l'apparence de la photo : vérifiez la description de l'article.</p>
                 </ui:fragment>
             </h:panelGroup>

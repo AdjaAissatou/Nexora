@@ -35,7 +35,9 @@ public record OffreSummaryResponse(
         /** Distance au lieu recherché (km) ; null hors recherche autour d'un lieu. */
         Double distanceKm,
         /** Quantité vendue (commandes non annulées). */
-        long nombreVentes) {
+        long nombreVentes,
+        /** Consultations de la fiche. */
+        Long vueCount) {
 
     public boolean suspendue() {
         return "SUSPENDU".equals(statut);

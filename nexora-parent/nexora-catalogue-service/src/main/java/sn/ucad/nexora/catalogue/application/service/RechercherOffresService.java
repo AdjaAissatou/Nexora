@@ -160,6 +160,7 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         r.setEspaceOuvertMaintenant(o.getEspaceOuvertMaintenant());
         r.setDistanceKm(o.getDistanceKm());
         r.setNombreVentes(o.getNombreVentes());
+        r.setVueCount(o.getVueCount());
         r.setEspaceId(o.getEspaceId());
         r.setEspaceNom(o.getEspaceNom());
         r.setEspaceLogo(o.getEspaceLogo());

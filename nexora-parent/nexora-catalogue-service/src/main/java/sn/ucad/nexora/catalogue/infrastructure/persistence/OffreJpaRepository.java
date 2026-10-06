@@ -11,6 +11,6 @@ public interface OffreJpaRepository extends JpaRepository<OffreJpaEntity, Long> 
 
     @Modifying
     @Transactional
-    @Query("UPDATE OffreJpaEntity o SET o.vueCount = o.vueCount + 1 WHERE o.id = :id")
+    @Query("UPDATE OffreJpaEntity o SET o.vueCount = COALESCE(o.vueCount, 0) + 1 WHERE o.id = :id")
     void incrementerVues(@Param("id") Long id);
 }
