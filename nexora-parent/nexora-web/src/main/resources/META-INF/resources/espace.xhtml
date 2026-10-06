@@ -76,9 +76,9 @@
                         </div>
 
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
-                            <ui:fragment rendered="#{!empty espaceDetailBean.espace.telephone}">
-                                <h:outputLink value="tel:#{espaceDetailBean.espace.telephone}" styleClass="nx-button nx-button-primary">Appeler</h:outputLink>
-                                <h:outputLink value="https://wa.me/221#{espaceDetailBean.espace.telephone}" styleClass="nx-button nx-button-outline">WhatsApp</h:outputLink>
+                            <ui:fragment rendered="#{format.telephoneValide(espaceDetailBean.espace.telephone)}">
+                                <h:outputLink value="tel:#{format.telephoneInternational(espaceDetailBean.espace.telephone)}" styleClass="nx-button nx-button-primary">Appeler</h:outputLink>
+                                <h:outputLink value="https://wa.me/#{format.telephoneInternational(espaceDetailBean.espace.telephone).replace('+', '')}" target="_blank" styleClass="nx-button nx-button-outline">WhatsApp</h:outputLink>
                             </ui:fragment>
                             <ui:fragment rendered="#{espaceDetailBean.espace.latitude != null}">
                                 <h:outputLink value="#{format.lienItineraire(espaceDetailBean.espace.latitude, espaceDetailBean.espace.longitude)}"
@@ -219,7 +219,9 @@
                 </ui:fragment>
 
                 <h3 style="margin-top:28px;">Informations</h3>
-                <div class="nx-profile-row"><span>Téléphone</span><span>#{espaceDetailBean.espace.telephone}</span></div>
+                <ui:fragment rendered="#{format.telephoneValide(espaceDetailBean.espace.telephone)}">
+                    <div class="nx-profile-row"><span>Téléphone</span><span>#{espaceDetailBean.espace.telephone}</span></div>
+                </ui:fragment>
                 <ui:fragment rendered="#{!empty espaceDetailBean.espace.email}">
                     <div class="nx-profile-row"><span>Email</span><span>#{espaceDetailBean.espace.email}</span></div>
                 </ui:fragment>

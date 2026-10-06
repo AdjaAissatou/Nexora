@@ -1478,5 +1478,26 @@ en ajoutant l'identité du visiteur.
 professionnels (le flux sait déjà lire une vidéo), commande et réservation dans Nexora quand le
 panier existera (aujourd'hui par WhatsApp), notifications « nouveauté chez un professionnel suivi ».
 
+## 19. Vérification globale (2e passe) et corrections
+
+**Parcours automatique** de toutes les pages, par rôle (visiteur, client, professionnel, super
+administrateur, agent de vérification), sur ordinateur (1280 px) et téléphone (390 px) : ~190 pages
+par largeur, en suivant les liens de chaque page. Relevés : code HTTP, erreurs JavaScript et de
+console, messages d'erreur affichés, débordement horizontal, images locales cassées, liens morts.
+Résultat : aucun souci.
+
+**Corrigé à cette occasion** (retours de test) :
+- **Téléphones** : aucun champ ne vérifiait le format — une adresse e-mail s'était retrouvée dans
+  le téléphone d'un espace. Inscription, Mon compte, création et modification d'espace exigent
+  désormais un numéro sénégalais (9 chiffres commençant par 7 ou 3, +221 facultatif), avec le
+  message sous le champ. La fiche d'un espace n'affiche plus un numéro invalide, et les liens
+  « Appeler » / « WhatsApp » sont au format international (+221…), quels que soient les espaces
+  saisis. Le téléphone du **compte** (Mon compte) et celui de l'**espace** (Mon espace, vu par les
+  clients) sont deux informations distinctes : la page Mon compte le rappelle.
+- **Lieux** : 33 marchés et quartiers de Dakar et de sa banlieue ajoutés comme repères
+  (Colobane, Gueule Tapée, Fass, Grand Yoff, Ouakam, Parcelles, Pikine, Guédiawaye, Almadies,
+  Mermoz, Sacré-Cœur, Point E…) : « colobane » montre le quartier, l'itinéraire et les commerces
+  autour (`09_seed/31_lieux_dakar_complements.sql`, coordonnées approximatives).
+
 ---
 *Dernière mise à jour : session du 06/10/2026, Nexora Découvrir.*

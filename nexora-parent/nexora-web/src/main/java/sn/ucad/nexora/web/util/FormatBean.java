@@ -116,6 +116,18 @@ public class FormatBean implements Serializable {
     }
 
     /** Lien "obtenir l'itinéraire" vers Google Maps — aucune clé d'API requise, s'ouvre dans l'appli Maps du visiteur. */
+    /** Un vrai numéro sénégalais (9 chiffres commençant par 7 ou 3, +221 facultatif) ? Une adresse e-mail n'en est pas un. */
+    public boolean telephoneValide(String telephone) {
+        return telephone != null && telephone.trim().matches("(\\+221|00221)?[ .-]*[37][0-9]([ .-]*[0-9]){7}");
+    }
+
+    /** « 77 123 45 67 » → « +221771234567 » (liens tel: et WhatsApp). */
+    public String telephoneInternational(String telephone) {
+        if (telephone == null) return "";
+        String chiffres = telephone.replaceAll("\\D", "").replaceFirst("^00", "");
+        return "+" + (chiffres.length() == 9 ? "221" + chiffres : chiffres);
+    }
+
     /** « à 350 m », « à 2,1 km » ; vide sans distance. */
     public String distance(Double km) {
         if (km == null) return "";
@@ -142,6 +154,8 @@ public class FormatBean implements Serializable {
             case "BANQUE" -> "Banque";
             case "STADE" -> "Stade";
             case "PORT" -> "Port";
+            case "QUARTIER" -> "Quartier";
+            case "CENTRE_COMMERCIAL" -> "Centre commercial";
             default -> type.charAt(0) + type.substring(1).toLowerCase(Locale.ROOT).replace('_', ' ');
         };
     }

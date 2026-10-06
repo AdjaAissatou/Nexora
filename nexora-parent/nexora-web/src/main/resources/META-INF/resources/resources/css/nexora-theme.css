@@ -1733,3 +1733,4 @@ select.nx-liste-ouverte option { padding: 6px 10px; border-radius: 8px; }
 .nx-explorer-besoin small { color: var(--nx-text-secondary); }
 @media (max-width: 600px) { .nx-explorer-besoins { grid-template-columns: 1fr; } }
 #nx-offres, #nx-resultats { scroll-margin-top: 96px; }
+.nx-erreur-champ { display: block; margin-top: 6px; color: #b3261e; font-size: 13px; font-weight: 600; }

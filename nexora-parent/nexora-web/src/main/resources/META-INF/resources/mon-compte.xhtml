@@ -44,7 +44,11 @@
                     </div>
                     <div class="nx-field">
                         <label for="profilForm:telephone">Téléphone</label>
-                        <h:inputText id="telephone" value="#{monCompteBean.telephone}" styleClass="nx-input" />
+                        <h:inputText id="telephone" value="#{monCompteBean.telephone}" styleClass="nx-input" validatorMessage="Numéro de téléphone invalide : 9 chiffres commençant par 7 ou 3 (ex. 77 123 45 67), avec +221 si vous voulez.">
+                            <f:validateRegex pattern="^$|^(\+221|00221)?[ .-]*[37][0-9]([ .-]*[0-9]){7}$" />
+                        </h:inputText>
+                        <h:message for="telephone" styleClass="nx-erreur-champ" />
+                        <small class="nx-aide">Votre numéro de compte. Celui que voient vos clients se modifie dans « Mon espace ».</small>
                     </div>
 
                     <h:commandButton value="Enregistrer" action="#{monCompteBean.enregistrerProfil}" styleClass="nx-button nx-button-primary nx-button-block" />

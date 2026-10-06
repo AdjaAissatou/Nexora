@@ -255,11 +255,17 @@
                             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 12px;">
                                 <div class="nx-field">
                                     <label for="espaceForm:telephone">Téléphone</label>
-                                    <h:inputText id="telephone" value="#{monEspaceBean.espaceTelephone}" styleClass="nx-input" />
+                                    <h:inputText id="telephone" value="#{monEspaceBean.espaceTelephone}" styleClass="nx-input" validatorMessage="Numéro de téléphone invalide : 9 chiffres commençant par 7 ou 3 (ex. 77 123 45 67), avec +221 si vous voulez.">
+                            <f:validateRegex pattern="^$|^(\+221|00221)?[ .-]*[37][0-9]([ .-]*[0-9]){7}$" />
+                        </h:inputText>
+                        <h:message for="telephone" styleClass="nx-erreur-champ" />
                                 </div>
                                 <div class="nx-field">
                                     <label for="espaceForm:telephoneSecondaire">Téléphone secondaire</label>
-                                    <h:inputText id="telephoneSecondaire" value="#{monEspaceBean.espaceTelephoneSecondaire}" styleClass="nx-input" />
+                                    <h:inputText id="telephoneSecondaire" value="#{monEspaceBean.espaceTelephoneSecondaire}" styleClass="nx-input" validatorMessage="Numéro de téléphone invalide : 9 chiffres commençant par 7 ou 3 (ex. 77 123 45 67), avec +221 si vous voulez.">
+                            <f:validateRegex pattern="^$|^(\+221|00221)?[ .-]*[37][0-9]([ .-]*[0-9]){7}$" />
+                        </h:inputText>
+                        <h:message for="telephoneSecondaire" styleClass="nx-erreur-champ" />
                                 </div>
                             </div>
                             <div class="nx-field">
