@@ -36,6 +36,8 @@ public class SecurityConfig {
                                 "/api/v1/offres/{id:\\d+}/similaires",
                                 "/api/v1/offres/suggestions"
                         ).permitAll()
+                        // Nexora Découvrir (§18) : flux et signaux anonymes, comme la recherche
+                        .requestMatchers("/api/v1/decouvrir", "/api/v1/decouvrir/**").permitAll()
                         // Recherche par photo (§11) : publique comme la recherche par mots.
                         .requestMatchers(HttpMethod.POST, "/api/v1/offres/recherche-photo").permitAll()
                         .requestMatchers(

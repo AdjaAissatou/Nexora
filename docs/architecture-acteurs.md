@@ -1389,6 +1389,71 @@ API : `GET /api/v1/offres/recherche` accepte `noteMin`, `neuf`, `negociable`, `d
 `nombreVentes`. `GET /api/v1/offres/recherche/facettes` (mêmes paramètres) : catégories et
 valeurs de caractéristiques présentes dans les résultats, avec leurs comptes, et la fourchette de prix.
 
+## 18. ✅ Nexora Découvrir : une offre à la fois, autour de moi, adaptée à mes goûts
+
+Trois façons de trouver, trois intentions :
+- **Rechercher** : « je sais ce que je veux » (robe bazin rouge taille M) ;
+- **À proximité** / **Explorer** : « qu'y a-t-il autour de moi, dans ce quartier ? » ;
+- **Découvrir** : « montre-moi ce qui pourrait me plaire ».
+Menu : Accueil · Explorer · ✨ Découvrir · À proximité · Rechercher.
+
+On ne copie pas TikTok : on reprend son meilleur mécanisme (une découverte à la fois, sans fin,
+sans friction) pour en faire une vitrine **locale** et **transactionnelle**.
+
+**Le flux** (`decouvrir.xhtml`, plein écran) : on glisse vers le haut pour passer à la carte
+suivante ; les pages suivantes se chargent avant d'arriver au bout. Quatre sortes de cartes :
+- **Produit** — photo plein écran, prix, tailles et couleurs disponibles, professionnel (✓ vérifié,
+  note, ouvert) ; **Commander** (par WhatsApp, message prérempli) ;
+- **Service** — « À partir de … » ; **Demander un devis** ;
+- **Prestation** (mariage, décoration, pack, réception, séance…) et restaurant — **Réserver** ;
+- **Professionnel** (une par page) — sa vitrine (couverture, photos de ses articles), note,
+  nombre d'offres ; **Découvrir l'espace**, **Appeler**.
+Sur chaque carte : ❤️ J'aime (double-tap aussi), 🔖 Enregistrer (favori du compte), ↗ Partager
+(partage du téléphone ou lien copié), 📞 Appeler ; plusieurs photos : toucher à gauche / à droite ;
+vidéos (.mp4, .webm) lues en boucle, sans le son, quand la carte est à l'écran.
+Une **accroche locale** : « 🔥 Ça bouge à Sandaga », « 🍽️ Ce soir à Plateau », « ✨ Nouveauté à
+Almadies », « 🏷️ −20 % en ce moment », « 💍 Mariage » ; et **pourquoi** cette carte :
+« Parce que vous aimez « Mode et textile » », « Tendance à Dakar », « Pour changer : à découvrir ».
+
+**La zone** : tout le Sénégal, un quartier (liste des quartiers ayant des offres), ou **autour de
+moi** (3 km). Le flux ne montre que ce qui est réellement accessible dans la zone.
+
+**L'apprentissage** (table `decouverte_signal`) : chaque interaction est un signal, du plus faible
+au plus fort — passée vite (< 1 s, −0,6), vue (≥ 1 s, 0,2), vue longue (≥ 3,5 s, 1), J'aime (3),
+partage (3), enregistré (4), fiche ouverte (4), tailles consultées (5), contact / devis (7),
+commande / réservation (8). Les poids s'atténuent avec le temps (moitié en deux semaines
+environ, 90 jours au plus). Le profil s'établit par rayon, catégorie parente, catégorie et
+professionnel. Une offre passée vite n'est pas remontrée pendant 7 jours.
+
+**Le classement** de chaque offre :
+`3 × intérêt (profil) + 1,2 × proximité + photos + 0,5 × disponibilité (ouvert) + popularité
+(vues, favoris, ventes) + qualité du professionnel (vérifié, certifié, note) + nouveauté
+(+ 1,5 × rang dans la recherche) + un peu de hasard`.
+Chaque page mélange ~**70 %** d'offres pertinentes, ~**20 %** de tendances locales (nouveautés,
+succès du coin) et ~**10 %** de découverte (un rayon que le visiteur n'a pas exploré), sans plus de
+deux offres d'une même catégorie, jamais deux fois de suite le même professionnel, au moins un
+service s'il y en a, et une fiche de professionnel en 5e position.
+
+**Pas de boîte noire** : ✨ « Vos goûts » montre ce que Nexora a compris (rayons et catégories
+préférés), le mélange 70/20/10, et permet d'**effacer ses goûts**.
+
+**Identité** : un visiteur anonyme est un identifiant aléatoire gardé dans un cookie
+(`nx_visiteur`, un an) ; une fois connecté, c'est son compte (`c-<compte>`) — le profil le suit
+d'un appareil à l'autre, et l'historique anonyme du navigateur y est rattaché à la première visite
+connectée.
+
+**Recherche → Découvrir** : sous les résultats, « ✨ Découvrir ces N offres, une à la fois »
+ouvre le flux limité à la recherche (mêmes filtres, caractéristiques comprises).
+
+API (catalogue-service, publique) : `GET /api/v1/decouvrir` (visiteur, zone ou lat/lng/rayonKm,
+vus, vusEspaces, taille, et les critères de la recherche), `POST /api/v1/decouvrir/signaux`,
+`DELETE /api/v1/decouvrir/signaux/j-aime`, `GET|DELETE /api/v1/decouvrir/profil`,
+`POST /api/v1/decouvrir/fusion`. Le web relaie (`/api/decouvrir/flux|signal|jaime|enregistrer|gouts|zones`)
+en ajoutant l'identité du visiteur.
+
+**À venir** : vidéos et formats « avant / après » ou « démonstration » déposés par les
+professionnels (le flux sait déjà lire une vidéo), commande et réservation dans Nexora quand le
+panier existera (aujourd'hui par WhatsApp), notifications « nouveauté chez un professionnel suivi ».
+
 ---
-*Dernière mise à jour : session du 04/10/2026, caractéristiques des articles, page Explorer,
-recherche autour d'un lieu, recherche tolérante, tris et filtres de recherche.*
+*Dernière mise à jour : session du 06/10/2026, Nexora Découvrir.*

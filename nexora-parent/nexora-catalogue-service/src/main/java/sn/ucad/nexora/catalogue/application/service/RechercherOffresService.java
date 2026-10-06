@@ -66,6 +66,14 @@ public class RechercherOffresService implements RechercherOffresUseCase {
         return offreRepository.search(params).stream().map(Offre::getId).toList();
     }
 
+    /** Identifiants d'une recherche avec tous ses filtres, dans l'ordre de la recherche (flux Découvrir, §18). */
+    public List<Long> idsRecherche(OffreSearchRequest request, int max) {
+        RechercheParams params = versParams(request);
+        params.setPage(0);
+        params.setTaille(max);
+        return offreRepository.search(params).stream().map(Offre::getId).toList();
+    }
+
     private RechercheParams versParams(OffreSearchRequest request) {
         RechercheParams params = new RechercheParams();
         params.setQ(request.getQ());

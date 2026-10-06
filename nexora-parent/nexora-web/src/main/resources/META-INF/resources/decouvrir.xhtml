@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<!-- Nexora Découvrir (docs/architecture-acteurs.md §18) : flux vertical, une offre à la fois, autour
+     de moi, adapté à mes goûts, avec une action immédiate. Page plein écran, hors du gabarit du site. -->
+<h:head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#073B35" />
+    <title>Découvrir — Nexora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet" />
+    <h:outputStylesheet library="css" name="nexora-theme.css" />
+    <h:outputStylesheet library="css" name="decouvrir.css" />
+    <script>window.addEventListener('pageshow', function (e) { if (e.persisted) window.location.reload(); });</script>
+</h:head>
+<h:body styleClass="nx-dc-page">
+
+    <div id="nx-dc" class="nx-dc" data-connecte="#{sessionBean.connecte}">
+
+        <!-- Barre du haut, par-dessus les photos -->
+        <header class="nx-dc-barre">
+            <h:link outcome="/index" styleClass="nx-dc-logo" title="Accueil Nexora">Nexora<span>.</span></h:link>
+            <button type="button" class="nx-dc-zone" id="nx-dc-zone" aria-haspopup="dialog">
+                <span aria-hidden="true">📍</span> <span id="nx-dc-zone-nom">Tout le Sénégal</span> <span aria-hidden="true">▾</span>
+            </button>
+            <nav class="nx-dc-icones">
+                <button type="button" class="nx-dc-icone" id="nx-dc-gouts-bouton" title="Vos goûts" aria-haspopup="dialog">✨</button>
+                <h:link outcome="/recherche" styleClass="nx-dc-icone" title="Rechercher">🔍</h:link>
+                <h:link outcome="/explorer" styleClass="nx-dc-icone nx-dc-large" title="Explorer">🧭</h:link>
+            </nav>
+        </header>
+
+        <!-- Flux tiré d'une recherche : on le dit, et on peut en sortir -->
+        <div class="nx-dc-recherche" id="nx-dc-recherche" hidden="hidden">
+            <span id="nx-dc-recherche-texte"></span>
+            <a href="#{request.contextPath}/decouvrir.xhtml" title="Revenir au flux général">✕</a>
+        </div>
+
+        <main class="nx-dc-flux" id="nx-dc-flux" aria-label="Flux de découverte" tabindex="0">
+            <section class="nx-dc-carte nx-dc-chargement" aria-label="Chargement">
+                <div class="nx-dc-squelette"></div>
+                <p>On prépare vos découvertes…</p>
+            </section>
+        </main>
+
+        <div class="nx-dc-astuce" id="nx-dc-astuce" hidden="hidden">
+            <span class="nx-dc-fleche" aria-hidden="true">↑</span> Glissez vers le haut pour découvrir la suite
+        </div>
+
+        <div class="nx-dc-toast" id="nx-dc-toast" role="status" aria-live="polite" hidden="hidden"></div>
+
+        <!-- Choix de la zone -->
+        <div class="nx-dc-feuille" id="nx-dc-feuille-zone" role="dialog" aria-modal="true" aria-labelledby="nx-dc-zone-titre" hidden="hidden">
+            <div class="nx-dc-feuille-contenu">
+                <h2 id="nx-dc-zone-titre">Où découvrir ?</h2>
+                <p class="nx-dc-feuille-aide">Nexora vous montre ce qui est vraiment accessible dans la zone choisie.</p>
+                <button type="button" class="nx-dc-option" data-zone="__position">📍 Autour de moi</button>
+                <button type="button" class="nx-dc-option" data-zone="">🇸🇳 Tout le Sénégal</button>
+                <div class="nx-dc-options" id="nx-dc-zones"></div>
+                <button type="button" class="nx-dc-fermer" data-fermer="nx-dc-feuille-zone">Fermer</button>
+            </div>
+        </div>
+
+        <!-- Vos goûts : ce que Nexora a compris, sans boîte noire -->
+        <div class="nx-dc-feuille" id="nx-dc-feuille-gouts" role="dialog" aria-modal="true" aria-labelledby="nx-dc-gouts-titre" hidden="hidden">
+            <div class="nx-dc-feuille-contenu">
+                <h2 id="nx-dc-gouts-titre">Vos goûts</h2>
+                <p class="nx-dc-feuille-aide">
+                    Ce que Nexora a compris de vos « J'aime », de ce que vous regardez longtemps, enregistrez ou demandez.
+                    Votre flux mélange environ <strong>70 %</strong> de ce qui vous plaît, <strong>20 %</strong> de nouveautés et
+                    tendances du coin, et <strong>10 %</strong> de surprises, pour ne pas vous enfermer.
+                </p>
+                <div id="nx-dc-gouts-liste"></div>
+                <button type="button" class="nx-dc-option nx-dc-danger" id="nx-dc-oublier">Effacer mes goûts et repartir de zéro</button>
+                <button type="button" class="nx-dc-fermer" data-fermer="nx-dc-feuille-gouts">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <h:outputScript library="js" name="decouvrir.js" />
+</h:body>
+</html>

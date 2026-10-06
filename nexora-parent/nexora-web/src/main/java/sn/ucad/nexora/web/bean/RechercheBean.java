@@ -577,4 +577,34 @@ public class RechercheBean implements Serializable {
     public BigDecimal getMaLng() { return maLng; }
     public void setMaLng(BigDecimal maLng) { this.maLng = maLng; }
     public boolean isPositionActive() { return positionActive; }
+
+    /** Le flux Découvrir limité à cette recherche (§18) : mêmes critères, une offre à la fois. */
+    public String getLienDecouvrir() {
+        StringBuilder p = new StringBuilder();
+        java.util.function.BiConsumer<String, Object> ajouter = (cle, valeur) -> {
+            if (valeur == null || valeur.toString().isBlank() || Boolean.FALSE.equals(valeur)) return;
+            p.append(p.length() == 0 ? '?' : '&').append(cle).append('=')
+                    .append(java.net.URLEncoder.encode(valeur.toString(), java.nio.charset.StandardCharsets.UTF_8));
+        };
+        boolean autourDuLieu = lieuChoisi != null && !positionActive;
+        ajouter.accept("q", autourDuLieu ? null : q);
+        ajouter.accept("idCategorie", idCategorie);
+        ajouter.accept("typeEspace", typeEspace);
+        ajouter.accept("commune", commune);
+        ajouter.accept("prixMin", prixMin);
+        ajouter.accept("prixMax", prixMax);
+        ajouter.accept("estProduit", "PRODUIT".equals(nature) ? Boolean.TRUE : "SERVICE".equals(nature) ? "false" : null);
+        ajouter.accept("avecPromotion", promo);
+        ajouter.accept("negociable", negociable);
+        ajouter.accept("domicile", domicile);
+        ajouter.accept("ouvertMaintenant", ouvertMaintenant);
+        ajouter.accept("espaceVerifie", verifieUniquement);
+        ajouter.accept("noteMin", noteMin);
+        ajouter.accept("neuf", "NEUF".equals(etat) ? Boolean.TRUE : "OCCASION".equals(etat) ? "false" : null);
+        coches.forEach((id, coche) -> ajouter.accept("valeurs", Boolean.TRUE.equals(coche) ? id : null));
+        // Autour d'un lieu ou de soi : le flux garde la zone (lieu reconnu → recherche de son quartier)
+        if (autourDuLieu && lieuChoisi.commune() != null) ajouter.accept("zone", lieuChoisi.commune());
+        String chemin = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/decouvrir.xhtml";
+        return chemin + p;
+    }
 }

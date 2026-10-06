@@ -162,6 +162,12 @@
                     <span class="nx-results-count">#{rechercheBean.total} résultat(s)</span>
                 </div>
 
+                <ui:fragment rendered="#{rechercheBean.total gt 0}">
+                    <a href="#{rechercheBean.lienDecouvrir}" class="nx-decouvrir-recherche">
+                        ✨ Découvrir ces #{rechercheBean.total} offres, une à la fois
+                    </a>
+                </ui:fragment>
+
                 <!-- Tris (§17) : « Plus proches » demande la position quand il n'y a ni lieu ni position -->
                 <h:form id="tris">
                     <div class="nx-tris" role="group" aria-label="Trier les résultats">
@@ -341,6 +347,10 @@
                     ? "Vous avez refusé de partager votre position. Autorisez-la dans le navigateur, ou cherchez un quartier ou un lieu (ex. « Sandaga »)."
                     : "Votre position n'a pas pu être trouvée. Réessayez, ou cherchez un quartier ou un lieu.");
             }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+        }
+        // « À proximité » (menu) : on demande la position dès l'arrivée
+        if (new URLSearchParams(window.location.search).has('proche') &amp;&amp; document.querySelector('.nx-autour-de-moi')) {
+            nexoraAutourDeMoi();
         }
         // Sur téléphone, les filtres sont repliés pour laisser voir les résultats.
         if (window.matchMedia('(max-width: 900px)').matches) {

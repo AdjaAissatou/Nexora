@@ -1695,3 +1695,13 @@ label.nx-chip-epuise:has(input:checked) { border-color: var(--nx-terracotta); ba
 /* La colonne des résultats ne doit jamais s'élargir à cause d'un contenu large (carte, barre de tri). */
 .nx-search-layout > * { min-width: 0; }
 .nx-tris > span { white-space: nowrap; }
+
+/* ===== Accès à Nexora Découvrir (§18) ===== */
+.nx-nav-decouvrir { color: var(--nx-terracotta) !important; font-weight: 700; }
+.nx-decouvrir-recherche { display: block; margin: 0 0 14px; padding: 12px 16px; border-radius: 14px; text-decoration: none;
+                          background: linear-gradient(90deg, #073B35, #0F5B4F); color: #fff; font-weight: 700; }
+.nx-decouvrir-recherche:hover { filter: brightness(1.1); }
+.nx-explorer-decouvrir { display: flex; flex-direction: column; gap: 2px; margin-top: 16px; padding: 14px 18px; border-radius: 16px; max-width: 560px;
+                         background: linear-gradient(90deg, #073B35, #C96F4A); color: #fff; text-decoration: none; }
+.nx-explorer-decouvrir span { font-weight: 800; font-size: 17px; }
+.nx-explorer-decouvrir small { opacity: .9; }

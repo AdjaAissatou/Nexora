@@ -89,7 +89,7 @@
                     </div>
 
                     <ui:fragment rendered="#{!empty offreDetailBean.offre.caracteristiques or offreDetailBean.offre.produit != null}">
-                        <div class="nx-caracteristiques">
+                        <div class="nx-caracteristiques" id="caracteristiques">
                             <h3>Caractéristiques</h3>
                             <dl>
                                 <ui:fragment rendered="#{!empty offreDetailBean.offre.produit.marque}">

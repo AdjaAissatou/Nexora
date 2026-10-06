@@ -77,6 +77,16 @@
                         value="Explorer"
                         styleClass="nx-nav-link" />
 
+                <h:link outcome="/decouvrir"
+                        value="✨ Découvrir"
+                        styleClass="nx-nav-link nx-nav-decouvrir" />
+
+                <h:link outcome="/recherche"
+                        value="À proximité"
+                        styleClass="nx-nav-link">
+                    <f:param name="proche" value="true" />
+                </h:link>
+
                 <h:link outcome="/recherche"
                         value="Rechercher"
                         styleClass="nx-nav-link" />
@@ -194,6 +204,9 @@
 
                     <h:link outcome="/explorer"
                             value="Explorer" />
+
+                    <h:link outcome="/decouvrir"
+                            value="Découvrir" />
 
                 </div>
 

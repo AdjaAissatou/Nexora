@@ -77,6 +77,7 @@ SET client_encoding = 'UTF8';
 \i 04_catalogue/16_offre_espace_cascade.sql
 \i 04_catalogue/17_image_vecteur.sql
 \i 04_catalogue/18_synonyme_recherche.sql
+\i 04_catalogue/19_decouverte_signal.sql
 \i 03_professional/08_moderation.sql
 \i 03_professional/09_horaires.sql
 
