@@ -128,6 +128,19 @@ public class FormatBean implements Serializable {
         return "+" + (chiffres.length() == 9 ? "221" + chiffres : chiffres);
     }
 
+    /** « à l'instant », « il y a 5 min », « il y a 2 h », « hier », « il y a 3 jours », « le 3 oct. ». */
+    public String depuis(java.time.LocalDateTime date) {
+        if (date == null) return "";
+        java.time.Duration d = java.time.Duration.between(date, java.time.LocalDateTime.now());
+        if (d.toMinutes() < 1) return "à l'instant";
+        if (d.toMinutes() < 60) return "il y a " + d.toMinutes() + " min";
+        if (d.toHours() < 24) return "il y a " + d.toHours() + " h";
+        long jours = java.time.temporal.ChronoUnit.DAYS.between(date.toLocalDate(), java.time.LocalDate.now());
+        if (jours == 1) return "hier";
+        if (jours < 7) return "il y a " + jours + " jours";
+        return "le " + date.format(java.time.format.DateTimeFormatter.ofPattern("d MMM", Locale.FRANCE));
+    }
+
     /** « à 350 m », « à 2,1 km » ; vide sans distance. */
     public String distance(Double km) {
         if (km == null) return "";

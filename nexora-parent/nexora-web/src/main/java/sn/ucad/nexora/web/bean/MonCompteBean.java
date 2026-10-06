@@ -65,8 +65,13 @@ public class MonCompteBean implements Serializable {
     private List<Element> historique = List.of();
 
     /** Élément affichable dans "Mes favoris" / "Mon historique" — une offre ou un espace. */
-    public record Element(Long offreId, Long espaceId, String titre, String sousTitre, String image, String href)
-            implements Serializable {}
+    public record Element(Long offreId, Long espaceId, String titre, String sousTitre, String image, String href,
+                          String espaceNom, String lieu, java.time.LocalDateTime date) implements Serializable {
+
+        public boolean offre() {
+            return offreId != null;
+        }
+    }
 
     @PostConstruct
     public void charger() {
@@ -93,7 +98,7 @@ public class MonCompteBean implements Serializable {
             List<FavoriResponse> brut = rechercheApiClient.listerFavoris(session.getAccessToken());
             List<Element> elements = new ArrayList<>();
             for (FavoriResponse f : brut) {
-                Element e = versElement(f.offreId(), f.espaceId());
+                Element e = versElement(f.offreId(), f.espaceId(), f.dateCreation());
                 if (e != null) elements.add(e);
             }
             favoris = elements;
@@ -112,7 +117,7 @@ public class MonCompteBean implements Serializable {
             for (HistoriqueConsultationResponse h : brut) {
                 String cle = h.offreId() != null ? "O" + h.offreId() : "E" + h.espaceId();
                 if (!dejaVus.add(cle)) continue;
-                Element e = versElement(h.offreId(), h.espaceId());
+                Element e = versElement(h.offreId(), h.espaceId(), h.dateConsultation());
                 if (e != null) elements.add(e);
                 if (elements.size() >= 20) break;
             }
@@ -123,15 +128,19 @@ public class MonCompteBean implements Serializable {
     }
 
     /** Une offre/espace supprimé(e) depuis reste référencé(e) en favori/historique : on l'ignore silencieusement. */
-    private Element versElement(Long offreId, Long espaceId) {
+    private Element versElement(Long offreId, Long espaceId, java.time.LocalDateTime date) {
         try {
             if (offreId != null) {
                 OffreDetailResponse o = catalogueApiClient.obtenir(offreId);
-                return new Element(offreId, null, o.titre(), format.prix(o.prix()), o.imagePrincipale(), "/offre.xhtml?id=" + offreId);
+                String lieu = o.localisation() == null ? null : o.localisation().texte();
+                return new Element(offreId, null, o.titre(), format.prix(o.prix()), o.imagePrincipale(), "/offre.xhtml?id=" + offreId,
+                        o.espaceNom(), lieu, date);
             }
             if (espaceId != null) {
                 EspaceResponse esp = espaceApiClient.obtenir(espaceId);
-                return new Element(null, espaceId, esp.nom(), esp.slogan(), esp.logo(), "/espace.xhtml?id=" + espaceId);
+                String image = esp.couverture() != null && !esp.couverture().isBlank() ? esp.couverture() : esp.logo();
+                return new Element(null, espaceId, esp.nom(), esp.slogan(), image, "/espace.xhtml?id=" + espaceId,
+                        null, esp.commune(), date);
             }
         } catch (ApiException ignored) {
             // Offre/espace introuvable (supprimé) : on n'affiche pas cette ligne.
@@ -221,5 +230,31 @@ public class MonCompteBean implements Serializable {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public long getNombreFavorisOffres() {
+        return favoris.stream().filter(Element::offre).count();
+    }
+
+    public long getNombreFavorisEspaces() {
+        return favoris.size() - getNombreFavorisOffres();
+    }
+
+    public List<EspaceResponse> getMesEspaces() {
+        return mesEspaces == null ? List.of() : mesEspaces;
+    }
+
+    /** Initiales du titulaire pour l'avatar ("AD" pour Adja Dione). */
+    public String getInitiales() {
+        String p = prenom == null ? "" : prenom.trim();
+        String n = nom == null ? "" : nom.trim();
+        String initiales = (p.isEmpty() ? "" : p.substring(0, 1)) + (n.isEmpty() ? "" : n.substring(0, 1));
+        return initiales.isEmpty() ? "?" : initiales.toUpperCase(java.util.Locale.FRANCE);
+    }
+
+    /** "mars 2026" : mois d'inscription, ou null s'il est inconnu. */
+    public String getMembreDepuis() {
+        if (profil == null || profil.createdAt() == null) return null;
+        return profil.createdAt().format(java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy", java.util.Locale.FRANCE));
     }
 }

@@ -9,10 +9,20 @@
 <ui:define name="titre">Mon compte — Nexora</ui:define>
 <ui:define name="content">
 
-    <section class="nx-page-header">
-        <div class="nx-container">
-            <h1>Mon compte</h1>
-            <p>Votre profil personnel sur Nexora.</p>
+    <section class="nx-page-header nx-compte-entete">
+        <div class="nx-container nx-compte-identite">
+            <span class="nx-compte-avatar" aria-hidden="true">#{monCompteBean.initiales}</span>
+            <div class="nx-compte-qui">
+                <h1>Bonjour, #{empty monCompteBean.prenom ? 'et bienvenue' : monCompteBean.prenom}</h1>
+                <p>#{sessionBean.compte.email}#{empty monCompteBean.membreDepuis ? '' : ' · membre depuis '.concat(monCompteBean.membreDepuis)}</p>
+                <div class="nx-compte-stats">
+                    <a href="#mes-favoris" class="nx-compte-stat"><strong>#{monCompteBean.favoris.size()}</strong> favori(s)</a>
+                    <a href="#vus-recemment" class="nx-compte-stat"><strong>#{monCompteBean.historique.size()}</strong> vu(s) récemment</a>
+                    <ui:fragment rendered="#{monCompteBean.possedeEspace}">
+                        <a href="#mes-espaces" class="nx-compte-stat"><strong>#{monCompteBean.mesEspaces.size()}</strong> espace(s)</a>
+                    </ui:fragment>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -22,24 +32,26 @@
             <div class="nx-alert nx-alert-error" style="margin-top:20px;">#{monCompteBean.erreur}</div>
         </ui:fragment>
 
-        <div class="nx-espace-layout">
+        <div class="nx-espace-layout nx-compte-layout">
 
-            <div class="nx-card" style="padding:18px;">
-                <h3>Mon profil</h3>
+            <div class="nx-card nx-compte-profil">
+                <h3>👤 Mes informations</h3>
 
                 <h:form id="profilForm">
                     <h:messages for="profilForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
 
-                    <div class="nx-field">
-                        <label for="profilForm:prenom">Prénom</label>
-                        <h:inputText id="prenom" value="#{monCompteBean.prenom}" styleClass="nx-input" required="true" label="Prénom" />
+                    <div class="nx-compte-duo">
+                        <div class="nx-field">
+                            <label for="profilForm:prenom">Prénom</label>
+                            <h:inputText id="prenom" value="#{monCompteBean.prenom}" styleClass="nx-input" required="true" label="Prénom" />
+                        </div>
+                        <div class="nx-field">
+                            <label for="profilForm:nom">Nom</label>
+                            <h:inputText id="nom" value="#{monCompteBean.nom}" styleClass="nx-input" required="true" label="Nom" />
+                        </div>
                     </div>
                     <div class="nx-field">
-                        <label for="profilForm:nom">Nom</label>
-                        <h:inputText id="nom" value="#{monCompteBean.nom}" styleClass="nx-input" required="true" label="Nom" />
-                    </div>
-                    <div class="nx-field">
-                        <label for="profilForm:email">Email</label>
+                        <label for="profilForm:email">Email <small class="nx-aide">(identifiant de connexion, non modifiable)</small></label>
                         <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
                     </div>
                     <div class="nx-field">
@@ -55,16 +67,44 @@
                 </h:form>
             </div>
 
-            <div>
+            <div class="nx-compte-colonne">
                 <ui:fragment rendered="#{monCompteBean.possedeEspace}">
-                    <div class="nx-card">
-                        <h3 style="margin-top:0;">Espace professionnel</h3>
-                        <p style="color:var(--nx-text-secondary);">
-                            Vous gérez <strong>#{monCompteBean.premierEspace.nom}</strong>
-                            <ui:fragment rendered="#{monCompteBean.nombreEspacesSupplementaires gt 0}"> et #{monCompteBean.nombreEspacesSupplementaires} autre(s) espace(s)</ui:fragment>
-                            sur Nexora.
-                        </p>
-                        <h:link outcome="/mon-espace" value="Gérer mon espace" styleClass="nx-button nx-button-primary" />
+                    <div class="nx-card" id="mes-espaces">
+                        <div class="nx-section-header">
+                            <h3 style="margin:0;">🏪 Mes espaces professionnels</h3>
+                            <h:link outcome="/creer-espace" value="+ Nouvel espace" styleClass="nx-see-all" />
+                        </div>
+                        <div class="nx-compte-espaces">
+                            <ui:repeat var="e" value="#{monCompteBean.mesEspaces}">
+                                <div class="nx-compte-espace">
+                                    <div class="nx-compte-espace-media" style="#{empty e.couverture ? '' : 'background-image:url('.concat(e.couverture).concat(')')}">
+                                        <ui:fragment rendered="#{!empty e.logo}"><img src="#{e.logo}" alt="" class="nx-compte-espace-logo" /></ui:fragment>
+                                        <ui:fragment rendered="#{empty e.logo}"><span class="nx-compte-espace-logo nx-compte-espace-initiale">#{e.nom.substring(0, 1)}</span></ui:fragment>
+                                    </div>
+                                    <div class="nx-compte-espace-corps">
+                                        <strong>#{e.nom}
+                                            <ui:fragment rendered="#{e.verifie}"><span class="nx-badge nx-badge-verifie" title="Espace vérifié">✓ Vérifié</span></ui:fragment>
+                                            <ui:fragment rendered="#{e.suspendu()}"><span class="nx-badge nx-badge-alerte">Suspendu</span></ui:fragment>
+                                        </strong>
+                                        <ui:fragment rendered="#{!empty e.slogan}"><small class="nx-compte-espace-slogan">#{e.slogan}</small></ui:fragment>
+                                        <small>#{empty e.commune ? '' : '📍 '.concat(e.commune).concat(' · ')}#{e.ouvert ? '🟢 Ouvert' : '⚪ Fermé'}</small>
+                                        <div class="nx-compte-espace-chiffres">
+                                            <span>👁 #{e.nombreVues == null ? 0 : e.nombreVues} vue(s)</span>
+                                            <span>♥ #{e.nombreFavoris == null ? 0 : e.nombreFavoris}</span>
+                                            <span>★ #{e.nombreAvis == null or e.nombreAvis == 0 ? '—' : e.noteMoyenne} (#{e.nombreAvis == null ? 0 : e.nombreAvis} avis)</span>
+                                        </div>
+                                    </div>
+                                    <div class="nx-compte-espace-actions">
+                                        <h:link outcome="/mon-espace" value="Gérer" styleClass="nx-button nx-button-primary">
+                                            <f:param name="id" value="#{e.id}" />
+                                        </h:link>
+                                        <h:link outcome="/espace" value="Voir la fiche" styleClass="nx-button nx-button-outline-dark">
+                                            <f:param name="id" value="#{e.id}" />
+                                        </h:link>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                        </div>
                     </div>
                 </ui:fragment>
 
@@ -78,51 +118,103 @@
                         <h:link outcome="/creer-espace" value="Créer mon espace" styleClass="nx-button nx-button-primary" />
                     </div>
                 </ui:fragment>
+
+                <nav class="nx-compte-raccourcis" aria-label="Raccourcis">
+                    <h:link outcome="/decouvrir" styleClass="nx-compte-raccourci"><span aria-hidden="true">✨</span><strong>Découvrir</strong><small>Le flux autour de vous</small></h:link>
+                    <h:link outcome="/recherche" styleClass="nx-compte-raccourci"><span aria-hidden="true">🔍</span><strong>Rechercher</strong><small>Articles, services, espaces</small></h:link>
+                    <h:link outcome="/explorer" styleClass="nx-compte-raccourci"><span aria-hidden="true">🧭</span><strong>Explorer</strong><small>Rayons et quartiers</small></h:link>
+                    <h:link outcome="/lieux" styleClass="nx-compte-raccourci"><span aria-hidden="true">📍</span><strong>Lieux</strong><small>Repères et itinéraires</small></h:link>
+                </nav>
             </div>
 
         </div>
 
-        <div class="nx-card" style="margin-top:20px;">
-            <h3 style="margin-top:0;">Mes favoris</h3>
+        <!-- Mes favoris : cartes avec photo, filtre Articles / Espaces -->
+        <div class="nx-card nx-mes-favoris" id="mes-favoris" style="margin-top:20px;">
+            <div class="nx-section-header">
+                <h3 style="margin:0;">♥ Mes favoris <span class="nx-compte">#{monCompteBean.favoris.size()}</span></h3>
+                <ui:fragment rendered="#{monCompteBean.nombreFavorisOffres gt 0 and monCompteBean.nombreFavorisEspaces gt 0}">
+                    <div class="nx-favoris-filtres" role="group" aria-label="Filtrer les favoris">
+                        <button type="button" class="nx-pastille active" data-type="">Tout</button>
+                        <button type="button" class="nx-pastille" data-type="offre">Articles (#{monCompteBean.nombreFavorisOffres})</button>
+                        <button type="button" class="nx-pastille" data-type="espace">Espaces (#{monCompteBean.nombreFavorisEspaces})</button>
+                    </div>
+                </ui:fragment>
+            </div>
             <ui:fragment rendered="#{empty monCompteBean.favoris}">
-                <p style="color:var(--nx-text-secondary);">Aucun favori pour le moment. Le cœur ♡ sur une fiche offre ou espace l'ajoute ici.</p>
+                <div class="nx-favoris-vide">
+                    <span aria-hidden="true">♡</span>
+                    <p><strong>Aucun favori pour le moment.</strong><br />Le cœur ♡ d'une offre ou d'un espace, ou « Enregistrer » dans Découvrir, l'ajoute ici.</p>
+                    <h:link outcome="/decouvrir" value="✨ Découvrir des offres" styleClass="nx-button nx-button-primary" />
+                </div>
             </ui:fragment>
             <ui:fragment rendered="#{not empty monCompteBean.favoris}">
-                <div class="nx-lieu-public-liste">
-                    <ui:repeat var="el" value="#{monCompteBean.favoris}">
-                        <div class="nx-lieu-public-item">
-                            <a href="#{el.href}" class="nx-lieu-public-nom">#{el.titre}</a>
-                            <span class="nx-lieu-public-commune">#{el.sousTitre}</span>
-                            <h:form>
-                                <h:commandButton value="Retirer" styleClass="nx-button nx-button-outline-dark"
-                                                 action="#{monCompteBean.retirerFavori(el.offreId, el.espaceId)}" />
-                            </h:form>
-                        </div>
-                    </ui:repeat>
-                </div>
+                <h:form id="favorisForm">
+                    <div class="nx-favoris-grille">
+                        <ui:repeat var="el" value="#{monCompteBean.favoris}">
+                            <article class="nx-favori" data-type="#{el.offre ? 'offre' : 'espace'}">
+                                <a href="#{request.contextPath}#{el.href}" class="nx-favori-media">
+                                    <ui:fragment rendered="#{!empty el.image}"><img src="#{el.image}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'nx-favori-sans-photo', textContent: '#{el.offre ? '🛍️' : '🏪'}'}))" /></ui:fragment>
+                                    <ui:fragment rendered="#{empty el.image}"><span class="nx-favori-sans-photo">#{el.offre ? '🛍️' : '🏪'}</span></ui:fragment>
+                                    <span class="nx-favori-type">#{el.offre ? 'Article' : 'Espace'}</span>
+                                </a>
+                                <h:commandLink action="#{monCompteBean.retirerFavori(el.offreId, el.espaceId)}" styleClass="nx-favori-retirer"
+                                               title="Retirer des favoris">♥<span class="nx-sr">Retirer des favoris</span></h:commandLink>
+                                <div class="nx-favori-corps">
+                                    <a href="#{request.contextPath}#{el.href}" class="nx-favori-titre">#{el.titre}</a>
+                                    <ui:fragment rendered="#{!empty el.sousTitre}">
+                                        <span class="#{el.offre ? 'nx-favori-prix' : 'nx-favori-slogan'}">#{el.sousTitre}</span>
+                                    </ui:fragment>
+                                    <small>#{empty el.espaceNom ? '' : el.espaceNom}#{!empty el.espaceNom and !empty el.lieu ? ' · ' : ''}#{empty el.lieu ? '' : '📍 '.concat(el.lieu)}</small>
+                                    <ui:fragment rendered="#{el.date != null}"><small class="nx-favori-date">Ajouté #{format.depuis(el.date)}</small></ui:fragment>
+                                </div>
+                            </article>
+                        </ui:repeat>
+                    </div>
+                </h:form>
+                <script>
+                    (function () {
+                        var boutons = document.querySelectorAll('.nx-favoris-filtres button');
+                        boutons.forEach(function (b) {
+                            b.addEventListener('click', function () {
+                                var type = b.getAttribute('data-type');
+                                boutons.forEach(function (x) { x.classList.toggle('active', x === b); });
+                                document.querySelectorAll('.nx-favori').forEach(function (f) {
+                                    f.hidden = !!type &amp;&amp; f.getAttribute('data-type') !== type;
+                                });
+                            });
+                        });
+                    })();
+                </script>
             </ui:fragment>
         </div>
 
-        <div class="nx-card" style="margin-top:20px;">
+        <!-- Vus récemment -->
+        <div class="nx-card" id="vus-recemment" style="margin-top:20px;">
             <div class="nx-section-header">
-                <h3 style="margin:0;">Mon historique</h3>
+                <h3 style="margin:0;">🕘 Vus récemment</h3>
                 <ui:fragment rendered="#{not empty monCompteBean.historique}">
                     <h:form>
                         <h:commandButton value="Effacer l'historique" styleClass="nx-button nx-button-outline-dark"
-                                         action="#{monCompteBean.effacerHistorique}" />
+                                         action="#{monCompteBean.effacerHistorique}" onclick="return confirm('Effacer tout votre historique ?');" />
                     </h:form>
                 </ui:fragment>
             </div>
             <ui:fragment rendered="#{empty monCompteBean.historique}">
-                <p style="color:var(--nx-text-secondary);">Aucune consultation récente.</p>
+                <p style="color:var(--nx-text-secondary);">Aucune consultation récente. Les offres et espaces que vous ouvrez apparaîtront ici.</p>
             </ui:fragment>
             <ui:fragment rendered="#{not empty monCompteBean.historique}">
-                <div class="nx-lieu-public-liste">
+                <div class="nx-historique-bande">
                     <ui:repeat var="el" value="#{monCompteBean.historique}">
-                        <div class="nx-lieu-public-item">
-                            <a href="#{el.href}" class="nx-lieu-public-nom">#{el.titre}</a>
-                            <span class="nx-lieu-public-commune">#{el.sousTitre}</span>
-                        </div>
+                        <a href="#{request.contextPath}#{el.href}" class="nx-historique-item">
+                            <span class="nx-historique-media">
+                                <ui:fragment rendered="#{!empty el.image}"><img src="#{el.image}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'nx-favori-sans-photo', textContent: '#{el.offre ? '🛍️' : '🏪'}'}))" /></ui:fragment>
+                                <ui:fragment rendered="#{empty el.image}"><span class="nx-favori-sans-photo">#{el.offre ? '🛍️' : '🏪'}</span></ui:fragment>
+                            </span>
+                            <strong>#{el.titre}</strong>
+                            <span class="#{el.offre ? 'nx-favori-prix' : 'nx-favori-slogan'}">#{el.sousTitre}</span>
+                            <small>#{el.offre ? 'Article' : 'Espace'} · vu #{format.depuis(el.date)}</small>
+                        </a>
                     </ui:repeat>
                 </div>
             </ui:fragment>

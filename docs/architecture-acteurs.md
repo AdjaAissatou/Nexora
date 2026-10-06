@@ -89,9 +89,9 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 
 | Page | Route proposée | État |
 |---|---|---|
-| Mon profil (infos personnelles) | `/mon-compte` | ✅ séparé de la gestion pro (voir §5) |
-| Mes favoris | `/mon-compte` (section) | ✅ bouton ♡/♥ sur les fiches offre et espace, liste + retrait dans Mon compte |
-| Mon historique de consultation | `/mon-compte` (section) | ✅ enregistré à l'ouverture d'une fiche offre/espace, dédoublonné, effaçable |
+| Mon profil (infos personnelles) | `/mon-compte` | ✅ séparé de la gestion pro (voir §5) ; en-tête avec avatar (initiales), « membre depuis », compteurs favoris / vus / espaces ; liste de tous mes espaces (vues, ♥, note, Gérer `?id=` / Voir la fiche) et raccourcis Découvrir · Rechercher · Explorer · Lieux |
+| Mes favoris | `/mon-compte` (section) | ✅ bouton ♡/♥ sur les fiches offre et espace ; dans Mon compte, grille de cartes avec photo (repli 🛍️/🏪), prix ou slogan, espace et lieu, « ajouté il y a … », filtre Tout / Articles / Espaces, retrait par le ♥ |
+| Mon historique de consultation | `/mon-compte` (section) | ✅ enregistré à l'ouverture d'une fiche offre/espace, dédoublonné, effaçable ; affiché en bande « Vus récemment » défilante avec vignettes et « vu il y a … » |
 | Mes demandes / messages | `/mon-compte/messages` | 🚧 (tables `conversation`/`message` existent, service `nexora-communication-service` non branché au web) |
 | Mes réservations | `/mon-compte/reservations` | 🚧 (table `reservation` existe) |
 | Mes commandes | `/mon-compte/commandes` | 🚧 (tables `commande`/`sous_commande` existent) |
