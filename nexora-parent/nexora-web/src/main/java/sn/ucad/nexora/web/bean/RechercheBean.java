@@ -607,4 +607,9 @@ public class RechercheBean implements Serializable {
         String chemin = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/decouvrir.xhtml";
         return chemin + p;
     }
+
+    /** Une recherche est en cours : un texte, un lieu ou une position (les filtres seuls ne suffisent pas). */
+    public boolean isRechercheEnCours() {
+        return (q != null && !q.isBlank()) || lieuChoisi != null || positionActive;
+    }
 }

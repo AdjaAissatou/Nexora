@@ -183,7 +183,8 @@
                         </ui:repeat>
                     </div>
 
-                    <ui:fragment rendered="#{rechercheBean.facettes.categories().size() gt 1}">
+                    <!-- Affiner : seulement pour une recherche en cours (sans elle, ce serait tout le catalogue) -->
+                    <ui:fragment rendered="#{rechercheBean.rechercheEnCours and rechercheBean.facettes.categories().size() gt 1}">
                         <div class="nx-tris nx-affiner">
                             <span>Affiner :</span>
                             <ui:repeat var="fc" value="#{rechercheBean.facettes.categories()}">
@@ -347,10 +348,6 @@
                     ? "Vous avez refusé de partager votre position. Autorisez-la dans le navigateur, ou cherchez un quartier ou un lieu (ex. « Sandaga »)."
                     : "Votre position n'a pas pu être trouvée. Réessayez, ou cherchez un quartier ou un lieu.");
             }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
-        }
-        // « À proximité » (menu) : on demande la position dès l'arrivée
-        if (new URLSearchParams(window.location.search).has('proche') &amp;&amp; document.querySelector('.nx-autour-de-moi')) {
-            nexoraAutourDeMoi();
         }
         // Sur téléphone, les filtres sont repliés pour laisser voir les résultats.
         if (window.matchMedia('(max-width: 900px)').matches) {

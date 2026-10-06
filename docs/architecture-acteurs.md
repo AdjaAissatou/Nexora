@@ -1402,9 +1402,9 @@ valeurs de caractéristiques présentes dans les résultats, avec leurs comptes,
 
 Trois façons de trouver, trois intentions :
 - **Rechercher** : « je sais ce que je veux » (robe bazin rouge taille M) ;
-- **À proximité** / **Explorer** : « qu'y a-t-il autour de moi, dans ce quartier ? » ;
+- **Explorer** et le filtre **Autour de moi** de la recherche : « qu'y a-t-il autour de moi, dans ce quartier ? » ;
 - **Découvrir** : « montre-moi ce qui pourrait me plaire ».
-Menu : Accueil · Explorer · ✨ Découvrir · À proximité · Rechercher.
+Menu : Accueil · Explorer · ✨ Découvrir · Rechercher (« autour de moi » est un filtre de la recherche).
 
 On ne copie pas TikTok : on reprend son meilleur mécanisme (une découverte à la fois, sans fin,
 sans friction) pour en faire une vitrine **locale** et **transactionnelle**.
