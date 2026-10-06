@@ -60,6 +60,8 @@ public class RechercheBean implements Serializable {
     /** Valeurs de caractéristiques cochées (taille M, couleur Noir…), par id de valeur. */
     private final Map<Long, Boolean> coches = new java.util.HashMap<>();
     private FacettesResponse facettes = FacettesResponse.vide();
+    /** Élément de la page à remettre à l'écran après un clic (résultats, grille d'offres), sinon null. */
+    private String defilerVers;
     /** Espaces dont le nom correspond au texte saisi, quels que soient les autres filtres. */
     private List<sn.ucad.nexora.web.dto.catalogue.EspaceTrouveResponse> espacesTrouves = List.of();
 
@@ -118,12 +120,17 @@ public class RechercheBean implements Serializable {
     public void rechercher() {
         page = 0;
         executer();
+        // Après un clic (filtre, tri, rayon…), on reste sur les résultats au lieu de remonter en haut
+        if (FacesContext.getCurrentInstance() != null && FacesContext.getCurrentInstance().isPostback()) {
+            defilerVers = "nx-resultats";
+        }
     }
 
     public void pagePrecedente() {
         if (page > 0) {
             page--;
             executer();
+            defilerVers = "nx-offres";
         }
     }
 
@@ -131,6 +138,7 @@ public class RechercheBean implements Serializable {
         if (!resultats.dernierePage()) {
             page++;
             executer();
+            defilerVers = "nx-offres";
         }
     }
 
@@ -229,10 +237,20 @@ public class RechercheBean implements Serializable {
 
     /** Valeurs cochées encore proposées par les facettes (une valeur absente ne trouverait rien). */
     private List<Long> valeursChoisies() {
-        java.util.Set<Long> proposees = new java.util.HashSet<>();
-        facettes.caracteristiques().forEach(c -> c.valeurs().forEach(v -> proposees.add(v.id())));
-        coches.entrySet().removeIf(e -> !Boolean.TRUE.equals(e.getValue()) || !proposees.contains(e.getKey()));
-        return coches.isEmpty() ? null : new ArrayList<>(coches.keySet());
+        Map<Long, List<Long>> proposees = new java.util.HashMap<>();
+        facettes.caracteristiques().forEach(c -> c.valeurs().forEach(v ->
+                proposees.put(v.id(), v.ids() == null || v.ids().isEmpty() ? List.of(v.id()) : v.ids())));
+        coches.entrySet().removeIf(e -> !Boolean.TRUE.equals(e.getValue()) || !proposees.containsKey(e.getKey()));
+        if (coches.isEmpty()) return null;
+        // « M » coché vaut pour toutes les « Tailles disponibles » (homme, femme…)
+        List<Long> valeurs = new ArrayList<>();
+        coches.keySet().forEach(id -> valeurs.addAll(proposees.get(id)));
+        return valeurs;
+    }
+
+    /** Caractéristiques à proposer : seulement pour une recherche ou une catégorie (sinon, tout le catalogue). */
+    public boolean isCaracteristiquesVisibles() {
+        return isRechercheEnCours() || idCategorie != null || typeEspace != null && !typeEspace.isBlank();
     }
 
     /** Nombre de filtres actifs (hors texte), affiché sur le bouton « Filtres » en mobile. */
@@ -262,6 +280,7 @@ public class RechercheBean implements Serializable {
 
     private void executer() {
         erreur = null;
+        defilerVers = null;
         if (positionActive) {
             lieuChoisi = null;
         } else {
@@ -618,5 +637,9 @@ public class RechercheBean implements Serializable {
 
     public List<sn.ucad.nexora.web.dto.catalogue.EspaceTrouveResponse> getEspacesTrouves() {
         return espacesTrouves;
+    }
+
+    public String getDefilerVers() {
+        return defilerVers;
     }
 }

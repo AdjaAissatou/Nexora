@@ -26,6 +26,18 @@
                 <span>✨ Nexora Découvrir</span>
                 <small>Une offre à la fois, autour de vous, selon vos goûts — glissez pour découvrir</small>
             </h:link>
+            <div class="nx-explorer-besoins">
+                <h:link outcome="/recherche" styleClass="nx-explorer-besoin">
+                    <f:param name="nature" value="PRODUIT" />
+                    <span class="nx-explorer-besoin-icone" aria-hidden="true">🛍️</span>
+                    <span><strong>Boutique</strong><small>Acheter : vêtements, téléphones, alimentation…</small></span>
+                </h:link>
+                <h:link outcome="/recherche" styleClass="nx-explorer-besoin">
+                    <f:param name="nature" value="SERVICE" />
+                    <span class="nx-explorer-besoin-icone" aria-hidden="true">🛠️</span>
+                    <span><strong>Services</strong><small>Trouver un pro : plombier, coiffure, transport…</small></span>
+                </h:link>
+            </div>
             <nav class="nx-explorer-sommaire" aria-label="Sommaire">
                 <a href="#rayons" class="nx-pastille">Rayons</a>
                 <a href="#quartiers" class="nx-pastille">Quartiers</a>

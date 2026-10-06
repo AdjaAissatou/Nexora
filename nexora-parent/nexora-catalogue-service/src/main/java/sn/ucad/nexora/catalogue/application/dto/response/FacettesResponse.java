@@ -18,7 +18,11 @@ public record FacettesResponse(
 
     public record Caracteristique(Long id, String nom, String typeChamp, List<Valeur> valeurs) {}
 
-    public record Valeur(Long id, String libelle, String couleur, long nombre) {}
+    /**
+     * Une valeur proposée. Deux caractéristiques de même nom (« Tailles disponibles » des vêtements
+     * homme et femme) sont fusionnées : {@code ids} réunit leurs valeurs « M », {@code id} les représente.
+     */
+    public record Valeur(Long id, String libelle, String couleur, long nombre, List<Long> ids) {}
 
     public static FacettesResponse vide() {
         return new FacettesResponse(List.of(), List.of(), null, null);

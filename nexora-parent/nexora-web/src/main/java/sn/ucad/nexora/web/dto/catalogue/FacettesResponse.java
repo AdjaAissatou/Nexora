@@ -18,5 +18,6 @@ public record FacettesResponse(
 
     public record Caracteristique(Long id, String nom, String typeChamp, List<Valeur> valeurs) {}
 
-    public record Valeur(Long id, String libelle, String couleur, long nombre) {}
+    /** {@code ids} : les valeurs de même libellé de plusieurs caractéristiques de même nom. */
+    public record Valeur(Long id, String libelle, String couleur, long nombre, java.util.List<Long> ids) {}
 }

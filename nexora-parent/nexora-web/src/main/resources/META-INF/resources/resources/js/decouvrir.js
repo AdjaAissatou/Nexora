@@ -19,7 +19,8 @@
     var PARAMETRES_RECHERCHE = ['q', 'idCategorie', 'typeEspace', 'commune', 'prixMin', 'prixMax', 'estProduit', 'avecPromotion',
         'espaceVerifie', 'ouvertMaintenant', 'noteMin', 'neuf', 'negociable', 'domicile', 'valeurs'];
 
-    var etat = { vus: [], vusEspaces: [], chargement: false, fin: false, zone: lireZone(), recherche: lireRecherche() };
+    var etat = { vus: [], vusEspaces: [], chargement: false, fin: false, zone: lireZone(), recherche: lireRecherche(),
+        nature: new URLSearchParams(window.location.search).get('nature') || '' };
 
     // ------------------------------------------------------------------ zone
 
@@ -64,6 +65,7 @@
         etat.chargement = true;
         var p = new URLSearchParams(etat.recherche);
         if (etat.zone.type === 'commune') p.set('zone', etat.zone.nom);
+        if (etat.nature) p.set('nature', etat.nature);
         if (etat.zone.type === 'position') { p.set('lat', etat.zone.lat); p.set('lng', etat.zone.lng); p.set('rayonKm', '3'); }
         etat.vus.slice(-300).forEach(function (id) { p.append('vus', id); });
         etat.vusEspaces.slice(-100).forEach(function (id) { p.append('vusEspaces', id); });
@@ -535,6 +537,22 @@
         });
     });
 
+    // ------------------------------------------------------------------ onglets : pour vous, boutique, services
+
+    var onglets = document.getElementById('nx-dc-onglets');
+    function marquerOnglet() {
+        onglets.querySelectorAll('button').forEach(function (b) { b.classList.toggle('actif', b.getAttribute('data-nature') === etat.nature); });
+    }
+    onglets.querySelectorAll('button').forEach(function (b) {
+        b.addEventListener('click', function () {
+            if (etat.nature === b.getAttribute('data-nature')) return;
+            etat.nature = b.getAttribute('data-nature');
+            marquerOnglet();
+            recommencer();
+        });
+    });
+    marquerOnglet();
+
     // ------------------------------------------------------------------ démarrage
 
     if (etat.recherche.toString()) {
@@ -542,6 +560,7 @@
         var q = etat.recherche.get('q');
         document.getElementById('nx-dc-recherche-texte').textContent = '✨ Découverte de votre recherche' + (q ? ' « ' + q + ' »' : '');
         bandeau.hidden = false;
+        onglets.hidden = true; // une recherche a déjà dit ce qu'on cherche
     }
     afficherZone();
     charger();

@@ -11,6 +11,8 @@
     </f:viewParam>
     <f:viewParam name="commune" value="#{rechercheBean.commune}" />
     <f:viewParam name="ouvert" value="#{rechercheBean.ouvertMaintenant}" />
+    <!-- PRODUIT (Boutique) ou SERVICE : entrées « Boutique » et « Services » d'Explorer -->
+    <f:viewParam name="nature" value="#{rechercheBean.nature}" />
     <f:viewParam name="lieu" value="#{rechercheBean.lieu}">
         <f:converter converterId="jakarta.faces.Long" />
     </f:viewParam>
@@ -95,7 +97,7 @@
                     </div>
 
                     <!-- Caractéristiques présentes dans les résultats : tailles, couleurs, matière… -->
-                    <ui:repeat var="fc" value="#{rechercheBean.facettes.caracteristiques()}">
+                    <ui:repeat var="fc" value="#{rechercheBean.caracteristiquesVisibles ? rechercheBean.facettes.caracteristiques() : null}">
                         <div class="nx-field">
                             <label>#{fc.nom()}</label>
                             <div class="nx-chips nx-chips-compacts">
@@ -157,7 +159,7 @@
             </h:form>
 
             <div>
-                <div class="nx-results-header">
+                <div class="nx-results-header" id="nx-resultats">
                     <h2>#{rechercheBean.positionActive ? 'Autour de vous' : (rechercheBean.lieuChoisi != null ? 'Commerces autour de '.concat(rechercheBean.lieuChoisi.nom) : 'Résultats de recherche')}</h2>
                     <span class="nx-results-count">#{rechercheBean.total} résultat(s)</span>
                 </div>
@@ -328,7 +330,7 @@
                 </ui:fragment>
 
                 <ui:fragment rendered="#{!rechercheBean.vide}">
-                    <div class="nx-offre-grid">
+                    <div class="nx-offre-grid" id="nx-offres">
                         <ui:repeat var="o" value="#{rechercheBean.contenu}">
                             <ui:include src="/WEB-INF/includes/offre-carte.xhtml"><ui:param name="o" value="#{o}" /></ui:include>
                         </ui:repeat>
@@ -348,6 +350,15 @@
         </div>
     </div>
 
+    <ui:fragment rendered="#{not empty rechercheBean.defilerVers}">
+        <script>
+            // Après « Suivant », un tri ou un filtre : on revient aux résultats, pas en haut de la page
+            (function () {
+                var cible = document.getElementById('#{rechercheBean.defilerVers}');
+                if (cible) cible.scrollIntoView({ block: 'start' });
+            })();
+        </script>
+    </ui:fragment>
     <script>
         // « Autour de moi » : la position reste dans le navigateur jusqu'à l'envoi du formulaire de recherche.
         function nexoraAutourDeMoi() {

@@ -52,6 +52,7 @@ public class DecouverteController {
             @RequestParam(required = false) List<Long> vus,
             @RequestParam(required = false) List<Long> vusEspaces,
             @RequestParam(defaultValue = "8") int taille,
+            @RequestParam(required = false) String nature,
             @ModelAttribute OffreSearchRequest criteres) {
         List<Long> rechercheClassee = null;
         if (rechercheActive(criteres)) {
@@ -64,7 +65,7 @@ public class DecouverteController {
         }
         return ResponseEntity.ok(decouverte.flux(visiteur, zone, lat, lng, Math.max(0.2, Math.min(rayonKm, 50)),
                 rechercheClassee, vus == null ? List.of() : vus, vusEspaces == null ? List.of() : vusEspaces,
-                Math.max(3, Math.min(taille, 20))));
+                Math.max(3, Math.min(taille, 20)), "PRODUIT".equals(nature) || "SERVICE".equals(nature) ? nature : null));
     }
 
     private static boolean rechercheActive(OffreSearchRequest c) {

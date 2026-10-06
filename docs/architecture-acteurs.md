@@ -1372,6 +1372,11 @@ commune : « plombier » ne trouvait rien, aucune offre ne contenant ce mot. Dé
 - **Le vrai total** : le nombre de résultats compte toutes les pages (avant, la première page se
   croyait la dernière : on ne voyait que 12 offres). Sans recherche, le tri par défaut s'appelle « Tout ».
 - **Ordre** : mot trouvé dans le titre d'abord, puis synonyme dans le titre, puis ailleurs.
+- **Listes longues** (catégories, types…) : un champ « Tapez pour chercher… » les réduit pendant la
+  saisie, sans accents ni majuscules (`listes-recherche.js`, toutes les pages, y compris le formulaire d'offre).
+- Après « Suivant », un tri, un filtre ou un rayon, la page reste sur les résultats.
+- Les caractéristiques de même nom (« Tailles disponibles » homme et femme) ne font qu'un filtre,
+  proposé seulement pendant une recherche ou pour une catégorie.
 
 Données : `04_catalogue/18_synonyme_recherche.sql`, `09_seed/30_synonymes_recherche.sql`. Les offres
 de démonstration rangées dans « Services » ou « Transport » (racine) vont dans Plomberie,
@@ -1447,6 +1452,10 @@ Chaque page mélange ~**70 %** d'offres pertinentes, ~**20 %** de tendances loca
 succès du coin) et ~**10 %** de découverte (un rayon que le visiteur n'a pas exploré), sans plus de
 deux offres d'une même catégorie, jamais deux fois de suite le même professionnel, au moins un
 service s'il y en a, et une fiche de professionnel en 5e position.
+
+**Selon le besoin** : en haut du flux, « Pour vous · 🛍️ Boutique · 🛠️ Services » — la boutique ne
+montre que des produits, les services que des services et prestations. Explorer propose les mêmes
+deux entrées (« Boutique », « Services »), qui ouvrent la recherche filtrée (`?nature=PRODUIT|SERVICE`).
 
 **Pas de boîte noire** : ✨ « Vos goûts » montre ce que Nexora a compris (rayons et catégories
 préférés), le mélange 70/20/10, et permet d'**effacer ses goûts**.

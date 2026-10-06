@@ -135,3 +135,10 @@
 
 /* L'attribut hidden doit l'emporter sur les display ci-dessus */
 .nx-dc [hidden] { display: none !important; }
+
+/* Onglets : pour vous, boutique, services */
+.nx-dc-onglets { position: absolute; z-index: 19; top: 58px; left: 0; right: 0; display: flex; justify-content: center; gap: 4px; pointer-events: none; }
+.nx-dc-onglets button { pointer-events: auto; padding: 6px 12px; border-radius: 999px; border: 0; background: transparent; cursor: pointer;
+                        color: rgba(255,255,255,.75); font: 700 14px 'DM Sans', sans-serif; text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+.nx-dc-onglets button.actif { color: #fff; background: rgba(0,0,0,.35); backdrop-filter: blur(6px); }
+.nx-dc-points { top: 100px; }

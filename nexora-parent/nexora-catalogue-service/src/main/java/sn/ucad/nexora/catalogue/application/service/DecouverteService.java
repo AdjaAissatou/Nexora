@@ -71,12 +71,20 @@ public class DecouverteService {
      */
     public Flux flux(String visiteur, String zone, BigDecimal lat, BigDecimal lng, double rayonKm,
                      List<Long> rechercheClassee, Collection<Long> vus, Collection<Long> vusEspaces, int taille) {
+        return flux(visiteur, zone, lat, lng, rayonKm, rechercheClassee, vus, vusEspaces, taille, null);
+    }
+
+    /** {@code nature} : PRODUIT (onglet Boutique), SERVICE (onglet Services) ou null (tout). */
+    public Flux flux(String visiteur, String zone, BigDecimal lat, BigDecimal lng, double rayonKm,
+                     List<Long> rechercheClassee, Collection<Long> vus, Collection<Long> vusEspaces, int taille, String nature) {
         ProfilBrut profil = visiteurValide(visiteur) ? repository.profil(visiteur) : ProfilBrut.vide();
         Set<Long> dejaVus = new HashSet<>(vus);
         if (rechercheClassee == null) dejaVus.addAll(repository.passeesRecemment(visiteur));
 
         List<Candidat> candidats = repository.candidats(rechercheClassee, zone, lat, lng, rayonKm).stream()
-                .filter(c -> !dejaVus.contains(c.idOffre())).toList();
+                .filter(c -> !dejaVus.contains(c.idOffre()))
+                .filter(c -> nature == null || ("SERVICE".equals(nature) ? c.service() : !c.service()))
+                .toList();
         if (candidats.isEmpty()) return new Flux(List.of(), true);
 
         Map<Long, Integer> rangs = new HashMap<>();
@@ -141,7 +149,7 @@ public class DecouverteService {
         }
 
         // Une fiche de professionnel après la 4e carte (hors flux tiré d'une recherche)
-        if (rechercheClassee == null && cartes.size() >= 4) {
+        if (rechercheClassee == null && nature == null && cartes.size() >= 4) {
             espace(profil, zone, lat, lng, rayonKm, vusEspaces, cartes).ifPresent(e -> cartes.add(4, e));
         }
         return new Flux(cartes, ordre.size() < taille);

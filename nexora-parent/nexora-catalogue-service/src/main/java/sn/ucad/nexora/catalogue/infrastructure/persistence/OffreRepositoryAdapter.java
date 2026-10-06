@@ -173,11 +173,13 @@ public class OffreRepositoryAdapter implements OffreRepository {
     private List<List<Long>> valeursParAttribut(List<Long> valeurs) {
         if (valeurs == null || valeurs.isEmpty()) return List.of();
         List<Object[]> lignes = em.createNativeQuery(
-                "SELECT id_attribut, id_valeur FROM valeur_attribut_possible WHERE id_valeur IN (:ids) ORDER BY id_attribut")
+                // Groupées par nom de caractéristique : « M » de deux « Tailles disponibles » = l'une ou l'autre
+                "SELECT lower(a.nom), v.id_valeur FROM valeur_attribut_possible v JOIN attribut a ON a.id_attribut = v.id_attribut"
+                        + " WHERE v.id_valeur IN (:ids) ORDER BY lower(a.nom)")
                 .setParameter("ids", valeurs).getResultList();
-        Map<Long, List<Long>> groupes = new LinkedHashMap<>();
+        Map<String, List<Long>> groupes = new LinkedHashMap<>();
         for (Object[] l : lignes) {
-            groupes.computeIfAbsent(((Number) l[0]).longValue(), k -> new java.util.ArrayList<>()).add(((Number) l[1]).longValue());
+            groupes.computeIfAbsent((String) l[0], k -> new java.util.ArrayList<>()).add(((Number) l[1]).longValue());
         }
         return new java.util.ArrayList<>(groupes.values());
     }

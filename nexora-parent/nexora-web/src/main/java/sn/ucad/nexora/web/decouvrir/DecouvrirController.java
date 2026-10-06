@@ -46,7 +46,7 @@ public class DecouvrirController {
     /** Paramètres du flux relayés tels quels (zone, position, déjà vus, critères d'une recherche). */
     private static final Set<String> PARAMETRES = Set.of("zone", "lat", "lng", "rayonKm", "vus", "vusEspaces", "taille",
             "q", "idCategorie", "typeEspace", "commune", "prixMin", "prixMax", "estProduit", "avecPromotion",
-            "espaceVerifie", "ouvertMaintenant", "noteMin", "neuf", "negociable", "domicile", "valeurs");
+            "espaceVerifie", "ouvertMaintenant", "noteMin", "neuf", "negociable", "domicile", "valeurs", "nature");
 
     private final RestClient catalogue = RestClient.builder()
             .baseUrl(GatewayConfig.gatewayUrl() + "/catalogue-service/api/v1/decouvrir").build();

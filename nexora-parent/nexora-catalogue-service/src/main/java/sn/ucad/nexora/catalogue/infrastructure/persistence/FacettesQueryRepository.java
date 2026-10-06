@@ -34,23 +34,26 @@ public class FacettesQueryRepository {
                 ORDER BY COUNT(*) DESC, c.nom""").setParameter("ids", ids).getResultList())
                 .stream().map(l -> new Categorie(((Number) l[0]).longValue(), (String) l[1], ((Number) l[2]).longValue())).toList();
 
-        // Seules les caractéristiques à choix (listes) et filtrables ; une valeur épuisée ne compte pas
+        // Seules les caractéristiques à choix (listes) et filtrables ; une valeur épuisée ne compte pas.
+        // Regroupées par nom : les « Tailles disponibles » de plusieurs rayons n'en font qu'une.
         List<Object[]> lignes = em.createNativeQuery("""
-                SELECT a.id_attribut, a.nom, CAST(a.type_champ AS TEXT), v.id_valeur, v.valeur, v.code_couleur,
-                       COUNT(DISTINCT oa.id_offre)
+                SELECT MIN(a.id_attribut), MIN(a.nom), MIN(CAST(a.type_champ AS TEXT)), MIN(v.id_valeur), v.valeur, MAX(v.code_couleur),
+                       COUNT(DISTINCT oa.id_offre), CAST(array_agg(DISTINCT v.id_valeur) AS TEXT)
                 FROM offre_attribut oa
                 JOIN attribut a ON a.id_attribut = oa.id_attribut
                 JOIN valeur_attribut_possible v ON v.id_valeur = oa.id_valeur
                 WHERE oa.id_offre IN (:ids) AND oa.epuise = FALSE
                   AND a.filtrable IS NOT FALSE AND a.actif IS NOT FALSE
                   AND CAST(a.type_champ AS TEXT) IN ('LISTE', 'MULTI_LISTE')
-                GROUP BY a.id_attribut, a.nom, a.type_champ, a.ordre_affichage, v.id_valeur, v.valeur, v.code_couleur, v.ordre_affichage
-                ORDER BY a.ordre_affichage, a.nom, v.ordre_affichage, v.valeur""").setParameter("ids", ids).getResultList();
-        Map<Long, Caracteristique> parAttribut = new LinkedHashMap<>();
+                GROUP BY lower(a.nom), v.valeur
+                ORDER BY MIN(a.ordre_affichage), lower(a.nom), MIN(v.ordre_affichage), v.valeur""").setParameter("ids", ids).getResultList();
+        Map<String, Caracteristique> parAttribut = new LinkedHashMap<>();
         for (Object[] l : lignes) {
-            Caracteristique c = parAttribut.computeIfAbsent(((Number) l[0]).longValue(),
-                    k -> new Caracteristique(k, (String) l[1], (String) l[2], new ArrayList<>()));
-            c.valeurs().add(new Valeur(((Number) l[3]).longValue(), (String) l[4], (String) l[5], ((Number) l[6]).longValue()));
+            Caracteristique c = parAttribut.computeIfAbsent(((String) l[1]).toLowerCase(),
+                    k -> new Caracteristique(((Number) l[0]).longValue(), (String) l[1], (String) l[2], new ArrayList<>()));
+            List<Long> idsValeur = java.util.Arrays.stream(((String) l[7]).replaceAll("[{}]", "").split(","))
+                    .map(String::trim).filter(t -> !t.isEmpty()).map(Long::valueOf).toList();
+            c.valeurs().add(new Valeur(((Number) l[3]).longValue(), (String) l[4], (String) l[5], ((Number) l[6]).longValue(), idsValeur));
         }
         // Une caractéristique à une seule valeur n'aide pas à choisir
         List<Caracteristique> caracteristiques = parAttribut.values().stream().filter(c -> c.valeurs().size() > 1).toList();

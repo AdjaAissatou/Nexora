@@ -1717,3 +1717,19 @@ label.nx-chip-epuise:has(input:checked) { border-color: var(--nx-terracotta); ba
                          color: #fff; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
 .nx-espace-trouve-texte { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .nx-espace-trouve-texte small { color: var(--nx-text-secondary); font-size: 12.5px; }
+
+/* ===== Listes longues : champ de recherche au-dessus ===== */
+.nx-liste-recherche { margin-bottom: 6px; padding-top: 8px; padding-bottom: 8px; font-size: 14px; }
+select.nx-liste-ouverte { height: auto; padding: 4px; border-radius: 12px; background-image: none; }
+select.nx-liste-ouverte option { padding: 6px 10px; border-radius: 8px; }
+
+/* Explorer : entrer par son besoin */
+.nx-explorer-besoins { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; max-width: 760px; }
+.nx-explorer-besoin { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-radius: 18px; text-decoration: none;
+                      background: var(--nx-surface); border: 1px solid var(--nx-border); color: var(--nx-text); }
+.nx-explorer-besoin:hover { border-color: var(--nx-gold-deep); transform: translateY(-2px); }
+.nx-explorer-besoin-icone { font-size: 30px; }
+.nx-explorer-besoin strong { display: block; font-size: 17px; }
+.nx-explorer-besoin small { color: var(--nx-text-secondary); }
+@media (max-width: 600px) { .nx-explorer-besoins { grid-template-columns: 1fr; } }
+#nx-offres, #nx-resultats { scroll-margin-top: 96px; }
