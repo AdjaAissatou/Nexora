@@ -79,6 +79,28 @@ public class CatalogueAdminController {
         return ResponseEntity.ok(service.lierTypeEspace(c, id, te, false));
     }
 
+    // ------------------------------------------------------------------ catégories proposées (« Autre… »)
+
+    @GetMapping("/propositions")
+    public ResponseEntity<List<Proposition>> propositions() {
+        return ResponseEntity.ok(service.propositions());
+    }
+
+    @PostMapping("/propositions/creer")
+    public ResponseEntity<List<Proposition>> creerProposee(@AuthenticationPrincipal UUID c, @RequestBody PropositionCreation r) {
+        return ResponseEntity.ok(service.creerCategorieProposee(c, r));
+    }
+
+    @PostMapping("/propositions/rattacher")
+    public ResponseEntity<List<Proposition>> rattacher(@AuthenticationPrincipal UUID c, @RequestBody PropositionRattachement r) {
+        return ResponseEntity.ok(service.rattacherProposition(c, r));
+    }
+
+    @PostMapping("/propositions/ecarter")
+    public ResponseEntity<List<Proposition>> ecarter(@AuthenticationPrincipal UUID c, @RequestBody PropositionEcart r) {
+        return ResponseEntity.ok(service.ecarterProposition(c, r));
+    }
+
     // ------------------------------------------------------------------ types d'offre
 
     @PostMapping("/categories/{id:\\d+}/types")

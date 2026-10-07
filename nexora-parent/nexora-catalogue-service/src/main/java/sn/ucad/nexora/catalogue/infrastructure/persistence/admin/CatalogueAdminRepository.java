@@ -156,6 +156,27 @@ public class CatalogueAdminRepository {
         return r.stream().findFirst();
     }
 
+    /**
+     * Offres en « Autre… » (§21) : id, titre, texte proposé, espace, catégorie actuelle (id, chemin),
+     * nature, date de création. Les plus anciennes d'abord.
+     */
+    @SuppressWarnings("unchecked")
+    public List<Object[]> offresProposees() {
+        return em.createNativeQuery("""
+                SELECT o.id_offre, o.titre, o.categorie_proposee, ep.id_espace, ep.nom, c.id_categorie,
+                       concat_ws(' › ', cgp.nom, cp.nom, c.nom),
+                       CASE WHEN EXISTS (SELECT 1 FROM service s WHERE s.id_offre = o.id_offre) THEN 'SERVICE' ELSE 'PRODUIT' END,
+                       o.date_creation
+                FROM offre o
+                JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
+                JOIN categorie c ON c.id_categorie = o.id_categorie
+                LEFT JOIN categorie cp ON cp.id_categorie = c.id_categorie_parent
+                LEFT JOIN categorie cgp ON cgp.id_categorie = cp.id_categorie_parent
+                WHERE o.categorie_proposee IS NOT NULL
+                ORDER BY o.date_creation, o.id_offre
+                """).getResultList();
+    }
+
     // ------------------------------------------------------------------ écriture
 
     /** {@code sql} : un INSERT … RETURNING &lt;identifiant&gt;. */

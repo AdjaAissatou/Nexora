@@ -25,12 +25,14 @@ public class UpdateOffreService implements UpdateOffreUseCase {
     private final EntityManager em;
     private final UtilisateurLookupRepository utilisateurRepository;
     private final EspaceLookupRepository espaceRepository;
+    private final RangementAutre rangementAutre;
 
     public UpdateOffreService(EntityManager em, UtilisateurLookupRepository utilisateurRepository,
-                               EspaceLookupRepository espaceRepository) {
+                               EspaceLookupRepository espaceRepository, RangementAutre rangementAutre) {
         this.em = em;
         this.utilisateurRepository = utilisateurRepository;
         this.espaceRepository = espaceRepository;
+        this.rangementAutre = rangementAutre;
     }
 
     @Override
@@ -42,7 +44,8 @@ public class UpdateOffreService implements UpdateOffreUseCase {
         if (r.getTitre() == null || r.getTitre().isBlank()) {
             throw new IllegalArgumentException("Le titre est obligatoire");
         }
-        if (r.getIdTypeOffre() == null || r.getIdCategorie() == null) {
+        String proposee = RangementAutre.texte(r.getCategorieProposee());
+        if (proposee == null && (r.getIdTypeOffre() == null || r.getIdCategorie() == null)) {
             throw new IllegalArgumentException("Type d'offre et catégorie sont obligatoires");
         }
 
@@ -56,9 +59,17 @@ public class UpdateOffreService implements UpdateOffreUseCase {
             throw new IllegalArgumentException("Vous n'êtes pas autorisé à modifier cette offre");
         }
 
-        String principale = verifierEtObtenirPrincipale(r.getIdTypeOffre(), r.getIdCategorie());
+        String principale;
+        if (proposee != null) {
+            RangementAutre.Rangement rangement = rangementAutre.ranger(idEspace, r.getNatureProposee());
+            r.setIdCategorie(rangement.idCategorie());
+            r.setIdTypeOffre(rangement.idTypeOffre());
+            principale = rangement.principale();
+        } else {
+            principale = verifierEtObtenirPrincipale(r.getIdTypeOffre(), r.getIdCategorie());
+        }
 
-        mettreAJourOffre(idOffre, r);
+        mettreAJourOffre(idOffre, r, proposee);
 
         Query supprimerProduit = em.createNativeQuery("DELETE FROM produit WHERE id_offre = :id");
         supprimerProduit.setParameter("id", idOffre).executeUpdate();
@@ -109,11 +120,12 @@ public class UpdateOffreService implements UpdateOffreUseCase {
         return (String) row[0];
     }
 
-    private void mettreAJourOffre(Long idOffre, UpdateOffreRequest r) {
+    private void mettreAJourOffre(Long idOffre, UpdateOffreRequest r, String proposee) {
         Query q = em.createNativeQuery("""
                 UPDATE offre SET id_type_offre = :idTypeOffre, id_categorie = :idCategorie, titre = :titre,
                        description = :description, prix = :prix, negociable = :negociable,
-                       disponible = :disponible, date_modification = NOW()
+                       disponible = :disponible, date_modification = NOW(),
+                       categorie_proposee = CAST(:proposee AS VARCHAR)
                 WHERE id_offre = :idOffre
                 """);
         q.setParameter("idTypeOffre", r.getIdTypeOffre());
@@ -123,6 +135,7 @@ public class UpdateOffreService implements UpdateOffreUseCase {
         q.setParameter("prix", r.getPrix());
         q.setParameter("negociable", r.isNegociable());
         q.setParameter("disponible", r.isDisponible());
+        q.setParameter("proposee", proposee);
         q.setParameter("idOffre", idOffre);
         q.executeUpdate();
     }

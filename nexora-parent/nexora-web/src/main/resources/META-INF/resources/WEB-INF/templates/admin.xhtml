@@ -65,6 +65,8 @@
                 <div class="nx-admin-nav-titre">Gestion</div>
                 <h:link outcome="/admin/catalogue" value="Catalogue" rendered="#{acces.catalogue}"
                         styleClass="nx-admin-nav-item #{section == 'catalogue' ? 'active' : ''}" />
+                <h:link outcome="/admin/propositions" value="Catégories proposées" rendered="#{acces.catalogue}"
+                        styleClass="nx-admin-nav-item #{section == 'propositions' ? 'active' : ''}" />
                 <h:link outcome="/admin/parametres" value="Paramètres" rendered="#{acces.parametres}"
                         styleClass="nx-admin-nav-item #{section == 'parametres' ? 'active' : ''}" />
             </ui:fragment>

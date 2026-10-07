@@ -55,7 +55,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 ep.nombre_vues AS espace_vues, ep.nombre_favoris,
 
                 te.nom AS type_espace,
-                c.nom AS categorie_nom,
+                COALESCE(o.categorie_proposee, c.nom) AS categorie_nom,
                 to2.libelle AS type_offre_libelle,
 
                 a.pays, a.region, a.departement, a.commune,
@@ -122,7 +122,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
     private static final double RAYON_DEFAUT_KM = 2;
 
     /** Tout le texte d'une offre où chercher, sans accents ni majuscules. */
-    private static final String DOCUMENT = "translate(lower(concat_ws(' ', o.titre, o.description, c.nom, cp.nom, cgp.nom, "
+    private static final String DOCUMENT = "translate(lower(concat_ws(' ', o.titre, o.description, o.categorie_proposee, c.nom, cp.nom, cgp.nom, "
             + "to2.libelle, ep.nom, te.nom, a.commune, a.quartier, a.departement, "
             + "(SELECT string_agg(tg.nom, ' ') FROM offre_tag ot JOIN tag tg ON tg.id_tag = ot.id_tag WHERE ot.id_offre = o.id_offre))), "
             + "'" + TexteRecherche.ACCENTS + "', '" + TexteRecherche.SANS_ACCENTS + "')";
@@ -234,7 +234,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 ep.nombre_vues AS espace_vues, ep.nombre_favoris,
 
                 te.nom AS type_espace,
-                c.nom AS categorie_nom,
+                COALESCE(o.categorie_proposee, c.nom) AS categorie_nom,
                 to2.libelle AS type_offre_libelle,
 
                 a.pays, a.region, a.departement, a.commune,

@@ -79,4 +79,13 @@ public class OffreEditionResponse {
     public void setAttributs(List<AttributValeurResponse> v) { attributs = v; }
     public List<String> getImages() { return images; }
     public void setImages(List<String> v) { images = v; }
+
+    /** « Autre… » (§21) : catégorie écrite par le professionnel, encore en attente ; nature de l'offre. */
+    private String categorieProposee;
+    private String nature;
+
+    public String getCategorieProposee() { return categorieProposee; }
+    public void setCategorieProposee(String v) { categorieProposee = v; }
+    public String getNature() { return nature; }
+    public void setNature(String v) { nature = v; }
 }

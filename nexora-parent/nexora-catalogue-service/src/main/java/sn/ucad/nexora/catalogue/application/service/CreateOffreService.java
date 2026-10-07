@@ -26,12 +26,14 @@ public class CreateOffreService implements CreateOffreUseCase {
     private final EntityManager em;
     private final UtilisateurLookupRepository utilisateurRepository;
     private final EspaceLookupRepository espaceRepository;
+    private final RangementAutre rangementAutre;
 
     public CreateOffreService(EntityManager em, UtilisateurLookupRepository utilisateurRepository,
-                               EspaceLookupRepository espaceRepository) {
+                               EspaceLookupRepository espaceRepository, RangementAutre rangementAutre) {
         this.em = em;
         this.utilisateurRepository = utilisateurRepository;
         this.espaceRepository = espaceRepository;
+        this.rangementAutre = rangementAutre;
     }
 
     @Override
@@ -43,7 +45,8 @@ public class CreateOffreService implements CreateOffreUseCase {
         if (r.getTitre() == null || r.getTitre().isBlank()) {
             throw new IllegalArgumentException("Le titre est obligatoire");
         }
-        if (r.getIdEspace() == null || r.getIdTypeOffre() == null || r.getIdCategorie() == null) {
+        String proposee = RangementAutre.texte(r.getCategorieProposee());
+        if (r.getIdEspace() == null || (proposee == null && (r.getIdTypeOffre() == null || r.getIdCategorie() == null))) {
             throw new IllegalArgumentException("Espace, type d'offre et catégorie sont obligatoires");
         }
 
@@ -57,9 +60,17 @@ public class CreateOffreService implements CreateOffreUseCase {
             throw new IllegalArgumentException("Vous n'êtes pas autorisé à publier une offre pour cet espace");
         }
 
-        String principale = verifierEtObtenirPrincipale(r.getIdTypeOffre(), r.getIdCategorie());
+        String principale;
+        if (proposee != null) {
+            RangementAutre.Rangement rangement = rangementAutre.ranger(r.getIdEspace(), r.getNatureProposee());
+            r.setIdCategorie(rangement.idCategorie());
+            r.setIdTypeOffre(rangement.idTypeOffre());
+            principale = rangement.principale();
+        } else {
+            principale = verifierEtObtenirPrincipale(r.getIdTypeOffre(), r.getIdCategorie());
+        }
 
-        Long idOffre = inserer(r);
+        Long idOffre = inserer(r, proposee);
 
         if ("SERVICE".equals(principale)) {
             insererService(idOffre, r);
@@ -90,13 +101,13 @@ public class CreateOffreService implements CreateOffreUseCase {
         return (String) row[0];
     }
 
-    private Long inserer(CreateOffreRequest r) {
+    private Long inserer(CreateOffreRequest r, String proposee) {
         Query q = em.createNativeQuery("""
                 INSERT INTO offre (id_espace, id_type_offre, id_categorie, titre, description, prix,
                                     negociable, disponible, est_commandable, statut, date_creation,
-                                    date_modification, date_publication)
+                                    date_modification, date_publication, categorie_proposee)
                 VALUES (:idEspace, :idTypeOffre, :idCategorie, :titre, :description, :prix,
-                        :negociable, :disponible, TRUE, 'PUBLIE', NOW(), NOW(), NOW())
+                        :negociable, :disponible, TRUE, 'PUBLIE', NOW(), NOW(), NOW(), CAST(:proposee AS VARCHAR))
                 RETURNING id_offre
                 """);
         q.setParameter("idEspace", r.getIdEspace());
@@ -107,6 +118,7 @@ public class CreateOffreService implements CreateOffreUseCase {
         q.setParameter("prix", r.getPrix());
         q.setParameter("negociable", r.isNegociable());
         q.setParameter("disponible", r.isDisponible());
+        q.setParameter("proposee", proposee);
         return ((Number) q.getSingleResult()).longValue();
     }
 

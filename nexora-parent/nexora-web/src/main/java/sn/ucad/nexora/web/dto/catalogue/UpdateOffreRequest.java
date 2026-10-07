@@ -22,4 +22,7 @@ public record UpdateOffreRequest(
         Boolean interventionDomicile,
         Boolean reservation,
         List<AttributValeurRequest> attributs,
-        List<String> images) {}
+        List<String> images,
+        // « Autre… » (§21) : catégorie écrite par le professionnel, nature PRODUIT ou SERVICE
+        String categorieProposee,
+        String natureProposee) {}

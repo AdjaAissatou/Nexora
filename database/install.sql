@@ -163,6 +163,7 @@ SET client_encoding = 'UTF8';
 \i 09_seed/32_lieux_celebres.sql
 \i 11_migrations/05_choix_multiples.sql
 \i 11_migrations/08_types_produits.sql
+\i 11_migrations/09_categorie_proposee.sql
 \i 11_migrations/06_compteurs_espace.sql
 \i 11_migrations/07_lieux_doublons.sql
 

@@ -43,7 +43,9 @@ public class GetOffreEditionService implements GetOffreEditionUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Profil utilisateur introuvable"));
 
         Query q = em.createNativeQuery("""
-                SELECT id_offre, id_espace, id_categorie, id_type_offre, titre, description, prix, negociable, disponible
+                SELECT id_offre, id_espace, id_categorie, id_type_offre, titre, description, prix, negociable, disponible,
+                       categorie_proposee,
+                       CASE WHEN EXISTS (SELECT 1 FROM service s WHERE s.id_offre = offre.id_offre) THEN 'SERVICE' ELSE 'PRODUIT' END
                 FROM offre WHERE id_offre = :id
                 """);
         q.setParameter("id", idOffre);
@@ -71,6 +73,8 @@ public class GetOffreEditionService implements GetOffreEditionUseCase {
         r.setPrix((BigDecimal) row[6]);
         r.setNegociable((Boolean) row[7]);
         r.setDisponible((Boolean) row[8]);
+        r.setCategorieProposee((String) row[9]);
+        r.setNature((String) row[10]);
 
         remplirChaineCategories(r);
         remplirProduitOuService(r);

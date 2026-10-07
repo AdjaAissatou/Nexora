@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.ucad.nexora.catalogue.application.dto.response.admin.CatalogueAdminDtos.*;
+import sn.ucad.nexora.catalogue.infrastructure.persistence.TexteRecherche;
 import sn.ucad.nexora.catalogue.infrastructure.persistence.admin.CatalogueAdminRepository;
 import sn.ucad.nexora.common.audit.JournalActions;
 import sn.ucad.nexora.common.exception.BusinessException;
@@ -137,6 +138,143 @@ public class CatalogueAdminService {
         journal.enregistrer(auteur, MODULE, lier ? "LIER_TYPE_ESPACE" : "DELIER_TYPE_ESPACE", "categorie", id,
                 "« " + c.nom() + " » " + (lier ? "proposée aux" : "retirée des") + " espaces de type " + typeEspace);
         return fiche(id);
+    }
+
+    // ------------------------------------------------------------------ catégories proposées (« Autre… », §21)
+
+    /** Propositions en attente, regroupées quand le texte revient au même ; les plus demandées d'abord. */
+    @Transactional(readOnly = true)
+    public List<Proposition> propositions() {
+        Map<String, List<Object[]>> groupes = new LinkedHashMap<>();
+        for (Object[] l : repo.offresProposees()) {
+            groupes.computeIfAbsent(cle((String) l[2]), k -> new java.util.ArrayList<>()).add(l);
+        }
+        return groupes.entrySet().stream()
+                .map(e -> proposition(e.getKey(), e.getValue()))
+                .sorted(java.util.Comparator.comparingInt(Proposition::nombreOffres).reversed()
+                        .thenComparing(Proposition::premiere))
+                .toList();
+    }
+
+    @Transactional
+    public List<Proposition> creerCategorieProposee(UUID auteur, PropositionCreation r) {
+        Proposition groupe = proposition(r.cle());
+        Long parentId = r.parentId() != null ? r.parentId() : groupe.categorieActuelleId();
+        categorie(parentId);
+        String nom = obligatoire(r.nom() == null || r.nom().isBlank() ? groupe.libelle() : r.nom(), "Le nom", 120);
+        String principale = principale(r.principale() == null || r.principale().isBlank() ? groupe.nature() : r.principale());
+        if (repo.existe("""
+                SELECT COUNT(*) FROM categorie WHERE id_categorie_parent = :p AND LOWER(nom) = LOWER(:n)""",
+                p("p", parentId, "n", nom))) {
+            throw new BusinessException("« " + nom + " » existe déjà à cet endroit : rangez plutôt les offres dans cette catégorie");
+        }
+        Long id = repo.inserer("""
+                INSERT INTO categorie (id_categorie_parent, nom, ordre_affichage, actif, date_creation)
+                VALUES (:parent, :nom, 0, TRUE, NOW()) RETURNING id_categorie
+                """, p("parent", parentId, "nom", nom));
+        Long type = repo.inserer("""
+                INSERT INTO type_offre (id_categorie, libelle, principale, actif)
+                VALUES (:c, :l, CAST(:p AS type_offre_principale), TRUE) RETURNING id_type_offre
+                """, p("c", id, "l", nom, "p", principale));
+        repo.inserer("""
+                INSERT INTO type_offre (id_categorie, libelle, description, principale, actif)
+                VALUES (:c, 'Autre', 'Produit ou service non listé — à préciser dans le titre', CAST(:p AS type_offre_principale), TRUE)
+                RETURNING id_type_offre
+                """, p("c", id, "p", principale));
+        List<Long> offres = groupe.offres().stream().map(OffreProposee::id).toList();
+        repo.executer("""
+                UPDATE offre SET id_categorie = :c, id_type_offre = :t, categorie_proposee = NULL, date_modification = NOW()
+                WHERE id_offre IN (:ids)""", p("c", id, "t", type, "ids", offres));
+        journal.enregistrer(auteur, MODULE, "CREER_CATEGORIE_PROPOSEE", "categorie", id,
+                "Catégorie « " + chemin(id) + " » créée depuis la proposition « " + groupe.libelle() + " » ("
+                        + offres.size() + " offre(s) rangée(s))");
+        return propositions();
+    }
+
+    @Transactional
+    public List<Proposition> rattacherProposition(UUID auteur, PropositionRattachement r) {
+        Proposition groupe = proposition(r.cle());
+        if (r.categorieId() == null) throw new BusinessException("Choisissez la catégorie où ranger les offres");
+        Noeud cible = categorie(r.categorieId());
+        if (!cible.actif()) throw new BusinessException("Cette catégorie est désactivée");
+        Map<String, List<Long>> parNature = new LinkedHashMap<>();
+        groupe.offres().forEach(o -> parNature.computeIfAbsent(o.nature(), k -> new java.util.ArrayList<>()).add(o.id()));
+        for (Map.Entry<String, List<Long>> e : parNature.entrySet()) {
+            Long type = typePour(r.categorieId(), e.getKey());
+            repo.executer("""
+                    UPDATE offre SET id_categorie = :c, id_type_offre = :t, categorie_proposee = NULL, date_modification = NOW()
+                    WHERE id_offre IN (:ids)""", p("c", r.categorieId(), "t", type, "ids", e.getValue()));
+        }
+        journal.enregistrer(auteur, MODULE, "RATTACHER_PROPOSITION", "categorie", r.categorieId(),
+                "Proposition « " + groupe.libelle() + " » : " + groupe.offres().size() + " offre(s) rangée(s) dans « "
+                        + chemin(r.categorieId()) + " »");
+        return propositions();
+    }
+
+    @Transactional
+    public List<Proposition> ecarterProposition(UUID auteur, PropositionEcart r) {
+        exigerMotif(r.motif());
+        Proposition groupe = proposition(r.cle());
+        List<Long> offres = groupe.offres().stream().map(OffreProposee::id).toList();
+        repo.executer("UPDATE offre SET categorie_proposee = NULL WHERE id_offre IN (:ids)", p("ids", offres));
+        journal.enregistrer(auteur, MODULE, "ECARTER_PROPOSITION", "categorie", groupe.categorieActuelleId(),
+                "Proposition « " + groupe.libelle() + " » écartée (" + offres.size() + " offre(s) laissée(s) dans « "
+                        + groupe.categorieActuelle() + " ») : " + r.motif().trim());
+        return propositions();
+    }
+
+    /** Clé de regroupement : mots utiles, sans accents ni majuscules, ramenés à leur racine (« Tissus wax » = « tissu Wax »). */
+    static String cle(String texte) {
+        List<String> mots = TexteRecherche.mots(texte).stream().map(TexteRecherche::racine).toList();
+        return mots.isEmpty() ? TexteRecherche.normaliser(texte).trim() : String.join(" ", mots);
+    }
+
+    private Proposition proposition(String cle) {
+        if (cle == null || cle.isBlank()) throw new BusinessException("Proposition non précisée");
+        List<Object[]> lignes = repo.offresProposees().stream().filter(l -> cle.equals(cle((String) l[2]))).toList();
+        if (lignes.isEmpty()) throw new ResourceNotFoundException("Proposition introuvable : elle a peut-être déjà été traitée");
+        return proposition(cle, lignes);
+    }
+
+    private static Proposition proposition(String cle, List<Object[]> lignes) {
+        Map<String, Long> textes = new LinkedHashMap<>();
+        Map<Long, Long> categories = new LinkedHashMap<>();
+        Map<Long, String> chemins = new java.util.HashMap<>();
+        Map<String, Long> natures = new LinkedHashMap<>();
+        java.util.Set<Long> espaces = new java.util.HashSet<>();
+        List<OffreProposee> offres = new java.util.ArrayList<>();
+        for (Object[] l : lignes) {
+            String texte = (String) l[2];
+            Long categorie = ((Number) l[5]).longValue();
+            textes.merge(texte, 1L, Long::sum);
+            categories.merge(categorie, 1L, Long::sum);
+            chemins.put(categorie, (String) l[6]);
+            natures.merge((String) l[7], 1L, Long::sum);
+            espaces.add(((Number) l[3]).longValue());
+            offres.add(new OffreProposee(((Number) l[0]).longValue(), (String) l[1], ((Number) l[3]).longValue(),
+                    (String) l[4], (String) l[7], texte));
+        }
+        String libelle = plusFrequent(textes);
+        Long categorie = plusFrequent(categories);
+        Object date = lignes.get(0)[8];
+        java.time.LocalDateTime premiere = date instanceof java.sql.Timestamp t ? t.toLocalDateTime()
+                : date instanceof java.time.LocalDateTime d ? d : null;
+        return new Proposition(cle, libelle, textes.keySet().stream().filter(t -> !t.equals(libelle)).toList(),
+                offres.size(), espaces.size(), categorie, chemins.get(categorie), plusFrequent(natures), premiere, offres);
+    }
+
+    private static <K> K plusFrequent(Map<K, Long> comptes) {
+        return comptes.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse(null);
+    }
+
+    /** Type d'offre d'une catégorie pour une nature : son « Autre », sinon un type de cette nature, sinon le premier. */
+    private Long typePour(Long categorieId, String nature) {
+        return repo.ligne("""
+                SELECT id_type_offre, libelle FROM type_offre WHERE id_categorie = :id AND COALESCE(actif, TRUE)
+                ORDER BY (CAST(principale AS TEXT) = '%s') DESC, (libelle ~* '^autre') DESC, id_type_offre LIMIT 1
+                """.formatted("SERVICE".equals(nature) ? "SERVICE" : "PRODUIT"), categorieId)
+                .map(l -> ((Number) l[0]).longValue())
+                .orElseThrow(() -> new BusinessException("Cette catégorie n'a aucun type d'offre actif : ajoutez-en un d'abord"));
     }
 
     // ------------------------------------------------------------------ types d'offre

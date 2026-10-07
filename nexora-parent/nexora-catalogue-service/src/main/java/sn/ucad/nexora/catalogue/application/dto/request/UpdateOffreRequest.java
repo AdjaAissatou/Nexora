@@ -64,4 +64,14 @@ public class UpdateOffreRequest {
     public void setAttributs(List<AttributValeurRequest> attributs) { this.attributs = attributs; }
     public List<String> getImages() { return images; }
     public void setImages(List<String> images) { this.images = images; }
+
+    // « Autre… » (§21) : catégorie écrite par le professionnel et nature choisie (PRODUIT ou SERVICE).
+    // Renseignée, elle remplace catégorie et type : l'offre va dans le rayon principal de l'espace.
+    private String categorieProposee;
+    private String natureProposee;
+
+    public String getCategorieProposee() { return categorieProposee; }
+    public void setCategorieProposee(String v) { this.categorieProposee = v; }
+    public String getNatureProposee() { return natureProposee; }
+    public void setNatureProposee(String v) { this.natureProposee = v; }
 }

@@ -37,6 +37,19 @@ public class CatalogueAdminApiClient {
                 .header("Authorization", "Bearer " + jeton).retrieve().body(new ParameterizedTypeReference<List<Resultat>>() {}));
     }
 
+    /** Catégories écrites par les professionnels (« Autre… », §21), regroupées. */
+    public List<Proposition> propositions(String jeton) {
+        return appel(() -> client.get().uri(BASE + "/propositions").header("Authorization", "Bearer " + jeton)
+                .retrieve().body(new ParameterizedTypeReference<List<Proposition>>() {}));
+    }
+
+    /** {@code action} : creer, rattacher ou ecarter ; renvoie les propositions restantes. */
+    public List<Proposition> traiterProposition(String jeton, String action, Object corps) {
+        LOG.info("Requête POST {}/propositions/{}", BASE, action);
+        return appel(() -> client.post().uri(BASE + "/propositions/{a}", action).header("Authorization", "Bearer " + jeton)
+                .body(corps).retrieve().body(new ParameterizedTypeReference<List<Proposition>>() {}));
+    }
+
     /** POST ou PUT renvoyant la fiche (null si le serveur répond 204, ex. suppression d'une racine). */
     public FicheCategorie envoyer(String jeton, String methode, String chemin, Object corps, Object... variables) {
         LOG.info("Requête {} {}{}", methode, BASE, chemin);

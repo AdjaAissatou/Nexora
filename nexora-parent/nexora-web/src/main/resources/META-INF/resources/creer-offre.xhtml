@@ -41,12 +41,40 @@
                         <label for="creerOffre:niveau1">Catégorie</label>
                         <h:selectOneMenu id="niveau1" value="#{creerOffreBean.niveau1Id}" styleClass="nx-select">
                             <f:selectItem itemLabel="Choisir une catégorie…" itemValue="#{null}" />
-                            <f:selectItems value="#{creerOffreBean.niveau1}" var="c" itemLabel="#{c.nom}" itemValue="#{c.id}" />
+                            <f:selectItems value="#{creerOffreBean.niveau1Choix}" />
                             <f:converter converterId="jakarta.faces.Long" />
                             <f:ajax listener="#{creerOffreBean.onNiveau1Change}"
-                                    render="niveau2Bloc niveau3Bloc typeOffreBloc attributsBloc communBloc" />
+                                    render="autreBloc niveau2Bloc niveau3Bloc typeOffreBloc attributsBloc communBloc" />
                         </h:selectOneMenu>
+                        <small class="nx-aide">Rien ne correspond à votre activité ? Choisissez « Autre… » tout en bas et écrivez votre catégorie.</small>
                     </div>
+
+                    <!-- « Autre… » (§21) : la catégorie écrite par le professionnel, rangée dans le rayon de son espace -->
+                    <h:panelGroup id="autreBloc" layout="block">
+                        <ui:fragment rendered="#{creerOffreBean.autreCategorie}">
+                            <div class="nx-autre-categorie">
+                                <div class="nx-field">
+                                    <label for="creerOffre:categorieProposee">Quelle catégorie ?</label>
+                                    <h:inputText id="categorieProposee" value="#{creerOffreBean.categorieProposee}" styleClass="nx-input"
+                                                 required="true" requiredMessage="Écrivez la catégorie de votre offre."
+                                                 maxlength="120" placeholder="Ex. : Tissus wax, Matériel de pêche, Décoration de mariage…" />
+                                    <h:message for="categorieProposee" styleClass="nx-erreur-champ" />
+                                </div>
+                                <div class="nx-field">
+                                    <label>C'est…</label>
+                                    <h:selectOneRadio id="natureProposee" value="#{creerOffreBean.natureProposee}" styleClass="nx-radios" layout="lineDirection">
+                                        <f:selectItem itemValue="PRODUIT" itemLabel="🛍️ Un article à vendre" />
+                                        <f:selectItem itemValue="SERVICE" itemLabel="🛠️ Un service" />
+                                        <f:ajax render="communBloc" />
+                                    </h:selectOneRadio>
+                                </div>
+                                <p class="nx-aide">
+                                    Votre offre est publiée tout de suite, dans le rayon de votre espace. L'équipe Nexora
+                                    examine les catégories proposées et crée les plus demandées ; votre offre y sera alors rangée.
+                                </p>
+                            </div>
+                        </ui:fragment>
+                    </h:panelGroup>
 
                     <h:panelGroup id="niveau2Bloc" layout="block">
                         <ui:fragment rendered="#{not empty creerOffreBean.niveau2}">
@@ -151,7 +179,7 @@
                     </h:panelGroup>
 
                     <h:panelGroup id="communBloc" layout="block">
-                        <ui:fragment rendered="#{creerOffreBean.typeOffreId != null}">
+                        <ui:fragment rendered="#{creerOffreBean.detailsVisibles}">
 
                             <h3 style="margin-top:20px;">Détails de l'offre</h3>
 
@@ -159,7 +187,7 @@
                                 <label for="creerOffre:titre">Titre</label>
                                 <h:inputText id="titre" value="#{creerOffreBean.titre}" styleClass="nx-input" required="true"
                                              requiredMessage="Le titre est obligatoire."
-                                             placeholder="#{creerOffreBean.autrePropose ? 'Décrivez précisément ce que vous proposez' : ''}" />
+                                             placeholder="#{creerOffreBean.autrePropose or creerOffreBean.autreCategorie ? 'Décrivez précisément ce que vous proposez' : ''}" />
                             </div>
 
                             <div class="nx-field">

@@ -28,7 +28,28 @@ public final class CatalogueAdminDtos {
 
     public record Resultat(String genre, Long id, Long categorieId, String libelle, String chemin, boolean actif) {}
 
+    /** Une offre rangée en « Autre… » avec la catégorie écrite par son professionnel (§21). */
+    public record OffreProposee(Long id, String titre, Long espaceId, String espace, String nature, String texte) {}
+
+    /**
+     * Les offres dont la catégorie écrite revient au même (accents, majuscules et pluriels confondus).
+     * {@code cle} identifie le groupe dans les actions ; {@code categorieActuelleId} : où elles sont rangées
+     * aujourd'hui (le rayon de leur espace), parent proposé par défaut pour la nouvelle catégorie.
+     */
+    public record Proposition(String cle, String libelle, List<String> variantes, int nombreOffres, int nombreEspaces,
+                              Long categorieActuelleId, String categorieActuelle, String nature,
+                              java.time.LocalDateTime premiere, List<OffreProposee> offres) {}
+
     // ------------------------------------------------------------------ requêtes
+
+    /** Créer la catégorie proposée sous {@code parentId}, avec un type d'offre du même nom, et y ranger les offres. */
+    public record PropositionCreation(String cle, Long parentId, String nom, String principale) {}
+
+    /** Ranger les offres de la proposition dans une catégorie existante. */
+    public record PropositionRattachement(String cle, Long categorieId) {}
+
+    /** Écarter la proposition : les offres restent où elles sont, le texte est effacé. */
+    public record PropositionEcart(String cle, String motif) {}
 
     public record CategorieRequest(Long parentId, String nom, String description, String icone, String couleur, Integer ordre) {}
 

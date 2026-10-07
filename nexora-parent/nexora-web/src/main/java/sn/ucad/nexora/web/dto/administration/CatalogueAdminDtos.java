@@ -49,4 +49,19 @@ public final class CatalogueAdminDtos {
     public record ValeurRequest(String valeur, Integer ordre) {}
 
     public record MotifRequest(String motif) {}
+
+    // ------------------------------------------------------------------ catégories proposées (« Autre… », §21)
+
+    public record OffreProposee(Long id, String titre, Long espaceId, String espace, String nature, String texte)
+            implements Serializable {}
+
+    public record Proposition(String cle, String libelle, List<String> variantes, int nombreOffres, int nombreEspaces,
+                              Long categorieActuelleId, String categorieActuelle, String nature,
+                              java.time.LocalDateTime premiere, List<OffreProposee> offres) implements Serializable {}
+
+    public record PropositionCreation(String cle, Long parentId, String nom, String principale) {}
+
+    public record PropositionRattachement(String cle, Long categorieId) {}
+
+    public record PropositionEcart(String cle, String motif) {}
 }

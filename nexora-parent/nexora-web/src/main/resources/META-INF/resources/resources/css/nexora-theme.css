@@ -1895,3 +1895,31 @@ select.nx-liste-ouverte option { padding: 6px 10px; border-radius: 8px; }
     .nx-compte-espace-actions { grid-column: 1 / -1; flex-direction: row; }
     .nx-compte-espace-actions .nx-button { flex: 1; }
 }
+
+/* ---------- Ajouter une offre : « Autre… » (§21) ---------- */
+.nx-autre-categorie {
+    margin: 4px 0 8px; padding: 16px 18px 6px;
+    border: 1px dashed var(--nx-gold-deep); border-radius: var(--nx-radius-md);
+    background: var(--nx-gold-soft);
+}
+.nx-autre-categorie .nx-aide { display: block; margin: 0 0 10px; }
+.nx-radios { border-collapse: separate; border-spacing: 0; }
+.nx-radios td { padding: 0 18px 6px 0; }
+.nx-radios label { display: inline; font-weight: 500; margin-left: 6px; cursor: pointer; }
+.nx-radios td { white-space: nowrap; }
+
+/* ---------- Admin : catégories proposées (§21) ---------- */
+.nx-proposition { margin-top: 16px; }
+.nx-proposition-tete { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.nx-proposition-tete h3 { margin: 0; }
+.nx-proposition-chiffres { color: var(--nx-text-secondary); font-size: 14px; }
+.nx-proposition-aide { color: var(--nx-text-secondary); font-size: 14px; margin: 8px 0 0; }
+.nx-proposition-offres { margin: 8px 0 0; padding-left: 18px; font-size: 14px; }
+.nx-proposition-offres span { color: var(--nx-text-secondary); }
+.nx-proposition-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+.nx-proposition-actions fieldset { border: 1px solid var(--nx-border); border-radius: var(--nx-radius-sm); padding: 12px 14px; margin: 0; min-width: 0; }
+.nx-proposition-actions legend { font-weight: 700; color: var(--nx-forest); padding: 0 6px; }
+.nx-proposition-actions .nx-field { margin-bottom: 10px; }
+.nx-proposition-resultats { list-style: none; margin: 10px 0 0; padding: 0; font-size: 14px; }
+.nx-proposition-resultats li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--nx-border); }
+@media (max-width: 960px) { .nx-proposition-actions { grid-template-columns: 1fr; } }

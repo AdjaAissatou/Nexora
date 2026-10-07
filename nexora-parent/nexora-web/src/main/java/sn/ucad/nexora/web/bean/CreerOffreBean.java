@@ -52,6 +52,12 @@ public class CreerOffreBean implements Serializable {
     private String erreur;
 
     private List<CategorieResponse> niveau1;
+    /** Valeur de « Autre… » dans la liste des catégories (§21). */
+    public static final long AUTRE = -1L;
+    /** « Autre… » choisi : le professionnel écrit sa catégorie, rangée par Nexora dans le rayon de son espace. */
+    private boolean autreCategorie;
+    private String categorieProposee;
+    private String natureProposee = "PRODUIT";
     private List<CategorieResponse> niveau2;
     private List<CategorieResponse> niveau3;
     private List<TypeOffreResponse> typesOffre;
@@ -134,8 +140,16 @@ public class CreerOffreBean implements Serializable {
             OffreEditionResponse r = catalogueApiClient.obtenirEdition(session.getAccessToken(), idOffre);
             idOffreEdition = r.id();
 
-            niveau1Id = r.niveau1Id();
-            if (niveau1Id != null) {
+            if (r.categorieProposee() != null && !r.categorieProposee().isBlank()) {
+                // Offre en « Autre… » encore en attente de l'administration : on rouvre ce mode.
+                autreCategorie = true;
+                niveau1Id = AUTRE;
+                categorieProposee = r.categorieProposee();
+                natureProposee = "SERVICE".equals(r.nature()) ? "SERVICE" : "PRODUIT";
+            } else {
+                niveau1Id = r.niveau1Id();
+            }
+            if (niveau1Id != null && !autreCategorie) {
                 CategorieResponse c = trouver(niveau1, niveau1Id);
                 if (c != null && c.aDesEnfants()) niveau2 = catalogueApiClient.sousCategories(niveau1Id);
             }
@@ -146,8 +160,10 @@ public class CreerOffreBean implements Serializable {
             }
             niveau3Id = r.niveau3Id();
 
-            chargerFeuille(r.idCategorie());
-            typeOffreId = r.idTypeOffre();
+            if (!autreCategorie) {
+                chargerFeuille(r.idCategorie());
+                typeOffreId = r.idTypeOffre();
+            }
 
             titre = r.titre();
             titreAutoSuggere = null;
@@ -190,7 +206,8 @@ public class CreerOffreBean implements Serializable {
         attributs = null;
         typeOffreId = null;
         reinitialiserDetails();
-        if (niveau1Id == null) return;
+        autreCategorie = niveau1Id != null && niveau1Id == AUTRE;
+        if (niveau1Id == null || autreCategorie) return;
 
         CategorieResponse c = trouver(niveau1, niveau1Id);
         if (c != null && c.aDesEnfants()) {
@@ -290,14 +307,29 @@ public class CreerOffreBean implements Serializable {
         return liste.stream().filter(c -> c.id().equals(id)).findFirst().orElse(null);
     }
 
+    /** Le titre, le prix et le reste du formulaire : dès qu'un type est choisi, ou « Autre… ». */
+    public boolean isDetailsVisibles() {
+        return typeOffreId != null || autreCategorie;
+    }
+
+    /** Catégories du rayon de l'espace, puis « Autre… » pour écrire la sienne (sans sortir du domaine de l'espace). */
+    public List<jakarta.faces.model.SelectItem> getNiveau1Choix() {
+        List<jakarta.faces.model.SelectItem> choix = new ArrayList<>();
+        if (niveau1 != null) niveau1.forEach(c -> choix.add(new jakarta.faces.model.SelectItem(c.id(), c.nom())));
+        choix.add(new jakarta.faces.model.SelectItem(AUTRE, "Autre… (écrire ma catégorie)"));
+        return choix;
+    }
+
     /** Id de la catégorie feuille effectivement sélectionnée (le niveau le plus profond choisi). */
     public Long getCategorieFeuilleId() {
+        if (autreCategorie) return null;
         if (niveau3Id != null) return niveau3Id;
         if (niveau2Id != null) return niveau2Id;
         return niveau1Id;
     }
 
     public boolean isTypeOffreService() {
+        if (autreCategorie) return "SERVICE".equals(natureProposee);
         if (typeOffreId == null || typesOffre == null) return false;
         return typesOffre.stream()
                 .filter(t -> t.id().equals(typeOffreId))
@@ -352,7 +384,7 @@ public class CreerOffreBean implements Serializable {
 
             if (idOffreEdition != null) {
                 UpdateOffreRequest requete = new UpdateOffreRequest(
-                        typeOffreId,
+                        autreCategorie ? null : typeOffreId,
                         getCategorieFeuilleId(),
                         titre,
                         description,
@@ -369,14 +401,16 @@ public class CreerOffreBean implements Serializable {
                         interventionDomicile,
                         reservation,
                         valeurs,
-                        images);
+                        images,
+                        autreCategorie ? categorieProposee : null,
+                        autreCategorie ? natureProposee : null);
                 catalogueApiClient.modifierOffre(session.getAccessToken(), idOffreEdition, requete);
                 FacesContext.getCurrentInstance()
                         .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, "Offre mise à jour.", null));
             } else {
                 CreateOffreRequest requete = new CreateOffreRequest(
                         espace.id(),
-                        typeOffreId,
+                        autreCategorie ? null : typeOffreId,
                         getCategorieFeuilleId(),
                         titre,
                         description,
@@ -393,7 +427,9 @@ public class CreerOffreBean implements Serializable {
                         interventionDomicile,
                         reservation,
                         valeurs,
-                        images);
+                        images,
+                        autreCategorie ? categorieProposee : null,
+                        autreCategorie ? natureProposee : null);
                 catalogueApiClient.creerOffre(session.getAccessToken(), requete);
                 FacesContext.getCurrentInstance()
                         .addMessage(null, sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, "Offre publiée.", null));
@@ -406,6 +442,12 @@ public class CreerOffreBean implements Serializable {
             return null;
         }
     }
+
+    public boolean isAutreCategorie() { return autreCategorie; }
+    public String getCategorieProposee() { return categorieProposee; }
+    public void setCategorieProposee(String v) { categorieProposee = v; }
+    public String getNatureProposee() { return natureProposee; }
+    public void setNatureProposee(String v) { natureProposee = "SERVICE".equals(v) ? "SERVICE" : "PRODUIT"; }
 
     public EspaceResponse getEspace() { return espace; }
     public String getErreur() { return erreur; }

@@ -1,0 +1,110 @@
+<ui:composition template="/WEB-INF/templates/admin.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+<!-- Catégories proposées (docs/architecture-acteurs.md §21) : ce que les professionnels ont écrit
+     en choisissant « Autre… » à l'ajout d'une offre. -->
+<f:metadata>
+    <f:event type="preRenderView" listener="#{acces.exigerCatalogue}" />
+</f:metadata>
+<ui:param name="section" value="propositions" />
+<ui:define name="titre">Catégories proposées</ui:define>
+<ui:define name="titre-page">Catégories proposées</ui:define>
+<ui:define name="content">
+
+    <ui:fragment rendered="#{not empty propositionsCategoriesBean.erreur}">
+        <div class="nx-alert nx-alert-error">#{propositionsCategoriesBean.erreur}</div>
+    </ui:fragment>
+
+    <h:form id="prop">
+    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+
+    <div class="nx-card">
+        <p style="margin:0; color:var(--nx-text-secondary);">
+            Quand aucune catégorie ne convient, le professionnel choisit « Autre… » et écrit la sienne. Son offre est
+            publiée tout de suite dans le rayon de son espace. Les textes qui reviennent au même (accents, majuscules,
+            pluriels) sont regroupés ; les plus demandés d'abord. Pour chacun : créez la catégorie, rangez les offres
+            dans une catégorie existante, ou écartez la proposition. Tout est écrit dans le journal.
+        </p>
+    </div>
+
+    <ui:fragment rendered="#{empty propositionsCategoriesBean.propositions and empty propositionsCategoriesBean.erreur}">
+        <div class="nx-card nx-card-empty"><h3>Aucune catégorie proposée en attente</h3>
+            <p>Les catégories écrites par les professionnels apparaîtront ici.</p></div>
+    </ui:fragment>
+
+    <ui:repeat var="p" value="#{propositionsCategoriesBean.propositions}">
+        <div class="nx-card nx-proposition">
+            <div class="nx-proposition-tete">
+                <h3>« #{p.libelle} »</h3>
+                <span class="nx-badge nx-badge-neutre">#{p.nature eq 'SERVICE' ? '🛠️ Service' : '🛍️ Article'}</span>
+                <span class="nx-proposition-chiffres">#{p.nombreOffres} offre(s) · #{p.nombreEspaces} espace(s) · depuis le #{format.dateHeure(p.premiere)}</span>
+            </div>
+            <ui:fragment rendered="#{not empty p.variantes}">
+                <p class="nx-proposition-aide">Aussi écrit :&#160;<ui:repeat var="v" value="#{p.variantes}" varStatus="st">« #{v} »#{st.last ? '' : ', '}</ui:repeat></p>
+            </ui:fragment>
+            <p class="nx-proposition-aide">Rangées aujourd'hui dans : <strong>#{p.categorieActuelle}</strong></p>
+            <ul class="nx-proposition-offres">
+                <ui:repeat var="o" value="#{p.offres}">
+                    <li><h:link outcome="/offre" value="#{o.titre}" target="_blank"><f:param name="id" value="#{o.id}" /></h:link>
+                        <span> — #{o.espace}</span></li>
+                </ui:repeat>
+            </ul>
+
+            <div class="nx-proposition-actions">
+                <fieldset>
+                    <legend>Créer la catégorie</legend>
+                    <div class="nx-field"><label>Nom</label>
+                        <h:inputText value="#{propositionsCategoriesBean.noms[p.cle]}" styleClass="nx-input" /></div>
+                    <div class="nx-field"><label>Sous</label>
+                        <h:selectOneMenu value="#{propositionsCategoriesBean.parents[p.cle]}" styleClass="nx-select">
+                            <f:selectItems value="#{propositionsCategoriesBean.emplacements(p)}" var="e" itemValue="#{e.id}" itemLabel="#{e.nom}" />
+                            <f:converter converterId="jakarta.faces.Long" />
+                        </h:selectOneMenu></div>
+                    <div class="nx-field"><label>Nature</label>
+                        <h:selectOneMenu value="#{propositionsCategoriesBean.natures[p.cle]}" styleClass="nx-select">
+                            <f:selectItem itemValue="PRODUIT" itemLabel="Articles à vendre" />
+                            <f:selectItem itemValue="SERVICE" itemLabel="Services" />
+                        </h:selectOneMenu></div>
+                    <h:commandButton value="Créer et y ranger les offres" styleClass="nx-button nx-button-primary">
+                        <f:ajax execute="@form" listener="#{propositionsCategoriesBean.creer(p.cle)}" render="@form" />
+                    </h:commandButton>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Ranger dans une catégorie existante</legend>
+                    <div class="nx-field"><label>Chercher la catégorie</label>
+                        <h:inputText value="#{propositionsCategoriesBean.recherches[p.cle]}" styleClass="nx-input" a:placeholder="ex. tissus, pêche…" /></div>
+                    <h:commandButton value="Chercher" styleClass="nx-button nx-button-outline">
+                        <f:ajax execute="@form" listener="#{propositionsCategoriesBean.chercher(p.cle)}" render="@form" />
+                    </h:commandButton>
+                    <ui:fragment rendered="#{propositionsCategoriesBean.resultats[p.cle] ne null and empty propositionsCategoriesBean.resultats[p.cle]}">
+                        <p class="nx-proposition-aide">Aucune catégorie trouvée.</p>
+                    </ui:fragment>
+                    <ul class="nx-proposition-resultats">
+                        <ui:repeat var="r" value="#{propositionsCategoriesBean.resultats[p.cle]}">
+                            <li><span>#{r.chemin}</span>
+                                <h:commandLink value="Ranger ici" styleClass="nx-see-all">
+                                    <f:ajax listener="#{propositionsCategoriesBean.rattacher(p.cle, r.categorieId, r.chemin)}" render="@form" />
+                                </h:commandLink></li>
+                        </ui:repeat>
+                    </ul>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Écarter</legend>
+                    <p class="nx-proposition-aide">Les offres restent dans leur rayon, le texte proposé est effacé.</p>
+                    <div class="nx-field"><label>Motif (journal)</label>
+                        <h:inputText value="#{propositionsCategoriesBean.motifs[p.cle]}" styleClass="nx-input" a:placeholder="ex. déjà couvert par « Mode »" /></div>
+                    <h:commandButton value="Écarter" styleClass="nx-button nx-button-outline">
+                        <f:ajax execute="@form" listener="#{propositionsCategoriesBean.ecarter(p.cle)}" render="@form" />
+                    </h:commandButton>
+                </fieldset>
+            </div>
+        </div>
+    </ui:repeat>
+    </h:form>
+</ui:define>
+</ui:composition>

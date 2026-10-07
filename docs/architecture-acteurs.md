@@ -105,7 +105,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 |---|---|---|
 | Mon espace — vue d'ensemble + gestion | `/mon-espace` | ✅ (tableau de bord refait récemment : stats, vocabulaire dynamique par type d'espace, cartes d'offres) |
 | Gérer les offres (vocabulaire dynamique) | `/mon-espace` (onglet) | ✅ |
-| Créer / modifier une offre | `/creer-offre` | ✅ |
+| Créer / modifier une offre | `/creer-offre` | ✅ ; « Autre… » en bas des catégories pour écrire la sienne (§21) |
 | Créer un espace | `/creer-espace` | ✅ |
 | Gérer les informations de l'espace (horaires, contact, localisation, photos) | `/mon-espace` (onglet) | ✅ pour l'essentiel — **horaires** (table `horaire`) et **moyens de contact** (table `moyen_contact`) non encore dans le formulaire |
 | Demandes reçues | — | 🚧 (dépend de la messagerie, non branchée) |
@@ -128,6 +128,7 @@ Back-office complet, cadré au §9 (étapes 6a à 6f) : layout dédié, menu fil
 | Rôles et permissions (matrice) | ✅ `/admin/roles` (§6, §9.8) |
 | Gérer/modérer les espaces et les offres | ✅ `/admin/espaces`, `/admin/espace?id=`, `/admin/offres` (§9.9) |
 | Gérer le catalogue (catégories, types d'offre, attributs) | ✅ `/admin/catalogue` (§9.11) |
+| Traiter les catégories proposées (« Autre… ») | ✅ `/admin/propositions` (§21) |
 | Modérer avis / traiter signalements | ✅ `/admin/avis`, `/admin/signalements` (§9.10) |
 | Vérifications : supervision, agents (§8) | ✅ `/admin/verifications` ; règles des justificatifs dans `/admin/parametres` (§9.12) |
 | Certifications 🏅 | — (après la vérification) |
@@ -1534,3 +1535,31 @@ appliqués sur place.
 
 ---
 *Dernière mise à jour : session du 06/10/2026, Nexora Découvrir.*
+
+## 21. ✅ « Autre… » : catégorie écrite par le professionnel, traitée par l'administration
+
+**Principe** : on ne sort jamais du domaine de l'espace. Les catégories proposées à l'ajout d'une offre
+restent celles du type de l'espace ; « Autre… (écrire ma catégorie) », en bas de la liste, sert quand
+aucune ne convient. Le texte libre ne crée jamais de catégorie tout seul (sinon « Tissu », « tissus »,
+« Tisus wax »… éparpilleraient le catalogue) : c'est une proposition que l'administration traite.
+
+**Côté professionnel** (`creer-offre.xhtml`, `CreerOffreBean`) : « Autre… » ouvre « Quelle catégorie ? »
+(obligatoire, 120 caractères) et « C'est… un article à vendre / un service » ; le reste du formulaire suit
+la nature choisie (état, stock, garantie ou durée, domicile). L'offre est publiée tout de suite.
+`RangementAutre` (catalogue-service) la range dans le rayon de l'espace — celui où il a déjà le plus
+d'offres, sinon un rayon principal de son type d'espace — avec le type « Autre » de ce rayon (créé à la
+racine la première fois). Le texte est gardé dans `offre.categorie_proposee`
+(`11_migrations/09_categorie_proposee.sql`) : il est cherchable, affiché comme nom de catégorie sur les
+cartes, et l'édition de l'offre rouvre le mode « Autre… ».
+
+**Côté administration** (`admin/propositions.xhtml`, menu Gestion › Catégories proposées, permission
+GERER_CATEGORIES ; API `GET/POST /api/v1/admin/catalogue/propositions[/creer|/rattacher|/ecarter]`) :
+les propositions sont regroupées quand le texte revient au même (accents, majuscules, pluriels :
+« Tissus wax » = « tissu Wax »), les plus demandées d'abord, avec les offres, les espaces, la nature et le
+rayon actuel. Trois décisions, chacune écrite dans le journal (module CATALOGUE) :
+- **Créer la catégorie** sous le rayon actuel ou l'une de ses sous-catégories, avec un type d'offre du
+  même nom et un « Autre » : les offres y sont rangées, le texte proposé est effacé ;
+- **Ranger dans une catégorie existante** (recherche dans le catalogue) : chaque offre prend le type de
+  sa nature (« Autre » de préférence) ;
+- **Écarter** (motif) : les offres restent dans leur rayon, le texte est effacé.
+
