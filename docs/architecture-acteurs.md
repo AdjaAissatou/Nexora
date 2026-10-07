@@ -105,7 +105,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 |---|---|---|
 | Mon espace — vue d'ensemble + gestion | `/mon-espace` | ✅ (tableau de bord refait récemment : stats, vocabulaire dynamique par type d'espace, cartes d'offres) |
 | Gérer les offres (vocabulaire dynamique) | `/mon-espace` (onglet) | ✅ |
-| Créer / modifier une offre | `/creer-offre` | ✅ catégories du type de l'espace, puis « Autre catégorie… » en bas de la liste qui ouvre toutes les catégories Nexora (aussi à l'édition d'une offre rangée hors du type) |
+| Créer / modifier une offre | `/creer-offre` | ✅ |
 | Créer un espace | `/creer-espace` | ✅ |
 | Gérer les informations de l'espace (horaires, contact, localisation, photos) | `/mon-espace` (onglet) | ✅ pour l'essentiel — **horaires** (table `horaire`) et **moyens de contact** (table `moyen_contact`) non encore dans le formulaire |
 | Demandes reçues | — | 🚧 (dépend de la messagerie, non branchée) |
