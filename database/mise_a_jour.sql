@@ -106,6 +106,7 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 09_seed/31_lieux_dakar_complements.sql
 \i 09_seed/32_lieux_celebres.sql
 \i 11_migrations/05_choix_multiples.sql
+\i 11_migrations/08_types_produits.sql
 \i 11_migrations/06_compteurs_espace.sql
 
 \echo '== Démonstration : comptes d''administration et agent, avis, horaires, caractéristiques des articles'

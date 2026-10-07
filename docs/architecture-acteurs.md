@@ -1309,7 +1309,12 @@ les caractéristiques qu'une fois le type d'offre choisi, et seulement celles qu
 service (« Câblage réseau ») n'a ni taille, ni couleur, ni garantie de produit. Les anciennes listes à
 choix unique (taille, couleur, pointure de « Commerce > Mode »…) sont devenues des choix multiples
 (`11_migrations/05_choix_multiples.sql`), et 65 types d'offre de service enregistrés comme produits
-(câblage, coiffure, réparation, cours, ménage, locations…) sont redevenus des services. L'état d'un
+(câblage, coiffure, réparation, cours, ménage, locations…) sont redevenus des services.
+À l'inverse, les rayons « de service » vendent aussi des produits : 15 types (Médicaments,
+Parapharmacie, Hygiène et soins, Mobilité, Parfums, Pneus, Batteries, Pièces moteur, Voitures neuves et
+d'occasion, Motos, Objets traditionnels, Bijouterie artisanale, Poterie, Paniererie) et leur « Autre »
+sont redevenus des produits (`11_migrations/08_types_produits.sql`) : état, stock et garantie au
+formulaire, présence dans « Boutique ». Réparation, location, assurance et formation restent des services. L'état d'un
 produit est une seule information : « Neuf » ou « Occasion » dans « Détails de l'offre »
 (la caractéristique « État » qui le doublait est retirée).
 
