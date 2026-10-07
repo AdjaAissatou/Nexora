@@ -52,6 +52,10 @@ public class CreerOffreBean implements Serializable {
     private String erreur;
 
     private List<CategorieResponse> niveau1;
+    /** Valeur de « Autre catégorie… » : élargit la liste à toutes les catégories Nexora. */
+    public static final long AUTRE_CATEGORIE = -1L;
+    /** Vrai quand la liste montre toutes les catégories, pas seulement celles du type de l'espace. */
+    private boolean toutesCategories;
     private List<CategorieResponse> niveau2;
     private List<CategorieResponse> niveau3;
     private List<TypeOffreResponse> typesOffre;
@@ -135,6 +139,8 @@ public class CreerOffreBean implements Serializable {
             idOffreEdition = r.id();
 
             niveau1Id = r.niveau1Id();
+            // Offre rangée hors des catégories du type de l'espace : on montre toutes les catégories.
+            if (niveau1Id != null && trouver(niveau1, niveau1Id) == null) afficherToutesCategories();
             if (niveau1Id != null) {
                 CategorieResponse c = trouver(niveau1, niveau1Id);
                 if (c != null && c.aDesEnfants()) niveau2 = catalogueApiClient.sousCategories(niveau1Id);
@@ -191,6 +197,11 @@ public class CreerOffreBean implements Serializable {
         typeOffreId = null;
         reinitialiserDetails();
         if (niveau1Id == null) return;
+        if (niveau1Id == AUTRE_CATEGORIE) {
+            niveau1Id = null;
+            afficherToutesCategories();
+            return;
+        }
 
         CategorieResponse c = trouver(niveau1, niveau1Id);
         if (c != null && c.aDesEnfants()) {
@@ -411,6 +422,26 @@ public class CreerOffreBean implements Serializable {
     public String getErreur() { return erreur; }
     public boolean isModeEdition() { return idOffreEdition != null; }
 
+    /** « Autre catégorie… » : toutes les catégories racines de Nexora, par ordre alphabétique. */
+    private void afficherToutesCategories() {
+        try {
+            niveau1 = catalogueApiClient.categoriesRacines(null).stream()
+                    .sorted(java.util.Comparator.comparing(CategorieResponse::nom, java.text.Collator.getInstance(java.util.Locale.FRANCE)))
+                    .toList();
+            toutesCategories = true;
+        } catch (ApiException e) {
+            erreur = e.getMessage();
+        }
+    }
+
+    public boolean isToutesCategories() { return toutesCategories; }
+    /** Choix de la catégorie : celles de l'espace, puis « Autre catégorie… » tant que la liste n'est pas complète. */
+    public List<jakarta.faces.model.SelectItem> getNiveau1Choix() {
+        List<jakarta.faces.model.SelectItem> choix = new java.util.ArrayList<>();
+        if (niveau1 != null) niveau1.forEach(c -> choix.add(new jakarta.faces.model.SelectItem(c.id(), c.nom())));
+        if (!toutesCategories) choix.add(new jakarta.faces.model.SelectItem(AUTRE_CATEGORIE, "Autre catégorie…"));
+        return choix;
+    }
     public List<CategorieResponse> getNiveau1() { return niveau1; }
     public List<CategorieResponse> getNiveau2() { return niveau2; }
     public List<CategorieResponse> getNiveau3() { return niveau3; }

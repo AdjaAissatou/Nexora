@@ -37,16 +37,22 @@
                 <h:form id="creerOffre">
                     <h:messages errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
 
-                    <div class="nx-field">
+                    <h:panelGroup id="niveau1Bloc" layout="block" styleClass="nx-field">
                         <label for="creerOffre:niveau1">Catégorie</label>
                         <h:selectOneMenu id="niveau1" value="#{creerOffreBean.niveau1Id}" styleClass="nx-select">
                             <f:selectItem itemLabel="Choisir une catégorie…" itemValue="#{null}" />
-                            <f:selectItems value="#{creerOffreBean.niveau1}" var="c" itemLabel="#{c.nom}" itemValue="#{c.id}" />
+                            <f:selectItems value="#{creerOffreBean.niveau1Choix}" />
                             <f:converter converterId="jakarta.faces.Long" />
                             <f:ajax listener="#{creerOffreBean.onNiveau1Change}"
-                                    render="niveau2Bloc niveau3Bloc typeOffreBloc attributsBloc communBloc" />
+                                    render="niveau1Bloc niveau2Bloc niveau3Bloc typeOffreBloc attributsBloc communBloc" />
                         </h:selectOneMenu>
-                    </div>
+                        <ui:fragment rendered="#{creerOffreBean.toutesCategories}">
+                            <small class="nx-aide">Toutes les catégories de Nexora sont proposées, au-delà de celles de votre type d'espace.</small>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{!creerOffreBean.toutesCategories}">
+                            <small class="nx-aide">Votre activité n'est pas dans la liste ? Choisissez « Autre catégorie… » tout en bas.</small>
+                        </ui:fragment>
+                    </h:panelGroup>
 
                     <h:panelGroup id="niveau2Bloc" layout="block">
                         <ui:fragment rendered="#{not empty creerOffreBean.niveau2}">

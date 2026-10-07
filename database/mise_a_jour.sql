@@ -118,6 +118,9 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \echo '== Accents abîmés par un ancien passage en WIN1252 (réparés s''il y en a)'
 \i 11_migrations/02_reparer_accents.sql
 
+\echo '== Lieux publics en double (supprimés s''il y en a)'
+\i 11_migrations/07_lieux_doublons.sql
+
 \echo '== Droits du compte des services (nexora_user) sur toutes les tables'
 \i 11_migrations/04_droits_nexora_user.sql
 

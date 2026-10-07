@@ -90,7 +90,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Page | Route proposée | État |
 |---|---|---|
 | Mon profil (infos personnelles) | `/mon-compte` | ✅ séparé de la gestion pro (voir §5) ; en-tête avec avatar (initiales), « membre depuis », compteurs favoris / vus / espaces ; liste de tous mes espaces (vues, ♥, note, Gérer `?id=` / Voir la fiche) et raccourcis Découvrir · Rechercher · Explorer · Lieux |
-| Mes favoris | `/mon-compte` (section) | ✅ bouton ♡/♥ sur les fiches offre et espace ; dans Mon compte, grille de cartes avec photo (repli 🛍️/🏪), prix ou slogan, espace et lieu, « ajouté il y a … », filtre Tout / Articles / Espaces, retrait par le ♥ |
+| Mes favoris | `/mon-compte` (section) | ✅ bouton ♡/♥ sur les fiches offre et espace ; dans Mon compte, grille de cartes avec photo (espace : couverture, sinon une de ses photos, son logo ou la photo d'un de ses articles ; repli 🛍️/🏪), prix ou slogan, espace et lieu, « ajouté il y a … », filtre Tout / Articles / Espaces, retrait par le ♥ |
 | Mon historique de consultation | `/mon-compte` (section) | ✅ enregistré à l'ouverture d'une fiche offre/espace, dédoublonné, effaçable ; affiché en bande « Vus récemment » défilante avec vignettes et « vu il y a … » |
 | Mes demandes / messages | `/mon-compte/messages` | 🚧 (tables `conversation`/`message` existent, service `nexora-communication-service` non branché au web) |
 | Mes réservations | `/mon-compte/reservations` | 🚧 (table `reservation` existe) |
@@ -105,7 +105,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 |---|---|---|
 | Mon espace — vue d'ensemble + gestion | `/mon-espace` | ✅ (tableau de bord refait récemment : stats, vocabulaire dynamique par type d'espace, cartes d'offres) |
 | Gérer les offres (vocabulaire dynamique) | `/mon-espace` (onglet) | ✅ |
-| Créer / modifier une offre | `/creer-offre` | ✅ |
+| Créer / modifier une offre | `/creer-offre` | ✅ catégories du type de l'espace, puis « Autre catégorie… » en bas de la liste qui ouvre toutes les catégories Nexora (aussi à l'édition d'une offre rangée hors du type) |
 | Créer un espace | `/creer-espace` | ✅ |
 | Gérer les informations de l'espace (horaires, contact, localisation, photos) | `/mon-espace` (onglet) | ✅ pour l'essentiel — **horaires** (table `horaire`) et **moyens de contact** (table `moyen_contact`) non encore dans le formulaire |
 | Demandes reçues | — | 🚧 (dépend de la messagerie, non branchée) |
@@ -1509,6 +1509,9 @@ Administrations et services, Sport — et par texte (sans accents), avec la cart
 **🧭 Itinéraire** (Google Maps) et **🛍️ Commerces autour** (recherche autour du lieu).
 Lieux célèbres ajoutés : `09_seed/32_lieux_celebres.sql` (coordonnées approximatives). Un texte qui
 est le nom d'un espace (« auchan ») cherche ses offres plutôt qu'un lieu homonyme.
+Lieux en double (base aux accents abîmés où les scripts de lieux s'étaient réinsérés) : supprimés
+par `11_migrations/07_lieux_doublons.sql` (même nom et même commune, on garde la plus ancienne copie),
+passé par `mise_a_jour.sql` après la réparation des accents.
 
 **Fiche d'une offre** : toutes ses photos — galerie avec flèches, compteur, vignettes, glisser au
 doigt sur téléphone, flèches du clavier (avant : la photo principale seulement).

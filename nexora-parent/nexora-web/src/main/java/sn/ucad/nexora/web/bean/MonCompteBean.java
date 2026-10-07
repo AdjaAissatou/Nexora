@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import sn.ucad.nexora.web.client.CatalogueApiClient;
+import sn.ucad.nexora.web.client.CritereRecherche;
 import sn.ucad.nexora.web.client.EspaceApiClient;
 import sn.ucad.nexora.web.client.RechercheApiClient;
 import sn.ucad.nexora.web.client.UserApiClient;
@@ -138,7 +139,7 @@ public class MonCompteBean implements Serializable {
             }
             if (espaceId != null) {
                 EspaceResponse esp = espaceApiClient.obtenir(espaceId);
-                String image = esp.couverture() != null && !esp.couverture().isBlank() ? esp.couverture() : esp.logo();
+                String image = imageEspace(esp);
                 return new Element(null, espaceId, esp.nom(), esp.slogan(), image, "/espace.xhtml?id=" + espaceId,
                         null, esp.commune(), date);
             }
@@ -256,5 +257,29 @@ public class MonCompteBean implements Serializable {
     public String getMembreDepuis() {
         if (profil == null || profil.createdAt() == null) return null;
         return profil.createdAt().format(java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy", java.util.Locale.FRANCE));
+    }
+
+    private final java.util.Map<Long, String> imagesEspaces = new java.util.HashMap<>();
+
+    /**
+     * Visuel d'un espace : sa couverture, sinon son logo, sinon une de ses photos, sinon la photo
+     * d'un de ses articles (la plupart des espaces n'ont pas encore de couverture). Null s'il n'a rien.
+     */
+    public String imageEspace(EspaceResponse esp) {
+        if (esp == null) return null;
+        return imagesEspaces.computeIfAbsent(esp.id(), id -> {
+            if (esp.couverture() != null && !esp.couverture().isBlank()) return esp.couverture();
+            if (esp.photos() != null && !esp.photos().isEmpty()) return esp.photos().get(0);
+            if (esp.logo() != null && !esp.logo().isBlank()) return esp.logo();
+            try {
+                return catalogueApiClient.rechercher(new CritereRecherche(null, null, null, null, null, null, id,
+                                null, null, null, null, null, null, "PERTINENCE", 0, 6)).contenu().stream()
+                        .map(o -> o.imagePrincipale())
+                        .filter(u -> u != null && !u.isBlank())
+                        .findFirst().orElse(null);
+            } catch (ApiException e) {
+                return null;
+            }
+        });
     }
 }
