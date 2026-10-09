@@ -260,6 +260,16 @@ public class DecouverteRepository {
                 .setParameter("t", s.type()).setParameter("d", s.dureeMs()).executeUpdate();
     }
 
+    /** Ce visiteur aime-t-il cette offre (ou, sans offre, cet espace) ? Pour l'état du bouton hors Découvrir (§23). */
+    @Transactional(readOnly = true)
+    public boolean aime(String visiteur, Long idOffre, Long idEspace) {
+        return ((Number) em.createNativeQuery("""
+                SELECT COUNT(*) FROM decouverte_signal WHERE visiteur = :v AND type_signal = 'J_AIME'
+                  AND id_offre IS NOT DISTINCT FROM :o AND id_espace IS NOT DISTINCT FROM :e""")
+                .setParameter("v", visiteur).setParameter("o", idOffre).setParameter("e", idEspace)
+                .getSingleResult()).longValue() > 0;
+    }
+
     /** « Je n'aime plus » : retire les J_AIME de ce visiteur sur cette offre ou cet espace. */
     @Transactional
     public void retirerJAime(String visiteur, Long idOffre, Long idEspace) {

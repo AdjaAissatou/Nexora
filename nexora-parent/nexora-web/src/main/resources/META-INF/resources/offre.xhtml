@@ -9,6 +9,7 @@
 </f:metadata>
 <ui:define name="titre">#{offreDetailBean.trouvee ? offreDetailBean.offre.titre : 'Offre'} — Nexora</ui:define>
 <ui:define name="content">
+    <h:outputScript library="js" name="reactions.js" target="head" />
 
     <div class="nx-container" style="padding-top:28px;">
 
@@ -99,27 +100,35 @@
                         </ui:fragment>
                     </div>
 
-                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
-                        <h1 style="margin:0;">#{offreDetailBean.offre.titre}</h1>
-                        <ui:fragment rendered="#{sessionBean.connecte}">
-                            <h:form>
-                                <h:commandButton value="#{offreDetailBean.favori ? '♥ Favori' : '♡ Favori'}"
-                                                 action="#{offreDetailBean.basculerFavori}"
-                                                 styleClass="nx-button #{offreDetailBean.favori ? 'nx-button-primary' : 'nx-button-outline'}"
-                                                 style="white-space:nowrap;" />
-                            </h:form>
-                        </ui:fragment>
-                    </div>
+                    <h1 style="margin:0;">#{offreDetailBean.offre.titre}</h1>
 
-                    <!-- Popularité (docs/architecture-acteurs.md §23) -->
-                    <div class="nx-offre-popularite">
+                    <!-- J'aime, Enregistrer, Partager (§24) et popularité (§23) -->
+                    <h:form id="reactions" styleClass="nx-reactions">
+                        <h:commandLink styleClass="nx-reaction nx-reaction-aime #{offreDetailBean.aime ? 'actif' : ''}"
+                                       title="#{offreDetailBean.aime ? 'Je n\'aime plus' : 'J\'aime'}">
+                            <f:ajax listener="#{offreDetailBean.basculerJaime}" render="@form" />
+                            <span class="nx-reaction-icone" aria-hidden="true">#{offreDetailBean.aime ? '♥' : '♡'}</span>
+                            <span>#{offreDetailBean.nombreJaime} j'aime</span>
+                        </h:commandLink>
+                        <h:commandLink rendered="#{sessionBean.connecte}" styleClass="nx-reaction nx-reaction-garde #{offreDetailBean.favori ? 'actif' : ''}"
+                                       title="#{offreDetailBean.favori ? 'Retirer de mes favoris' : 'Enregistrer dans mes favoris'}">
+                            <f:ajax listener="#{offreDetailBean.basculerFavori}" render="@form" />
+                            <span class="nx-reaction-icone" aria-hidden="true">🔖</span>
+                            <span>#{offreDetailBean.favori ? 'Enregistré' : 'Enregistrer'} · #{offreDetailBean.nombreFavoris}</span>
+                        </h:commandLink>
+                        <h:link rendered="#{!sessionBean.connecte}" outcome="/connexion" styleClass="nx-reaction" title="Connectez-vous pour enregistrer">
+                            <f:param name="redirect" value="/offre.xhtml?id=#{offreDetailBean.offre.id}" />
+                            <span class="nx-reaction-icone" aria-hidden="true">🔖</span>
+                            <span>Enregistrer · #{offreDetailBean.nombreFavoris}</span>
+                        </h:link>
+                        <button type="button" class="nx-reaction" onclick="nexoraPartager(this)">
+                            <span class="nx-reaction-icone" aria-hidden="true">↗</span><span>Partager</span>
+                        </button>
+                        <span class="nx-reaction-info" title="Fiche ouverte et carte regardée dans Découvrir">👁&#160;<h:outputText value="#{offreDetailBean.offre.vueCount + offreDetailBean.offre.vuesDecouvrir}"><f:convertNumber groupingUsed="true" /></h:outputText> vue(s)</span>
                         <ui:fragment rendered="#{offreDetailBean.offre.populaire}">
                             <span class="nx-offre-populaire-badge" title="Parmi les offres les plus aimées, enregistrées et vues de Nexora">🔥 Populaire</span>
                         </ui:fragment>
-                        <span title="J'aime dans Nexora Découvrir">♥ #{offreDetailBean.offre.nombreJaime} j'aime</span>
-                        <span title="Enregistrée en favori">🔖 #{offreDetailBean.offre.nombreFavoris} favori(s)</span>
-                        <span title="Fiche ouverte et carte regardée dans Découvrir">👁&#160;<h:outputText value="#{offreDetailBean.offre.vueCount + offreDetailBean.offre.vuesDecouvrir}"><f:convertNumber groupingUsed="true" /></h:outputText> vue(s)</span>
-                    </div>
+                    </h:form>
 
                     <p style="margin-top:16px; color:var(--nx-text-secondary); line-height:1.7; white-space:pre-line;">
                         #{offreDetailBean.offre.description}

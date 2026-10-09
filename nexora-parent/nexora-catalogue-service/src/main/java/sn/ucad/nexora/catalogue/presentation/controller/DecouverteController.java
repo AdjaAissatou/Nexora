@@ -89,6 +89,13 @@ public class DecouverteController {
         }
     }
 
+    @GetMapping("/signaux/j-aime")
+    @Operation(summary = "Ce visiteur aime-t-il cette offre ou cet espace ?")
+    public ResponseEntity<java.util.Map<String, Boolean>> aime(@RequestParam String visiteur, @RequestParam(required = false) Long idOffre,
+                                                               @RequestParam(required = false) Long idEspace) {
+        return ResponseEntity.ok(java.util.Map.of("aime", decouverte.aime(visiteur, idOffre, idEspace)));
+    }
+
     @DeleteMapping("/signaux/j-aime")
     @Operation(summary = "Retirer un « J'aime »")
     public ResponseEntity<Void> retirerJAime(@RequestParam String visiteur, @RequestParam(required = false) Long idOffre,

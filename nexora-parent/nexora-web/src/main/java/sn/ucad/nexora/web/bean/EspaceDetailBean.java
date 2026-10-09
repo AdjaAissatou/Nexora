@@ -68,6 +68,8 @@ public class EspaceDetailBean implements Serializable {
             trouve = false;
             return;
         }
+        nombreJaime = espace.nombreJaime() == null ? 0 : espace.nombreJaime();
+        aime = sn.ucad.nexora.web.decouvrir.Reactions.aime(sn.ucad.nexora.web.decouvrir.Reactions.visiteurCourant(), null, id);
         try {
             offres = catalogueApiClient.rechercher(CritereRecherche.parEspace(id)).contenu();
         } catch (ApiException e) {
@@ -99,6 +101,22 @@ public class EspaceDetailBean implements Serializable {
             }
         }
     }
+
+    /** « J'aime » du visiteur sur l'espace (le même que dans Découvrir) et compteur affiché (§24). */
+    private boolean aime;
+    private int nombreJaime;
+
+    public void basculerJaime() {
+        if (espace == null || isProprietaire()) return;
+        boolean nouveau = !aime;
+        if (sn.ucad.nexora.web.decouvrir.Reactions.aimer(sn.ucad.nexora.web.decouvrir.Reactions.visiteurCourant(), null, id, nouveau)) {
+            aime = nouveau;
+            nombreJaime = Math.max(0, nombreJaime + (aime ? 1 : -1));
+        }
+    }
+
+    public boolean isAime() { return aime; }
+    public int getNombreJaime() { return nombreJaime; }
 
     public void basculerFavori() {
         if (!session.isConnecte() || espace == null) return;

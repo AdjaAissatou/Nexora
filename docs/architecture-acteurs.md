@@ -1636,3 +1636,20 @@ badge et « 👁 vues · ♥ j'aime · 🔖 favoris » (au survol : fiche / Déc
 **Démonstration** : `09_seed/34_demo_popularite.sql`, vues et j'aime de visiteurs fictifs (`demo-…`),
 uniquement sur les offres des comptes `@nexora-demo.sn` ; rejouable.
 
+## 24. ✅ J'aime, Enregistrer et Partager sur les fiches ; Découvrir ne s'épuise plus
+
+**Fiche offre et fiche espace** : une barre « ♡ n j'aime · 🔖 Enregistrer · n · ↗ Partager » (et, sur l'offre,
+« 👁 vues » et le badge « 🔥 Populaire »).
+- **J'aime** : ouvert à tous, sans compte. C'est le même signal que dans Découvrir (`decouvrir/Reactions`) :
+  le même visiteur (cookie anonyme, puis « c-&lt;compte&gt; » une fois connecté, l'historique anonyme y étant
+  rattaché), compté une fois, retirable ici ou là. L'état est relu au chargement
+  (`GET /api/v1/decouvrir/signaux/j-aime?visiteur=&idOffre=|idEspace=`). Un pro n'aime pas son propre espace.
+- **Enregistrer** : le favori du compte (ajout et retrait) ; sans compte, lien vers la connexion qui ramène à la fiche.
+- **Partager** : le partage du téléphone (WhatsApp, SMS…) quand il existe, sinon le lien est copié.
+- Correctif : l'ancien bouton « ♡ Favori » était invisible (bouton clair prévu pour fond sombre, blanc sur blanc).
+
+**Découvrir** : une offre passée vite (moins d'une seconde) n'est plus cachée 7 jours, elle recule en fin de flux
+(pénalité de score). Un défilement rapide vidait le flux d'un petit catalogue, « Revoir depuis le début »
+compris. Seules les cartes déjà montrées pendant la séance sont exclues ; « Vous avez tout vu » ne s'affiche
+donc qu'après avoir vraiment tout parcouru.
+

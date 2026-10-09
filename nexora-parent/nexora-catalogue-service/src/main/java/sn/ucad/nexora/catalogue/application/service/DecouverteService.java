@@ -43,6 +43,9 @@ import sn.ucad.nexora.catalogue.infrastructure.persistence.DecouverteRepository.
 @Service
 public class DecouverteService {
 
+    /** Une offre passée vite récemment recule nettement, sans disparaître du flux. */
+    private static final double PENALITE_PASSEE = 4.0;
+
     public static final Set<String> TYPES_SIGNAL = Set.of(
             "VUE", "VUE_LONGUE", "PASSE", "J_AIME", "ENREGISTRE", "PARTAGE", "DETAIL", "TAILLES", "CONTACT", "ACHAT");
     private static final Pattern VISITEUR = Pattern.compile("[A-Za-z0-9-]{8,64}");
@@ -78,8 +81,11 @@ public class DecouverteService {
     public Flux flux(String visiteur, String zone, BigDecimal lat, BigDecimal lng, double rayonKm,
                      List<Long> rechercheClassee, Collection<Long> vus, Collection<Long> vusEspaces, int taille, String nature) {
         ProfilBrut profil = visiteurValide(visiteur) ? repository.profil(visiteur) : ProfilBrut.vide();
+        // Seules les cartes déjà montrées pendant cette séance sont exclues. Celles que le visiteur a
+        // passées vite ces 7 derniers jours restent proposées, mais en fin de flux : un défilement rapide
+        // ne doit pas vider Découvrir (le flux se terminait dès l'ouverture sur un petit catalogue).
         Set<Long> dejaVus = new HashSet<>(vus);
-        if (rechercheClassee == null) dejaVus.addAll(repository.passeesRecemment(visiteur));
+        Set<Long> passees = rechercheClassee == null ? repository.passeesRecemment(visiteur) : Set.of();
 
         List<Candidat> candidats = repository.candidats(rechercheClassee, zone, lat, lng, rayonKm).stream()
                 .filter(c -> !dejaVus.contains(c.idOffre()))
@@ -106,6 +112,10 @@ public class DecouverteService {
             double score = 3 * interet + 1.2 * proximite + visuel + 0.5 * dispo + populaire + qualite + nouveaute
                     + 1.5 * recherche + 0.6 * hasard.nextDouble();
             double tendance = 1.5 * nouveaute + 1.5 * populaire + 0.5 * visuel + 0.5 * qualite + 0.4 * hasard.nextDouble();
+            if (passees.contains(c.idOffre())) {
+                score -= PENALITE_PASSEE;
+                tendance -= PENALITE_PASSEE;
+            }
             notes.add(new Note(c, interet, score, tendance, null));
         }
 
@@ -118,7 +128,8 @@ public class DecouverteService {
         Deque<Note> tendances = choisir(notes, Comparator.comparingDouble(Note::tendance).reversed(), nTendance, pris, "TENDANCE");
         // Découverte : de préférence un rayon que le visiteur n'a pas encore exploré, au hasard
         List<Note> ailleurs = new ArrayList<>(notes.stream()
-                .filter(n -> !pris.contains(n.c().idOffre()) && profil.racines().getOrDefault(n.c().idRacine(), 0.0) <= 0).toList());
+                .filter(n -> !pris.contains(n.c().idOffre()) && !passees.contains(n.c().idOffre())
+                        && profil.racines().getOrDefault(n.c().idRacine(), 0.0) <= 0).toList());
         if (ailleurs.isEmpty()) ailleurs = new ArrayList<>(notes.stream().filter(n -> !pris.contains(n.c().idOffre())).toList());
         java.util.Collections.shuffle(ailleurs, hasard);
         Deque<Note> decouvertes = choisir(ailleurs, (a, b) -> 0, nDecouverte, pris, "DECOUVERTE");
@@ -321,6 +332,10 @@ public class DecouverteService {
         }
         Integer duree = s.dureeMs() == null ? null : Math.max(0, Math.min(s.dureeMs(), 600_000));
         repository.enregistrer(new Signal(s.visiteur(), s.idOffre(), s.idEspace(), s.type(), duree));
+    }
+
+    public boolean aime(String visiteur, Long idOffre, Long idEspace) {
+        return visiteurValide(visiteur) && (idOffre != null || idEspace != null) && repository.aime(visiteur, idOffre, idEspace);
     }
 
     public void retirerJAime(String visiteur, Long idOffre, Long idEspace) {

@@ -10,6 +10,7 @@
 </f:metadata>
 <ui:define name="titre">#{espaceDetailBean.trouve ? espaceDetailBean.espace.nom : 'Espace'} — Nexora</ui:define>
 <ui:define name="content">
+    <h:outputScript library="js" name="reactions.js" target="head" />
 
     <div class="nx-container" style="padding-top:28px; padding-bottom:80px;">
 
@@ -84,14 +85,35 @@
                                 <h:outputLink value="#{format.lienItineraire(espaceDetailBean.espace.latitude, espaceDetailBean.espace.longitude)}"
                                               target="_blank" styleClass="nx-button nx-button-outline">Itinéraire</h:outputLink>
                             </ui:fragment>
-                            <ui:fragment rendered="#{sessionBean.connecte}">
-                                <h:form>
-                                    <h:commandButton value="#{espaceDetailBean.favori ? '♥ Favori' : '♡ Favori'}"
-                                                     action="#{espaceDetailBean.basculerFavori}"
-                                                     styleClass="nx-button #{espaceDetailBean.favori ? 'nx-button-primary' : 'nx-button-outline'}" />
-                                </h:form>
-                            </ui:fragment>
                         </div>
+
+                        <!-- J'aime, Enregistrer, Partager (§24) : le même « J'aime » que dans Découvrir -->
+                        <h:form id="reactions" styleClass="nx-reactions">
+                            <h:commandLink rendered="#{!espaceDetailBean.proprietaire}"
+                                           styleClass="nx-reaction nx-reaction-aime #{espaceDetailBean.aime ? 'actif' : ''}"
+                                           title="#{espaceDetailBean.aime ? 'Je n\'aime plus' : 'J\'aime'}">
+                                <f:ajax listener="#{espaceDetailBean.basculerJaime}" render="@form" />
+                                <span class="nx-reaction-icone" aria-hidden="true">#{espaceDetailBean.aime ? '♥' : '♡'}</span>
+                                <span>#{espaceDetailBean.nombreJaime} j'aime</span>
+                            </h:commandLink>
+                            <ui:fragment rendered="#{espaceDetailBean.proprietaire}">
+                                <span class="nx-reaction-info">♥ #{espaceDetailBean.nombreJaime} j'aime</span>
+                            </ui:fragment>
+                            <h:commandLink rendered="#{sessionBean.connecte and !espaceDetailBean.proprietaire}"
+                                           styleClass="nx-reaction nx-reaction-garde #{espaceDetailBean.favori ? 'actif' : ''}"
+                                           title="#{espaceDetailBean.favori ? 'Retirer de mes favoris' : 'Enregistrer dans mes favoris'}">
+                                <f:ajax listener="#{espaceDetailBean.basculerFavori}" render="@form" />
+                                <span class="nx-reaction-icone" aria-hidden="true">🔖</span>
+                                <span>#{espaceDetailBean.favori ? 'Enregistré' : 'Enregistrer'}</span>
+                            </h:commandLink>
+                            <h:link rendered="#{!sessionBean.connecte}" outcome="/connexion" styleClass="nx-reaction" title="Connectez-vous pour enregistrer">
+                                <f:param name="redirect" value="/espace.xhtml?id=#{espaceDetailBean.espace.id}" />
+                                <span class="nx-reaction-icone" aria-hidden="true">🔖</span><span>Enregistrer</span>
+                            </h:link>
+                            <button type="button" class="nx-reaction" onclick="nexoraPartager(this)">
+                                <span class="nx-reaction-icone" aria-hidden="true">↗</span><span>Partager</span>
+                            </button>
+                        </h:form>
                     </div>
                 </div>
 

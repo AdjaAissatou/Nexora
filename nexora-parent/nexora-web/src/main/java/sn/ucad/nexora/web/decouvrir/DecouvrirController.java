@@ -1,13 +1,10 @@
 package sn.ucad.nexora.web.decouvrir;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.enterprise.inject.spi.CDI;
@@ -41,8 +38,6 @@ import sn.ucad.nexora.web.session.SessionBean;
 public class DecouvrirController {
 
     private static final Logger LOG = LoggerFactory.getLogger(DecouvrirController.class);
-    static final String COOKIE = "nx_visiteur";
-    private static final String FUSION_FAITE = "nexora.decouvrir.fusion";
     /** Paramètres du flux relayés tels quels (zone, position, déjà vus, critères d'une recherche). */
     private static final Set<String> PARAMETRES = Set.of("zone", "lat", "lng", "rayonKm", "vus", "vusEspaces", "taille",
             "q", "idCategorie", "typeEspace", "commune", "prixMin", "prixMax", "estProduit", "avecPromotion",
@@ -51,16 +46,8 @@ public class DecouvrirController {
     private final RestClient catalogue = RestClient.builder()
             .baseUrl(GatewayConfig.gatewayUrl() + "/catalogue-service/api/v1/decouvrir").build();
 
-    /**
-     * La session du compte, telle que la voient les pages JSF : un bean CDI (Weld), et non Spring —
-     * une injection Spring en créerait une autre, vide.
-     */
     private static SessionBean session() {
-        try {
-            return CDI.current().select(SessionBean.class).get();
-        } catch (RuntimeException e) {
-            return null;
-        }
+        return Reactions.session();
     }
 
     @GetMapping(value = "/flux", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -178,41 +165,9 @@ public class DecouvrirController {
         }
     }
 
-    /**
-     * Le visiteur : « c-&lt;compte&gt; » une fois connecté (l'historique anonyme du navigateur y est
-     * rattaché une fois par session), sinon l'identifiant anonyme du cookie, créé au besoin.
-     */
+    /** Le visiteur : voir {@link Reactions#visiteur}. */
     private String visiteur(HttpServletRequest requete, HttpServletResponse reponse) {
-        String anonyme = null;
-        if (requete.getCookies() != null) {
-            for (Cookie c : requete.getCookies()) {
-                if (COOKIE.equals(c.getName()) && c.getValue() != null && c.getValue().matches("[A-Za-z0-9-]{8,64}")) anonyme = c.getValue();
-            }
-        }
-        if (anonyme == null) {
-            anonyme = UUID.randomUUID().toString();
-            Cookie cookie = new Cookie(COOKIE, anonyme);
-            cookie.setPath("/");
-            cookie.setMaxAge(60 * 60 * 24 * 365);
-            cookie.setHttpOnly(true);
-            cookie.setAttribute("SameSite", "Lax");
-            reponse.addCookie(cookie);
-        }
-        SessionBean s = session();
-        if (s == null || !s.isConnecte() || s.getCompte() == null || s.getCompte().id() == null) return anonyme;
-        String compte = "c-" + s.getCompte().id();
-        HttpSession httpSession = requete.getSession();
-        if (httpSession.getAttribute(FUSION_FAITE) == null) {
-            httpSession.setAttribute(FUSION_FAITE, Boolean.TRUE);
-            String ancien = anonyme;
-            try {
-                catalogue.post().uri(u -> u.path("/fusion").queryParam("ancien", ancien).queryParam("nouveau", compte).build())
-                        .retrieve().toBodilessEntity();
-            } catch (Exception e) {
-                LOG.info("Historique anonyme non rattaché : {}", e.getMessage());
-            }
-        }
-        return compte;
+        return Reactions.visiteur(requete, reponse);
     }
 
     private static Long nombre(Object o) {
