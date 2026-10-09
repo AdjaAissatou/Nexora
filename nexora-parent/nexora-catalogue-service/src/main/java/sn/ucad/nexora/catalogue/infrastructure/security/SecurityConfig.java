@@ -39,6 +39,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // Nexora Découvrir (§18) : flux et signaux anonymes, comme la recherche
                         .requestMatchers("/api/v1/decouvrir", "/api/v1/decouvrir/**").permitAll()
+                        // Clics relayés par le web (§26) ; les statistiques elles-mêmes exigent un compte
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/statistiques/evenements").permitAll()
                         // Recherche par photo (§11) : publique comme la recherche par mots.
                         .requestMatchers(HttpMethod.POST, "/api/v1/offres/recherche-photo").permitAll()
                         .requestMatchers(

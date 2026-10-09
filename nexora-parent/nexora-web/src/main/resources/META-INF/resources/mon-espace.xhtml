@@ -13,6 +13,7 @@
 
     <h:outputScript library="js" name="geolocation.js" target="head" />
     <h:outputScript library="js" name="mon-espace.js" target="head" />
+    <h:outputScript library="js" name="statistiques.js" target="head" />
 
     <section class="nx-page-header">
         <div class="nx-container">
@@ -83,6 +84,7 @@
                         <h:link outcome="/creer-offre" styleClass="nx-espace-nav-item" value="#{monEspaceBean.libelleAjouterOffre}">
                             <f:param name="idEspace" value="#{monEspaceBean.espace.id}" />
                         </h:link>
+                        <button type="button" class="nx-espace-nav-item" data-tab="statistiques" onclick="nexoraAfficherOnglet('statistiques', this)">Statistiques</button>
                         <button type="button" class="nx-espace-nav-item" data-tab="infos" onclick="nexoraAfficherOnglet('infos', this)">Gérer les informations de l'espace</button>
                         <button type="button" class="nx-espace-nav-item" data-tab="horaires" onclick="nexoraAfficherOnglet('horaires', this)">Horaires</button>
                         <button type="button" class="nx-espace-nav-item" data-tab="avis" onclick="nexoraAfficherOnglet('avis', this)">
@@ -160,6 +162,7 @@
                                 <span class="nx-apercu-label">#{monEspaceBean.espace.nombreAvis} avis</span>
                             </div>
                         </div>
+                        <p class="nx-apercu-lien"><a href="#statistiques" onclick="nexoraAfficherOnglet('statistiques', document.querySelector('[data-tab=statistiques]')); return false;">Voir l'évolution semaine par semaine, les appels et les messages WhatsApp →</a></p>
                         <ui:fragment rendered="#{monEspaceBean.nombrePopulaires gt 0}">
                             <p class="nx-apercu-populaires">🔥 #{monEspaceBean.nombrePopulaires} de vos offres #{monEspaceBean.nombrePopulaires gt 1 ? 'portent' : 'porte'} le badge « Populaire » :
                                 elles font partie des plus aimées, enregistrées et vues de Nexora, et remontent dans le tri « Populaires ».</p>
@@ -508,6 +511,168 @@
                 </div>
 
                 <!-- ===================== Onglet Vérification (docs/architecture-acteurs.md §8.8) ===================== -->
+                <!-- Statistiques (docs/architecture-acteurs.md §26) : évolution par semaine et contacts -->
+                <div class="nx-tab-pane" id="tab-statistiques">
+                    <h:form id="statistiquesForm">
+                    <h:panelGroup id="statsBloc" layout="block" styleClass="nx-stats">
+                        <div class="nx-card nx-stats-entete">
+                            <div>
+                                <h3>Statistiques de #{monEspaceBean.espace.nom}</h3>
+                                <p class="nx-aide">Période #{statistiquesEspaceBean.libellePeriode}, comparée #{statistiquesEspaceBean.libelleComparaison} à la même heure.</p>
+                            </div>
+                            <div class="nx-stats-periodes" role="group" aria-label="Période">
+                                <h:commandButton value="4 semaines" styleClass="nx-pastille #{statistiquesEspaceBean.semaines == 4 ? 'active' : ''}">
+                                    <f:ajax listener="#{statistiquesEspaceBean.periode(4)}" render="statsBloc" onevent="nexoraStatsAjax" />
+                                </h:commandButton>
+                                <h:commandButton value="12 semaines" styleClass="nx-pastille #{statistiquesEspaceBean.semaines == 12 ? 'active' : ''}">
+                                    <f:ajax listener="#{statistiquesEspaceBean.periode(12)}" render="statsBloc" onevent="nexoraStatsAjax" />
+                                </h:commandButton>
+                                <h:commandButton value="6 mois" styleClass="nx-pastille #{statistiquesEspaceBean.semaines == 26 ? 'active' : ''}">
+                                    <f:ajax listener="#{statistiquesEspaceBean.periode(26)}" render="statsBloc" onevent="nexoraStatsAjax" />
+                                </h:commandButton>
+                            </div>
+                        </div>
+
+                        <ui:fragment rendered="#{not empty statistiquesEspaceBean.erreur}">
+                            <div class="nx-alert nx-alert-error">#{statistiquesEspaceBean.erreur}</div>
+                        </ui:fragment>
+
+                        <ui:fragment rendered="#{statistiquesEspaceBean.stats != null}">
+                        <div class="nx-stats-tuiles">
+                            <ui:repeat var="i" value="#{statistiquesEspaceBean.indicateurs}">
+                                <div class="nx-stats-tuile" title="#{i.aide()}">
+                                    <span class="nx-stats-tuile-libelle">#{i.libelle()}</span>
+                                    <span class="nx-stats-tuile-valeur">#{i.valeur()}</span>
+                                    <span class="nx-stats-evolution nx-stats-#{i.tendance()}">
+                                        <ui:fragment rendered="#{i.evolution() != null}">
+                                            <span aria-hidden="true">#{i.tendance() == 'hausse' ? '▲' : i.tendance() == 'baisse' ? '▼' : '■'}</span>
+                                            #{i.evolution()}
+                                        </ui:fragment>
+                                        <ui:fragment rendered="#{i.evolution() == null}">pas de comparaison</ui:fragment>
+                                    </span>
+                                    <ui:fragment rendered="#{not empty i.courbe()}">
+                                        <svg class="nx-stats-courbe" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+                                            <path d="#{i.courbe()}" />
+                                        </svg>
+                                    </ui:fragment>
+                                </div>
+                            </ui:repeat>
+                        </div>
+
+                        <div class="nx-card nx-stats-evolution-carte">
+                            <div class="nx-stats-graphique-tete">
+                                <h3 id="statsTitreGraphique">Vues par semaine</h3>
+                                <div class="nx-stats-mesures nx-avis-filtres" role="group" aria-label="Mesure affichée">
+                                    <button type="button" class="nx-pastille active" data-mesure="vues" aria-pressed="true">Vues</button>
+                                    <button type="button" class="nx-pastille" data-mesure="jaime" aria-pressed="false">J'aime</button>
+                                    <button type="button" class="nx-pastille" data-mesure="favoris" aria-pressed="false">Favoris</button>
+                                    <button type="button" class="nx-pastille" data-mesure="contacts" aria-pressed="false">Contacts</button>
+                                </div>
+                            </div>
+                            <div class="nx-stats-legende" id="statsLegende"></div>
+                            <div class="nx-stats-graphique" id="statsGraphique" data-semaines="#{statistiquesEspaceBean.donnees}"></div>
+                            <details class="nx-stats-tableau">
+                                <summary>Voir les chiffres en tableau</summary>
+                                <div class="nx-stats-defilement">
+                                <table class="nx-verif-tableau nx-stats-table">
+                                    <thead><tr><th>Semaine du</th><th>Vues fiches</th><th>Vues Découvrir</th><th>J'aime</th><th>Favoris</th><th>Appels</th><th>WhatsApp</th><th>Itinéraire</th><th>Partages</th></tr></thead>
+                                    <tbody>
+                                        <ui:repeat var="sem" value="#{statistiquesEspaceBean.stats.parSemaine()}">
+                                            <tr>
+                                                <td>#{format.dateLongue(sem.debut())}</td>
+                                                <td>#{sem.compteurs().vuesFiches()}</td><td>#{sem.compteurs().vuesDecouvrir()}</td>
+                                                <td>#{sem.compteurs().jaime()}</td><td>#{sem.compteurs().favoris()}</td>
+                                                <td>#{sem.compteurs().appels()}</td><td>#{sem.compteurs().whatsapp()}</td>
+                                                <td>#{sem.compteurs().itineraires()}</td><td>#{sem.compteurs().partages()}</td>
+                                            </tr>
+                                        </ui:repeat>
+                                    </tbody>
+                                </table>
+                                </div>
+                            </details>
+                        </div>
+
+                        <div class="nx-stats-duo">
+                            <div class="nx-card">
+                                <h3>Contacts par canal</h3>
+                                <p class="nx-aide">Clics sur les boutons de vos fiches et de Découvrir pendant la période.</p>
+                                <ui:fragment rendered="#{statistiquesEspaceBean.totalCanaux == 0}">
+                                    <p class="nx-aide">Aucun clic pour l'instant : un numéro WhatsApp et une adresse précise donnent envie de vous contacter.</p>
+                                </ui:fragment>
+                                <ui:fragment rendered="#{statistiquesEspaceBean.totalCanaux gt 0}">
+                                    <ui:repeat var="c" value="#{statistiquesEspaceBean.canaux}">
+                                        <div class="nx-stats-canal">
+                                            <span class="nx-stats-canal-libelle">#{c.libelle()}</span>
+                                            <span class="nx-stats-canal-fond"><span style="width:#{c.largeur()}%;"></span></span>
+                                            <span class="nx-stats-canal-valeur"><strong>#{c.nombre()}</strong> #{c.part()}</span>
+                                        </div>
+                                    </ui:repeat>
+                                </ui:fragment>
+                            </div>
+                            <div class="nx-card nx-stats-conseils">
+                                <h3>Ce que mesurent ces chiffres</h3>
+                                <ul>
+                                    <li><strong>Vues</strong> : ouvertures de vos fiches (espace et offres) et cartes regardées dans Découvrir.</li>
+                                    <li><strong>Contacts</strong> : clics sur Appeler, WhatsApp et Itinéraire, depuis vos fiches et Découvrir.</li>
+                                    <li><strong>Taux de contact</strong> : contacts pour 100 vues de fiche. Des photos nettes, un prix affiché et des horaires à jour le font monter.</li>
+                                    <li>Un même visiteur n'est compté qu'une fois toutes les 30 secondes par bouton.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="nx-card nx-stats-offres">
+                            <h3>Par offre</h3>
+                            <p class="nx-aide">Sur la période. Cliquez sur un titre de colonne pour trier.</p>
+                            <ui:fragment rendered="#{empty statistiquesEspaceBean.offres}">
+                                <p class="nx-aide">Aucune offre pour l'instant.</p>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{not empty statistiquesEspaceBean.offres}">
+                            <div class="nx-stats-defilement">
+                            <table class="nx-verif-tableau nx-stats-table" data-replie="true">
+                                <thead>
+                                    <tr>
+                                        <th data-tri="texte" scope="col">Offre</th>
+                                        <th data-tri="nombre" scope="col" aria-sort="descending">Vues fiche</th>
+                                        <th data-tri="nombre" scope="col">Découvrir</th>
+                                        <th data-tri="nombre" scope="col">J'aime</th>
+                                        <th data-tri="nombre" scope="col">Favoris</th>
+                                        <th data-tri="nombre" scope="col">Contacts</th>
+                                        <th data-tri="nombre" scope="col">Taux</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ui:repeat var="l" value="#{statistiquesEspaceBean.offres}">
+                                        <tr>
+                                            <td data-valeur="#{l.offre().titre()}">
+                                                <h:link outcome="/offre" styleClass="nx-stats-offre">
+                                                    <f:param name="id" value="#{l.offre().id()}" />
+                                                    <ui:fragment rendered="#{not empty l.offre().image()}"><img src="#{l.offre().image()}" alt="" loading="lazy" /></ui:fragment>
+                                                    <ui:fragment rendered="#{empty l.offre().image()}"><span class="nx-stats-offre-vide" aria-hidden="true"></span></ui:fragment>
+                                                    <span>#{l.offre().titre()}</span>
+                                                    <ui:fragment rendered="#{l.offre().populaire()}"><span class="nx-stats-populaire" title="Badge « Populaire »">🔥</span></ui:fragment>
+                                                </h:link>
+                                            </td>
+                                            <td data-valeur="#{l.offre().compteurs().vuesFiches()}">#{l.offre().compteurs().vuesFiches()}</td>
+                                            <td data-valeur="#{l.offre().compteurs().vuesDecouvrir()}">#{l.offre().compteurs().vuesDecouvrir()}</td>
+                                            <td data-valeur="#{l.offre().compteurs().jaime()}">#{l.offre().compteurs().jaime()}</td>
+                                            <td data-valeur="#{l.offre().compteurs().favoris()}">#{l.offre().compteurs().favoris()}</td>
+                                            <td data-valeur="#{l.offre().compteurs().contacts()}" title="Appels #{l.offre().compteurs().appels()} · WhatsApp #{l.offre().compteurs().whatsapp()} · Itinéraire #{l.offre().compteurs().itineraires()}">#{l.offre().compteurs().contacts()}</td>
+                                            <td data-valeur="#{l.tauxValeur()}">#{l.taux()}</td>
+                                        </tr>
+                                    </ui:repeat>
+                                </tbody>
+                            </table>
+                            </div>
+                            <ui:fragment rendered="#{statistiquesEspaceBean.offres.size() gt 10}">
+                                <button type="button" class="nx-see-all nx-stats-deplier" data-libelle="Voir les #{statistiquesEspaceBean.offres.size()} offres">Voir les #{statistiquesEspaceBean.offres.size()} offres</button>
+                            </ui:fragment>
+                            </ui:fragment>
+                        </div>
+                        </ui:fragment>
+                    </h:panelGroup>
+                    </h:form>
+                </div>
+
                 <!-- Avis reçus (docs/architecture-acteurs.md §22) : synthèse et réponses publiques -->
                 <div class="nx-tab-pane" id="tab-avis">
                     <h:form id="avisRecusForm">

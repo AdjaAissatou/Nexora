@@ -357,4 +357,18 @@ public class CatalogueApiClient {
             throw ApiErrors.reseau(e);
         }
     }
+
+    /** Statistiques détaillées d'un de mes espaces (§26) : {@code semaines} = 4, 12 ou 26. */
+    public sn.ucad.nexora.web.dto.catalogue.StatistiquesDtos.StatistiquesEspace statistiques(String accessToken, Long idEspace, int semaines) {
+        LOG.info("Requête GET {}/api/v1/statistiques/espaces/{}?semaines={}", baseUrl, idEspace, semaines);
+        try {
+            return client.get().uri(u -> u.path("/api/v1/statistiques/espaces/{id}").queryParam("semaines", semaines).build(idEspace))
+                    .header("Authorization", "Bearer " + accessToken)
+                    .retrieve().body(sn.ucad.nexora.web.dto.catalogue.StatistiquesDtos.StatistiquesEspace.class);
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
 }

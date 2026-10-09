@@ -2039,3 +2039,109 @@ select.nx-liste-ouverte option { padding: 6px 10px; border-radius: 8px; }
 .nx-sessions li a { grid-column: 2; grid-row: 1 / span 2; }
 .nx-session-appareil { font-weight: 600; color: var(--nx-forest); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 @media (max-width: 860px) { .nx-securite-grille { grid-template-columns: 1fr; } }
+
+/* ===================== Statistiques du pro (§26) ===================== */
+:root {
+    /* Séries des graphiques : palette validée (validate_palette.js) sur surface blanche */
+    --nx-serie-1: #1baf7a;
+    --nx-serie-2: #eb6834;
+    --nx-serie-unique: var(--nx-emerald);
+    --nx-graphique-grille: #EFE8DA;
+    --nx-graphique-axe: #CFC4AE;
+}
+.nx-apercu-lien { margin: 14px 0 0; font-size: 14px; }
+.nx-apercu-lien a { color: var(--nx-emerald); font-weight: 600; text-decoration: none; }
+.nx-apercu-lien a:hover { text-decoration: underline; }
+.nx-stats > * + * { margin-top: 16px; }
+.nx-stats h3 { margin: 0 0 4px; }
+.nx-stats-entete { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.nx-stats-entete .nx-aide { margin: 0; }
+.nx-stats-periodes { display: flex; gap: 8px; flex-wrap: wrap; }
+.nx-stats-periodes .nx-pastille { cursor: pointer; font: inherit; font-size: 13.5px; }
+.nx-stats-periodes .nx-pastille::before, .nx-stats-mesures .nx-pastille::before { content: none; }
+
+.nx-stats-tuiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.nx-stats-tuile {
+    position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 2px;
+    padding: 16px 16px 44px; background: var(--nx-surface); border: 1px solid var(--nx-border);
+    border-radius: var(--nx-radius-md); box-shadow: var(--nx-shadow);
+    transition: transform .25s var(--nx-ease), box-shadow .25s var(--nx-ease);
+}
+.nx-stats-tuile:hover { transform: translateY(-3px); box-shadow: var(--nx-shadow-hover); }
+.nx-stats-tuile-libelle { font-size: 13px; color: var(--nx-text-secondary); font-weight: 600; }
+.nx-stats-tuile-valeur { font-family: var(--nx-font-display); font-size: 30px; font-weight: 700; color: var(--nx-text); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.nx-stats-evolution { font-size: 12.5px; font-weight: 600; color: var(--nx-text-light); }
+.nx-stats-evolution.nx-stats-hausse { color: var(--nx-success); }
+.nx-stats-evolution.nx-stats-baisse { color: var(--nx-error); }
+.nx-stats-courbe { position: absolute; left: 0; right: 0; bottom: 6px; width: 100%; height: 32px; }
+.nx-stats-courbe path { fill: none; stroke: var(--nx-serie-unique); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .55; }
+
+.nx-stats-graphique-tete { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.nx-stats-mesures { margin: 0; }
+.nx-stats-mesures .nx-pastille { cursor: pointer; font: inherit; font-size: 13px; }
+.nx-stats-legende { display: flex; gap: 18px; flex-wrap: wrap; margin: 12px 0 6px; font-size: 13.5px; color: var(--nx-text-secondary); }
+.nx-stats-legende-item { display: inline-flex; align-items: center; gap: 6px; }
+.nx-stats-legende-item strong { color: var(--nx-text); font-variant-numeric: tabular-nums; }
+.nx-stats-pastille { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.nx-stats-graphique { position: relative; height: 260px; }
+.nx-stats-graphique svg { display: block; overflow: visible; }
+.nx-stats-grille { stroke: var(--nx-graphique-grille); stroke-width: 1; }
+.nx-stats-axe { stroke: var(--nx-graphique-axe); stroke-width: 1; }
+.nx-stats-graduation { font-size: 11.5px; fill: var(--nx-text-light); font-variant-numeric: tabular-nums; }
+.nx-stats-survol { fill: var(--nx-primary-light); opacity: .55; }
+.nx-stats-cible { outline: none; cursor: default; }
+.nx-stats-cible:focus-visible { stroke: var(--nx-emerald); stroke-width: 1.5; }
+.nx-stats-anime g { transform-box: fill-box; transform-origin: bottom; animation: nx-stats-pousse .6s var(--nx-ease) both; animation-delay: calc(var(--i) * 25ms); }
+@keyframes nx-stats-pousse { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.nx-stats-bulle {
+    position: absolute; top: 0; z-index: 3; display: none; min-width: 170px; pointer-events: none;
+    padding: 10px 12px; border-radius: 12px; background: var(--nx-surface); border: 1px solid var(--nx-border);
+    box-shadow: var(--nx-shadow-float); font-size: 13px; color: var(--nx-text-secondary);
+}
+.nx-stats-bulle-titre { font-weight: 700; color: var(--nx-text); margin-bottom: 6px; }
+.nx-stats-bulle-ligne { display: flex; align-items: center; gap: 6px; }
+.nx-stats-bulle-ligne strong { margin-left: auto; padding-left: 14px; color: var(--nx-text); font-variant-numeric: tabular-nums; }
+.nx-stats-bulle-total { border-top: 1px solid var(--nx-border); margin-top: 4px; padding-top: 4px; }
+.nx-stats-bulle-detail { margin-top: 4px; font-size: 12px; color: var(--nx-text-light); }
+.nx-stats-tableau { margin-top: 10px; font-size: 14px; }
+.nx-stats-tableau summary { cursor: pointer; color: var(--nx-emerald); font-weight: 600; }
+.nx-stats-defilement { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.nx-stats-table td, .nx-stats-table th { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.nx-stats-table td:not(:first-child), .nx-stats-table th:not(:first-child) { text-align: right; }
+
+.nx-stats-duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.nx-stats-duo > .nx-card { margin: 0; }
+.nx-stats-canal { display: grid; grid-template-columns: 92px minmax(0, 1fr) 84px; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; }
+.nx-stats-canal-libelle { color: var(--nx-text-secondary); font-weight: 600; }
+.nx-stats-canal-fond { height: 14px; border-radius: 0 4px 4px 0; background: transparent; }
+.nx-stats-canal-fond span { display: block; height: 100%; border-radius: 0 4px 4px 0; background: var(--nx-serie-unique); min-width: 2px;
+    animation: nx-stats-etire .8s var(--nx-ease) both; transform-origin: left; }
+@keyframes nx-stats-etire { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.nx-stats-canal-valeur { color: var(--nx-text-light); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.nx-stats-canal-valeur strong { color: var(--nx-text); font-size: 14px; margin-right: 4px; }
+.nx-stats-conseils ul { margin: 8px 0 0; padding-left: 18px; color: var(--nx-text-secondary); font-size: 14px; line-height: 1.55; }
+.nx-stats-conseils li + li { margin-top: 6px; }
+
+.nx-stats-offres th[data-tri] { cursor: pointer; user-select: none; }
+.nx-stats-offres th[data-tri]:hover { color: var(--nx-emerald); }
+.nx-stats-offres th[aria-sort="descending"]::after { content: " ▼"; font-size: 10px; }
+.nx-stats-offres th[aria-sort="ascending"]::after { content: " ▲"; font-size: 10px; }
+.nx-stats-offre { display: inline-flex; align-items: center; gap: 10px; color: var(--nx-text); text-decoration: none; font-weight: 600; max-width: 340px; }
+.nx-stats-offre span:not(.nx-stats-populaire) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nx-stats-offre:hover span { color: var(--nx-emerald); }
+.nx-stats-offre img, .nx-stats-offre-vide { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex: none; background: var(--nx-sand); }
+.nx-stats-deplier { margin-top: 12px; background: none; border: 0; cursor: pointer; font: inherit; }
+
+@media (max-width: 1100px) { .nx-stats-tuiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+    .nx-stats-tuiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nx-stats-duo { grid-template-columns: minmax(0, 1fr); }
+    .nx-stats-tuile-valeur { font-size: 24px; }
+    .nx-stats-offre { max-width: 150px; gap: 8px; font-size: 13px; }
+    .nx-stats-offre img, .nx-stats-offre-vide { width: 28px; height: 28px; }
+    .nx-stats-table td, .nx-stats-table th { min-width: 0; padding: 8px 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .nx-stats-anime g, .nx-stats-canal-fond span { animation: none; }
+    .nx-stats-tuile { transition: none; }
+}

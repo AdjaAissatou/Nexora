@@ -19,3 +19,19 @@ function nexoraPartager(bouton) {
         window.prompt('Copiez le lien :', url);
     }
 }
+
+/* Statistiques du professionnel (docs/architecture-acteurs.md §26) : un clic sur Appeler, WhatsApp,
+ * Itinéraire ou Partager est compté ([data-stat], [data-offre] ou [data-espace]). Envoi « keepalive » :
+ * il part même si le lien quitte la page. */
+document.addEventListener('click', function (e) {
+    var cible = e.target.closest ? e.target.closest('[data-stat]') : null;
+    if (!cible) return;
+    var corps = { type: cible.getAttribute('data-stat') };
+    if (cible.getAttribute('data-offre')) corps.idOffre = Number(cible.getAttribute('data-offre'));
+    if (cible.getAttribute('data-espace')) corps.idEspace = Number(cible.getAttribute('data-espace'));
+    try {
+        var base = (document.querySelector('meta[name="nx-contexte"]') || {}).content || '';
+        fetch(base + '/api/statistiques/clic', { method: 'POST', credentials: 'same-origin', keepalive: true,
+            headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps) });
+    } catch (err) { /* un clic non compté n'empêche rien */ }
+});

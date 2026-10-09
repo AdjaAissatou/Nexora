@@ -111,6 +111,7 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 11_migrations/10_avis_modification.sql
 \i 11_migrations/11_popularite_offres.sql
 \i 11_migrations/12_securite_comptes.sql
+\i 11_migrations/13_statistiques.sql
 \i 11_migrations/06_compteurs_espace.sql
 
 \echo '== Démonstration : comptes d''administration et agent, avis, horaires, caractéristiques des articles'
@@ -120,6 +121,7 @@ SELECT NOT EXISTS (SELECT 1 FROM lieu_public WHERE nom = 'Palais de la Républiq
 \i 09_seed/26_demo_horaires.sql
 \i 09_seed/33_demo_reponses_avis.sql
 \i 09_seed/34_demo_popularite.sql
+\i 09_seed/35_demo_statistiques.sql
 \i 09_seed/29_demo_caracteristiques.sql
 
 \echo '== Accents abîmés par un ancien passage en WIN1252 (réparés s''il y en a)'

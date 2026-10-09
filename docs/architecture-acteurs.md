@@ -112,7 +112,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Réservations reçues | — | 🚧 |
 | Commandes reçues | — | 🚧 |
 | Avis reçus + réponse | `/mon-espace` onglet « Avis reçus » (`#avis`) | ✅ synthèse des notes, filtres, réponse publique modifiable (§22) |
-| Statistiques détaillées (au-delà de la Vue d'ensemble) | — | 🚧 (vues, vues Découvrir, j'aime et favoris par offre déjà visibles, §23) |
+| Statistiques détaillées (au-delà de la Vue d'ensemble) | — | ✅ onglet « Statistiques » de Mon espace : évolution par semaine, contacts par canal, tableau par offre (§26) |
 | Vérification de mon espace (dossier, justificatifs, suivi) | `/mon-espace` (onglet « Vérification ») | ✅ (§8.11) |
 | Certification 🏅 | — | — (après la vérification, critères à définir, §8.3) |
 | Ma fiche publique | `/espace?id=` (lien depuis Mon espace) | ✅ |
@@ -1674,3 +1674,29 @@ donc qu'après avoir vraiment tout parcouru.
 `…/email/confirmer`, `…/sessions/{sid}/terminer`, `…/sessions/terminer-autres`.
 **Base** : `11_migrations/12_securite_comptes.sql` (`connexion_compte`, `changement_email`).
 
+## 26. ✅ Statistiques détaillées du professionnel (Mon espace → « Statistiques »)
+
+- **Période** : 4 semaines, 12 semaines ou 6 mois (semaines du lundi, heure de Dakar, semaine en cours
+  comprise). Elle est **comparée à la période précédente de même durée, arrêtée à la même heure** : la
+  semaine en cours n'est jamais opposée à une semaine entière.
+- **Indicateurs** : Vues (fiches + Découvrir), J'aime, Favoris, Contacts (Appeler + WhatsApp + Itinéraire)
+  et **Taux de contact** (contacts pour 100 vues de fiche), chacun avec son évolution (▲/▼ en %, en points
+  pour le taux ; « nouveau » si la période précédente était vide) et sa courbe semaine par semaine.
+- **Évolution par semaine** : histogramme Vues (Fiches et Découvrir empilées), J'aime, Favoris ou Contacts ;
+  info-bulle au survol (détail par canal pour les contacts), légende avec totaux, et les **chiffres en tableau**.
+- **Contacts par canal** : WhatsApp, Appels, Itinéraire, Partages (nombre et part).
+- **Par offre** : vues de fiche, Découvrir, j'aime, favoris, contacts, taux ; tri par colonne, 10 premières
+  puis « Voir les n offres ». Lien depuis la Vue d'ensemble de l'onglet Offres.
+
+**Collecte** : les boutons Appeler, WhatsApp, Itinéraire et Partager des fiches offre et espace portent
+`data-stat` ; un clic est envoyé sans bloquer la navigation (`fetch keepalive`) à `POST /api/statistiques/clic`
+(web), qui le relaie avec l'identifiant de visiteur (le même que Découvrir) à
+`POST /api/v1/statistiques/evenements` (catalogue, ouvert). Un même visiteur n'est compté qu'une fois toutes
+les 30 secondes par bouton et par cible. Les vues de fiches sont datées par déclencheur à chaque hausse de
+`offre.vue_count` / `espace_professionnel.nombre_vues`. Les vues, j'aime, appels et partages de Découvrir
+(`decouverte_signal`) et les favoris (`favori.date_creation`) sont relus tels quels.
+
+**API** : `GET /api/v1/statistiques/espaces/{id}?semaines=4|12|26` (propriétaire de l'espace).
+**Base** : `11_migrations/13_statistiques.sql` (`evenement_statistique`, déclencheurs de vues) ;
+démonstration `09_seed/35_demo_statistiques.sql` (25 semaines d'historique et des favoris datés pour les
+comptes `@nexora-demo.sn`).

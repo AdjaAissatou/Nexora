@@ -78,12 +78,12 @@
 
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
                             <ui:fragment rendered="#{format.telephoneValide(espaceDetailBean.espace.telephone)}">
-                                <h:outputLink value="tel:#{format.telephoneInternational(espaceDetailBean.espace.telephone)}" styleClass="nx-button nx-button-primary">Appeler</h:outputLink>
-                                <h:outputLink value="https://wa.me/#{format.telephoneInternational(espaceDetailBean.espace.telephone).replace('+', '')}" target="_blank" styleClass="nx-button nx-button-outline">WhatsApp</h:outputLink>
+                                <h:outputLink value="tel:#{format.telephoneInternational(espaceDetailBean.espace.telephone)}" styleClass="nx-button nx-button-primary" a:data-stat="APPEL" a:data-espace="#{espaceDetailBean.espace.id}">Appeler</h:outputLink>
+                                <h:outputLink value="https://wa.me/#{format.telephoneInternational(espaceDetailBean.espace.telephone).replace('+', '')}" target="_blank" styleClass="nx-button nx-button-outline" a:data-stat="WHATSAPP" a:data-espace="#{espaceDetailBean.espace.id}">WhatsApp</h:outputLink>
                             </ui:fragment>
                             <ui:fragment rendered="#{espaceDetailBean.espace.latitude != null}">
                                 <h:outputLink value="#{format.lienItineraire(espaceDetailBean.espace.latitude, espaceDetailBean.espace.longitude)}"
-                                              target="_blank" styleClass="nx-button nx-button-outline">Itinéraire</h:outputLink>
+                                              target="_blank" styleClass="nx-button nx-button-outline" a:data-stat="ITINERAIRE" a:data-espace="#{espaceDetailBean.espace.id}">Itinéraire</h:outputLink>
                             </ui:fragment>
                         </div>
 
@@ -110,7 +110,7 @@
                                 <f:param name="redirect" value="/espace.xhtml?id=#{espaceDetailBean.espace.id}" />
                                 <span class="nx-reaction-icone" aria-hidden="true">🔖</span><span>Enregistrer</span>
                             </h:link>
-                            <button type="button" class="nx-reaction" onclick="nexoraPartager(this)">
+                            <button type="button" class="nx-reaction" onclick="nexoraPartager(this)" data-stat="PARTAGE" data-espace="#{espaceDetailBean.espace.id}">
                                 <span class="nx-reaction-icone" aria-hidden="true">↗</span><span>Partager</span>
                             </button>
                         </h:form>

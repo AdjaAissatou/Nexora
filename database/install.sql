@@ -167,6 +167,7 @@ SET client_encoding = 'UTF8';
 \i 11_migrations/10_avis_modification.sql
 \i 11_migrations/11_popularite_offres.sql
 \i 11_migrations/12_securite_comptes.sql
+\i 11_migrations/13_statistiques.sql
 \i 11_migrations/06_compteurs_espace.sql
 \i 11_migrations/07_lieux_doublons.sql
 

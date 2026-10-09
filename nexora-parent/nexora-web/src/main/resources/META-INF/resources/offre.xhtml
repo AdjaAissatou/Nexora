@@ -2,7 +2,8 @@
                  xmlns="http://www.w3.org/1999/xhtml"
                  xmlns:h="http://xmlns.jcp.org/jsf/html"
                  xmlns:f="http://xmlns.jcp.org/jsf/core"
-                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
 <f:metadata>
     <f:viewParam name="id" value="#{offreDetailBean.id}" />
     <f:viewAction action="#{offreDetailBean.charger}" />
@@ -121,7 +122,7 @@
                             <span class="nx-reaction-icone" aria-hidden="true">🔖</span>
                             <span>Enregistrer · #{offreDetailBean.nombreFavoris}</span>
                         </h:link>
-                        <button type="button" class="nx-reaction" onclick="nexoraPartager(this)">
+                        <button type="button" class="nx-reaction" onclick="nexoraPartager(this)" data-stat="PARTAGE" data-offre="#{offreDetailBean.offre.id}">
                             <span class="nx-reaction-icone" aria-hidden="true">↗</span><span>Partager</span>
                         </button>
                         <span class="nx-reaction-info" title="Fiche ouverte et carte regardée dans Découvrir">👁&#160;<h:outputText value="#{offreDetailBean.offre.vueCount + offreDetailBean.offre.vuesDecouvrir}"><f:convertNumber groupingUsed="true" /></h:outputText> vue(s)</span>
@@ -219,7 +220,8 @@
                                         loading="lazy" title="Carte de localisation" />
                                 </div>
                                 <h:outputLink value="#{format.lienItineraire(offreDetailBean.offre.localisation.latitude, offreDetailBean.offre.localisation.longitude)}"
-                                              target="_blank" styleClass="nx-button nx-button-outline-dark nx-button-block" style="margin-top:12px;">
+                                              target="_blank" styleClass="nx-button nx-button-outline-dark nx-button-block" style="margin-top:12px;"
+                                              a:data-stat="ITINERAIRE" a:data-offre="#{offreDetailBean.offre.id}">
                                     <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;">
                                         <path d="M3 11l18-8-8 18-2-8-8-2z"/>
                                     </svg>
@@ -248,13 +250,13 @@
 
                     <div style="margin-top:22px; display:flex; flex-direction:column; gap:10px;">
                         <ui:fragment rendered="#{!empty offreDetailBean.offre.espaceTelephone}">
-                            <h:outputLink value="#{format.lienTelephone(offreDetailBean.offre.espaceTelephone)}" styleClass="nx-button nx-button-primary nx-button-block">
+                            <h:outputLink value="#{format.lienTelephone(offreDetailBean.offre.espaceTelephone)}" styleClass="nx-button nx-button-primary nx-button-block" a:data-stat="APPEL" a:data-offre="#{offreDetailBean.offre.id}">
                                 <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;">
                                     <path d="M6 3h4l1.5 4.5-2 2a12 12 0 0 0 5.5 5.5l2-2L21 15v4a2 2 0 0 1-2 2C11 21 3 13 3 5a2 2 0 0 1 2-2z"/>
                                 </svg>
                                 #{format.telephoneAffiche(offreDetailBean.offre.espaceTelephone)}
                             </h:outputLink>
-                            <h:outputLink value="#{format.lienWhatsApp(offreDetailBean.offre.espaceTelephone)}" styleClass="nx-button nx-button-outline-dark nx-button-block" target="_blank">
+                            <h:outputLink value="#{format.lienWhatsApp(offreDetailBean.offre.espaceTelephone)}" styleClass="nx-button nx-button-outline-dark nx-button-block" target="_blank" a:data-stat="WHATSAPP" a:data-offre="#{offreDetailBean.offre.id}">
                                 <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;">
                                     <path d="M4 4h16v11H9l-5 4V4z"/>
                                 </svg>
