@@ -18,7 +18,9 @@ public final class DecouverteDtos {
                         String espaceNom, String espaceLogo, boolean espaceVerifie, boolean espaceCertifie,
                         BigDecimal note, Integer nombreAvis, String typeEspace, String commune, String quartier,
                         Double distanceKm, Boolean ouvertMaintenant, String telephone, String accroche, String raison,
-                        List<Caracteristique> caracteristiques, boolean reservation, boolean domicile, long nombreOffres) {}
+                        List<Caracteristique> caracteristiques, boolean reservation, boolean domicile, long nombreOffres,
+                        /** Popularité (§23) : j'aime reçus (affichés sous le cœur) et badge « 🔥 Populaire ». */
+                        long nombreJaime, boolean populaire) {}
 
     public record Caracteristique(String nom, List<String> valeurs) {}
 

@@ -198,6 +198,9 @@ public class OffreController {
             @Parameter(description = "Uniquement les services avec intervention à domicile")
             @RequestParam(required = false) Boolean domicile,
 
+            @Parameter(description = "Uniquement les offres populaires (badge 🔥, §23)")
+            @RequestParam(required = false) Boolean populaire,
+
             @Parameter(description = "Valeurs de caractéristiques exigées (id_valeur : taille, couleur…), non épuisées")
             @RequestParam(required = false) java.util.List<Long> valeurs,
 
@@ -231,6 +234,7 @@ public class OffreController {
         request.setNeuf(neuf);
         request.setNegociable(negociable);
         request.setDomicile(domicile);
+        request.setPopulaire(populaire);
         request.setValeurs(valeurs);
         request.setTri(tri);
         request.setPage(page);

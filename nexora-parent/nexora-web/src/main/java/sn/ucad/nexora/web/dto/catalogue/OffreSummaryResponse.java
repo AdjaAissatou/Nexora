@@ -37,7 +37,12 @@ public record OffreSummaryResponse(
         /** Quantité vendue (commandes non annulées). */
         long nombreVentes,
         /** Consultations de la fiche. */
-        Long vueCount) {
+        Long vueCount,
+        /** Popularité (§23) : vues dans Découvrir, j'aime (Découvrir), favoris, badge « 🔥 Populaire ». */
+        long vuesDecouvrir,
+        int nombreJaime,
+        int nombreFavoris,
+        boolean populaire) {
 
     public boolean suspendue() {
         return "SUSPENDU".equals(statut);

@@ -41,7 +41,9 @@ public record EspaceResponse(
         List<String> photos,
         // Modération (§9.9) : renseignés pour le propriétaire quand l'espace est suspendu
         String motifModeration,
-        java.time.LocalDateTime dateModeration) {
+        java.time.LocalDateTime dateModeration,
+        /** J'aime sur la fiche de l'espace dans Découvrir (§23). */
+        Integer nombreJaime) {
 
     public boolean suspendu() {
         return "SUSPENDU".equals(statut);

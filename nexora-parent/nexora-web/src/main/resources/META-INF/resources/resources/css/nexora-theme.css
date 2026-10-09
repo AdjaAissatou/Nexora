@@ -1983,3 +1983,22 @@ select.nx-liste-ouverte option { padding: 6px 10px; border-radius: 8px; }
 .nx-avis-reponse-actions .nx-button { padding: 8px 16px; font-size: 14px; }
 @media (max-width: 560px) { .nx-avis-synthese { grid-template-columns: 1fr; } }
 .nx-avis-repondre textarea { min-height: 64px; }
+
+/* ---------- Popularité des offres (§23) ---------- */
+.nx-offre-media { position: relative; }
+.nx-offre-populaire {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    padding: 4px 10px; border-radius: var(--nx-radius-pill);
+    background: var(--nx-grad-warm); color: #fff; font-size: 12px; font-weight: 700;
+    box-shadow: 0 4px 12px rgba(201, 111, 74, .35);
+}
+.nx-offre-compteur { font-size: 12px; color: var(--nx-text-secondary); white-space: nowrap; }
+.nx-offre-popularite { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin-top: 10px; font-size: 14px; color: var(--nx-text-secondary); }
+.nx-offre-populaire-badge {
+    padding: 4px 12px; border-radius: var(--nx-radius-pill); background: var(--nx-grad-warm);
+    color: #fff; font-weight: 700; font-size: 13px;
+}
+.nx-apercu-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.nx-apercu-emoji { font-size: 20px; line-height: 1; }
+.nx-apercu-populaires { margin: 14px 0 0; padding: 10px 14px; border-radius: var(--nx-radius-sm); background: #FDEEE6; color: var(--nx-terracotta-dark); font-size: 14px; }
+.nx-offre-stats { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; color: var(--nx-text-secondary); margin-top: 4px; }

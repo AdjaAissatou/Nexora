@@ -311,7 +311,9 @@
             r.appendChild(b);
             return b;
         }
-        bouton('❤️', "J'aime", 'nx-dc-aime', function () { aimer(section); });
+        // Nombre de j'aime sous le cœur (§23), comme le libellé quand personne n'aime encore
+        var aime = bouton('❤️', libelleJaime(c.nombreJaime), 'nx-dc-aime', function () { aimer(section); });
+        aime.setAttribute('aria-label', "J'aime");
         bouton('🔖', 'Enregistrer', 'nx-dc-garde', function () { enregistrer(section); });
         bouton('↗️', 'Partager', null, function () { partager(c); });
         if (c.telephone && c.type !== 'ESPACE') {
@@ -355,11 +357,21 @@
         } catch (e) { /* un signal perdu n'empêche pas de découvrir */ }
     }
 
+    /** « J'aime », ou le nombre de j'aime en abrégé : 7, 1,2 k, 3 M. */
+    function libelleJaime(n) {
+        if (!n) return "J'aime";
+        if (n < 1000) return String(n);
+        if (n < 1000000) return (n / 1000).toFixed(n < 10000 ? 1 : 0).replace('.', ',').replace(',0', '') + ' k';
+        return (n / 1000000).toFixed(1).replace('.', ',').replace(',0', '') + ' M';
+    }
+
     function aimer(section, forcer) {
         var c = section._carte, b = section.querySelector('.nx-dc-aime');
         var aime = !b.classList.contains('actif');
         if (forcer && !aime) return;
         b.classList.toggle('actif', aime);
+        c.nombreJaime = Math.max(0, (c.nombreJaime || 0) + (aime ? 1 : -1));
+        b.lastChild.textContent = libelleJaime(c.nombreJaime);
         if (aime) signal(c, 'J_AIME');
         else fetch(API + '/jaime?' + (c.type === 'ESPACE' ? 'idEspace=' + c.idEspace : 'idOffre=' + c.idOffre), { method: 'DELETE', credentials: 'same-origin' });
     }

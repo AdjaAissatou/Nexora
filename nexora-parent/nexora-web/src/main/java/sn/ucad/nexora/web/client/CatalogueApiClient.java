@@ -69,6 +69,7 @@ public class CatalogueApiClient {
                 .queryParamIfPresent("neuf", java.util.Optional.ofNullable(c.neuf()))
                 .queryParamIfPresent("negociable", java.util.Optional.ofNullable(c.negociable()))
                 .queryParamIfPresent("domicile", java.util.Optional.ofNullable(c.domicile()))
+                .queryParamIfPresent("populaire", java.util.Optional.ofNullable(c.populaire()))
                 .queryParam("valeurs", c.valeurs() == null ? new Object[0] : c.valeurs().toArray())
                 .queryParam("tri", c.tri() == null ? "PERTINENCE" : c.tri())
                 .queryParam("page", c.page())

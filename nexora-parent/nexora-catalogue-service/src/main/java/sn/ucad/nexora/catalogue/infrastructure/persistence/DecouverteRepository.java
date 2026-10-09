@@ -32,13 +32,14 @@ public class DecouverteRepository {
                            BigDecimal note, Integer nombreAvis, String typeEspace, String telephone,
                            String commune, String quartier, Double distanceKm, LocalDateTime publication,
                            long vues, long favoris, long ventes, int nombreImages, Boolean ouvertMaintenant,
-                           boolean produit, boolean service, boolean reservation, boolean domicile) {}
+                           boolean produit, boolean service, boolean reservation, boolean domicile,
+                           long vuesDecouvrir, long jaime, boolean populaire) {}
 
     /** Un espace actif de la zone ayant des offres visibles. */
     public record EspaceCandidat(Long idEspace, String nom, String logo, String couverture, String slogan, boolean verifie,
                                  boolean certifie, BigDecimal note, Integer nombreAvis, String typeEspace, String telephone,
                                  String commune, String quartier, Double distanceKm, Boolean ouvertMaintenant,
-                                 long nombreOffres, Long idRacine, String rayon) {}
+                                 long nombreOffres, Long idRacine, String rayon, long jaime) {}
 
     /** Poids du profil par dimension : racine, catégorie parente, catégorie, espace. */
     public record ProfilBrut(Map<Long, Double> racines, Map<Long, Double> parents, Map<Long, Double> categories,
@@ -90,14 +91,15 @@ public class DecouverteRepository {
                        ep.id_espace, ep.nom, ep.logo, ep.verifie, ep.certifie, ep.note_moyenne, ep.nombre_avis, te.nom, ep.telephone,
                        a.commune, a.quartier, %s,
                        o.date_publication, COALESCE(o.vue_count, 0),
-                       (SELECT COUNT(*) FROM favori f WHERE f.id_offre = o.id_offre),
+                       o.nombre_favoris,
                        (SELECT COALESCE(SUM(lc.quantite), 0) FROM ligne_commande lc
                         JOIN sous_commande sc ON sc.id_sous_commande = lc.id_sous_commande
                         WHERE lc.id_offre = o.id_offre AND CAST(sc.statut AS TEXT) NOT IN ('ANNULEE', 'REMBOURSEE')),
                        (SELECT COUNT(*) FROM image i WHERE i.id_offre = o.id_offre),
                        %s,
                        EXISTS (SELECT 1 FROM produit pr WHERE pr.id_offre = o.id_offre),
-                       sv.id_service IS NOT NULL, COALESCE(sv.reservation, FALSE), COALESCE(sv.intervention_domicile, FALSE)
+                       sv.id_service IS NOT NULL, COALESCE(sv.reservation, FALSE), COALESCE(sv.intervention_domicile, FALSE),
+                       o.vues_decouvrir, o.nombre_jaime, %s
                 FROM offre o
                 JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
                 JOIN categorie c ON c.id_categorie = o.id_categorie
@@ -108,7 +110,7 @@ public class DecouverteRepository {
                 LEFT JOIN service sv ON sv.id_offre = o.id_offre
                 WHERE CAST(o.statut AS TEXT) = 'PUBLIE' AND o.disponible = TRUE
                   AND ep.ouvert = TRUE AND CAST(ep.statut AS TEXT) = 'ACTIF'
-                """.formatted(point ? DISTANCE : "CAST(NULL AS DOUBLE PRECISION)", OUVERT));
+                """.formatted(point ? DISTANCE : "CAST(NULL AS DOUBLE PRECISION)", OUVERT, OffreRepositoryAdapter.POPULAIRE));
         Map<String, Object> parametres = new HashMap<>();
         filtrer(sql, parametres, zone, lat, lng, rayonKm);
         if (limiterA != null) {
@@ -129,7 +131,7 @@ public class DecouverteRepository {
                     (String) l[19], (String) l[20], l[21] == null ? null : ((Number) l[21]).doubleValue(),
                     date(l[22]),
                     lg0(l[23]), lg0(l[24]), lg0(l[25]), (int) lg0(l[26]), l[27] == null ? null : vrai(l[27]),
-                    vrai(l[28]), vrai(l[29]), vrai(l[30]), vrai(l[31])));
+                    vrai(l[28]), vrai(l[29]), vrai(l[30]), vrai(l[31]), lg0(l[32]), lg0(l[33]), vrai(l[34])));
         }
         return candidats;
     }
@@ -149,7 +151,8 @@ public class DecouverteRepository {
                 SELECT ep.id_espace, ep.nom, ep.logo, ep.couverture, ep.slogan, ep.verifie, ep.certifie, ep.note_moyenne,
                        ep.nombre_avis, te.nom, ep.telephone, a.commune, a.quartier, %s, %s,
                        (SELECT SUM(n) FROM offres x WHERE x.id_espace = ep.id_espace),
-                       (SELECT x.racine FROM offres x WHERE x.id_espace = ep.id_espace ORDER BY x.n DESC LIMIT 1)
+                       (SELECT x.racine FROM offres x WHERE x.id_espace = ep.id_espace ORDER BY x.n DESC LIMIT 1),
+                       ep.nombre_jaime
                 FROM espace_professionnel ep
                 JOIN type_espace te ON te.id_type_espace = ep.id_type_espace
                 LEFT JOIN adresse a ON a.id_espace = ep.id_espace AND a.principale = TRUE
@@ -167,7 +170,7 @@ public class DecouverteRepository {
             espaces.add(new EspaceCandidat(lg(l[0]), (String) l[1], (String) l[2], (String) l[3], (String) l[4], vrai(l[5]),
                     vrai(l[6]), (BigDecimal) l[7], l[8] == null ? null : ((Number) l[8]).intValue(), (String) l[9],
                     (String) l[10], (String) l[11], (String) l[12], l[13] == null ? null : ((Number) l[13]).doubleValue(),
-                    l[14] == null ? null : vrai(l[14]), lg0(l[15]), lg(l[16]), nomsRacines.get(lg(l[16]))));
+                    l[14] == null ? null : vrai(l[14]), lg0(l[15]), lg(l[16]), nomsRacines.get(lg(l[16])), lg0(l[17])));
         }
         return espaces;
     }

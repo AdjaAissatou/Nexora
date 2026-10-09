@@ -28,6 +28,9 @@ public class EspaceProfessionnel {
     /** Compteurs à 0 dès la création : « NULL + 1 » resterait NULL, le compteur ne bougerait jamais. */
     private Long nombreVues = 0L;
     private Long nombreFavoris = 0L;
+    /** J'aime dans Découvrir (§23), lecture seule. */
+    private Integer nombreJaime = 0;
+    public Integer getNombreJaime(){return nombreJaime;} public void setNombreJaime(Integer v){nombreJaime=v;}
     private LocalDateTime dateCreation;
     private LocalDateTime dateCertification;
     private LocalDateTime dateVerification;

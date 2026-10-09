@@ -46,7 +46,12 @@ public record OffreDetailResponse(
         Produit produit,
         Service service,
         List<String> tags,
-        List<Caracteristique> caracteristiques) {
+        List<Caracteristique> caracteristiques,
+        /** Popularité (§23) : vues dans Découvrir, j'aime (Découvrir), favoris, badge « 🔥 Populaire ». */
+        long vuesDecouvrir,
+        int nombreJaime,
+        int nombreFavoris,
+        boolean populaire) {
 
     public boolean enPromotion() {
         return promotion != null;

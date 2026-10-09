@@ -297,9 +297,26 @@ public class MonEspaceBean implements Serializable {
     public long getTotalVues() {
         long vues = espace == null || espace.nombreVues() == null ? 0 : espace.nombreVues();
         if (mesOffres != null) {
-            for (OffreSummaryResponse o : mesOffres) vues += o.vueCount() == null ? 0 : o.vueCount();
+            for (OffreSummaryResponse o : mesOffres) vues += (o.vueCount() == null ? 0 : o.vueCount()) + o.vuesDecouvrir();
         }
         return vues;
+    }
+
+    /** Vues des cartes de mes offres dans Découvrir (§23), comprises dans {@link #getTotalVues()}. */
+    public long getTotalVuesDecouvrir() {
+        return mesOffres == null ? 0 : mesOffres.stream().mapToLong(OffreSummaryResponse::vuesDecouvrir).sum();
+    }
+
+    /** J'aime reçus dans Découvrir : sur mes offres et sur la fiche de l'espace (§23). */
+    public long getTotalJaime() {
+        long jaime = espace == null || espace.nombreJaime() == null ? 0 : espace.nombreJaime();
+        if (mesOffres != null) jaime += mesOffres.stream().mapToLong(OffreSummaryResponse::nombreJaime).sum();
+        return jaime;
+    }
+
+    /** Mes offres portant le badge « 🔥 Populaire ». */
+    public long getNombrePopulaires() {
+        return mesOffres == null ? 0 : mesOffres.stream().filter(OffreSummaryResponse::populaire).count();
     }
 
     public List<OffreSummaryResponse> getMesOffres() {

@@ -112,7 +112,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Réservations reçues | — | 🚧 |
 | Commandes reçues | — | 🚧 |
 | Avis reçus + réponse | `/mon-espace` onglet « Avis reçus » (`#avis`) | ✅ synthèse des notes, filtres, réponse publique modifiable (§22) |
-| Statistiques détaillées (au-delà de la Vue d'ensemble) | — | 🚧 |
+| Statistiques détaillées (au-delà de la Vue d'ensemble) | — | 🚧 (vues, vues Découvrir, j'aime et favoris par offre déjà visibles, §23) |
 | Vérification de mon espace (dossier, justificatifs, suivi) | `/mon-espace` (onglet « Vérification ») | ✅ (§8.11) |
 | Certification 🏅 | — | — (après la vérification, critères à définir, §8.3) |
 | Ma fiche publique | `/espace?id=` (lien depuis Mon espace) | ✅ |
@@ -1600,4 +1600,39 @@ Mode restent sans réponse pour essayer l'onglet.
 
 **Correctif** : sur téléphone, Mon espace passe en une colonne (le menu au-dessus du contenu) au lieu
 d'écraser le contenu à côté du menu.
+
+## 23. ✅ Popularité des offres : vues, j'aime et favoris comptés, badge « 🔥 Populaire »
+
+**Ce qui est compté** (par la base, `11_migrations/11_popularite_offres.sql`, quel que soit le service qui agit) :
+
+| Compteur | Source | Règle |
+|---|---|---|
+| `offre.vue_count` | fiche de l'offre ouverte | existait déjà |
+| `offre.vues_decouvrir` | carte regardée ≥ 1 s dans Découvrir (`VUE`, `VUE_LONGUE`) | compteur : ne redescend pas si un visiteur efface ses goûts |
+| `offre.nombre_jaime` | « J'aime » dans Découvrir | visiteurs distincts ; retiré quand on n'aime plus ; un même visiteur connecté sur deux appareils compte une fois |
+| `offre.nombre_favoris` | cœur de la fiche ou « Enregistrer » dans Découvrir | nombre de comptes |
+| `espace_professionnel.nombre_jaime` | « J'aime » sur la fiche d'un espace dans Découvrir | lecture seule côté espace-service |
+
+`offre.score_popularite` (colonne calculée) = vues + ½ vue Découvrir + 3 j'aime + 5 favoris.
+
+**Propriété de démarquage — badge « 🔥 Populaire »** : une offre publiée parmi les **20 % au meilleur
+score**, avec **au moins deux j'aime ou favoris**. Le seuil est relatif : il suit la vie de la plateforme
+(pas de chiffre magique à revoir quand Nexora grandit). Le badge et les compteurs servent :
+- sur les cartes d'offres (badge en haut à droite, « ♥ n » et « 🔖 n ») et sur la fiche (« 🔥 Populaire ·
+  ♥ j'aime · 🔖 favoris · 👁 vues ») ;
+- dans la recherche : tri « Populaires » (score + 10 × ventes), filtre « 🔥 Populaires » (`?populaire=true`) ;
+- sur Explorer : section « 🔥 Populaires sur Nexora » ;
+- dans Découvrir : le nombre de j'aime sous le cœur (mis à jour au clic), l'accroche « 🔥 Populaire à … »,
+  et la popularité dans le classement des tendances.
+
+**Pour le professionnel** (Mon espace) : vue d'ensemble « vues (dont n dans Découvrir) » et « j'aime dans
+Découvrir » (offres + fiche de l'espace), message quand des offres portent le badge ; sur chaque offre,
+badge et « 👁 vues · ♥ j'aime · 🔖 favoris » (au survol : fiche / Découvrir).
+
+**API** : `OffreSummaryResponse` et `OffreDetailResponse` portent `vuesDecouvrir`, `nombreJaime`,
+`nombreFavoris`, `populaire` ; `GET /api/v1/offres/recherche?populaire=true` ; la carte Découvrir porte
+`nombreJaime` et `populaire` ; `EspaceResponse.nombreJaime`.
+
+**Démonstration** : `09_seed/34_demo_popularite.sql`, vues et j'aime de visiteurs fictifs (`demo-…`),
+uniquement sur les offres des comptes `@nexora-demo.sn` ; rejouable.
 

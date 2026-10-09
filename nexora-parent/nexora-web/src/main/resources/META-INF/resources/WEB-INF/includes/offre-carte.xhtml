@@ -10,6 +10,9 @@
         <ui:fragment rendered="#{not empty ressemblance}">
             <span class="nx-ressemblance #{ressemblance ge 0.6 ? 'forte' : ''}" title="Ressemblance avec la photo">#{format.ressemblance(ressemblance)}</span>
         </ui:fragment>
+        <ui:fragment rendered="#{o.populaire}">
+            <span class="nx-offre-populaire" title="Parmi les offres les plus aimées, enregistrées et vues">🔥 Populaire</span>
+        </ui:fragment>
         <ui:fragment rendered="#{!empty o.imagePrincipale}">
             <img src="#{o.imagePrincipale}" alt="#{o.titre}" loading="lazy" />
         </ui:fragment>
@@ -53,6 +56,8 @@
             <ui:fragment rendered="#{o.espaceOuvertMaintenant eq false}"><span class="nx-ouverture">Fermé</span></ui:fragment>
             <ui:fragment rendered="#{o.enPromotion}"><span class="nx-badge nx-badge-promo">Promo</span></ui:fragment>
             <ui:fragment rendered="#{o.nombreVentes gt 0}"><span class="nx-ventes">#{o.nombreVentes} vendu(s)</span></ui:fragment>
+            <ui:fragment rendered="#{o.nombreJaime gt 0}"><span class="nx-offre-compteur" title="J'aime dans Découvrir">♥ #{o.nombreJaime}</span></ui:fragment>
+            <ui:fragment rendered="#{o.nombreFavoris gt 0}"><span class="nx-offre-compteur" title="Enregistré en favori">🔖 #{o.nombreFavoris}</span></ui:fragment>
         </span>
     </div>
 </h:link>

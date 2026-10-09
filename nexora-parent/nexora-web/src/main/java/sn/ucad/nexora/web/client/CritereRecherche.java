@@ -33,7 +33,9 @@ public record CritereRecherche(
         Boolean neuf,
         Boolean negociable,
         Boolean domicile,
-        java.util.List<Long> valeurs) {
+        java.util.List<Long> valeurs,
+        /** Uniquement les offres « 🔥 Populaire » (§23). */
+        Boolean populaire) {
 
     public CritereRecherche(String q, String categorie, Long idCategorie, String typeEspace, String commune,
                             String region, Long idEspace, BigDecimal prixMin, BigDecimal prixMax,
@@ -42,7 +44,7 @@ public record CritereRecherche(
                             BigDecimal lat, BigDecimal lng, Double rayonKm) {
         this(q, categorie, idCategorie, typeEspace, commune, region, idEspace, prixMin, prixMax, estProduit,
                 avecPromotion, espaceVerifie, ouvertMaintenant, tri, page, taille, lat, lng, rayonKm,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
     }
 
     public CritereRecherche(String q, String categorie, Long idCategorie, String typeEspace, String commune,
@@ -51,7 +53,7 @@ public record CritereRecherche(
                             Boolean ouvertMaintenant, String tri, int page, int taille) {
         this(q, categorie, idCategorie, typeEspace, commune, region, idEspace, prixMin, prixMax, estProduit,
                 avecPromotion, espaceVerifie, ouvertMaintenant, tri, page, taille, null, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
     }
 
     public static CritereRecherche vide() {

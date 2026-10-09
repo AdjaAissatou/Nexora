@@ -45,6 +45,8 @@ public class ExplorerBean implements Serializable {
     private List<OffreSummaryResponse> nouveautes = List.of();
     private List<OffreSummaryResponse> promotions = List.of();
     private List<OffreSummaryResponse> ouverts = List.of();
+    /** Offres « 🔥 Populaire » (§23), les plus populaires d'abord. */
+    private List<OffreSummaryResponse> populaires = List.of();
 
     @PostConstruct
     public void charger() {
@@ -56,6 +58,16 @@ public class ExplorerBean implements Serializable {
         nouveautes = offres("DATE_DESC", null, null);
         promotions = offres("PERTINENCE", Boolean.TRUE, null);
         ouverts = offres("NOTE", null, Boolean.TRUE);
+        try {
+            populaires = catalogueApiClient.rechercher(new CritereRecherche(null, null, null, null, null, null, null, null, null,
+                    null, null, null, null, "POPULARITE", 0, VITRINE, null, null, null, null, null, null, null, null, Boolean.TRUE)).contenu();
+        } catch (ApiException e) {
+            populaires = List.of();
+        }
+    }
+
+    public List<OffreSummaryResponse> getPopulaires() {
+        return populaires;
     }
 
     private List<OffreSummaryResponse> offres(String tri, Boolean avecPromotion, Boolean ouvert) {

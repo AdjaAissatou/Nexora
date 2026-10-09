@@ -47,6 +47,7 @@
                 <a href="#quartiers" class="nx-pastille">Quartiers</a>
                 <a href="#lieux" class="nx-pastille">Autour des lieux</a>
                 <a href="#carte" class="nx-pastille">Carte</a>
+                <ui:fragment rendered="#{!empty explorerBean.populaires}"><a href="#populaires" class="nx-pastille">🔥 Populaires</a></ui:fragment>
                 <a href="#nouveautes" class="nx-pastille">Nouveautés</a>
                 <ui:fragment rendered="#{!empty explorerBean.promotions}"><a href="#promotions" class="nx-pastille">Promotions</a></ui:fragment>
                 <ui:fragment rendered="#{!empty explorerBean.ouverts}"><a href="#ouverts" class="nx-pastille">Ouvert maintenant</a></ui:fragment>
@@ -139,6 +140,23 @@
                 });
             </script>
         </section>
+
+        <ui:fragment rendered="#{!empty explorerBean.populaires}">
+            <section id="populaires" class="nx-explorer-section">
+                <div class="nx-explorer-titre">
+                    <h2>🔥 Populaires sur Nexora</h2>
+                    <h:link outcome="/recherche" value="Tout voir →" styleClass="nx-see-all">
+                        <f:param name="populaire" value="true" />
+                    </h:link>
+                </div>
+                <p class="nx-explorer-intro">Les plus aimées, enregistrées et vues, notamment dans Découvrir.</p>
+                <div class="nx-offre-grid">
+                    <ui:repeat var="o" value="#{explorerBean.populaires}">
+                        <ui:include src="/WEB-INF/includes/offre-carte.xhtml"><ui:param name="o" value="#{o}" /></ui:include>
+                    </ui:repeat>
+                </div>
+            </section>
+        </ui:fragment>
 
         <section id="nouveautes" class="nx-explorer-section">
             <div class="nx-explorer-titre">

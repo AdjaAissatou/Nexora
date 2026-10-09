@@ -32,6 +32,15 @@ public class OffreRepositoryAdapter implements OffreRepository {
         this.em = em;
     }
 
+    /**
+     * Badge « 🔥 Populaire » (§23) : parmi les 20 % d'offres publiées au meilleur score de popularité
+     * (vues, vues Découvrir, j'aime, favoris), avec au moins deux j'aime ou favoris. Le seuil est relatif :
+     * il suit la vie de la plateforme. Sous-requête non corrélée : calculée une fois par requête.
+     */
+    public static final String POPULAIRE = "(o.nombre_jaime + o.nombre_favoris >= 2 AND o.score_popularite >= "
+            + "(SELECT percentile_disc(0.8) WITHIN GROUP (ORDER BY op.score_popularite) FROM offre op "
+            + "WHERE CAST(op.statut AS TEXT) = 'PUBLIE' AND op.score_popularite > 0))";
+
     // ===================== findById =====================
 
     @Override
@@ -68,7 +77,9 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 pr.quantite_stock, pr.poids, pr.garantie, pr.neuf,
 
                 sv.duree_estimee, sv.intervention_domicile, sv.intervention_distance,
-                sv.delai_reponse, sv.reservation, sv.urgence
+                sv.delai_reponse, sv.reservation, sv.urgence,
+
+                o.vues_decouvrir, o.nombre_jaime, o.nombre_favoris, %POP
 
             FROM offre o
             JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
@@ -91,7 +102,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
             LIMIT 1
             """;
 
-        Query q = em.createNativeQuery(sql);
+        Query q = em.createNativeQuery(sql.replace("%POP", POPULAIRE));
         q.setParameter("id", id);
 
         @SuppressWarnings("unchecked")
@@ -100,6 +111,11 @@ public class OffreRepositoryAdapter implements OffreRepository {
 
         Object[] row = rows.get(0);
         Offre offre = mapRowToOffre(row);
+        // Popularité (§23) : colonnes 63..66
+        offre.setVuesDecouvrir(toLong(row[63]) == null ? 0 : toLong(row[63]));
+        offre.setNombreJaime(toInt(row[64]) == null ? 0 : toInt(row[64]));
+        offre.setNombreFavoris(toInt(row[65]) == null ? 0 : toInt(row[65]));
+        offre.setPopulaire(toBool(row[66]));
 
         // Charger les images
         offre.setImages(loadImages(id));
@@ -268,7 +284,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
                 (SELECT COALESCE(SUM(lc.quantite), 0) FROM ligne_commande lc
                  JOIN sous_commande sc ON sc.id_sous_commande = lc.id_sous_commande
                  WHERE lc.id_offre = o.id_offre AND CAST(sc.statut AS TEXT) NOT IN ('ANNULEE', 'REMBOURSEE')) AS ventes,
-                (SELECT COUNT(*) FROM favori f WHERE f.id_offre = o.id_offre) AS favoris
+                o.nombre_favoris AS favoris,
+                -- Popularité (§23) : colonnes 70..74
+                o.vues_decouvrir, o.nombre_jaime, o.nombre_favoris AS nombre_favoris_offre, %POP AS populaire,
+                o.score_popularite
 
             FROM offre o
             JOIN espace_professionnel ep ON ep.id_espace = o.id_espace
@@ -288,6 +307,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
             ) p ON (p.id_offre = o.id_offre OR p.id_espace = ep.id_espace)
             LEFT JOIN image img ON img.id_offre = o.id_offre AND img.principale = TRUE
             """);
+        marqueur(sql, "%POP", POPULAIRE);
         String distance = params.isAutourDunPoint() ? DISTANCE_KM : "CAST(NULL AS DOUBLE PRECISION)";
         int marque = sql.indexOf("%s AS distance_km");
         sql.replace(marque, marque + 2, distance);
@@ -393,6 +413,10 @@ public class OffreRepositoryAdapter implements OffreRepository {
             sql.append(" AND o.negociable = TRUE ");
         }
 
+        if (Boolean.TRUE.equals(params.getPopulaire())) {
+            sql.append(" AND ").append(POPULAIRE).append(" ");
+        }
+
         if (Boolean.TRUE.equals(params.getDomicile())) {
             sql.append(" AND EXISTS (SELECT 1 FROM service sd WHERE sd.id_offre = o.id_offre AND sd.intervention_domicile = TRUE) ");
         }
@@ -475,7 +499,7 @@ public class OffreRepositoryAdapter implements OffreRepository {
             case "PRIX_DESC"  -> " ORDER BY prix DESC NULLS LAST ";
             case "DATE_DESC"  -> " ORDER BY date_publication DESC NULLS LAST ";
             case "NOTE"       -> " ORDER BY espace_note DESC NULLS LAST ";
-            case "POPULARITE" -> " ORDER BY ventes DESC, favoris DESC, vue_count DESC NULLS LAST, espace_note DESC NULLS LAST ";
+            case "POPULARITE" -> " ORDER BY (score_popularite + 10 * ventes) DESC, espace_note DESC NULLS LAST, id_offre ";
             case "REMISE"     -> " ORDER BY CASE WHEN ancien_prix > prix THEN (ancien_prix - prix) / ancien_prix ELSE 0 END DESC, prix ASC ";
             case "DISTANCE"   -> " ORDER BY distance_km ASC NULLS LAST, pertinence_texte DESC, score_pertinence DESC ";
             default           -> " ORDER BY pertinence_texte DESC, score_pertinence DESC, vue_count DESC ";
@@ -585,7 +609,20 @@ public class OffreRepositoryAdapter implements OffreRepository {
         if (r.length > 68 && r[68] != null) {
             o.setNombreVentes(((Number) r[68]).longValue());
         }
+        // Popularité (§23) : vues Découvrir (70), j'aime (71), favoris (72), populaire (73)
+        if (r.length > 73) {
+            o.setVuesDecouvrir(r[70] == null ? 0 : ((Number) r[70]).longValue());
+            o.setNombreJaime(r[71] == null ? 0 : ((Number) r[71]).intValue());
+            o.setNombreFavoris(r[72] == null ? 0 : ((Number) r[72]).intValue());
+            o.setPopulaire(toBool(r[73]));
+        }
         return o;
+    }
+
+    /** Remplace la première occurrence de {@code marque} dans la requête. */
+    private static void marqueur(StringBuilder sql, String marque, String valeur) {
+        int i = sql.indexOf(marque);
+        if (i >= 0) sql.replace(i, i + marque.length(), valeur);
     }
 
     private List<String> loadImages(Long offreId) {

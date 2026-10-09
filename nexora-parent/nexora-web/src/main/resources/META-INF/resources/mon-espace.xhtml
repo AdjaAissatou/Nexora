@@ -137,7 +137,12 @@
                             <div class="nx-apercu-stat">
                                 <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
                                 <span class="nx-apercu-valeur"><h:outputText value="#{monEspaceBean.totalVues}"><f:convertNumber groupingUsed="true" /></h:outputText></span>
-                                <span class="nx-apercu-label">vues (espace et offres)</span>
+                                <span class="nx-apercu-label" title="Fiches de l'espace et des offres, et cartes regardées dans Découvrir">vues (dont #{monEspaceBean.totalVuesDecouvrir} dans Découvrir)</span>
+                            </div>
+                            <div class="nx-apercu-stat">
+                                <span class="nx-apercu-emoji" aria-hidden="true">❤️</span>
+                                <span class="nx-apercu-valeur"><h:outputText value="#{monEspaceBean.totalJaime}"><f:convertNumber groupingUsed="true" /></h:outputText></span>
+                                <span class="nx-apercu-label">j'aime dans Découvrir</span>
                             </div>
                             <div class="nx-apercu-stat">
                                 <svg class="nx-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
@@ -155,6 +160,10 @@
                                 <span class="nx-apercu-label">#{monEspaceBean.espace.nombreAvis} avis</span>
                             </div>
                         </div>
+                        <ui:fragment rendered="#{monEspaceBean.nombrePopulaires gt 0}">
+                            <p class="nx-apercu-populaires">🔥 #{monEspaceBean.nombrePopulaires} de vos offres #{monEspaceBean.nombrePopulaires gt 1 ? 'portent' : 'porte'} le badge « Populaire » :
+                                elles font partie des plus aimées, enregistrées et vues de Nexora, et remontent dans le tri « Populaires ».</p>
+                        </ui:fragment>
                         <ui:fragment rendered="#{not empty verificationEspaceBean.codeEtat}">
                             <p style="margin:14px 0 0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                 Vérification :
@@ -188,6 +197,9 @@
                                                     <path d="M3 3h8l10 10-8 8L3 11V3z"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
                                                 </svg>
                                             </ui:fragment>
+                                            <ui:fragment rendered="#{o.populaire}">
+                                                <span class="nx-offre-populaire">🔥 Populaire</span>
+                                            </ui:fragment>
                                             <ui:fragment rendered="#{o.suspendue()}">
                                                 <span class="nx-badge nx-badge-alerte nx-offre-media-badge">Suspendue</span>
                                             </ui:fragment>
@@ -209,6 +221,12 @@
                                             <span class="nx-offre-souscategorie">
                                                 #{o.categorie}
                                                 <ui:fragment rendered="#{o.negociable}"> • Négociable</ui:fragment>
+                                            </span>
+                                            <!-- Popularité de l'offre (§23) -->
+                                            <span class="nx-offre-stats">
+                                                <span title="Fiche ouverte : #{o.vueCount == null ? 0 : o.vueCount} · carte regardée dans Découvrir : #{o.vuesDecouvrir}">👁 #{(o.vueCount == null ? 0 : o.vueCount) + o.vuesDecouvrir}</span>
+                                                <span title="J'aime dans Découvrir">♥ #{o.nombreJaime}</span>
+                                                <span title="Favoris (cœur de la fiche ou « Enregistrer » dans Découvrir)">🔖 #{o.nombreFavoris}</span>
                                             </span>
                                             <div class="nx-offre-card-actions">
                                                 <h:link outcome="/creer-offre" value="Modifier" styleClass="nx-button nx-button-outline">

@@ -111,6 +111,16 @@
                         </ui:fragment>
                     </div>
 
+                    <!-- Popularité (docs/architecture-acteurs.md §23) -->
+                    <div class="nx-offre-popularite">
+                        <ui:fragment rendered="#{offreDetailBean.offre.populaire}">
+                            <span class="nx-offre-populaire-badge" title="Parmi les offres les plus aimées, enregistrées et vues de Nexora">🔥 Populaire</span>
+                        </ui:fragment>
+                        <span title="J'aime dans Nexora Découvrir">♥ #{offreDetailBean.offre.nombreJaime} j'aime</span>
+                        <span title="Enregistrée en favori">🔖 #{offreDetailBean.offre.nombreFavoris} favori(s)</span>
+                        <span title="Fiche ouverte et carte regardée dans Découvrir">👁&#160;<h:outputText value="#{offreDetailBean.offre.vueCount + offreDetailBean.offre.vuesDecouvrir}"><f:convertNumber groupingUsed="true" /></h:outputText> vue(s)</span>
+                    </div>
+
                     <p style="margin-top:16px; color:var(--nx-text-secondary); line-height:1.7; white-space:pre-line;">
                         #{offreDetailBean.offre.description}
                     </p>

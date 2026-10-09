@@ -163,7 +163,8 @@ public class DecouverteService {
     }
 
     private static double popularite(Candidat c) {
-        return c.vues() + 5.0 * c.favoris() + 10.0 * c.ventes();
+        // Même pondération que offre.score_popularite (§23), plus les ventes
+        return c.vues() + 0.5 * c.vuesDecouvrir() + 3.0 * c.jaime() + 5.0 * c.favoris() + 10.0 * c.ventes();
     }
 
     private static double nouveaute(LocalDateTime publication) {
@@ -243,7 +244,7 @@ public class DecouverteService {
                 medias, c.categorie(), c.rayon(), c.espaceNom(), c.espaceLogo(), c.verifie(), c.certifie(), c.note(),
                 c.nombreAvis(), c.typeEspace(), c.commune(), c.quartier(), c.distanceKm(), c.ouvertMaintenant(),
                 c.telephone(), accroche(c), raison(n, profilConnu, depuisRecherche), caracteristiques,
-                c.reservation() || restaurant(c.typeEspace()), c.domicile(), 0);
+                c.reservation() || restaurant(c.typeEspace()), c.domicile(), 0, c.jaime(), c.populaire());
     }
 
     private static boolean restaurant(String typeEspace) {
@@ -268,7 +269,8 @@ public class DecouverteService {
         String texte = (c.titre() + " " + c.categorie()).toLowerCase(Locale.ROOT);
         if (texte.contains("mariage")) return "💍 Mariage";
         if ("Événementiel".equals(c.rayon())) return "🎉 Événement";
-        if (c.favoris() + c.ventes() > 0 || c.vues() > 50) return "🔥 Ça bouge à " + lieu;
+        if (c.populaire()) return "🔥 Populaire à " + lieu;
+        if (c.favoris() + c.jaime() + c.ventes() > 0 || c.vues() > 50) return "🔥 Ça bouge à " + lieu;
         return "📍 " + lieu;
     }
 
@@ -310,7 +312,7 @@ public class DecouverteService {
         return new Carte("ESPACE", "PERTINENT", null, e.idEspace(), e.nom(), e.slogan(), null, null, medias, e.typeEspace(), e.rayon(),
                 e.nom(), e.logo(), e.verifie(), e.certifie(), e.note(), e.nombreAvis(), e.typeEspace(), e.commune(), e.quartier(),
                 e.distanceKm(), e.ouvertMaintenant(), e.telephone(), "🏪 À découvrir" + (lieu != null ? " à " + lieu : ""), raison,
-                List.of(), false, false, e.nombreOffres());
+                List.of(), false, false, e.nombreOffres(), e.jaime(), false);
     }
 
     public void signal(Signal s) {

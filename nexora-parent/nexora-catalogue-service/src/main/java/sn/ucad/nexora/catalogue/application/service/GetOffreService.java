@@ -54,6 +54,10 @@ public class GetOffreService implements GetOffreUseCase {
         r.setStockable(o.isStockable());
         r.setQuantiteDisponible(o.getQuantiteDisponible());
         r.setVueCount(o.getVueCount());
+        r.setVuesDecouvrir(o.getVuesDecouvrir());
+        r.setNombreJaime(o.getNombreJaime());
+        r.setNombreFavoris(o.getNombreFavoris());
+        r.setPopulaire(o.isPopulaire());
         r.setStatut(o.getStatut());
         r.setDatePublication(o.getDatePublication());
 

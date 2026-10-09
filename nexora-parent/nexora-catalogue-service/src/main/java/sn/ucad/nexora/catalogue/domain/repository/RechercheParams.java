@@ -115,6 +115,10 @@ public class RechercheParams {
     public void setNeuf(Boolean neuf) { this.neuf = neuf; }
     public Boolean getNegociable() { return negociable; }
     public void setNegociable(Boolean negociable) { this.negociable = negociable; }
+    /** Uniquement les offres « 🔥 Populaire » (§23). */
+    private Boolean populaire;
+    public Boolean getPopulaire() { return populaire; }
+    public void setPopulaire(Boolean populaire) { this.populaire = populaire; }
     public Boolean getDomicile() { return domicile; }
     public void setDomicile(Boolean domicile) { this.domicile = domicile; }
     public java.util.List<Long> getValeurs() { return valeurs; }

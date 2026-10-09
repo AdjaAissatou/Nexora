@@ -57,6 +57,8 @@ public class RechercheBean implements Serializable {
     private boolean promo;
     private boolean negociable;
     private boolean domicile;
+    /** Uniquement les offres « 🔥 Populaire » (§23). */
+    private boolean populaire;
     /** Valeurs de caractéristiques cochées (taille M, couleur Noir…), par id de valeur. */
     private final Map<Long, Boolean> coches = new java.util.HashMap<>();
     private FacettesResponse facettes = FacettesResponse.vide();
@@ -74,7 +76,7 @@ public class RechercheBean implements Serializable {
     public record Tri(String code, String libelle) implements Serializable {}
     public static final List<Tri> TRIS = List.of(
             new Tri("PERTINENCE", "Pertinence"), new Tri("DISTANCE", "Plus proches"),
-            new Tri("PRIX_ASC", "Moins chers"), new Tri("POPULARITE", "Plus vendus"),
+            new Tri("PRIX_ASC", "Moins chers"), new Tri("POPULARITE", "Populaires"),
             new Tri("NOTE", "Mieux notés"), new Tri("DATE_DESC", "Nouveautés"),
             new Tri("REMISE", "Meilleures remises"), new Tri("PRIX_DESC", "Plus chers"));
 
@@ -167,6 +169,7 @@ public class RechercheBean implements Serializable {
         promo = false;
         negociable = false;
         domicile = false;
+        populaire = false;
         coches.clear();
         positionActive = false;
         maLat = null;
@@ -232,7 +235,7 @@ public class RechercheBean implements Serializable {
                 point == null ? null : point[0], point == null ? null : point[1], point == null ? null : rayonKm,
                 noteMin == null || noteMin.isBlank() ? null : new BigDecimal(noteMin),
                 "NEUF".equals(etat) ? Boolean.TRUE : "OCCASION".equals(etat) ? Boolean.FALSE : null,
-                negociable ? Boolean.TRUE : null, domicile ? Boolean.TRUE : null, valeurs);
+                negociable ? Boolean.TRUE : null, domicile ? Boolean.TRUE : null, valeurs, populaire ? Boolean.TRUE : null);
     }
 
     /** Valeurs cochées encore proposées par les facettes (une valeur absente ne trouverait rien). */
@@ -259,7 +262,7 @@ public class RechercheBean implements Serializable {
         for (Object f : new Object[] {idCategorie, vide(typeEspace), vide(commune), prixMin, prixMax, vide(noteMin), vide(etat), vide(nature)}) {
             if (f != null) n++;
         }
-        for (boolean b : new boolean[] {verifieUniquement, ouvertMaintenant, promo, negociable, domicile, positionActive}) {
+        for (boolean b : new boolean[] {verifieUniquement, ouvertMaintenant, promo, negociable, domicile, populaire, positionActive}) {
             if (b) n++;
         }
         return n + coches.size();
@@ -594,6 +597,8 @@ public class RechercheBean implements Serializable {
     public void setPromo(boolean promo) { this.promo = promo; }
     public boolean isNegociable() { return negociable; }
     public void setNegociable(boolean negociable) { this.negociable = negociable; }
+    public boolean isPopulaire() { return populaire; }
+    public void setPopulaire(boolean populaire) { this.populaire = populaire; }
     public boolean isDomicile() { return domicile; }
     public void setDomicile(boolean domicile) { this.domicile = domicile; }
     public BigDecimal getMaLat() { return maLat; }

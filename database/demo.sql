@@ -26,5 +26,6 @@ SET client_encoding = 'UTF8';
 \i 09_seed/25_demo_avis.sql
 \i 09_seed/26_demo_horaires.sql
 \i 09_seed/33_demo_reponses_avis.sql
+\i 09_seed/34_demo_popularite.sql
 \i 09_seed/29_demo_caracteristiques.sql
 \echo '== Démonstration installée'

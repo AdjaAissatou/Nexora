@@ -13,6 +13,7 @@
     <f:viewParam name="ouvert" value="#{rechercheBean.ouvertMaintenant}" />
     <!-- PRODUIT (Boutique) ou SERVICE : entrées « Boutique » et « Services » d'Explorer -->
     <f:viewParam name="nature" value="#{rechercheBean.nature}" />
+    <f:viewParam name="populaire" value="#{rechercheBean.populaire}" />
     <f:viewParam name="lieu" value="#{rechercheBean.lieu}">
         <f:converter converterId="jakarta.faces.Long" />
     </f:viewParam>
@@ -145,6 +146,7 @@
                     </div>
 
                     <div class="nx-field nx-cases">
+                        <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.populaire}" /> 🔥 Populaires</label>
                         <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.promo}" /> En promotion</label>
                         <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.negociable}" /> Prix négociable</label>
                         <label class="nx-field-check"><h:selectBooleanCheckbox value="#{rechercheBean.domicile}" /> Intervention à domicile</label>

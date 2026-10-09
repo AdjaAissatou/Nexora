@@ -225,4 +225,19 @@ public class Offre {
 
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+
+    // Popularité (§23) : vues dans Découvrir, j'aime, favoris, badge « Populaire »
+    private long vuesDecouvrir;
+    private int nombreJaime;
+    private int nombreFavoris;
+    private boolean populaire;
+
+    public long getVuesDecouvrir() { return vuesDecouvrir; }
+    public void setVuesDecouvrir(long v) { this.vuesDecouvrir = v; }
+    public int getNombreJaime() { return nombreJaime; }
+    public void setNombreJaime(int v) { this.nombreJaime = v; }
+    public int getNombreFavoris() { return nombreFavoris; }
+    public void setNombreFavoris(int v) { this.nombreFavoris = v; }
+    public boolean isPopulaire() { return populaire; }
+    public void setPopulaire(boolean v) { this.populaire = v; }
 }
