@@ -13,6 +13,8 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 public final class EnTetesClient {
 
     public static final String EN_TETE_IP_CLIENT = "X-Nexora-Client-IP";
+    /** User-Agent du navigateur (historique des connexions, journal). */
+    public static final String EN_TETE_AGENT_CLIENT = "X-Nexora-Client-Agent";
 
     private EnTetesClient() {}
 
@@ -22,6 +24,8 @@ public final class EnTetesClient {
             String relais = http.getHeader("X-Forwarded-For");
             String ip = relais == null || relais.isBlank() ? http.getRemoteAddr() : relais.split(",")[0].trim();
             requete.getHeaders().set(EN_TETE_IP_CLIENT, ip);
+            String agent = http.getHeader("User-Agent");
+            if (agent != null && !agent.isBlank()) requete.getHeaders().set(EN_TETE_AGENT_CLIENT, agent);
         }
         return execution.execute(requete, corps);
     };

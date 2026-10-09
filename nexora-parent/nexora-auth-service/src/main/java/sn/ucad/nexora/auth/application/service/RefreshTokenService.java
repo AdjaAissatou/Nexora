@@ -20,14 +20,18 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     private final JwtProviderPort jwtProvider;
     private final RevokedTokenRepository revokedTokenRepository;
 
+    private final sn.ucad.nexora.auth.infrastructure.persistance.securite.ConnexionsRepository connexions;
+
     public RefreshTokenService(
             AccountRepository accountRepository,
             JwtProviderPort jwtProvider,
-            RevokedTokenRepository revokedTokenRepository) {
+            RevokedTokenRepository revokedTokenRepository,
+            sn.ucad.nexora.auth.infrastructure.persistance.securite.ConnexionsRepository connexions) {
 
         this.accountRepository = accountRepository;
         this.jwtProvider = jwtProvider;
         this.revokedTokenRepository = revokedTokenRepository;
+        this.connexions = connexions;
     }
 
     @Override
@@ -78,6 +82,12 @@ public class RefreshTokenService implements RefreshTokenUseCase {
         UUID accountId =
                 UUID.fromString(subject);
 
+        // Session révoquée depuis « Sécurité du compte », ou fermée par un changement de mot de passe (§25)
+        String sid = claims.get("sid", String.class);
+        if (!connexions.sessionValide(sid)) {
+            throw new IllegalArgumentException("Session terminée : reconnectez-vous");
+        }
+
         // 5. Récupération du compte
         Account account =
                 accountRepository
@@ -105,7 +115,7 @@ public class RefreshTokenService implements RefreshTokenUseCase {
 
         // 7. Génération d'un nouveau access token
         String newAccessToken =
-                jwtProvider.generateAccessToken(account);
+                jwtProvider.generateAccessToken(account, sid);
 
         // 8. Préparation de la réponse
         AuthenticationResponse response =

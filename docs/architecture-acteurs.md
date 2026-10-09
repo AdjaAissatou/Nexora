@@ -97,7 +97,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Mes commandes | `/mon-compte/commandes` | 🚧 (tables `commande`/`sous_commande` existent) |
 | Mes avis laissés | `/mon-compte` (section « Mes avis ») | ✅ masqués compris (motif), réponse du pro, modifier (fiche espace) et supprimer (§22) |
 | Notifications | `/mon-compte/notifications` | 🚧 (table `notification` existe) |
-| Sécurité / paramètres du compte | `/mon-compte/securite` | 🚧 |
+| Sécurité / paramètres du compte | `/securite` | ✅ mot de passe, email de connexion, appareils connectés, historique (§25) |
 
 ### Professionnel (connecté, rôle `FOURNISSEUR`)
 
@@ -1652,4 +1652,25 @@ uniquement sur les offres des comptes `@nexora-demo.sn` ; rejouable.
 (pénalité de score). Un défilement rapide vidait le flux d'un petit catalogue, « Revoir depuis le début »
 compris. Seules les cartes déjà montrées pendant la séance sont exclues ; « Vous avez tout vu » ne s'affiche
 donc qu'après avoir vraiment tout parcouru.
+
+## 25. ✅ Sécurité du compte (`/securite`, lien depuis Mon compte)
+
+- **Mot de passe** : l'actuel est exigé ; 8 caractères au moins, différent de l'actuel, confirmé. Les **autres
+  appareils sont déconnectés**, celui-ci reste connecté. Notification « Votre mot de passe a été modifié ».
+- **Email de connexion** : nouvelle adresse + mot de passe → un **code** est envoyé à la nouvelle adresse
+  (valable 15 minutes, 5 essais) ; l'email ne change qu'à la saisie du code (compte et profil). Adresse déjà
+  prise refusée. Les autres appareils sont déconnectés ; notification.
+- **Appareils connectés** : chaque connexion ouvre une **session** (`connexion_compte`, identifiant « sid »
+  inscrit dans les jetons), avec l'appareil (« Chrome · Windows », « Safari · iPhone ») et l'adresse IP
+  relayés par le web (`X-Nexora-Client-IP`, `X-Nexora-Client-Agent`). « Déconnecter » un appareil ou « tous
+  les autres » : son rafraîchissement est refusé, il perd l'accès au plus tard 15 minutes après (durée du
+  jeton d'accès). La déconnexion ferme la session ; 30 jours sans activité, elle est considérée terminée.
+- **Historique et alerte** : sessions terminées (motif) et **tentatives échouées** (mauvais mot de passe sur
+  un compte existant) des 30 derniers jours, avec un bandeau d'alerte s'il y en a.
+- Journal (module SECURITE) : changement de mot de passe, d'email, déconnexion d'appareils. Le journal
+  enregistre désormais le navigateur réel de l'utilisateur, et non plus celui du serveur web.
+
+**API** (auth-service, connecté) : `GET /api/v1/compte/securite` ; `POST …/mot-de-passe`, `…/email`,
+`…/email/confirmer`, `…/sessions/{sid}/terminer`, `…/sessions/terminer-autres`.
+**Base** : `11_migrations/12_securite_comptes.sql` (`connexion_compte`, `changement_email`).
 

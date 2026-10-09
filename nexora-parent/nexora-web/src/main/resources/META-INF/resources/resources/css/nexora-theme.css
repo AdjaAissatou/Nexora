@@ -2018,3 +2018,24 @@ select.nx-liste-ouverte option { padding: 6px 10px; border-radius: 8px; }
 .nx-reaction-aime.actif { border-color: #F2B8C4; background: #FDECEF; color: #B0244A; }
 .nx-reaction-garde.actif { border-color: var(--nx-emerald); background: var(--nx-primary-light); }
 .nx-reaction-info { font-size: 14px; color: var(--nx-text-secondary); padding: 0 4px; }
+
+/* ---------- Sécurité du compte (§25) ---------- */
+.nx-fil { margin: 0 0 6px; font-size: 14px; }
+.nx-securite { padding: 20px 0 80px; }
+.nx-securite-alerte { margin-bottom: 18px; }
+.nx-securite-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.nx-securite-colonne { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.nx-securite h3 { margin-top: 0; }
+.nx-securite-actuel { margin: 0 0 12px; color: var(--nx-text-secondary); overflow-wrap: anywhere; }
+.nx-securite-code { font-size: 22px; letter-spacing: 6px; max-width: 220px; }
+.nx-sessions { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.nx-sessions li {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center;
+    padding: 10px 12px; border: 1px solid var(--nx-border); border-radius: var(--nx-radius-sm); background: #fff;
+}
+.nx-sessions li.actuelle { border-color: var(--nx-emerald); background: var(--nx-primary-light); }
+.nx-sessions li.echec { background: var(--nx-warning-soft); }
+.nx-sessions li small { grid-column: 1; color: var(--nx-text-secondary); font-size: 13px; }
+.nx-sessions li a { grid-column: 2; grid-row: 1 / span 2; }
+.nx-session-appareil { font-weight: 600; color: var(--nx-forest); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+@media (max-width: 860px) { .nx-securite-grille { grid-template-columns: 1fr; } }

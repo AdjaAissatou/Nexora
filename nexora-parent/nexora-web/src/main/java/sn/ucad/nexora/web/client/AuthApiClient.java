@@ -132,4 +132,62 @@ public class AuthApiClient {
             throw ApiErrors.reseau(e);
         }
     }
+
+    // ------------------------------------------------------------------ sécurité du compte (§25)
+
+    private static final String SECURITE = "/api/v1/compte/securite";
+
+    public sn.ucad.nexora.web.dto.auth.SecuriteDtos.Securite securite(String jeton) {
+        return appel(() -> client.get().uri(SECURITE).header("Authorization", "Bearer " + jeton)
+                .retrieve().body(sn.ucad.nexora.web.dto.auth.SecuriteDtos.Securite.class));
+    }
+
+    public sn.ucad.nexora.web.dto.auth.SecuriteDtos.Resultat changerMotDePasse(String jeton, String actuel, String nouveau, String confirmation) {
+        LOG.info("Requête POST {}{}/mot-de-passe", baseUrl, SECURITE);
+        java.util.Map<String, Object> corps = new java.util.HashMap<>();
+        corps.put("actuel", actuel);
+        corps.put("nouveau", nouveau);
+        corps.put("confirmation", confirmation);
+        return poster(jeton, SECURITE + "/mot-de-passe", corps);
+    }
+
+    public sn.ucad.nexora.web.dto.auth.SecuriteDtos.Resultat demanderChangementEmail(String jeton, String email, String motDePasse) {
+        LOG.info("Requête POST {}{}/email", baseUrl, SECURITE);
+        java.util.Map<String, Object> corps = new java.util.HashMap<>();
+        corps.put("nouvelEmail", email);
+        corps.put("motDePasse", motDePasse);
+        return poster(jeton, SECURITE + "/email", corps);
+    }
+
+    public sn.ucad.nexora.web.dto.auth.SecuriteDtos.Resultat confirmerChangementEmail(String jeton, String code) {
+        LOG.info("Requête POST {}{}/email/confirmer", baseUrl, SECURITE);
+        java.util.Map<String, Object> corps = new java.util.HashMap<>();
+        corps.put("code", code);
+        return poster(jeton, SECURITE + "/email/confirmer", corps);
+    }
+
+    public sn.ucad.nexora.web.dto.auth.SecuriteDtos.Resultat terminerSession(String jeton, String sid) {
+        return poster(jeton, SECURITE + "/sessions/" + sid + "/terminer", java.util.Map.of());
+    }
+
+    public sn.ucad.nexora.web.dto.auth.SecuriteDtos.Resultat terminerAutresSessions(String jeton) {
+        return poster(jeton, SECURITE + "/sessions/terminer-autres", java.util.Map.of());
+    }
+
+    private sn.ucad.nexora.web.dto.auth.SecuriteDtos.Resultat poster(String jeton, String chemin, Object corps) {
+        return appel(() -> client.post().uri(chemin).header("Authorization", "Bearer " + jeton).body(corps)
+                .retrieve().body(sn.ucad.nexora.web.dto.auth.SecuriteDtos.Resultat.class));
+    }
+
+    private static <T> T appel(java.util.function.Supplier<T> requete) {
+        try {
+            return requete.get();
+        } catch (RestClientResponseException e) {
+            throw ApiErrors.depuis(e);
+        } catch (sn.ucad.nexora.web.error.ApiException e) {
+            throw e;
+        } catch (Exception e) {
+            throw ApiErrors.reseau(e);
+        }
+    }
 }

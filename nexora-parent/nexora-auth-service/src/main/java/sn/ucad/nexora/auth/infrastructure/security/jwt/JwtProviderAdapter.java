@@ -40,11 +40,22 @@ public class JwtProviderAdapter implements JwtProviderPort {
 
     @Override
     public String generateAccessToken(Account account) {
+        return generateAccessToken(account, null);
+    }
+
+    @Override
+    public String generateRefreshToken(Account account) {
+        return generateRefreshToken(account, null);
+    }
+
+    @Override
+    public String generateAccessToken(Account account, String sid) {
 
         Instant now = Instant.now();
 
         return Jwts.builder()
                 .subject(account.getId().toString())
+                .claim("sid", sid)
                 .claim("email", account.getEmail())
                 .claim(
                         "roles",
@@ -69,12 +80,13 @@ public class JwtProviderAdapter implements JwtProviderPort {
     }
 
     @Override
-    public String generateRefreshToken(Account account) {
+    public String generateRefreshToken(Account account, String sid) {
 
         Instant now = Instant.now();
 
         return Jwts.builder()
                 .subject(account.getId().toString())
+                .claim("sid", sid)
                 .claim("type", "REFRESH")
                 .issuedAt(Date.from(now))
                 .expiration(

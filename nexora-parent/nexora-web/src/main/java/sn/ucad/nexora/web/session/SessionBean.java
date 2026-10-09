@@ -213,6 +213,13 @@ public class SessionBean implements Serializable {
         return compte;
     }
 
+    /** L'email de connexion vient de changer (Sécurité du compte, §25). */
+    public synchronized void majEmail(String email) {
+        if (compte == null || email == null) return;
+        compte = new AccountResponse(compte.id(), compte.firstName(), compte.lastName(), email, compte.phone(),
+                compte.roles(), compte.permissions());
+    }
+
     public String getPrenom() {
         return compte != null ? compte.firstName() : "";
     }

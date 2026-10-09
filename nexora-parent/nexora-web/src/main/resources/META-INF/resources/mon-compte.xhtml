@@ -19,6 +19,7 @@
                     <a href="#mes-favoris" class="nx-compte-stat"><strong>#{monCompteBean.favoris.size()}</strong> favori(s)</a>
                     <a href="#mes-avis" class="nx-compte-stat"><strong>#{monCompteBean.mesAvis.size()}</strong> avis</a>
                     <a href="#vus-recemment" class="nx-compte-stat"><strong>#{monCompteBean.historique.size()}</strong> vu(s) récemment</a>
+                    <h:link outcome="/securite" styleClass="nx-compte-stat">🔒 Sécurité du compte</h:link>
                     <ui:fragment rendered="#{monCompteBean.possedeEspace}">
                         <a href="#mes-espaces" class="nx-compte-stat"><strong>#{monCompteBean.mesEspaces.size()}</strong> espace(s)</a>
                     </ui:fragment>
@@ -52,7 +53,7 @@
                         </div>
                     </div>
                     <div class="nx-field">
-                        <label for="profilForm:email">Email <small class="nx-aide">(identifiant de connexion, non modifiable)</small></label>
+                        <label for="profilForm:email">Email <small class="nx-aide">(identifiant de connexion : <h:link outcome="/securite" value="le changer" />)</small></label>
                         <h:inputText id="email" value="#{sessionBean.compte.email}" styleClass="nx-input" disabled="true" />
                     </div>
                     <div class="nx-field">

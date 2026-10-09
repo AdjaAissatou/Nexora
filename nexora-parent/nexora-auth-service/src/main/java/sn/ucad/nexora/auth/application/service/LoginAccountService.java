@@ -10,6 +10,8 @@ import sn.ucad.nexora.auth.application.port.outbound.PasswordEncoderPort;
 import sn.ucad.nexora.auth.application.usecase.LoginUseCase;
 import sn.ucad.nexora.auth.domain.entity.Account;
 import sn.ucad.nexora.auth.domain.repository.AccountRepository;
+import sn.ucad.nexora.auth.infrastructure.persistance.securite.ConnexionsRepository;
+import sn.ucad.nexora.common.audit.ClientHttp;
 import sn.ucad.nexora.common.exception.BusinessException;
 
 @Service
@@ -18,15 +20,18 @@ public class LoginAccountService implements LoginUseCase {
     private final AccountRepository accountRepository;
     private final PasswordEncoderPort passwordEncoder;
     private final JwtProviderPort jwtProvider;
+    private final ConnexionsRepository connexions;
 
     public LoginAccountService(
             AccountRepository accountRepository,
             PasswordEncoderPort passwordEncoder,
-            JwtProviderPort jwtProvider) {
+            JwtProviderPort jwtProvider,
+            ConnexionsRepository connexions) {
 
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
+        this.connexions = connexions;
     }
 
     @Override
@@ -89,9 +94,13 @@ public class LoginAccountService implements LoginUseCase {
          * Vérification du mot de passe
          */
 
+        jakarta.servlet.http.HttpServletRequest requete = ClientHttp.requeteCourante();
         if (!passwordEncoder.matches(
                 request.getPassword(),
                 account.getPassword())) {
+
+            // Gardée pour l'alerte « tentatives échouées » de la page Sécurité (§25)
+            connexions.echec(account.getId(), ClientHttp.adresseIp(requete), ClientHttp.agent(requete));
 
             throw new BusinessException(
                     "Email/téléphone ou mot de passe incorrect."
@@ -102,11 +111,14 @@ public class LoginAccountService implements LoginUseCase {
          * Génération des tokens
          */
 
+        // Une session par connexion (§25) : son identifiant « sid » permet de la révoquer
+        String sid = connexions.ouvrirSession(account.getId(), ClientHttp.adresseIp(requete), ClientHttp.agent(requete));
+
         String accessToken =
-                jwtProvider.generateAccessToken(account);
+                jwtProvider.generateAccessToken(account, sid);
 
         String refreshToken =
-                jwtProvider.generateRefreshToken(account);
+                jwtProvider.generateRefreshToken(account, sid);
 
         /*
          * Construction de la réponse

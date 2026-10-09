@@ -1,0 +1,146 @@
+<ui:composition template="/WEB-INF/templates/layout.xhtml"
+                 xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                 xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+<!-- Sécurité du compte (docs/architecture-acteurs.md §25) -->
+<f:metadata>
+    <f:event type="preRenderView" listener="#{sessionBean.exigerConnexion}" />
+</f:metadata>
+<ui:define name="titre">Sécurité du compte — Nexora</ui:define>
+<ui:define name="content">
+
+    <section class="nx-page-header">
+        <div class="nx-container">
+            <p class="nx-fil"><h:link outcome="/mon-compte" value="← Mon compte" /></p>
+            <h1>🔒 Sécurité du compte</h1>
+            <p>Votre mot de passe, votre adresse de connexion et les appareils connectés à votre compte.</p>
+        </div>
+    </section>
+
+    <div class="nx-container nx-securite">
+        <ui:fragment rendered="#{not empty securiteBean.erreur}">
+            <div class="nx-alert nx-alert-error">#{securiteBean.erreur}</div>
+        </ui:fragment>
+
+        <ui:fragment rendered="#{securiteBean.securite != null}">
+        <ui:fragment rendered="#{not empty securiteBean.securite.tentativesEchouees}">
+            <div class="nx-alert nx-alert-warn nx-securite-alerte">
+                ⚠️ <strong>#{securiteBean.securite.tentativesEchouees.size()} tentative(s) de connexion avec un mauvais mot de passe</strong>
+                ces 30 derniers jours, la dernière le #{format.dateHeure(securiteBean.securite.tentativesEchouees[0].date())}
+                (#{securiteBean.securite.tentativesEchouees[0].appareil()}#{empty securiteBean.securite.tentativesEchouees[0].adresseIp() ? '' : ', '.concat(securiteBean.securite.tentativesEchouees[0].adresseIp())}).
+                Si ce n'était pas vous, changez votre mot de passe.
+            </div>
+        </ui:fragment>
+
+        <div class="nx-securite-grille">
+            <div class="nx-securite-colonne">
+                <!-- Mot de passe -->
+                <div class="nx-card">
+                    <h3>🔑 Mot de passe</h3>
+                    <h:form id="motDePasseForm">
+                        <h:messages for="motDePasseForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                        <div class="nx-field">
+                            <label for="motDePasseForm:actuel">Mot de passe actuel</label>
+                            <h:inputSecret id="actuel" value="#{securiteBean.actuel}" styleClass="nx-input" a:autocomplete="current-password" required="true" requiredMessage="Saisissez votre mot de passe actuel." />
+                        </div>
+                        <div class="nx-field">
+                            <label for="motDePasseForm:nouveau">Nouveau mot de passe <small class="nx-aide">(8 caractères au moins)</small></label>
+                            <h:inputSecret id="nouveau" value="#{securiteBean.nouveau}" styleClass="nx-input" a:autocomplete="new-password" a:minlength="8" required="true" requiredMessage="Saisissez le nouveau mot de passe." />
+                        </div>
+                        <div class="nx-field">
+                            <label for="motDePasseForm:confirmation">Confirmer le nouveau mot de passe</label>
+                            <h:inputSecret id="confirmation" value="#{securiteBean.confirmation}" styleClass="nx-input" a:autocomplete="new-password" required="true" requiredMessage="Confirmez le nouveau mot de passe." />
+                        </div>
+                        <p class="nx-aide">Vos autres appareils seront déconnectés ; celui-ci reste connecté.</p>
+                        <h:commandButton value="Changer le mot de passe" action="#{securiteBean.changerMotDePasse}" styleClass="nx-button nx-button-primary" />
+                    </h:form>
+                </div>
+
+                <!-- Email -->
+                <div class="nx-card">
+                    <h3>✉️ Adresse email de connexion</h3>
+                    <p class="nx-securite-actuel">Actuelle : <strong>#{securiteBean.securite.email}</strong></p>
+                    <h:form id="emailForm">
+                        <h:messages for="emailForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                        <ui:fragment rendered="#{empty securiteBean.securite.emailEnAttente}">
+                            <div class="nx-field">
+                                <label for="emailForm:nouvelEmail">Nouvelle adresse</label>
+                                <h:inputText id="nouvelEmail" value="#{securiteBean.nouvelEmail}" styleClass="nx-input" a:type="email" a:autocomplete="email" />
+                            </div>
+                            <div class="nx-field">
+                                <label for="emailForm:motDePasseEmail">Votre mot de passe <small class="nx-aide">(pour confirmer que c'est bien vous)</small></label>
+                                <h:inputSecret id="motDePasseEmail" value="#{securiteBean.motDePasseEmail}" styleClass="nx-input" a:autocomplete="current-password" />
+                            </div>
+                            <p class="nx-aide">Un code est envoyé à la nouvelle adresse ; l'email ne change qu'une fois ce code saisi.</p>
+                            <h:commandButton value="Recevoir un code" action="#{securiteBean.demanderEmail}" styleClass="nx-button nx-button-primary" />
+                        </ui:fragment>
+                        <ui:fragment rendered="#{not empty securiteBean.securite.emailEnAttente}">
+                            <p>Code envoyé à <strong>#{securiteBean.securite.emailEnAttente}</strong> (valable 15 minutes).</p>
+                            <div class="nx-field">
+                                <label for="emailForm:code">Code reçu</label>
+                                <h:inputText id="code" value="#{securiteBean.code}" styleClass="nx-input nx-securite-code" a:inputmode="numeric" a:autocomplete="one-time-code" maxlength="10" />
+                            </div>
+                            <h:commandButton value="Confirmer la nouvelle adresse" action="#{securiteBean.confirmerEmail}" styleClass="nx-button nx-button-primary" />
+                            <p class="nx-aide" style="margin-top:10px;">Pas reçu ? Vérifiez les indésirables, ou attendez 15 minutes pour demander un nouveau code.</p>
+                        </ui:fragment>
+                    </h:form>
+                </div>
+            </div>
+
+            <div class="nx-securite-colonne">
+                <!-- Appareils connectés -->
+                <div class="nx-card">
+                    <h:form id="appareilsForm">
+                        <div class="nx-section-header">
+                            <h3 style="margin:0;">💻 Appareils connectés <span class="nx-compte">#{securiteBean.securite.sessionsActives.size()}</span></h3>
+                        </div>
+                        <h:messages for="appareilsForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                        <ui:fragment rendered="#{empty securiteBean.securite.sessionsActives}">
+                            <p class="nx-aide">Aucune session suivie pour le moment : elles apparaissent à la prochaine connexion.</p>
+                        </ui:fragment>
+                        <ul class="nx-sessions">
+                            <ui:repeat var="c" value="#{securiteBean.securite.sessionsActives}">
+                                <li class="#{c.actuelle() ? 'actuelle' : ''}">
+                                    <span class="nx-session-appareil">#{c.appareil()}
+                                        <ui:fragment rendered="#{c.actuelle()}"><span class="nx-badge nx-badge-verifie">Cet appareil</span></ui:fragment></span>
+                                    <small>Connecté le #{format.dateHeure(c.debut())} · actif #{format.depuis(c.derniereActivite())}#{empty c.adresseIp() ? '' : ' · '.concat(c.adresseIp())}</small>
+                                    <ui:fragment rendered="#{!c.actuelle()}">
+                                        <h:commandLink value="Déconnecter" styleClass="nx-mon-avis-supprimer" action="#{securiteBean.terminer(c.idSession())}"
+                                                       onclick="return confirm('Déconnecter cet appareil ?');" />
+                                    </ui:fragment>
+                                </li>
+                            </ui:repeat>
+                        </ul>
+                        <ui:fragment rendered="#{securiteBean.securite.sessionsActives.size() gt 1}">
+                            <h:commandButton value="Déconnecter tous les autres appareils" action="#{securiteBean.terminerAutres}"
+                                             styleClass="nx-button nx-button-outline-dark" style="margin-top:12px;"
+                                             onclick="return confirm('Déconnecter tous les appareils sauf celui-ci ?');" />
+                        </ui:fragment>
+                        <p class="nx-aide" style="margin-top:10px;">Un appareil déconnecté perd l'accès au plus tard 15 minutes après.</p>
+                    </h:form>
+                </div>
+
+                <!-- Historique -->
+                <ui:fragment rendered="#{not empty securiteBean.securite.historique or not empty securiteBean.securite.tentativesEchouees}">
+                    <div class="nx-card">
+                        <h3>🕘 Historique des connexions</h3>
+                        <ul class="nx-sessions nx-sessions-passees">
+                            <ui:repeat var="c" value="#{securiteBean.securite.historique}">
+                                <li><span class="nx-session-appareil">#{c.appareil()}</span>
+                                    <small>#{format.dateHeure(c.debut())}#{empty c.adresseIp() ? '' : ' · '.concat(c.adresseIp())} · #{c.fin() == null ? 'inactive depuis 30 jours' : securiteBean.motif(c.motifFin())}</small></li>
+                            </ui:repeat>
+                            <ui:repeat var="t" value="#{securiteBean.securite.tentativesEchouees}">
+                                <li class="echec"><span class="nx-session-appareil">⚠️ Mot de passe erroné · #{t.appareil()}</span>
+                                    <small>#{format.dateHeure(t.date())}#{empty t.adresseIp() ? '' : ' · '.concat(t.adresseIp())}</small></li>
+                            </ui:repeat>
+                        </ul>
+                    </div>
+                </ui:fragment>
+            </div>
+        </div>
+        </ui:fragment>
+    </div>
+</ui:define>
+</ui:composition>

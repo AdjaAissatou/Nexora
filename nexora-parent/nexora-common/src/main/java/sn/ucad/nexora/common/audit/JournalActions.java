@@ -6,8 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * Journal des actions du back-office (table {@code journal_action}, docs/architecture-acteurs.md §9.3).
@@ -20,7 +18,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class JournalActions {
 
-    public static final String EN_TETE_IP_CLIENT = "X-Nexora-Client-IP";
+    public static final String EN_TETE_IP_CLIENT = ClientHttp.EN_TETE_IP_CLIENT;
 
     @PersistenceContext
     private EntityManager em;
@@ -41,27 +39,12 @@ public class JournalActions {
                 .setParameter("entite", entite)
                 .setParameter("idEntite", idEntite)
                 .setParameter("description", description)
-                .setParameter("ip", adresseIp(requete))
-                .setParameter("agent", requete == null ? null : tronquer(requete.getHeader("User-Agent"), 500))
+                .setParameter("ip", ClientHttp.adresseIp(requete))
+                .setParameter("agent", ClientHttp.agent(requete))
                 .executeUpdate();
     }
 
     private static HttpServletRequest requeteCourante() {
-        return RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributs
-                ? attributs.getRequest() : null;
-    }
-
-    private static String adresseIp(HttpServletRequest requete) {
-        if (requete == null) return null;
-        String ip = requete.getHeader(EN_TETE_IP_CLIENT);
-        if (ip == null || ip.isBlank()) {
-            String relais = requete.getHeader("X-Forwarded-For");
-            ip = relais == null || relais.isBlank() ? requete.getRemoteAddr() : relais.split(",")[0];
-        }
-        return tronquer(ip.trim(), 50);
-    }
-
-    private static String tronquer(String valeur, int max) {
-        return valeur == null || valeur.length() <= max ? valeur : valeur.substring(0, max);
+        return ClientHttp.requeteCourante();
     }
 }

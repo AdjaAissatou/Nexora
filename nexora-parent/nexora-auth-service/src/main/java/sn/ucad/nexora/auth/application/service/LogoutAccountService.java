@@ -12,13 +12,16 @@ public class LogoutAccountService implements LogoutUseCase {
 
     private final JwtProviderAdapter jwtProvider;
     private final RevokedTokenRepository revokedTokenRepository;
+    private final sn.ucad.nexora.auth.infrastructure.persistance.securite.ConnexionsRepository connexions;
 
     public LogoutAccountService(
             JwtProviderAdapter jwtProvider,
-            RevokedTokenRepository revokedTokenRepository) {
+            RevokedTokenRepository revokedTokenRepository,
+            sn.ucad.nexora.auth.infrastructure.persistance.securite.ConnexionsRepository connexions) {
 
         this.jwtProvider = jwtProvider;
         this.revokedTokenRepository = revokedTokenRepository;
+        this.connexions = connexions;
     }
 
     @Override
@@ -44,5 +47,7 @@ public class LogoutAccountService implements LogoutUseCase {
                 refreshToken,
                 claims.getExpiration()
         );
+        // La session apparaît terminée dans « Sécurité du compte » (§25)
+        connexions.terminer(java.util.UUID.fromString(claims.getSubject()), claims.get("sid", String.class), "DECONNEXION");
     }
 }
