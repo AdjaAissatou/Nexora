@@ -85,6 +85,14 @@
                         </h:link>
                         <button type="button" class="nx-espace-nav-item" data-tab="infos" onclick="nexoraAfficherOnglet('infos', this)">Gérer les informations de l'espace</button>
                         <button type="button" class="nx-espace-nav-item" data-tab="horaires" onclick="nexoraAfficherOnglet('horaires', this)">Horaires</button>
+                        <button type="button" class="nx-espace-nav-item" data-tab="avis" onclick="nexoraAfficherOnglet('avis', this)">
+                            Avis reçus
+                            <h:panelGroup id="badgeAvisRecus">
+                                <ui:fragment rendered="#{avisRecusBean.sansReponse gt 0}">
+                                    <span class="nx-badge nx-badge-attente" style="margin-left:6px;" title="Avis sans réponse">#{avisRecusBean.sansReponse}</span>
+                                </ui:fragment>
+                            </h:panelGroup>
+                        </button>
                         <button type="button" class="nx-espace-nav-item" data-tab="verification" onclick="nexoraAfficherOnglet('verification', this)">
                             Vérification
                             <ui:fragment rendered="#{not empty verificationEspaceBean.codeEtat}">
@@ -482,6 +490,107 @@
                 </div>
 
                 <!-- ===================== Onglet Vérification (docs/architecture-acteurs.md §8.8) ===================== -->
+                <!-- Avis reçus (docs/architecture-acteurs.md §22) : synthèse et réponses publiques -->
+                <div class="nx-tab-pane" id="tab-avis">
+                    <h:form id="avisRecusForm">
+                    <div class="nx-card">
+                        <h3 style="margin-top:0;">Avis reçus</h3>
+                        <h:messages for="avisRecusForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                        <ui:fragment rendered="#{not empty avisRecusBean.erreur}">
+                            <div class="nx-alert nx-alert-error">#{avisRecusBean.erreur}</div>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{avisRecusBean.recus != null}">
+                            <div class="nx-avis-synthese">
+                                <div class="nx-avis-moyenne">
+                                    <span class="nx-avis-moyenne-valeur"><h:outputText value="#{avisRecusBean.recus.moyenne}"><f:convertNumber minFractionDigits="1" maxFractionDigits="1" /></h:outputText></span>
+                                    <span class="nx-avis-etoiles">#{format.etoiles(avisRecusBean.recus.moyenne + 0.5)}</span>
+                                    <span class="nx-avis-moyenne-nombre">#{avisRecusBean.recus.nombre} avis</span>
+                                </div>
+                                <div class="nx-avis-barres">
+                                    <ui:repeat var="n" value="#{[5, 4, 3, 2, 1]}">
+                                        <div class="nx-avis-barre">
+                                            <span>#{n} ★</span>
+                                            <span class="nx-avis-barre-fond"><span style="width:#{avisRecusBean.pourcentage(n)}%;"></span></span>
+                                            <span>#{avisRecusBean.nombre(n)}</span>
+                                        </div>
+                                    </ui:repeat>
+                                </div>
+                            </div>
+                            <p class="nx-aide" style="margin-top:12px;">
+                                Votre réponse est publique : elle s'affiche sous l'avis, sur votre fiche, et son auteur est prévenu.
+                                Remerciez, apportez une précision ou proposez une solution ; restez courtois, même face à une critique.
+                                <ui:fragment rendered="#{avisRecusBean.recus.masques gt 0}">
+                                    #{avisRecusBean.recus.masques} avis masqué(s) par la modération ne sont ni listés ni comptés.
+                                </ui:fragment>
+                            </p>
+                        </ui:fragment>
+                    </div>
+
+                    <ui:fragment rendered="#{avisRecusBean.recus != null and avisRecusBean.recus.nombre == 0}">
+                        <div class="nx-card nx-card-empty" style="margin-top:16px;">
+                            <h3>Pas encore d'avis</h3>
+                            <p>Invitez vos clients à noter votre espace depuis sa fiche publique : les espaces bien notés remontent dans la recherche.</p>
+                        </div>
+                    </ui:fragment>
+
+                    <ui:fragment rendered="#{avisRecusBean.recus != null and avisRecusBean.recus.nombre gt 0}">
+                        <div class="nx-avis-filtres" role="group" aria-label="Filtrer les avis">
+                            <button type="button" class="nx-pastille active" data-filtre="">Tous (#{avisRecusBean.recus.nombre})</button>
+                            <button type="button" class="nx-pastille" data-filtre="sans-reponse">Sans réponse (#{avisRecusBean.sansReponse})</button>
+                            <button type="button" class="nx-pastille" data-filtre="critique">Critiques (1-2 ★)</button>
+                        </div>
+                        <h:panelGroup id="avisRecusListe" layout="block" styleClass="nx-avis-recus">
+                            <ui:repeat var="a" value="#{avisRecusBean.recus.avis}">
+                                <article class="nx-avis nx-avis-recu" data-repondu="#{a.avecReponse()}" data-note="#{a.note}">
+                                    <div class="nx-avis-tete">
+                                        <span class="nx-avis-etoiles" aria-label="#{a.note} sur 5">#{format.etoiles(a.note)}</span>
+                                        <strong>#{a.auteur}</strong>
+                                        <span class="nx-avis-date">#{format.date(a.dateCreation)}#{a.dateModification == null ? '' : ' · modifié le '.concat(format.date(a.dateModification))}</span>
+                                        <ui:fragment rendered="#{!a.avecReponse()}"><span class="nx-badge nx-badge-attente">Sans réponse</span></ui:fragment>
+                                    </div>
+                                    <ui:fragment rendered="#{a.offreId != null}">
+                                        <p class="nx-avis-sur">Sur : <h:link outcome="/offre" value="#{a.offreTitre}"><f:param name="id" value="#{a.offreId}" /></h:link></p>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{not empty a.commentaire}"><p>#{a.commentaire}</p></ui:fragment>
+                                    <ui:fragment rendered="#{empty a.commentaire}"><p class="nx-avis-sans-texte">Note sans commentaire.</p></ui:fragment>
+
+                                    <ui:fragment rendered="#{a.avecReponse() and !avisRecusBean.formulaireVisible(a)}">
+                                        <div class="nx-avis-reponse">
+                                            <span class="nx-avis-reponse-tete">↳ Votre réponse <span class="nx-avis-date">#{format.date(a.dateReponse)}</span></span>
+                                            <p>#{a.reponse}</p>
+                                        </div>
+                                        <div class="nx-avis-reponse-actions">
+                                            <h:commandLink value="Modifier ma réponse" styleClass="nx-see-all">
+                                                <f:ajax listener="#{avisRecusBean.modifierReponse(a)}" render="@form" />
+                                            </h:commandLink>
+                                            <h:commandLink value="Retirer" styleClass="nx-mon-avis-supprimer" onclick="return confirm('Retirer votre réponse à cet avis ?');">
+                                                <f:ajax listener="#{avisRecusBean.retirerReponse(a.id)}" render="@form :badgeAvisRecus" />
+                                            </h:commandLink>
+                                        </div>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{avisRecusBean.formulaireVisible(a)}">
+                                        <div class="nx-avis-repondre">
+                                            <h:inputTextarea value="#{avisRecusBean.brouillons[a.id]}" styleClass="nx-input" rows="2"
+                                                             a:placeholder="Répondre publiquement à #{a.auteur}…" a:maxlength="#{site.avisLongueurMax}" />
+                                            <div class="nx-avis-reponse-actions">
+                                                <h:commandButton value="#{a.avecReponse() ? 'Enregistrer' : 'Publier la réponse'}" styleClass="nx-button nx-button-primary">
+                                                    <f:ajax execute="@form" listener="#{avisRecusBean.repondre(a.id)}" render="@form :badgeAvisRecus" />
+                                                </h:commandButton>
+                                                <ui:fragment rendered="#{a.avecReponse()}">
+                                                    <h:commandLink value="Annuler" styleClass="nx-see-all">
+                                                        <f:ajax listener="#{avisRecusBean.annuler(a.id)}" render="@form" />
+                                                    </h:commandLink>
+                                                </ui:fragment>
+                                            </div>
+                                        </div>
+                                    </ui:fragment>
+                                </article>
+                            </ui:repeat>
+                        </h:panelGroup>
+                    </ui:fragment>
+                    </h:form>
+                </div>
+
                 <div class="nx-tab-pane" id="tab-verification">
                     <h:form id="verificationForm">
                     <h:panelGroup id="verificationBloc" layout="block">

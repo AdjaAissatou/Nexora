@@ -17,6 +17,7 @@
                 <p>#{sessionBean.compte.email}#{empty monCompteBean.membreDepuis ? '' : ' · membre depuis '.concat(monCompteBean.membreDepuis)}</p>
                 <div class="nx-compte-stats">
                     <a href="#mes-favoris" class="nx-compte-stat"><strong>#{monCompteBean.favoris.size()}</strong> favori(s)</a>
+                    <a href="#mes-avis" class="nx-compte-stat"><strong>#{monCompteBean.mesAvis.size()}</strong> avis</a>
                     <a href="#vus-recemment" class="nx-compte-stat"><strong>#{monCompteBean.historique.size()}</strong> vu(s) récemment</a>
                     <ui:fragment rendered="#{monCompteBean.possedeEspace}">
                         <a href="#mes-espaces" class="nx-compte-stat"><strong>#{monCompteBean.mesEspaces.size()}</strong> espace(s)</a>
@@ -186,6 +187,64 @@
                         });
                     })();
                 </script>
+            </ui:fragment>
+        </div>
+
+        <!-- Mes avis (docs/architecture-acteurs.md §22) : masqués compris, avec la réponse du professionnel -->
+        <div class="nx-card" id="mes-avis" style="margin-top:20px;">
+            <div class="nx-section-header">
+                <h3 style="margin:0;">⭐ Mes avis <span class="nx-compte">#{monCompteBean.mesAvis.size()}</span></h3>
+            </div>
+            <ui:fragment rendered="#{empty monCompteBean.mesAvis}">
+                <div class="nx-favoris-vide">
+                    <span aria-hidden="true">☆</span>
+                    <p><strong>Vous n'avez pas encore donné d'avis.</strong><br />Après une visite ou un achat, notez l'espace depuis sa fiche : votre avis aide les autres clients.</p>
+                </div>
+            </ui:fragment>
+            <ui:fragment rendered="#{not empty monCompteBean.mesAvis}">
+                <h:form id="mesAvisForm">
+                    <h:messages globalOnly="true" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                    <div class="nx-mes-avis">
+                        <ui:repeat var="a" value="#{monCompteBean.mesAvis}">
+                            <article class="nx-mon-avis-item #{a.masque ? 'masque' : ''}">
+                                <a class="nx-mon-avis-media" href="#{request.contextPath}#{a.lien()}">
+                                    <ui:fragment rendered="#{!empty a.image}"><img src="#{a.image}" alt="" loading="lazy"
+                                        onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'nx-favori-sans-photo', textContent: '🏪'}))" /></ui:fragment>
+                                    <ui:fragment rendered="#{empty a.image}"><span class="nx-favori-sans-photo">🏪</span></ui:fragment>
+                                </a>
+                                <div class="nx-mon-avis-corps">
+                                    <div class="nx-mon-avis-titre">
+                                        <a href="#{request.contextPath}#{a.lien()}">#{a.offreId != null ? a.offreTitre : a.espaceNom}</a>
+                                        <ui:fragment rendered="#{a.offreId != null}"><small> chez #{a.espaceNom}</small></ui:fragment>
+                                    </div>
+                                    <div class="nx-avis-tete">
+                                        <span class="nx-avis-etoiles" aria-label="#{a.note} sur 5">#{format.etoiles(a.note)}</span>
+                                        <span class="nx-avis-date">#{format.date(a.dateCreation)}#{a.dateModification == null ? '' : ' · modifié le '.concat(format.date(a.dateModification))}</span>
+                                        <ui:fragment rendered="#{a.masque}"><span class="nx-badge nx-badge-alerte">Masqué</span></ui:fragment>
+                                        <ui:fragment rendered="#{!a.masque and a.avecReponse()}"><span class="nx-badge nx-badge-verifie">Le pro a répondu</span></ui:fragment>
+                                    </div>
+                                    <ui:fragment rendered="#{not empty a.commentaire}"><p class="nx-mon-avis-texte">#{a.commentaire}</p></ui:fragment>
+                                    <ui:fragment rendered="#{a.masque}">
+                                        <p class="nx-mon-avis-masque">Masqué par la modération de Nexora : #{empty a.motifModeration ? 'motif non précisé' : a.motifModeration}. Il n'est plus visible et ne compte plus dans la note.</p>
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{a.avecReponse()}">
+                                        <div class="nx-avis-reponse">
+                                            <span class="nx-avis-reponse-tete">↳ Réponse de <strong>#{a.espaceNom}</strong> <span class="nx-avis-date">#{format.date(a.dateReponse)}</span></span>
+                                            <p>#{a.reponse}</p>
+                                        </div>
+                                    </ui:fragment>
+                                    <div class="nx-mon-avis-actions">
+                                        <ui:fragment rendered="#{!a.masque and a.cibleVisible and a.offreId == null}">
+                                            <a href="#{request.contextPath}/espace.xhtml?id=#{a.espaceId}#avis" class="nx-see-all">Modifier</a>
+                                        </ui:fragment>
+                                        <h:commandLink value="Supprimer" action="#{monCompteBean.supprimerAvis(a.id)}" styleClass="nx-mon-avis-supprimer"
+                                                       onclick="return confirm('Supprimer définitivement cet avis ?');" />
+                                    </div>
+                                </div>
+                            </article>
+                        </ui:repeat>
+                    </div>
+                </h:form>
             </ui:fragment>
         </div>
 

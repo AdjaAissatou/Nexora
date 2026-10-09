@@ -56,6 +56,48 @@ public class AvisApiClient {
                 .retrieve().body(AvisResponse.class));
     }
 
+    // ------------------------------------------------------------------ §22 : modifier, mes avis, avis reçus, réponse
+
+    public AvisResponse modifier(String accessToken, Long avisId, int note, String commentaire) {
+        LOG.info("Requête PUT {}/api/v1/avis/{}", baseUrl, avisId);
+        java.util.Map<String, Object> corps = new java.util.HashMap<>();
+        corps.put("note", note);
+        corps.put("commentaire", commentaire);
+        return appel(() -> client.put().uri("/api/v1/avis/{id}", avisId).header("Authorization", "Bearer " + accessToken)
+                .body(corps).retrieve().body(AvisResponse.class));
+    }
+
+    public void supprimer(String accessToken, Long avisId) {
+        LOG.info("Requête DELETE {}/api/v1/avis/{}", baseUrl, avisId);
+        appel(() -> client.delete().uri("/api/v1/avis/{id}", avisId).header("Authorization", "Bearer " + accessToken)
+                .retrieve().toBodilessEntity());
+    }
+
+    public List<sn.ucad.nexora.web.dto.recherche.AvisDtos.MonAvisDetail> mesAvis(String accessToken) {
+        return appel(() -> client.get().uri("/api/v1/avis/mes-avis").header("Authorization", "Bearer " + accessToken)
+                .retrieve().body(new org.springframework.core.ParameterizedTypeReference<List<sn.ucad.nexora.web.dto.recherche.AvisDtos.MonAvisDetail>>() {}));
+    }
+
+    public sn.ucad.nexora.web.dto.recherche.AvisDtos.AvisRecus recus(String accessToken, Long espaceId) {
+        return appel(() -> client.get().uri(u -> u.path("/api/v1/avis/recus").queryParam("espaceId", espaceId).build())
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve().body(sn.ucad.nexora.web.dto.recherche.AvisDtos.AvisRecus.class));
+    }
+
+    public void repondre(String accessToken, Long avisId, String texte) {
+        LOG.info("Requête PUT {}/api/v1/avis/{}/reponse", baseUrl, avisId);
+        java.util.Map<String, Object> corps = new java.util.HashMap<>();
+        corps.put("texte", texte);
+        appel(() -> client.put().uri("/api/v1/avis/{id}/reponse", avisId).header("Authorization", "Bearer " + accessToken)
+                .body(corps).retrieve().toBodilessEntity());
+    }
+
+    public void retirerReponse(String accessToken, Long avisId) {
+        LOG.info("Requête DELETE {}/api/v1/avis/{}/reponse", baseUrl, avisId);
+        appel(() -> client.delete().uri("/api/v1/avis/{id}/reponse", avisId).header("Authorization", "Bearer " + accessToken)
+                .retrieve().toBodilessEntity());
+    }
+
     /** Motifs de signalement proposés : code → libellé. */
     public java.util.Map<String, String> motifsSignalement() {
         return appel(() -> client.get().uri("/api/v1/signalements/motifs").retrieve()

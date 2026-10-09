@@ -14,4 +14,6 @@ public record AvisResponse(
         LocalDateTime dateCreation,
         LocalDateTime dateReponse,
         /** Prénom et initiale du nom (« Aïssatou D. »). */
-        String auteur) {}
+        String auteur,
+        /** Dernière modification par son auteur ; null s'il n'a jamais été modifié. */
+        LocalDateTime dateModification) implements java.io.Serializable {}

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import sn.ucad.nexora.recherche.application.dto.response.AvisDtos;
 import sn.ucad.nexora.recherche.application.dto.response.AvisResponse;
 import sn.ucad.nexora.recherche.application.dto.response.moderation.ModerationRechercheDtos.AvisModere;
 
@@ -44,7 +45,7 @@ public class AvisModerationRepository {
         List<Object[]> r = em.createNativeQuery("""
                 SELECT a.id_avis, a.id_utilisateur, a.id_offre, a.id_espace, a.note, a.commentaire,
                        a.reponse_fournisseur, a.date_creation, a.date_reponse,
-                       TRIM(COALESCE(u.prenom, '') || ' ' || COALESCE(LEFT(u.nom, 1) || '.', ''))
+                       TRIM(COALESCE(u.prenom, '') || ' ' || COALESCE(LEFT(u.nom, 1) || '.', '')), a.date_modification
                 FROM avis a JOIN utilisateurs u ON u.id_utilisateur = a.id_utilisateur
                 WHERE NOT a.masque AND\s""" + condition + " ORDER BY a.date_creation DESC, a.id_avis DESC")
                 .setParameter("id", id).getResultList();
@@ -60,6 +61,7 @@ public class AvisModerationRepository {
             a.setDateCreation(date(l[7]));
             a.setDateReponse(date(l[8]));
             a.setAuteur((String) l[9]);
+            a.setDateModification(date(l[10]));
             return a;
         }).toList();
     }
@@ -80,6 +82,88 @@ public class AvisModerationRepository {
     public boolean aDejaNoteEspace(Long utilisateurId, Long espaceId) {
         return ((Number) em.createNativeQuery("SELECT COUNT(*) FROM avis WHERE id_utilisateur = :u AND id_espace = :e")
                 .setParameter("u", utilisateurId).setParameter("e", espaceId).getSingleResult()).longValue() > 0;
+    }
+
+    // ------------------------------------------------------------------ mes avis, avis reçus (§22)
+
+    /** Tous les avis d'un utilisateur, masqués compris, les plus récents d'abord. */
+    @SuppressWarnings("unchecked")
+    public List<AvisDtos.MonAvisDetail> mesAvis(Long utilisateurId) {
+        List<Object[]> r = em.createNativeQuery("""
+                SELECT a.id_avis, a.note, a.commentaire, a.date_creation, a.date_modification, a.masque, a.motif_moderation,
+                       a.reponse_fournisseur, a.date_reponse, e.id_espace, e.nom, o.id_offre, o.titre,
+                       COALESCE((SELECT i.url FROM image i WHERE i.id_offre = o.id_offre ORDER BY i.principale DESC, i.ordre_affichage LIMIT 1),
+                                NULLIF(e.couverture, ''), NULLIF(e.logo, ''),
+                                (SELECT i.url FROM image i JOIN offre o2 ON o2.id_offre = i.id_offre
+                                 WHERE o2.id_espace = e.id_espace ORDER BY i.principale DESC, i.id_image LIMIT 1)),
+                       CAST(e.statut AS TEXT) = 'ACTIF' AND (o.id_offre IS NULL OR CAST(o.statut AS TEXT) = 'PUBLIE')
+                FROM avis a
+                LEFT JOIN offre o ON o.id_offre = a.id_offre
+                LEFT JOIN espace_professionnel e ON e.id_espace = COALESCE(a.id_espace, o.id_espace)
+                WHERE a.id_utilisateur = :u
+                ORDER BY COALESCE(a.date_modification, a.date_creation) DESC, a.id_avis DESC
+                """).setParameter("u", utilisateurId).getResultList();
+        return r.stream().map(l -> new AvisDtos.MonAvisDetail(((Number) l[0]).longValue(), ((Number) l[1]).intValue(),
+                (String) l[2], date(l[3]), date(l[4]), Boolean.TRUE.equals(l[5]), (String) l[6], (String) l[7], date(l[8]),
+                l[9] == null ? null : ((Number) l[9]).longValue(), (String) l[10],
+                l[11] == null ? null : ((Number) l[11]).longValue(), (String) l[12], (String) l[13],
+                Boolean.TRUE.equals(l[14]))).toList();
+    }
+
+    /** Avis visibles d'un espace (sur lui et sur ses offres), les plus récents d'abord, et nombre d'avis masqués. */
+    @SuppressWarnings("unchecked")
+    public List<AvisDtos.AvisRecu> avisRecus(Long espaceId) {
+        List<Object[]> r = em.createNativeQuery("""
+                SELECT a.id_avis, a.note, a.commentaire,
+                       TRIM(COALESCE(u.prenom, '') || ' ' || COALESCE(LEFT(u.nom, 1) || '.', '')),
+                       a.date_creation, a.date_modification, o.id_offre, o.titre, a.reponse_fournisseur, a.date_reponse
+                FROM avis a
+                JOIN utilisateurs u ON u.id_utilisateur = a.id_utilisateur
+                LEFT JOIN offre o ON o.id_offre = a.id_offre
+                WHERE NOT a.masque AND (a.id_espace = :e OR o.id_espace = :e)
+                ORDER BY a.date_creation DESC, a.id_avis DESC
+                """).setParameter("e", espaceId).getResultList();
+        return r.stream().map(l -> new AvisDtos.AvisRecu(((Number) l[0]).longValue(), ((Number) l[1]).intValue(),
+                (String) l[2], (String) l[3], date(l[4]), date(l[5]), l[6] == null ? null : ((Number) l[6]).longValue(),
+                (String) l[7], (String) l[8], date(l[9]))).toList();
+    }
+
+    public int avisMasques(Long espaceId) {
+        return ((Number) em.createNativeQuery("""
+                SELECT COUNT(*) FROM avis a LEFT JOIN offre o ON o.id_offre = a.id_offre
+                WHERE a.masque AND (a.id_espace = :e OR o.id_espace = :e)""")
+                .setParameter("e", espaceId).getSingleResult()).intValue();
+    }
+
+    /** L'avis (auteur, masqué, réponse actuelle) et l'espace concerné, pour les règles de modification et de réponse. */
+    public record EtatAvis(Long auteurId, boolean masque, String reponse, Long espaceId, String espaceNom,
+                           Long proprietaireId, Long offreId) {}
+
+    @SuppressWarnings("unchecked")
+    public Optional<EtatAvis> etat(Long avisId) {
+        List<Object[]> r = em.createNativeQuery("""
+                SELECT a.id_utilisateur, a.masque, a.reponse_fournisseur, e.id_espace, e.nom, e.id_utilisateur, a.id_offre
+                FROM avis a
+                LEFT JOIN offre o ON o.id_offre = a.id_offre
+                JOIN espace_professionnel e ON e.id_espace = COALESCE(a.id_espace, o.id_espace)
+                WHERE a.id_avis = :id
+                """).setParameter("id", avisId).getResultList();
+        return r.stream().findFirst().map(l -> new EtatAvis(((Number) l[0]).longValue(), Boolean.TRUE.equals(l[1]),
+                (String) l[2], ((Number) l[3]).longValue(), (String) l[4], ((Number) l[5]).longValue(),
+                l[6] == null ? null : ((Number) l[6]).longValue()));
+    }
+
+    public void modifier(Long avisId, int note, String commentaire) {
+        em.createNativeQuery("UPDATE avis SET note = :n, commentaire = :c, date_modification = NOW() WHERE id_avis = :id")
+                .setParameter("n", note).setParameter("c", commentaire).setParameter("id", avisId).executeUpdate();
+    }
+
+    /** {@code texte} null : la réponse est retirée. */
+    public void definirReponse(Long avisId, String texte) {
+        em.createNativeQuery("""
+                UPDATE avis SET reponse_fournisseur = CAST(:t AS TEXT),
+                       date_reponse = CASE WHEN CAST(:t AS TEXT) IS NULL THEN NULL ELSE NOW() END
+                WHERE id_avis = :id""").setParameter("t", texte).setParameter("id", avisId).executeUpdate();
     }
 
     // ------------------------------------------------------------------ cibles

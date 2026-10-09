@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sn.ucad.nexora.recherche.application.dto.request.PublierAvisRequest;
+import sn.ucad.nexora.recherche.application.dto.response.AvisDtos;
 import sn.ucad.nexora.recherche.application.dto.response.AvisResponse;
 import sn.ucad.nexora.recherche.application.dto.response.MessageResponse;
 import sn.ucad.nexora.recherche.application.usecase.AvisUseCase;
@@ -95,5 +96,40 @@ public class AvisController {
         Long utilisateurId = PrincipalHelper.resolveUtilisateurId(auth, lookupRepository);
         avisUseCase.supprimer(utilisateurId, id);
         return ResponseEntity.ok(new MessageResponse("Avis supprimé"));
+    }
+
+    // ------------------------------------------------------------------ §22
+
+    @PutMapping("/{id:\\d+}")
+    @Operation(summary = "Modifier son avis", description = "Nouvelle note et nouveau commentaire ; impossible sur un avis masqué.")
+    public ResponseEntity<AvisResponse> modifier(Authentication auth, @PathVariable Long id,
+                                                 @Valid @RequestBody AvisDtos.ModifierAvisRequest request) {
+        return ResponseEntity.ok(avisUseCase.modifier(PrincipalHelper.resolveUtilisateurId(auth, lookupRepository), id, request));
+    }
+
+    @GetMapping("/mes-avis")
+    @Operation(summary = "Mes avis", description = "Tous les avis du compte connecté, masqués compris, avec la réponse du professionnel.")
+    public ResponseEntity<List<AvisDtos.MonAvisDetail>> mesAvis(Authentication auth) {
+        return ResponseEntity.ok(avisUseCase.mesAvis(PrincipalHelper.resolveUtilisateurId(auth, lookupRepository)));
+    }
+
+    @GetMapping("/recus")
+    @Operation(summary = "Avis reçus", description = "Avis visibles d'un de mes espaces (sur lui et ses offres) et leur synthèse.")
+    public ResponseEntity<AvisDtos.AvisRecus> recus(Authentication auth, @RequestParam Long espaceId) {
+        return ResponseEntity.ok(avisUseCase.avisRecus(PrincipalHelper.resolveUtilisateurId(auth, lookupRepository), espaceId));
+    }
+
+    @PutMapping("/{id:\\d+}/reponse")
+    @Operation(summary = "Répondre à un avis", description = "Réponse publique du propriétaire de l'espace (ou modification de sa réponse).")
+    public ResponseEntity<AvisDtos.AvisRecu> repondre(Authentication auth, @PathVariable Long id,
+                                                      @RequestBody AvisDtos.ReponseRequest request) {
+        return ResponseEntity.ok(avisUseCase.repondre(PrincipalHelper.resolveUtilisateurId(auth, lookupRepository), id,
+                request == null ? null : request.texte()));
+    }
+
+    @DeleteMapping("/{id:\\d+}/reponse")
+    @Operation(summary = "Retirer sa réponse")
+    public ResponseEntity<AvisDtos.AvisRecu> retirerReponse(Authentication auth, @PathVariable Long id) {
+        return ResponseEntity.ok(avisUseCase.retirerReponse(PrincipalHelper.resolveUtilisateurId(auth, lookupRepository), id));
     }
 }

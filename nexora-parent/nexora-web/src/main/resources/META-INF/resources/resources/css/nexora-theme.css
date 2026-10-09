@@ -1394,6 +1394,8 @@ textarea.nx-input { min-height: 100px; resize: vertical; font-family: inherit; }
     .nx-pres-carte { min-height: 360px; }
     .nx-search-layout { grid-template-columns: 1fr; }
     .nx-detail-layout { grid-template-columns: 1fr; }
+    /* Mon espace / Mon compte : le menu passe au-dessus du contenu au lieu de l'écraser */
+    .nx-espace-layout { grid-template-columns: minmax(0, 1fr); }
     .nx-auth-split { grid-template-columns: 1fr; }
     .nx-auth-visuel { min-height: 300px; }
     .nx-footer-main { grid-template-columns: 1fr; gap: 30px; }
@@ -1923,3 +1925,61 @@ select.nx-liste-ouverte option { padding: 6px 10px; border-radius: 8px; }
 .nx-proposition-resultats { list-style: none; margin: 10px 0 0; padding: 0; font-size: 14px; }
 .nx-proposition-resultats li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--nx-border); }
 @media (max-width: 960px) { .nx-proposition-actions { grid-template-columns: 1fr; } }
+
+/* ---------- Avis : réponse du pro, mon avis, mes avis (§22) ---------- */
+.nx-avis-reponse {
+    margin: 10px 0 0 14px; padding: 10px 14px; border-left: 3px solid var(--nx-emerald);
+    background: var(--nx-primary-light); border-radius: 0 12px 12px 0;
+}
+.nx-avis-reponse-tete { font-size: 13px; color: var(--nx-text-secondary); }
+.nx-avis-reponse-tete strong { color: var(--nx-forest); }
+.nx-avis-reponse p { margin: 4px 0 0; color: var(--nx-text); line-height: 1.55; }
+.nx-avis-proprietaire { margin-top: 12px; font-size: 14px; color: var(--nx-text-secondary); }
+.nx-mon-avis .nx-button { margin-top: 0; }
+.nx-mon-avis-ligne { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.nx-mon-avis-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.nx-mes-avis { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+.nx-mon-avis-item {
+    display: grid; grid-template-columns: 84px 1fr; gap: 14px; padding: 12px;
+    border: 1px solid var(--nx-border); border-radius: var(--nx-radius-md); background: #fff;
+}
+.nx-mon-avis-item.masque { background: var(--nx-error-soft); border-color: rgba(179, 38, 30, .2); }
+.nx-mon-avis-media {
+    position: relative; display: block; width: 84px; height: 84px; border-radius: var(--nx-radius-sm);
+    overflow: hidden; background: var(--nx-sand);
+}
+.nx-mon-avis-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.nx-mon-avis-media .nx-favori-sans-photo { position: absolute; inset: 0; display: grid; place-items: center; font-size: 30px; }
+.nx-mon-avis-corps { min-width: 0; }
+.nx-mon-avis-titre a { font-weight: 700; color: var(--nx-forest); text-decoration: none; }
+.nx-mon-avis-titre small { color: var(--nx-text-secondary); }
+.nx-mon-avis-texte { margin: 6px 0 0; color: var(--nx-text-secondary); line-height: 1.55; }
+.nx-mon-avis-masque { margin: 6px 0 0; font-size: 13px; color: var(--nx-error); }
+.nx-mon-avis-actions { margin-top: 8px; align-items: center; }
+.nx-mon-avis-supprimer { font-size: 13px; color: var(--nx-text-light); }
+.nx-mon-avis-supprimer:hover { color: var(--nx-error); }
+@media (max-width: 560px) {
+    .nx-mon-avis-item { grid-template-columns: 60px 1fr; }
+    .nx-mon-avis-media { width: 60px; height: 60px; }
+}
+
+/* ---------- Mon espace : avis reçus (§22) ---------- */
+.nx-avis-synthese { display: grid; grid-template-columns: 160px 1fr; gap: 24px; align-items: center; }
+.nx-avis-moyenne { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.nx-avis-moyenne-valeur { font-family: var(--nx-font-display); font-size: 44px; font-weight: 700; color: var(--nx-forest); line-height: 1; }
+.nx-avis-moyenne .nx-avis-etoiles { font-size: 18px; }
+.nx-avis-moyenne-nombre { font-size: 13px; color: var(--nx-text-secondary); }
+.nx-avis-barres { display: flex; flex-direction: column; gap: 6px; }
+.nx-avis-barre { display: grid; grid-template-columns: 36px 1fr 28px; gap: 10px; align-items: center; font-size: 13px; color: var(--nx-text-secondary); }
+.nx-avis-barre-fond { height: 8px; border-radius: 999px; background: var(--nx-sand); overflow: hidden; }
+.nx-avis-barre-fond span { display: block; height: 100%; border-radius: 999px; background: var(--nx-grad-gold); }
+.nx-avis-filtres { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 10px; }
+.nx-avis-recus { display: flex; flex-direction: column; gap: 10px; }
+.nx-avis-recu { background: #fff; }
+.nx-avis-sur { font-size: 13px; }
+.nx-avis-sans-texte { font-style: italic; }
+.nx-avis-repondre { margin-top: 10px; }
+.nx-avis-reponse-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 8px; }
+.nx-avis-reponse-actions .nx-button { padding: 8px 16px; font-size: 14px; }
+@media (max-width: 560px) { .nx-avis-synthese { grid-template-columns: 1fr; } }
+.nx-avis-repondre textarea { min-height: 64px; }

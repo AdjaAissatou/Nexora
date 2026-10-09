@@ -21,6 +21,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     var nom = ongletAvecErreur;
+    // Lien direct vers un onglet (ex. notification « Nouvel avis » → mon-espace.xhtml?id=…#avis).
+    if (!nom && location.hash && document.getElementById('tab-' + location.hash.substring(1))) {
+        nom = location.hash.substring(1);
+    }
     if (!nom) {
         try { nom = sessionStorage.getItem('nexora-onglet-espace'); } catch (e) { /* ignoré */ }
     }
@@ -53,3 +57,17 @@ function nexoraConfirmerModificationVerifiee(espaceVerifie) {
     return !modifie || confirm('Vous modifiez une information vérifiée (nom, téléphone, adresse, NINEA ou RCCM).\n'
         + 'Votre espace perdra le badge « Vérifié » ; vous pourrez redemander la vérification.\n\nContinuer ?');
 }
+
+/* Avis reçus (§22) : filtres Tous / Sans réponse / Critiques, par délégation pour survivre aux
+ * rendus ajax de la liste. */
+document.addEventListener('click', function (e) {
+    var bouton = e.target.closest('.nx-avis-filtres button');
+    if (!bouton) return;
+    var filtre = bouton.getAttribute('data-filtre');
+    bouton.parentNode.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b === bouton); });
+    document.querySelectorAll('.nx-avis-recu').forEach(function (a) {
+        var note = parseInt(a.getAttribute('data-note'), 10);
+        a.hidden = (filtre === 'sans-reponse' && a.getAttribute('data-repondu') === 'true')
+            || (filtre === 'critique' && note > 2);
+    });
+});

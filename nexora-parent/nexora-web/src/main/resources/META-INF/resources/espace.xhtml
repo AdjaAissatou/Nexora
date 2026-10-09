@@ -155,7 +155,8 @@
                             <div class="nx-avis-tete">
                                 <span class="nx-avis-etoiles" aria-label="#{a.note} sur 5">#{format.etoiles(a.note)}</span>
                                 <strong>#{a.auteur}</strong>
-                                <span class="nx-avis-date">#{format.date(a.dateCreation)}</span>
+                                <ui:fragment rendered="#{espaceDetailBean.estMonAvis(a)}"><span class="nx-badge nx-badge-neutre">Votre avis</span></ui:fragment>
+                                <span class="nx-avis-date">#{format.date(a.dateCreation)}#{a.dateModification == null ? '' : ' · modifié le '.concat(format.date(a.dateModification))}</span>
                                 <ui:fragment rendered="#{!espaceDetailBean.estMonAvis(a)}">
                                     <h:link outcome="/signaler" value="Signaler" styleClass="nx-avis-signaler">
                                         <f:param name="avis" value="#{a.id}" />
@@ -163,6 +164,14 @@
                                 </ui:fragment>
                             </div>
                             <ui:fragment rendered="#{not empty a.commentaire}"><p>#{a.commentaire}</p></ui:fragment>
+                            <!-- Réponse publique du professionnel (§22) -->
+                            <ui:fragment rendered="#{not empty a.reponseFournisseur}">
+                                <div class="nx-avis-reponse">
+                                    <span class="nx-avis-reponse-tete">↳ Réponse de <strong>#{espaceDetailBean.espace.nom}</strong>
+                                        <span class="nx-avis-date">#{format.date(a.dateReponse)}</span></span>
+                                    <p>#{a.reponseFournisseur}</p>
+                                </div>
+                            </ui:fragment>
                         </div>
                     </ui:repeat>
                 </div>
@@ -185,8 +194,46 @@
                                          styleClass="nx-button nx-button-primary" />
                     </h:form>
                 </ui:fragment>
+                <ui:fragment rendered="#{espaceDetailBean.proprietaire}">
+                    <p class="nx-avis-proprietaire">C'est votre espace :
+                        <h:link outcome="/mon-espace" fragment="avis" value="répondez à vos avis depuis Mon espace →">
+                            <f:param name="id" value="#{espaceDetailBean.espace.id}" /></h:link></p>
+                </ui:fragment>
                 <ui:fragment rendered="#{espaceDetailBean.dejaNote}">
                     <h:messages for="avisForm" errorClass="nx-alert nx-alert-error" infoClass="nx-alert nx-alert-info" layout="table" />
+                    <!-- Modifier ou supprimer mon avis (§22), sauf s'il a été masqué par la modération -->
+                    <ui:fragment rendered="#{!espaceDetailBean.monAvis.masque()}">
+                        <h:form id="monAvisForm" styleClass="nx-avis-form nx-mon-avis">
+                            <ui:fragment rendered="#{!espaceDetailBean.modificationAvis}">
+                                <div class="nx-mon-avis-ligne">
+                                    <span>Votre avis : <span class="nx-avis-etoiles">#{format.etoiles(espaceDetailBean.monAvis.note())}</span></span>
+                                    <span class="nx-mon-avis-actions">
+                                        <h:commandButton value="Modifier mon avis" styleClass="nx-button nx-button-outline-dark">
+                                            <f:ajax listener="#{espaceDetailBean.commencerModificationAvis}" render="@form" />
+                                        </h:commandButton>
+                                        <h:commandButton value="Supprimer" action="#{espaceDetailBean.supprimerMonAvis}" styleClass="nx-button nx-button-outline"
+                                                         onclick="return confirm('Supprimer définitivement votre avis sur cet espace ?');" />
+                                    </span>
+                                </div>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{espaceDetailBean.modificationAvis}">
+                                <h4>Modifier votre avis</h4>
+                                <h:selectOneRadio id="noteModifiee" value="#{espaceDetailBean.noteModifiee}" styleClass="nx-avis-choix" layout="lineDirection">
+                                    <f:selectItem itemValue="5" itemLabel="★★★★★ Excellent" />
+                                    <f:selectItem itemValue="4" itemLabel="★★★★ Très bien" />
+                                    <f:selectItem itemValue="3" itemLabel="★★★ Correct" />
+                                    <f:selectItem itemValue="2" itemLabel="★★ Décevant" />
+                                    <f:selectItem itemValue="1" itemLabel="★ À éviter" />
+                                </h:selectOneRadio>
+                                <h:inputTextarea id="commentaireModifie" value="#{espaceDetailBean.commentaireModifie}" styleClass="nx-input" rows="3"
+                                                 a:placeholder="Racontez votre expérience (facultatif)" a:maxlength="#{site.avisLongueurMax}" />
+                                <h:commandButton value="Enregistrer" action="#{espaceDetailBean.enregistrerModificationAvis}" styleClass="nx-button nx-button-primary" />
+                                <h:commandButton value="Annuler" styleClass="nx-button nx-button-outline" style="margin-left:8px;">
+                                    <f:ajax listener="#{espaceDetailBean.annulerModificationAvis}" render="@form" />
+                                </h:commandButton>
+                            </ui:fragment>
+                        </h:form>
+                    </ui:fragment>
                     <ui:fragment rendered="#{espaceDetailBean.monAvis.masque()}">
                         <div class="nx-alert nx-alert-warn" style="margin-top:14px;">
                             Votre avis sur cet espace a été masqué par la modération de Nexora :

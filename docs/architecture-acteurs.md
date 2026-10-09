@@ -95,7 +95,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Mes demandes / messages | `/mon-compte/messages` | 🚧 (tables `conversation`/`message` existent, service `nexora-communication-service` non branché au web) |
 | Mes réservations | `/mon-compte/reservations` | 🚧 (table `reservation` existe) |
 | Mes commandes | `/mon-compte/commandes` | 🚧 (tables `commande`/`sous_commande` existent) |
-| Mes avis laissés | `/mon-compte/avis` | 🚧 (`AvisApiClient` déjà utilisé en lecture côté fiche espace, jamais en écriture) |
+| Mes avis laissés | `/mon-compte` (section « Mes avis ») | ✅ masqués compris (motif), réponse du pro, modifier (fiche espace) et supprimer (§22) |
 | Notifications | `/mon-compte/notifications` | 🚧 (table `notification` existe) |
 | Sécurité / paramètres du compte | `/mon-compte/securite` | 🚧 |
 
@@ -111,7 +111,7 @@ Légende : ✅ existe déjà · 🚧 à construire · — non prioritaire pour l
 | Demandes reçues | — | 🚧 (dépend de la messagerie, non branchée) |
 | Réservations reçues | — | 🚧 |
 | Commandes reçues | — | 🚧 |
-| Avis reçus + réponse | — | 🚧 (lecture publique déjà ok sur `/espace`, pas de vue dédiée côté pro, pas de réponse) |
+| Avis reçus + réponse | `/mon-espace` onglet « Avis reçus » (`#avis`) | ✅ synthèse des notes, filtres, réponse publique modifiable (§22) |
 | Statistiques détaillées (au-delà de la Vue d'ensemble) | — | 🚧 |
 | Vérification de mon espace (dossier, justificatifs, suivi) | `/mon-espace` (onglet « Vérification ») | ✅ (§8.11) |
 | Certification 🏅 | — | — (après la vérification, critères à définir, §8.3) |
@@ -1562,4 +1562,42 @@ rayon actuel. Trois décisions, chacune écrite dans le journal (module CATALOGU
 - **Ranger dans une catégorie existante** (recherche dans le catalogue) : chaque offre prend le type de
   sa nature (« Autre » de préférence) ;
 - **Écarter** (motif) : les offres restent dans leur rayon, le texte est effacé.
+
+## 22. ✅ Avis : mes avis, avis reçus et réponse du professionnel
+
+**Client**
+- **Fiche espace** : son avis porte le badge « Votre avis » ; « Modifier mon avis » (note et commentaire,
+  « modifié le … » affiché) et « Supprimer ». Un avis masqué par la modération ne se modifie plus
+  (on ne contourne pas la modération) ; il reste supprimable.
+- **Mon compte › Mes avis** (`#mes-avis`, pastille dans l'en-tête) : tous ses avis, masqués compris
+  avec le motif, la photo et le lien de l'espace (ou de l'offre), la réponse du professionnel
+  (badge « Le pro a répondu »), « Modifier » (vers la fiche) et « Supprimer ».
+
+**Professionnel** (`mon-espace.xhtml?id=…#avis`, onglet « Avis reçus », badge = avis sans réponse)
+- Synthèse : moyenne, nombre d'avis, répartition 5 → 1 étoiles ; avis masqués signalés mais non comptés.
+- Filtres Tous / Sans réponse / Critiques (1-2 ★) ; avis sur l'espace et sur ses offres (« Sur : … »).
+- **Réponse publique** sous chaque avis : publier, modifier, retirer. Elle s'affiche sous l'avis sur la
+  fiche espace (« ↳ Réponse de … ») et dans « Mes avis » de son auteur. Pas de réponse à un avis masqué.
+- Sur sa propre fiche, le professionnel voit « répondez à vos avis depuis Mon espace → ».
+
+**Notifications** (table `notification`, en attendant la page Notifications) : le professionnel est
+prévenu de chaque nouvel avis (lien vers `#avis` de Mon espace) ; l'auteur est prévenu de la première
+réponse (pas des retouches).
+
+**API** (recherche-service, connecté)
+
+| Route | Règle |
+|---|---|
+| `PUT /api/v1/avis/{id}` `{note, commentaire}` | son avis, non masqué ; note recalculée |
+| `GET /api/v1/avis/mes-avis` | ses avis, masqués compris |
+| `GET /api/v1/avis/recus?espaceId=` | propriétaire de l'espace : synthèse et avis visibles |
+| `PUT /api/v1/avis/{id}/reponse` `{texte}`, `DELETE …/reponse` | propriétaire de l'espace, avis non masqué, `AVIS_LONGUEUR_MAX` |
+
+**Base** : `11_migrations/10_avis_modification.sql` (colonne `avis.date_modification` ; la réponse
+utilise `reponse_fournisseur` / `date_reponse`, présentes depuis l'origine). Démonstration :
+`09_seed/33_demo_reponses_avis.sql`, six réponses (surtout aux critiques) ; les avis de Boutique Sarah
+Mode restent sans réponse pour essayer l'onglet.
+
+**Correctif** : sur téléphone, Mon espace passe en une colonne (le menu au-dessus du contenu) au lieu
+d'écraser le contenu à côté du menu.
 

@@ -49,6 +49,12 @@ public class MonCompteBean implements Serializable {
     private transient RechercheApiClient rechercheApiClient;
 
     @Inject
+    private transient sn.ucad.nexora.web.client.AvisApiClient avisApiClient;
+
+    /** Mes avis, masqués compris, avec la réponse du professionnel (§22). */
+    private List<sn.ucad.nexora.web.dto.recherche.AvisDtos.MonAvisDetail> mesAvis = List.of();
+
+    @Inject
     private SessionBean session;
 
     @Inject
@@ -92,6 +98,31 @@ public class MonCompteBean implements Serializable {
         }
         chargerFavoris();
         chargerHistorique();
+        chargerMesAvis();
+    }
+
+    private void chargerMesAvis() {
+        try {
+            mesAvis = avisApiClient.mesAvis(session.getAccessToken());
+        } catch (ApiException e) {
+            mesAvis = List.of();
+        }
+    }
+
+    public void supprimerAvis(Long avisId) {
+        try {
+            avisApiClient.supprimer(session.getAccessToken(), avisId);
+            chargerMesAvis();
+            FacesContext.getCurrentInstance().addMessage(null,
+                    sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_INFO, "Votre avis est supprimé.", null));
+        } catch (ApiException e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    sn.ucad.nexora.web.util.Messages.complet(FacesMessage.SEVERITY_ERROR, "Suppression impossible", e.getMessage()));
+        }
+    }
+
+    public List<sn.ucad.nexora.web.dto.recherche.AvisDtos.MonAvisDetail> getMesAvis() {
+        return mesAvis;
     }
 
     private void chargerFavoris() {

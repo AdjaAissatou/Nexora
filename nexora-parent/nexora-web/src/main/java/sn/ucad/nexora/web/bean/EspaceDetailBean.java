@@ -134,6 +134,63 @@ public class EspaceDetailBean implements Serializable {
         }
     }
 
+    // ------------------------------------------------------------------ modifier / supprimer mon avis (§22)
+
+    private boolean modificationAvis;
+    private Integer noteModifiee;
+    private String commentaireModifie;
+
+    public void commencerModificationAvis() {
+        if (monAvis == null || monAvis.masque()) return;
+        modificationAvis = true;
+        noteModifiee = monAvis.note();
+        commentaireModifie = monAvis.commentaire();
+    }
+
+    public void annulerModificationAvis() {
+        modificationAvis = false;
+    }
+
+    public void enregistrerModificationAvis() {
+        if (monAvis == null) return;
+        if (noteModifiee == null || noteModifiee < 1 || noteModifiee > 5) {
+            message(jakarta.faces.application.FacesMessage.SEVERITY_ERROR, "Choisissez une note de 1 à 5 étoiles.");
+            return;
+        }
+        try {
+            avisApiClient.modifier(session.getAccessToken(), monAvis.id(), noteModifiee, commentaireModifie);
+            rechargerAvis();
+            modificationAvis = false;
+            message(jakarta.faces.application.FacesMessage.SEVERITY_INFO, "Votre avis est modifié.");
+        } catch (ApiException e) {
+            message(jakarta.faces.application.FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
+    }
+
+    public void supprimerMonAvis() {
+        if (monAvis == null) return;
+        try {
+            avisApiClient.supprimer(session.getAccessToken(), monAvis.id());
+            rechargerAvis();
+            modificationAvis = false;
+            message(jakarta.faces.application.FacesMessage.SEVERITY_INFO, "Votre avis est supprimé.");
+        } catch (ApiException e) {
+            message(jakarta.faces.application.FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
+    }
+
+    private void rechargerAvis() {
+        avis = avisApiClient.parEspace(id);
+        espace = espaceApiClient.obtenir(id);
+        chargerMonAvis();
+    }
+
+    public boolean isModificationAvis() { return modificationAvis; }
+    public Integer getNoteModifiee() { return noteModifiee; }
+    public void setNoteModifiee(Integer v) { noteModifiee = v; }
+    public String getCommentaireModifie() { return commentaireModifie; }
+    public void setCommentaireModifie(String v) { commentaireModifie = v; }
+
     private static void message(jakarta.faces.application.FacesMessage.Severity gravite, String texte) {
         jakarta.faces.context.FacesContext.getCurrentInstance()
                 .addMessage("avisForm", new jakarta.faces.application.FacesMessage(gravite, texte, null));

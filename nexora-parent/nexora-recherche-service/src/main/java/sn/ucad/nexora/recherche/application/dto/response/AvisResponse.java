@@ -12,6 +12,8 @@ public class AvisResponse {
     private String reponseFournisseur;
     private LocalDateTime dateCreation;
     private LocalDateTime dateReponse;
+    /** Dernière modification par son auteur ; null s'il n'a jamais été modifié. */
+    private LocalDateTime dateModification;
     /** Prénom et initiale du nom de l'auteur (« Aïssatou D. »). */
     private String auteur;
 
@@ -35,4 +37,6 @@ public class AvisResponse {
     public void setDateReponse(LocalDateTime dateReponse) { this.dateReponse = dateReponse; }
     public String getAuteur() { return auteur; }
     public void setAuteur(String auteur) { this.auteur = auteur; }
+    public LocalDateTime getDateModification() { return dateModification; }
+    public void setDateModification(LocalDateTime dateModification) { this.dateModification = dateModification; }
 }
